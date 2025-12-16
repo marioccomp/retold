@@ -1,0 +1,48 @@
+.header {
+  display: flex;
+  font-family: var(--font-questrial), sans-serif;
+  background-color: #f3f4f4;
+  height: 72px;
+  color: black;
+  align-items: center;
+  font-size: 22px;
+}
+
+.logo {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+}
+
+.logo img {
+  height: 100%;
+  width: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.headerBtn {
+  display: flex;
+  gap: 76px;
+}
+
+.logoWithBtn {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 52px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+  padding-right: 49px;
+}
+
+.profile img {
+  height: 60px;
+  border-radius: 2rem;
+}
