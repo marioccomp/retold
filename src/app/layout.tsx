@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Retold",
-  description: "Reimagine your stories.", // Você pode ajustar essa descrição conforme o objetivo do app
+  description: "Reimagine your stories.", // ajustar dps
 };
 
 export default function RootLayout({
@@ -30,8 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <Header />
-        <ProjectCard />
-
+        {/* <ProjectCard /> */}
         <main className="flex-grow">{children}</main>
       </body>
     </html>
