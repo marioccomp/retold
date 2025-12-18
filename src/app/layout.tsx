@@ -31,6 +31,7 @@ export default function RootLayout({
       >
         <Header />
         {/* <ProjectCard /> */}
+
         <main className="flex-grow">{children}</main>
       </body>
     </html>
