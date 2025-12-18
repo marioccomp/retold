@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Retold",
-  description: "Reimagine your stories.", // Você pode ajustar essa descrição conforme o objetivo do app
+  description: "Reimagine your stories.", // ajustar dps
 };
 
 export default function RootLayout({

@@ -1,0 +1,187 @@
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  margin-top: 235px;
+}
+
+.logo {
+  margin-bottom: 83px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.form input[type="email"],
+.form input[type="password"],
+.form input[type="text"],
+.form button {
+  border: 1px solid #d9d9d9;
+  text-align: center;
+  width: 367px;
+  height: 34px;
+  border-radius: 5px;
+  font-size: 20px;
+}
+
+.passwordInput {
+  position: relative;
+  width: 367px;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #9a9a9a;
+  font-size: 20px;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.form input::placeholder {
+  color: #000;
+  opacity: 0.8;
+}
+
+.form input[type="email"]:focus,
+.form input[type="password"]:focus {
+  border: 1px solid #05dc7f;
+  outline: none;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #9a9a9a;
+  margin-bottom: 41px;
+}
+
+.options span:last-child,
+.createAccount span {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.options span:last-child:hover,
+.createAccount span:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.check input {
+  margin: 0;
+  position: relative;
+  top: 1px;
+}
+
+.check input[type="checkbox"] {
+  accent-color: #05dc7f;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.forgotPassword {
+  color: #05dc7f;
+  font-weight: 600;
+}
+
+.form button {
+  border: none;
+  background-color: #05dc7f;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  font-weight: 500;
+}
+
+.form button:hover {
+  background-color: #04c370;
+}
+
+.form button:active {
+  transform: scale(0.98);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 30px 0;
+  color: #9a9a9a;
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #d9d9d9;
+}
+
+.divider span {
+  padding: 0 10px;
+}
+
+.accounts {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.account {
+  border: 1px solid #d9d9d9;
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c3e50;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.account:hover {
+  border-color: #05dc7f;
+  color: #05dc7f;
+  background-color: #f0fff7;
+  transform: translateY(-2px);
+}
+
+.createAccount {
+  color: #9a9a9a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 34px;
+  gap: 5px;
+  font-size: 15px;
+}
+
+.createAccount span {
+  color: #05dc7f;
+  font-weight: 600;
+}
