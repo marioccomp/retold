@@ -1,6 +1,5 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDotenv": [".env"],
   "tasks": {
     "db:generate": {
       "cache": false
