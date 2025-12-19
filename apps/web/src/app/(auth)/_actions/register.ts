@@ -1,9 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@repo/database";
-import bcrypt from "bcryptjs";
-import { error } from "console";
+import { registerUser } from "@/src/services/auth/register.service";
 
 const registerSchema = z
   .object({
@@ -28,12 +26,9 @@ const registerSchema = z
   });
 
 export async function register(prevState: any, formData: FormData) {
-  console.log("DEBUG DATABASE_URL:", process.env.DATABASE_URL);
   const data = Object.fromEntries(formData.entries());
 
   const validatedFields = registerSchema.safeParse(data);
-
-  console.log(validatedFields);
 
   if (!validatedFields.success) {
     return {
@@ -42,49 +37,17 @@ export async function register(prevState: any, formData: FormData) {
     };
   }
 
-  const { name, email, password, username } = validatedFields.data;
+  const { name, email, username, password } = validatedFields.data;
 
   try {
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: email.toLowerCase().trim() }, { username: username.toLowerCase().trim() }],
-      },
-    });
-
-    if (existingUser) {
-      const inputEmail = email.toLowerCase().trim();
-      const inputUsername = username.toLowerCase().trim();
-      const dbEmail = existingUser.email.toLowerCase().trim();
-      const dbUsername = existingUser.username.toLowerCase().trim();
-
-      if (dbEmail === inputEmail) {
-        return { error: "E-mail already in use" };
-      }
-
-      if (dbUsername === inputUsername) {
-        console.log("ta entrando nessa porra aqui?");
-        return { error: "Username already in use" };
-      }
-
-      return { error: "User already exists with these credentials" };
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await prisma.user.create({
-      data: {
-        name,
-        email: email.toLowerCase().trim(),
-        username: username.toLowerCase().trim(),
-        password: hashedPassword,
-      },
-    });
-
+    await registerUser({ name, email, username, password });
     return {
       success: "User created successfully",
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return { error: "An internal error ocurred. Try again" };
+    return {
+      error: error.message,
+    };
   }
 }
