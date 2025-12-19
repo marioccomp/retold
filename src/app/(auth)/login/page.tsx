@@ -6,6 +6,7 @@ import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -20,7 +21,7 @@ export default function Login() {
         <img src={retoldImg.src} alt="Retold Logo" />
       </div>
 
-      <div>
+      <div className={styles.formDiv}>
         <form action="" className={styles.form}>
           <input type="email" required placeholder="Email" />
           <div className={styles.passwordInput}>
@@ -51,7 +52,10 @@ export default function Login() {
             <FaGoogle className={styles.account} />
           </div>
           <p className={styles.createAccount}>
-            Não tem uma conta? <span>Cadastre-se</span>
+            Não tem uma conta?
+            <Link href="/register" className={styles.link}>
+              Crie uma conta
+            </Link>
           </p>
         </div>
       </div>
