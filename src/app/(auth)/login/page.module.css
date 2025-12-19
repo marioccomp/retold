@@ -2,37 +2,74 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  margin-top: 235px;
+  justify-content: center;
+  min-height: calc(100vh - 72px);
+  width: 100%;
+  padding: 24px;
+  background-color: #fff;
 }
 
 .logo {
   margin-bottom: 83px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.logo img {
+  max-width: 100%;
+  height: auto;
 }
 
 .form {
   display: flex;
   flex-direction: column;
   gap: 13px;
+  width: 100%;
+  max-width: 367px;
+  align-items: center;
+}
+
+.formDiv {
+  width: 100%;
+  max-width: 367px;
 }
 
 .form input[type="email"],
 .form input[type="password"],
 .form input[type="text"],
 .form button {
+  width: 100%;
+  max-width: 367px;
   border: 1px solid #d9d9d9;
   text-align: center;
-  width: 367px;
   height: 34px;
   border-radius: 5px;
   font-size: 20px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form input[type="password"] {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+input[type="password"]::placeholder {
+  font-size: 20px;
+  letter-spacing: normal;
 }
 
 .passwordInput {
   position: relative;
-  width: 367px;
+  width: 100%;
+  max-width: 367px;
   display: flex;
   align-items: center;
+}
+
+.passwordInput input {
+  width: 100%;
 }
 
 .icon {
@@ -64,6 +101,9 @@
   align-items: center;
   color: #9a9a9a;
   margin-bottom: 41px;
+  width: 100%;
+  max-width: 367px;
+  font-size: 14px;
 }
 
 .options span:last-child,
@@ -125,6 +165,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  max-width: 367px;
   margin: 30px 0;
   color: #9a9a9a;
   font-size: 14px;
@@ -184,4 +225,17 @@
 .createAccount span {
   color: #05dc7f;
   font-weight: 600;
+}
+
+.link {
+  color: #05dc7f;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }

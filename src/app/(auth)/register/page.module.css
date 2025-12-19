@@ -2,12 +2,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: calc(100vh - 72px);
-  background-color: #fff;
-  padding: 20px;
-  overflow-x: hidden;
   width: 100%;
+  padding-top: 17vh;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 24px;
+  /* padding: 24px; */
+  background-color: #fff;
 }
 
 .contentWrapper {
@@ -19,14 +22,14 @@
 }
 
 .logoSection {
-  margin-bottom: 40px;
+  margin-bottom: 83px;
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .logoImage {
-  width: 100%;
-  max-width: 300px;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
 }
@@ -35,21 +38,22 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 10px;
+  gap: 13px;
   align-items: center;
 }
 
 .input {
   width: 100%;
   max-width: 367px;
-  padding: 0 12px;
   height: 34px;
   border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 14px;
-  outline: none;
+  border-radius: 5px;
+  font-size: 20px;
   text-align: center;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  padding: 0 12px;
   transition: border-color 0.2s;
 }
 
@@ -62,29 +66,65 @@
   border-color: #05dc7f;
 }
 
+.passwordInput {
+  position: relative;
+  width: 100%;
+  max-width: 367px;
+  display: flex;
+  align-items: center;
+}
+
+.form input[type="password"] {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.form input[type="password"]::placeholder {
+  font-size: 20px;
+  letter-spacing: normal;
+}
+
+.icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #9a9a9a;
+  font-size: 20px;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
 .button {
   width: 100%;
   max-width: 367px;
-  height: 40px;
-  margin-top: 12px;
+  height: 34px;
   background-color: #05dc7f;
-  color: #152e2b;
+  color: #000;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
+  border-radius: 5px;
+  font-size: 20px;
   font-weight: 500;
   cursor: pointer;
-  transition: filter 0.2s;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  margin-top: 0;
 }
 
 .button:hover {
-  filter: brightness(0.95);
+  background-color: #04c370;
+}
+
+.button:active {
+  transform: scale(0.98);
 }
 
 .footerText {
-  margin-top: 32px;
-  font-size: 14px;
-  color: #a0aec0;
+  margin-top: 34px;
+  font-size: 15px;
+  color: #9a9a9a;
 }
 
 .link {
@@ -92,4 +132,10 @@
   text-decoration: none;
   font-weight: 600;
   margin-left: 5px;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }

@@ -3,7 +3,8 @@ import { Questrial } from "next/font/google";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useState } from "react";
-import logo from "@/assets/logo-large.png";
+import logo from "@/assets/retold-login.png";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const questrial = Questrial({
   subsets: ["latin"],
@@ -15,6 +16,8 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,23 +40,37 @@ export default function Register() {
             required
           />
 
-          <input
-            type="password"
-            placeholder="Senha"
-            className={styles.input}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className={styles.passwordInput}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Senha"
+              className={styles.input}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {showPassword ? (
+              <FaEyeSlash className={styles.icon} onClick={() => setShowPassword(false)} />
+            ) : (
+              <FaEye className={styles.icon} onClick={() => setShowPassword(true)} />
+            )}
+          </div>
 
-          <input
-            type="password"
-            placeholder="Confirmar senha"
-            className={styles.input}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+          <div className={styles.passwordInput}>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirmar senha"
+              className={styles.input}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            {showConfirmPassword ? (
+              <FaEyeSlash className={styles.icon} onClick={() => setShowConfirmPassword(false)} />
+            ) : (
+              <FaEye className={styles.icon} onClick={() => setShowConfirmPassword(true)} />
+            )}
+          </div>
 
           <button type="submit" className={styles.button}>
             Criar conta
