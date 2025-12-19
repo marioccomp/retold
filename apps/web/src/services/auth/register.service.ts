@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { userRepository } from "@repo/database/repositories/user.repository";
+import { userRepository } from "@repo/database";
 
 export async function registerUser(data: {
   name: string;
