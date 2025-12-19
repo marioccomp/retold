@@ -1,0 +1,4 @@
+[00:00:01.048] Server  LOG      ✓ Ready in 714ms
+[00:00:06.168] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:09.540] Server  LOG     DEBUG DATABASE_URL: "postgresql://local_db:123@localhost:5432/local_db"
+[00:00:09.543] Server  LOG     {}
