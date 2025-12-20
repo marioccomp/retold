@@ -18,8 +18,7 @@ export async function loginUser(identifier: string, password: string) {
 
   return {
     id: String(user.id),
-    name: user.name,
-    email: user.email,
-    username: user.username,
+    role: user.role,
+    plan: user.plan,
   };
 }

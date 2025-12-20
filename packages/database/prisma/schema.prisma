@@ -12,6 +12,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  RECRUITER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PREMIUM
+}
+
 model User {
   id    Int     @id @default(autoincrement())
   username String @unique
@@ -19,11 +30,17 @@ model User {
   emailVerified DateTime?
   name  String?
   image String?
-  password String?
-  isRecruiter Boolean @default(false)
+  bio String?
+  password String? // null when OAuth
+  role Role @default(USER)
+  plan Plan @default(FREE)
   accounts      Account[]
   sessions      Session[]
   projects Project[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([email])
+  @@index([username])
 }
 
 model Account {
@@ -45,8 +62,8 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Session {
-  id           Int      @id @default(autoincrement())
+model Session {  // por enquanto nao é usado por usar strategy = "jwt", mas pode precisar num futuro
+  id           Int      @id @default(autoincrement()) 
   sessionToken String   @unique
   userId       Int
   expires      DateTime
@@ -67,6 +84,7 @@ model Project {
   description String
   longerDescription String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId Int
   user User @relation(fields:[userId], references: [id])
