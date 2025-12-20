@@ -108,10 +108,32 @@ pnpm db:rebuild
 
 ---
 
+### Testes com Vitest
+
+O projeto usa **Vitest** para testes unitários na aplicação web.
+Como o monorepo contém múltiplos pacotes, use **`--filter web`** para rodar apenas os testes do app Next.js:
+
+```bash
+# Rodar testes em modo interativo
+pnpm --filter web test
+
+# Rodar todos os testes (sem interação)
+pnpm --filter web test:run
+
+# Rodar testes com cobertura
+pnpm --filter web test:coverage
+```
+
+> Exemplo de teste com Vitest: `web/src/services/auth/register.service.test.ts`
+> Ele testa a função `registerUser` e usa mocks do repositório de usuários.
+
+---
+
 ## Observações importantes
 
 - O banco de dados usa **PostgreSQL 18+ com pgvector**
 - Os dados do banco são persistidos
+- Os testes do web precisam sempre rodar com `--filter web` por conta do monorepo
 
 ---
 
@@ -123,3 +145,4 @@ pnpm db:rebuild
 - **Docker**
 - **PNPM**
 - **Turborepo**
+- **Vitest**
