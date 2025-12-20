@@ -22,6 +22,8 @@ POSTGRES_PASSWORD=123
 POSTGRES_DB=local_db
 POSTGRES_PORT=5432
 
+AUTH_SECRET="PalavraMuitoSecretaHERE"
+
 DATABASE_URL="postgresql://local_db:123@localhost:5432/local_db"
 ```
 
