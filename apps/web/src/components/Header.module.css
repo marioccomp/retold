@@ -1,48 +1,97 @@
 .header {
   display: flex;
-  font-family: var(--font-questrial), sans-serif;
-  background-color: #f3f4f4;
-  height: 72px;
-  color: black;
   align-items: center;
+
+  height: 72px;
+  background-color: #f3f4f4;
+  color: black;
+  font-family: var(--font-questrial), sans-serif;
   font-size: 22px;
+  padding: 0 40px;
 }
 
-.logo {
-  height: 100%;
+.logoContainer {
   display: flex;
   align-items: center;
-  padding-left: 16px;
 }
 
-.logo img {
-  height: 100%;
-  width: 100%;
+.logoImg {
+  height: 55px;
   width: auto;
   object-fit: contain;
 }
 
+.navContainer {
+  margin-left: 60px;
+}
+
 .headerBtn {
   display: flex;
-  gap: 76px;
+  gap: 40px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.logoWithBtn {
-  display: flex;
-  height: 100%;
-  align-items: center;
-  gap: 52px;
+.headerBtn li {
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.profile {
+.profileContainer {
+  margin-left: auto;
+
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-left: auto;
-  padding-right: 49px;
 }
 
-.profile img {
-  height: 60px;
-  border-radius: 2rem;
+.profileImgWrapper img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.name {
+  margin: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 16px;
+    height: 80px;
+  }
+
+  .logoImg {
+    height: 50px;
+  }
+
+  .navContainer {
+    margin-left: 5px;
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .headerBtn {
+    gap: 20px;
+    font-size: 18px;
+  }
+
+  .name {
+    display: none;
+  }
+
+  .profileContainer {
+    margin-left: 0;
+    gap: 0;
+  }
+
+  .profileImgWrapper img {
+    height: 45px;
+    width: 45px;
+  }
 }
