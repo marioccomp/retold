@@ -1,9 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@repo/database";
-import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
+import { signIn } from "@/src/auth";
+import { AuthError } from "next-auth";
 
 const loginSchema = z.object({
   identifier: z.string().min(3, "Email or username is required"),
@@ -22,34 +21,22 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   const { identifier, password } = validatedFields.data;
-  const loginLower = identifier.toLowerCase().trim();
-
-  let isSuccessful = false;
 
   try {
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: loginLower }, { username: loginLower }],
-      },
+    await signIn("credentials", {
+      identifier,
+      password,
+      redirectTo: "/",
     });
-
-    if (!user) {
-      return { error: "Invalid credentials" };
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return { error: "Invalid credentials" };
-    }
-
-    isSuccessful = true;
   } catch (error) {
-    console.log("Login error:", error);
-    return { error: "An internal error occurred. Please try again." };
-  }
-
-  if (isSuccessful) {
-    redirect("/");
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { error: "Invalid credentials." };
+        default:
+          return { error: "something went wrong. Please try again." };
+      }
+    }
+    throw error;
   }
 }
