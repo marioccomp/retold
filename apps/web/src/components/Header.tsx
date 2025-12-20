@@ -1,9 +1,9 @@
+import Image from "next/image";
 import logo from "@/assets/image 15.png";
 import profilePic from "@/assets/foto.jpeg";
 import styles from "./Header.module.css";
 import { Questrial } from "next/font/google";
 
-// Fonte Questrial
 const questrial = Questrial({
   subsets: ["latin"],
   weight: "400",
@@ -13,19 +13,22 @@ const questrial = Questrial({
 export default function Header() {
   return (
     <header className={`${styles.header} ${questrial.variable}`}>
-      <div className={styles.logoWithBtn}>
-        <div className={styles.logo}>
-          <img src={logo.src} alt="" />
-        </div>
+      <div className={styles.logoContainer}>
+        <img src={logo.src} alt="Logo" className={styles.logoImg} />
+      </div>
+
+      <nav className={styles.navContainer}>
         <ul className={styles.headerBtn}>
           <li>Explorar</li>
-          <li>Vagas</li>
           <li>Sobre</li>
         </ul>
-      </div>
-      <div className={styles.profile}>
+      </nav>
+
+      <div className={styles.profileContainer}>
         <p className={styles.name}>Mario Junior</p>
-        <img src={profilePic.src} alt="" />
+        <div className={styles.profileImgWrapper}>
+          <img src={profilePic.src} alt="Profile" />
+        </div>
       </div>
     </header>
   );
