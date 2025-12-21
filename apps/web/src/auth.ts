@@ -18,6 +18,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id;
         token.role = (user as any).role;
         token.plan = (user as any).plan;
+        token.name = user.name;
+        token.image = user.image;
       }
       return token;
     },
@@ -26,6 +28,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as any;
         session.user.plan = token.plan as any;
+        session.user.name = token.name as string;
+        session.user.image = token.image as string;
       }
 
       return session;

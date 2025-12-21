@@ -20,5 +20,7 @@ export async function loginUser(identifier: string, password: string) {
     id: String(user.id),
     role: user.role,
     plan: user.plan,
+    name: user.name,
+    image: user.image,
   };
 }
