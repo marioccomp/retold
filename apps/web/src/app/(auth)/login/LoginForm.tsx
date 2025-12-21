@@ -10,9 +10,14 @@ import Link from "next/link";
 import { login } from "../_actions/login";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function LoginForm() {
+  const router = useRouter();
+  const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const [state, formAction, isPending] = useActionState(login, null);
 
@@ -23,16 +28,14 @@ export default function LoginForm() {
   };
 
   useEffect(() => {
-    if (state?.error) {
-      setShowError(true);
+    if (state?.success && !isRedirecting) {
+      setIsRedirecting(true);
 
-      const timer = setTimeout(() => {
-        setShowError(false);
-      }, 3000);
-
-      return () => clearTimeout(timer);
+      update().then(() => {
+        router.push("/dashboard");
+      });
     }
-  }, [state]);
+  }, [state, isRedirecting]);
 
   return (
     <div className={styles.login}>

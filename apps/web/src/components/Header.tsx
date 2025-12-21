@@ -1,17 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import logo from "@/assets/image 15.png";
 import profilePic from "@/assets/foto.jpeg";
 import styles from "./Header.module.css";
-import { auth } from "@/src/auth";
 import { FaRegUser } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
-export default async function Header() {
-  const session = await auth();
-  // const userImage = session?.user?.image;
-  const userImage = profilePic.src;
+export default function Header() {
+  const { data: session, status } = useSession();
+
+  const userImage = profilePic.src; // Aqui to pegando a imagem da pasta msm, dps so descomentar a linha de baixo que pega do banco
   const userName = session?.user?.name;
+  // const userImage = session?.user?.image;
 
-  console.log(session);
   return (
     <header className={`${styles.header}`}>
       <div className={styles.logoContainer}>
