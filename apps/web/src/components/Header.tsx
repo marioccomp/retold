@@ -2,17 +2,10 @@ import Image from "next/image";
 import logo from "@/assets/image 15.png";
 import profilePic from "@/assets/foto.jpeg";
 import styles from "./Header.module.css";
-import { Questrial } from "next/font/google";
-
-const questrial = Questrial({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-questrial",
-});
 
 export default function Header() {
   return (
-    <header className={`${styles.header} ${questrial.variable}`}>
+    <header className={`${styles.header}`}>
       <div className={styles.logoContainer}>
         <img src={logo.src} alt="Logo" className={styles.logoImg} />
       </div>
