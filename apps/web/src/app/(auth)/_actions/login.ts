@@ -26,7 +26,7 @@ export async function login(prevState: any, formData: FormData) {
     await signIn("credentials", {
       identifier,
       password,
-      redirectTo: "/",
+      redirectTo: "/dashboard",
     });
   } catch (error) {
     if (error instanceof AuthError) {
