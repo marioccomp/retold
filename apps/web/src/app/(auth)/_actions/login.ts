@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { signIn } from "@/src/auth";
 import { AuthError } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 const loginSchema = z.object({
   identifier: z.string().min(3, "Email or username is required"),
@@ -26,8 +27,11 @@ export async function login(prevState: any, formData: FormData) {
     await signIn("credentials", {
       identifier,
       password,
-      redirectTo: "/dashboard",
+      redirect: false,
     });
+
+    revalidatePath("/");
+    return { success: true };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
