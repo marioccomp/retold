@@ -1,17 +1,10 @@
 "use client";
-import { Questrial } from "next/font/google";
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import logo from "@/assets/retold-login.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { register } from "../_actions/register";
-
-const questrial = Questrial({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-questrial",
-});
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +13,7 @@ export default function Register() {
   const [state, formAction, isPending] = useActionState(register, null);
 
   return (
-    <main className={`${styles.container} ${questrial.variable}`}>
+    <main className={styles.container}>
       <div className={styles.contentWrapper}>
         <div className={styles.logoSection}>
           <img src={logo.src} alt="Logo Retold" className={styles.logoImage} />

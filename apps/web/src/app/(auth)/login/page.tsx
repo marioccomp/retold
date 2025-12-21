@@ -5,18 +5,33 @@ import styles from "./page.module.css";
 import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { login } from "../_actions/login";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const [state, formAction, isPending] = useActionState(login, null);
 
+  const [showError, setShowError] = useState(false);
+
   const togglePasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
+
+  useEffect(() => {
+    if (state?.error) {
+      setShowError(true);
+
+      const timer = setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
 
   return (
     <div className={styles.login}>
@@ -26,26 +41,13 @@ export default function Login() {
 
       <div className={styles.formDiv}>
         <form action={formAction} className={styles.form}>
-          {state?.error && (
-            <div className="relative w-full rounded-lg border border-red-500/50 bg-red-50 p-3 text-red-700 mb-4 flex gap-3 items-start">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mt-0.5"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <div className="text-sm font-medium">{state.error}</div>
-            </div>
+          {showError && (
+            <Alert variant="destructive" className={styles.alert}>
+              <AlertTitle className={styles.title}>Something went wrong</AlertTitle>
+              <AlertDescription className={styles.description}>
+                Please verify your credentials and try again.
+              </AlertDescription>
+            </Alert>
           )}
 
           <input
@@ -55,9 +57,6 @@ export default function Login() {
             placeholder="Email or Username"
             className={styles.input}
           />
-          {state?.errors?.identifier && (
-            <p className="text-red-500 text-xs mt-[-10px] mb-2">{state.errors.identifier}</p>
-          )}
 
           <div className={styles.passwordInput}>
             <input
@@ -72,9 +71,6 @@ export default function Login() {
               <FaEyeSlash className={styles.icon} onClick={togglePasswordVisible} />
             )}
           </div>
-          {state?.errors?.password && (
-            <p className="text-red-500 text-xs mt-1">{state.errors.password}</p>
-          )}
 
           <div className={styles.options}>
             <label className={styles.check}>

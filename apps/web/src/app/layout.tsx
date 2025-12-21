@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Questrial } from "next/font/google";
 import Header from "../components/Header";
+
 import "./globals.css";
 import ProjectCard from "../components/ProjectCard";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const questrial = Questrial({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-questrial",
 });
 
 export const metadata: Metadata = {
@@ -25,12 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
-      >
+    <html lang="en" className={questrial.variable}>
+      <body className={`${questrial.className} antialiased min-h-screen flex flex-col`}>
         <Header />
-        <ProjectCard />
 
         <main className="flex-grow">{children}</main>
       </body>
