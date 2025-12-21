@@ -24,8 +24,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={questrial.variable}>
       <body className={`${questrial.className} antialiased min-h-screen flex flex-col`}>
-        <Header />
-
         <main className="flex-grow">{children}</main>
       </body>
     </html>
