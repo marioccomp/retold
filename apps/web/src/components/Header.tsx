@@ -2,12 +2,20 @@ import Image from "next/image";
 import logo from "@/assets/image 15.png";
 import profilePic from "@/assets/foto.jpeg";
 import styles from "./Header.module.css";
+import { auth } from "@/src/auth";
+import { FaRegUser } from "react-icons/fa";
 
-export default function Header() {
+export default async function Header() {
+  const session = await auth();
+  // const userImage = session?.user?.image;
+  const userImage = profilePic.src;
+  const userName = session?.user?.name;
+
+  console.log(session);
   return (
     <header className={`${styles.header}`}>
       <div className={styles.logoContainer}>
-        <img src={logo.src} alt="Logo" className={styles.logoImg} />
+        <Image src={logo} alt="Logo" className={styles.logoImg} priority />
       </div>
 
       <nav className={styles.navContainer}>
@@ -18,9 +26,21 @@ export default function Header() {
       </nav>
 
       <div className={styles.profileContainer}>
-        <p className={styles.name}>Mario Junior</p>
+        <p className={styles.name}>{userName || "Convidado"}</p>
         <div className={styles.profileImgWrapper}>
-          <img src={profilePic.src} alt="Profile" />
+          {userImage ? (
+            <Image
+              src={userImage}
+              alt={`Foto de ${userName}`}
+              width={45}
+              height={45}
+              className={styles.profileImg}
+            />
+          ) : (
+            <div className={styles.iconFallback}>
+              <FaRegUser />
+            </div>
+          )}
         </div>
       </div>
     </header>
