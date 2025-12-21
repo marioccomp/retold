@@ -1,8 +1,15 @@
 import bcrypt from "bcryptjs";
 import { userRepository } from "@repo/database";
+import { loginRateLimit } from "@/lib/redis-rate-limit";
 
 export async function loginUser(identifier: string, password: string) {
   const login = identifier.toLowerCase().trim();
+
+  const { success } = await loginRateLimit.limit(login);
+
+  if (!success) {
+    throw new Error("Too many login attempts. Try again later");
+  }
 
   const user = await userRepository.findByEmailOrUsername(login, login);
 
