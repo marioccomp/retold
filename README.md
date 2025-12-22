@@ -25,6 +25,9 @@ POSTGRES_PORT=5432
 AUTH_SECRET="PalavraMuitoSecretaHERE"
 
 DATABASE_URL="postgresql://local_db:123@localhost:5432/local_db"
+
+UPSTASH_REDIS_REST_URL="https://seu-banco.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="seu_token_aqui"
 ```
 
 ---
@@ -148,3 +151,5 @@ pnpm --filter web test:coverage
 - **PNPM**
 - **Turborepo**
 - **Vitest**
+- **Tanstack Query**
+- **Upstash (Redis)**
