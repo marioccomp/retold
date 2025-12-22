@@ -1,29 +1,50 @@
-// src/app/(auth)/register/RegisterForm.tsx
 "use client";
 
 import styles from "./page.module.css";
 import Link from "next/link";
-import { useActionState, useState } from "react";
-import Image from "next/image"; // Use o Image do Next!
+import { useState } from "react";
+import Image from "next/image";
 import logo from "@/assets/retold-login.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { register } from "../_actions/register";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [state, setState] = useState<any>(null);
 
-  const [state, formAction, isPending] = useActionState(register, null);
+  const registerMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      await register(formData);
+    },
+    onSuccess: (data) => {
+      setState(data);
+      router.push("/login");
+    },
+
+    onError: () => {
+      setState({ error: "Something went wrong" });
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    registerMutation.mutate(formData);
+  }
 
   return (
     <main className={styles.container}>
       <div className={styles.contentWrapper}>
         <div className={styles.logoSection}>
-          {/* Melhor usar o componente Image */}
           <Image src={logo} alt="Logo Retold" className={styles.logoImage} priority />
         </div>
 
-        <form action={formAction} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form}>
           <input name="name" placeholder="Name" className={styles.input} required />
           {state?.errors?.name && <p className="text-red-500 text-sm">{state.errors.name}</p>}
 
@@ -48,7 +69,7 @@ export default function RegisterForm() {
               className={styles.iconButton}
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
           {state?.errors?.password && (
@@ -68,7 +89,7 @@ export default function RegisterForm() {
               className={styles.iconButton}
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
           {state?.errors?.confirmPassword && (
@@ -81,8 +102,8 @@ export default function RegisterForm() {
             </div>
           )}
 
-          <button type="submit" className={styles.button} disabled={isPending}>
-            {isPending ? "Carregando..." : "Criar conta"}
+          <button type="submit" className={styles.button} disabled={registerMutation.isPending}>
+            {registerMutation.isPending ? "Carregando..." : "Criar conta"}
           </button>
         </form>
 

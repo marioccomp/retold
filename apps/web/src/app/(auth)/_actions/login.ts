@@ -10,7 +10,7 @@ const loginSchema = z.object({
   password: z.string().min(6, "password is required"),
 });
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(formData: FormData) {
   const data = Object.fromEntries(formData.entries());
   const validatedFields = loginSchema.safeParse(data);
 
@@ -22,6 +22,7 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   const { identifier, password } = validatedFields.data;
+  console.log("1");
 
   try {
     await signIn("credentials", {
@@ -29,6 +30,8 @@ export async function login(prevState: any, formData: FormData) {
       password,
       redirect: false,
     });
+
+    console.log("2");
 
     revalidatePath("/");
     return { success: true };

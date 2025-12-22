@@ -5,37 +5,57 @@ import styles from "./page.module.css";
 import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { useActionState, useEffect, useState } from "react";
+import { ReactElement, useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { login } from "../_actions/login";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useMutation } from "@tanstack/react-query";
 
 export default function LoginForm() {
   const router = useRouter();
   const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  const [state, formAction, isPending] = useActionState(login, null);
-
   const [showError, setShowError] = useState(false);
 
   const togglePasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  useEffect(() => {
-    if (state?.success && !isRedirecting) {
-      setIsRedirecting(true);
+  const loginMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      return login(formData);
+    },
 
-      update().then(() => {
-        router.push("/dashboard");
-      });
-    }
-  }, [state, isRedirecting]);
+    onSuccess: async (data) => {
+      if (!data?.success) {
+        setShowError(true);
+        return;
+      }
+
+      await update();
+
+      router.push("/dashboard");
+    },
+
+    onError: () => {
+      setShowError(true);
+      setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setShowError(false);
+
+    const formData = new FormData(e.currentTarget);
+
+    loginMutation.mutate(formData);
+  }
 
   return (
     <div className={styles.login}>
@@ -44,7 +64,7 @@ export default function LoginForm() {
       </div>
 
       <div className={styles.formDiv}>
-        <form action={formAction} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form}>
           {showError && (
             <Alert variant="destructive" className={styles.alert}>
               <AlertTitle className={styles.title}>Something went wrong</AlertTitle>
@@ -83,8 +103,8 @@ export default function LoginForm() {
             </label>
             <span className={styles.forgotPassword}>Esqueci a senha</span>
           </div>
-          <button type="submit" disabled={isPending}>
-            {isPending ? "Carregando..." : "Entrar"}
+          <button type="submit" disabled={loginMutation.isPending}>
+            {loginMutation.isPending ? "Carregando..." : "Entrar"}
           </button>
         </form>
 

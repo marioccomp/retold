@@ -25,7 +25,7 @@ const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export async function register(prevState: any, formData: FormData) {
+export async function register(formData: FormData) {
   const data = Object.fromEntries(formData.entries());
 
   const validatedFields = registerSchema.safeParse(data);

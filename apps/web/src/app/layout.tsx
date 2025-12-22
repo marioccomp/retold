@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Questrial } from "next/font/google";
 import Header from "../components/Header";
 import AuthProvider from "../providers/auth";
+import { QueryProvider } from "../providers/QueryProvider";
 
 import "./globals.css";
 import ProjectCard from "../components/ProjectCard";
@@ -26,8 +27,10 @@ export default function RootLayout({
     <html lang="en" className={questrial.variable}>
       <body className={`${questrial.className} antialiased min-h-screen flex flex-col`}>
         <AuthProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
+          <QueryProvider>
+            <Header />
+            <main className="flex-grow">{children}</main>
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>
