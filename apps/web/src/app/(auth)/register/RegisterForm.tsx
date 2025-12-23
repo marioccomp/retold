@@ -9,29 +9,40 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { register } from "../_actions/register";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [state, setState] = useState<any>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]> | null>(null);
 
   const registerMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      await register(formData);
-    },
-    onSuccess: (data) => {
-      setState(data);
+    mutationFn: async (formData: FormData) => await register(formData),
+    onSuccess: (res) => {
+      if (res.success === false) {
+        toast.error(res.message);
+
+        if (res.fieldErrors) {
+          setFieldErrors(res.fieldErrors);
+        }
+
+        return;
+      }
+
+      toast.success("Account created successfully");
+      setFieldErrors(null);
       router.push("/login");
     },
 
     onError: () => {
-      setState({ error: "Something went wrong" });
+      toast.error("Something went wrong. Please try again.");
     },
   });
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setFieldErrors(null);
 
     const formData = new FormData(e.currentTarget);
     registerMutation.mutate(formData);
@@ -46,20 +57,20 @@ export default function RegisterForm() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <input name="name" placeholder="Name" className={styles.input} required />
-          {state?.errors?.name && <p className="text-red-500 text-sm">{state.errors.name}</p>}
+          {fieldErrors?.name && <p className="text-red-500 text-sm">{fieldErrors.name[0]}</p>}
 
           <input name="username" placeholder="Username" className={styles.input} required />
-          {state?.errors?.username && (
-            <p className="text-red-500 text-sm">{state.errors.username}</p>
+          {fieldErrors?.username && (
+            <p className="text-red-500 text-sm">{fieldErrors.username[0]}</p>
           )}
 
           <input type="email" name="email" placeholder="Email" className={styles.input} required />
-          {state?.errors?.email && <p className="text-red-500 text-sm">{state.errors.email}</p>}
+          {fieldErrors?.email && <p className="text-red-500 text-sm">{fieldErrors.email[0]}</p>}
 
           <div className={styles.passwordInput}>
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Senha"
+              placeholder="Password"
               name="password"
               className={styles.input}
               required
@@ -72,14 +83,14 @@ export default function RegisterForm() {
               {showPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
-          {state?.errors?.password && (
-            <p className="text-red-500 text-sm">{state.errors.password}</p>
+          {fieldErrors?.password && (
+            <p className="text-red-500 text-sm">{fieldErrors.password[0]}</p>
           )}
 
           <div className={styles.passwordInput}>
             <input
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirmar senha"
+              placeholder="Confirm Password"
               className={styles.input}
               name="confirmPassword"
               required
@@ -92,25 +103,19 @@ export default function RegisterForm() {
               {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
             </button>
           </div>
-          {state?.errors?.confirmPassword && (
-            <p className="text-red-500 text-sm">{state.errors.confirmPassword}</p>
-          )}
-
-          {state?.error && (
-            <div className="bg-red-100 p-2 text-red-700 rounded border border-red-200">
-              {state.error}
-            </div>
+          {fieldErrors?.confirmPassword && (
+            <p className="text-red-500 text-sm">{fieldErrors.confirmPassword[0]}</p>
           )}
 
           <button type="submit" className={styles.button} disabled={registerMutation.isPending}>
-            {registerMutation.isPending ? "Carregando..." : "Criar conta"}
+            {registerMutation.isPending ? "Loading..." : "Create account"}
           </button>
         </form>
 
         <p className={styles.footerText}>
-          Já tem uma conta?{" "}
+          Already have an account?{" "}
           <Link href="/login" className={styles.link}>
-            Faça Login
+            Sign in
           </Link>
         </p>
       </div>

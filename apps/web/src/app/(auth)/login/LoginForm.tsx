@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { ReactElement, useActionState, useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { login } from "../_actions/login";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -13,12 +13,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const router = useRouter();
   const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [showError, setShowError] = useState(false);
 
   const togglePasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -31,26 +31,22 @@ export default function LoginForm() {
 
     onSuccess: async (data) => {
       if (!data?.success) {
-        setShowError(true);
+        toast.error(data.message);
         return;
       }
 
+      toast.success("Login realizado com sucesso"); // mudar p ingles ou tirar antes de subir o pr
       await update();
-
       router.push("/dashboard");
     },
 
     onError: () => {
-      setShowError(true);
-      setTimeout(() => {
-        setShowError(false);
-      }, 3000);
+      toast.error("Erro inesperado. Tente novamente"); // mudar p ingles ou tirar antes de subir o pr
     },
   });
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setShowError(false);
 
     const formData = new FormData(e.currentTarget);
 
@@ -65,15 +61,6 @@ export default function LoginForm() {
 
       <div className={styles.formDiv}>
         <form onSubmit={handleSubmit} className={styles.form}>
-          {showError && (
-            <Alert variant="destructive" className={styles.alert}>
-              <AlertTitle className={styles.title}>Something went wrong</AlertTitle>
-              <AlertDescription className={styles.description}>
-                Please verify your credentials and try again.
-              </AlertDescription>
-            </Alert>
-          )}
-
           <input
             type="text"
             name="identifier"

@@ -2,52 +2,76 @@
 
 import { z } from "zod";
 import { registerUser } from "@/src/services/auth/register.service";
+import type { ActionResponse } from "@/lib/action-response";
+import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/errors/auth.errors";
 
 const registerSchema = z
   .object({
     name: z
       .string()
-      .max(40, "Name must have at maximum 40 characters")
-      .min(3, "Name must have at least 3 characters"),
-    email: z.string().email("E-mail inválido"),
+      .min(3, "Name must be at least 3 characters long")
+      .max(40, "Name must be at most 40 characters long"),
+    email: z.string().email("Invalid email address"),
     username: z
       .string()
-      .max(20, "Username must have at maximum 20 characters")
-      .min(3, "Username must have at least 3 characters"),
+      .min(3, "Username must be at least 3 characters long")
+      .max(20, "Username must be at most 20 characters long"),
     password: z
       .string()
-      .max(17, "Password must have at maximum 17 characters")
-      .min(6, "Password must have at least 6 characters"),
+      .min(6, "Password must be at least 6 characters long")
+      .max(17, "Password must be at most 17 characters long"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords are different",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
-export async function register(formData: FormData) {
+export async function register(formData: FormData): Promise<ActionResponse> {
   const data = Object.fromEntries(formData.entries());
 
-  const validatedFields = registerSchema.safeParse(data);
+  const parsed = registerSchema.safeParse(data);
 
-  if (!validatedFields.success) {
+  if (!parsed.success) {
     return {
-      error: "Invalid fields",
-      errors: validatedFields.error.flatten().fieldErrors,
+      success: false,
+      message: "Invalid fields",
+      fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
 
-  const { name, email, username, password } = validatedFields.data;
+  const { name, email, username, password } = parsed.data;
 
   try {
     await registerUser({ name, email, username, password });
     return {
-      success: "User created successfully",
+      success: true,
     };
   } catch (error: any) {
-    console.error(error);
+    if (error instanceof EmailAlreadyInUseError) {
+      return {
+        success: false,
+        message: "This email is already in use",
+        fieldErrors: {
+          email: ["This email is already in use"],
+        },
+      };
+    }
+
+    if (error instanceof UsernameAlreadyInUseError) {
+      return {
+        success: false,
+        message: "This username is already in use",
+        fieldErrors: {
+          username: ["This username is already in use"],
+        },
+      };
+    }
+
+    console.error("Register error:", error);
     return {
-      error: error.message,
+      success: false,
+      message: "Unable to create account. Please try again.",
     };
   }
 }

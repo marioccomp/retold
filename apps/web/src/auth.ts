@@ -48,7 +48,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         try {
           return await loginUser(String(credentials.identifier), String(credentials.password));
-        } catch {
+        } catch (error) {
+          console.error("Login error:", error);
           return null;
         }
       },
