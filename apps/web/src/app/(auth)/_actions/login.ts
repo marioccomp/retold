@@ -4,46 +4,44 @@ import { z } from "zod";
 import { signIn } from "@/src/auth";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
+import type { ActionResponse } from "@/lib/action-response";
 
 const loginSchema = z.object({
   identifier: z.string().min(3, "Email or username is required"),
   password: z.string().min(6, "password is required"),
 });
 
-export async function login(formData: FormData) {
+export async function login(formData: FormData): Promise<ActionResponse> {
   const data = Object.fromEntries(formData.entries());
-  const validatedFields = loginSchema.safeParse(data);
+  const parsed = loginSchema.safeParse(data);
 
-  if (!validatedFields.success) {
+  if (!parsed.success) {
     return {
-      error: "Please fill in all fields correctly.",
-      errors: validatedFields.error.flatten().fieldErrors,
+      success: false,
+      message: "Invalid fields",
+      fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
 
-  const { identifier, password } = validatedFields.data;
-  console.log("1");
-
   try {
     await signIn("credentials", {
-      identifier,
-      password,
+      ...parsed.data,
       redirect: false,
     });
 
-    console.log("2");
-
-    revalidatePath("/");
     return { success: true };
   } catch (error) {
     if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return { error: "Invalid credentials." };
-        default:
-          return { error: "something went wrong. Please try again." };
+      if (error.type === "CredentialsSignin") {
+        return {
+          success: false,
+          message: "Incorrect E-mail/username or password",
+        };
       }
     }
-    throw error;
+    return {
+      success: false,
+      message: "Erro inesperado. Tente novamente.",
+    };
   }
 }

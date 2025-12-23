@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { userRepository } from "@repo/database";
+import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/errors/auth.errors";
 
 export async function registerUser(data: {
   name: string;
@@ -15,9 +16,9 @@ export async function registerUser(data: {
 
   if (existingUser) {
     if (existingUser.email === email) {
-      throw new Error("E-mail already in use");
+      throw new EmailAlreadyInUseError();
     }
-    throw new Error("Username already in use");
+    throw new UsernameAlreadyInUseError();
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);

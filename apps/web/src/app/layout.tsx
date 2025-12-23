@@ -3,6 +3,7 @@ import { Questrial } from "next/font/google";
 import Header from "../components/Header";
 import AuthProvider from "../providers/auth";
 import { QueryProvider } from "../providers/QueryProvider";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 import ProjectCard from "../components/ProjectCard";
@@ -30,6 +31,7 @@ export default function RootLayout({
           <QueryProvider>
             <Header />
             <main className="flex-grow">{children}</main>
+            <Toaster richColors position="top-right" />
           </QueryProvider>
         </AuthProvider>
       </body>
