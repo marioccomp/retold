@@ -1,13 +1,32 @@
 import bcrypt from "bcryptjs";
 import { userRepository } from "@repo/database";
-import { loginRateLimit } from "@/lib/redis-rate-limit";
+import {
+  ipRateLimit,
+  bruteForceRateLimit,
+  protectionRateLimit,
+} from "@/lib/redis-rate-limit";
+import { getClientIp } from "@/lib/get-client-ip";
 
 export async function loginUser(identifier: string, password: string) {
   const login = identifier.toLowerCase().trim();
+  const ip = await getClientIp();
 
-  const { success } = await loginRateLimit.limit(login);
+  const bruteForceKey = `${ip}:${login}`
 
-  if (!success) {
+  const ipResult = await ipRateLimit.limit(ip);
+
+  if (!ipResult.success) {
+    throw new Error ("Too many login attempts. Try again later");
+  }
+
+  const bruteResult = await bruteForceRateLimit.limit(bruteForceKey);
+  if (!bruteResult.success) {
+    throw new Error("Too many login attempts. Try again later");
+  }
+
+  const protectionResult = await protectionRateLimit.limit(login);
+  
+  if (!protectionResult.success) {
     throw new Error("Too many login attempts. Try again later");
   }
 
