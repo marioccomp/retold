@@ -1,0 +1,107 @@
+.genericCard {
+  background: #fff;
+  border: 1px solid #e7eae9;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  height: 100%;
+}
+
+.genericCard:hover {
+  border-color: #05dc7f;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.genericCardContent {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+.cardImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background-color: #f5f5f5;
+}
+
+.cardImage {
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: #152e2b;
+  color: #05dc7f;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.cardInfo h4 {
+  margin: 0 0 4px 0;
+  color: #152e2b;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.partDescription {
+  margin-top: 8px !important;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #4a5554 !important;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.genericCard small {
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+.newCard {
+  width: 100%;
+  min-height: 240px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 2px dashed #e7eae9;
+  border-radius: 12px;
+  background-color: #fafafa;
+  color: #6b7c7a;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.newCard:hover {
+  border-color: #05dc7f;
+  color: #05dc7f;
+  background-color: rgba(5, 220, 127, 0.04);
+  transform: translateY(-3px);
+}
+
+.newIcon {
+  width: 36px;
+  height: 36px;
+  stroke-width: 1.5px;
+}
+
+.newText {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
