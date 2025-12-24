@@ -35,13 +35,13 @@ export default function LoginForm() {
         return;
       }
 
-      toast.success("Login realizado com sucesso"); // mudar p ingles ou tirar antes de subir o pr
+      toast.success("Signed in successfully");
       await update();
       router.push("/dashboard");
     },
 
     onError: () => {
-      toast.error("Erro inesperado. Tente novamente"); // mudar p ingles ou tirar antes de subir o pr
+      toast.error("Unexpected error. Please try again.");
     },
   });
 
@@ -74,7 +74,7 @@ export default function LoginForm() {
               type={isPasswordVisible ? "text" : "password"}
               name="password"
               required
-              placeholder="Senha"
+              placeholder="Password"
             />
             {isPasswordVisible ? (
               <FaEye className={styles.icon} onClick={togglePasswordVisible} />
@@ -86,18 +86,18 @@ export default function LoginForm() {
           <div className={styles.options}>
             <label className={styles.check}>
               <input type="checkbox" />
-              <span>Lembre de mim</span>
+              <span>Remember me</span>
             </label>
-            <span className={styles.forgotPassword}>Esqueci a senha</span>
+            <span className={styles.forgotPassword}>Forgot password?</span>
           </div>
           <button type="submit" disabled={loginMutation.isPending}>
-            {loginMutation.isPending ? "Carregando..." : "Entrar"}
+            {loginMutation.isPending ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
         <div className={styles.otherOptions}>
           <div className={styles.divider}>
-            <span>Ou entre com</span>
+            <span>Or sign in with</span>
           </div>
           <div className={styles.accounts}>
             <FiGithub className={styles.account} />
@@ -105,9 +105,9 @@ export default function LoginForm() {
             <FaGoogle className={styles.account} />
           </div>
           <p className={styles.createAccount}>
-            Não tem uma conta?
+            Don&apos;t have an account?
             <Link href="/register" className={styles.link}>
-              Crie uma conta
+              Create one
             </Link>
           </p>
         </div>

@@ -113,7 +113,8 @@
   cursor: pointer;
   transition:
     background-color 0.2s ease,
-    transform 0.1s ease;
+    transform 0.1s ease,
+    opacity 0.2s ease;
   margin-top: 0;
 }
 
@@ -123,6 +124,23 @@
 
 .button:active {
   transform: scale(0.98);
+}
+
+.button:disabled {
+  background-color: #e6e6e6;
+  color: #9a9a9a;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+.button:disabled:hover {
+  background-color: #e6e6e6;
+}
+
+.button:disabled:active {
+  transform: none;
 }
 
 .footerText {
