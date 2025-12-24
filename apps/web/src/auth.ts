@@ -3,7 +3,9 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@repo/database";
 import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
-import { loginUser } from "@/src/services/auth/login.service";
+import { userRepository } from "@repo/database";
+import bcrypt from "bcryptjs";
+import { loginUser } from "./services/auth/login.service";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -41,17 +43,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       name: "credentials",
+      credentials: {
+        identifier: { label: "Identifier", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
       async authorize(credentials) {
-        if (!credentials?.identifier || !credentials?.password) {
-          return null;
-        }
+        if (!credentials) return null;
 
-        try {
-          return await loginUser(String(credentials.identifier), String(credentials.password));
-        } catch (error) {
-          console.error("Login error:", error);
-          return null;
-        }
+        const user = await loginUser(
+          credentials.identifier as string,
+          credentials.password as string
+        );
+
+        return user;
       },
     }),
   ],

@@ -9,3 +9,17 @@ export class UsernameAlreadyInUseError extends Error {
     super("USERNAME_ALREADY_IN_USE");
   }
 }
+
+export class InvalidCredentialsError extends Error {
+  constructor() {
+    super("Invalid credentials");
+    this.name = "InvalidCredentialsError";
+  }
+}
+
+export class TooManyLoginAttemptsError extends Error {
+  constructor() {
+    super("Too many login attempts");
+    this.name = "TooManyLoginAttemptsError";
+  }
+}
