@@ -1,0 +1,34 @@
+.newProjectCard {
+  width: 100%;
+  min-height: 240px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 2px dashed #e7eae9;
+  border-radius: 12px;
+  background-color: #fafafa;
+  color: #6b7c7a;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.newProjectCard:hover {
+  border-color: #05dc7f;
+  color: #05dc7f;
+  background-color: rgba(5, 220, 127, 0.04);
+  transform: translateY(-3px);
+}
+
+.newProjectIcon {
+  width: 36px;
+  height: 36px;
+  stroke-width: 1.5px;
+}
+
+.newProjectText {
+  font-weight: 600;
+  font-size: 1.1rem;
+}

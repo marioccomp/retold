@@ -1,127 +1,53 @@
 .card {
   display: flex;
-  color: black;
   flex-direction: column;
-  /* height: 100vh; */
   width: 100%;
-  justify-content: center;
-  align-items: center;
-  max-width: 410px;
-  /* max-height: 360px; */
-  margin-left: 50%;
-  margin-top: 10rem;
   border: 1px solid #f0f0f0;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  background-color: #fff;
+  transition: transform 0.2s ease-in-out;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  transition: all 0.2s ease-in-out;
 }
 
+/* --- SEÇÃO DA IMAGEM --- */
 .img {
-  /* min-height: 200px; */
   width: 100%;
+  height: 260px; /* Altura fixa para manter o padrão */
   position: relative;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 
-.img > img {
+.img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- OVERLAY DESKTOP (Vira bloco no mobile) --- */
+.longerDescription {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 1;
-  object-fit: cover;
-}
-
-.projectText {
-  width: 100%;
-  min-height: 20%;
-  background-color: #fff;
-  padding: 24px 24px 16px 16px;
-  text-align: left;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 2px;
-  color: #1a202c;
-}
-
-.description {
-  color: #718096;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.stats {
-  display: flex;
-  width: 100%;
-  background-color: #f7fafc;
-  padding: 12px 24px;
-  gap: 16px;
-  border-top: 1px solid #edf2f7;
-  color: #4a5568;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.stats > div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 14px;
-}
-
-.like {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-@keyframes heartPop {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.4);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.likedAnimation {
-  color: #e53e3e;
-  animation: heartPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.like:active {
-  transform: scale(0.9);
-}
-
-/* Descricao do hover */
-
-.longerDescription {
+  background: rgba(21, 46, 43, 0.96);
   color: #fff;
-  min-height: 200px;
-  position: relative;
   padding: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  background: rgba(21, 46, 43, 0.95);
-  transition: all 0.2s ease-in-out;
+  z-index: 2;
+  box-sizing: border-box;
 }
 
-.longerDescription:hover {
+.card:hover .longerDescription {
   opacity: 1;
 }
 
@@ -129,44 +55,277 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .owner img {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   object-fit: cover;
-  position: relative;
-  z-index: 10;
-  opacity: 1;
-}
-
-.owner p {
-  font-weight: bold;
-  font-size: 16px;
 }
 
 .text {
+  font-size: 15px;
+  line-height: 1.5;
   color: #f0fdf4;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+
+  /* Estratégia de Clamping para Desktop */
+  display: -webkit-box;
+  line-clamp: 7;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* Se preferir que o usuário possa dar scroll em vez de cortar:
+  overflow-y: auto; 
+  flex-grow: 1; 
+  */
 }
 
 .tags {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   list-style: none;
   padding: 0;
-  margin: 0;
-  margin-top: auto;
+  margin-top: auto; /* Empurra as tags para o fim do container */
   flex-wrap: wrap;
+  max-height: 50px; /* Limita para não subir demais */
+  overflow: hidden;
 }
 
 .tags li {
   background-color: #05dc7f;
   color: #152e2b;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
+}
+
+/* --- RODAPÉ (TÍTULO E STATS) --- */
+.footerWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.projectText {
+  padding: 20px 24px 10px 24px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+
+  /* Mudanças para quebrar linha */
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2; /* Mostra até 2 linhas antes de colocar reticências */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal; /* Permite quebra de linha */
+}
+
+.description {
+  color: #718096;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.stats {
+  display: flex;
+  padding: 10px 24px 20px 24px;
+  gap: 16px;
+  justify-content: flex-end;
+  color: #4a5568;
+}
+
+.stats > div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+.like {
+  cursor: pointer;
+}
+
+.likes {
+  cursor: pointer;
+  user-select: none; /* Evita selecionar o texto ao clicar rápido */
+  transition: transform 0.1s ease;
+}
+
+.likes:active {
+  transform: scale(0.9); /* Efeito de "apertar" o botão ao clicar */
+}
+
+/* Estilo do ícone de borda (não curtido) */
+.likes svg {
+  color: #4a5568;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.likes:hover svg {
+  color: #ff4d4d; /* Fica levemente vermelho no hover */
+}
+
+.likedAnimation {
+  color: #ff4d4d !important; /* Vermelho vibrante */
+  animation: heartPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Efeito de batida de coração */
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.4);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Ajuste fino nos números de likes para acompanhar a cor */
+.likes p {
+  transition: color 0.2s ease;
+}
+
+.likes:has(.likedAnimation) p {
+  color: #ff4d4d;
+  font-weight: 600;
+}
+
+/* === RESPONSIVIDADE (O SEGREDO ESTÁ AQUI) === */
+
+@media (max-width: 650px) {
+  /* 1. Reduzimos a altura total para o card não ficar gigante no celular */
+  .img {
+    height: 320px;
+    position: relative;
+  }
+
+  /* 2. Voltamos ao fundo sólido, mas fixado apenas no fundo (bottom) */
+  .longerDescription {
+    height: auto;
+    max-height: 80%; /* Não deixa o texto cobrir a imagem toda */
+    top: auto;
+    bottom: 0;
+    opacity: 1;
+    padding: 20px;
+  }
+
+  /* 3. Ajustes de texto para ocupar menos espaço vertical */
+  .owner {
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .owner img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .owner p {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .text p {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #e2e8f0;
+    margin-bottom: 12px;
+
+    display: -webkit-box;
+    line-clamp: 3;
+
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tags {
+    gap: 6px;
+  }
+
+  .tags li {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+
+  /* 4. Rodapé do Card (Título e Stats) */
+  .footerWrapper {
+    flex-direction: row;
+    align-items: flex-start; /* Alinha ícones ao topo se o título tiver 2 linhas */
+    justify-content: space-between;
+    padding: 16px 20px;
+    gap: 10px;
+    width: 100%;
+    background: #fff;
+  }
+
+  .projectText {
+    padding: 0;
+    flex: 1;
+    min-width: 0;
+    margin-right: 12px;
+  }
+
+  .description {
+    display: none;
+  }
+
+  .title {
+    font-size: 1.1rem;
+    white-space: normal; /* Permite quebra de linha no mobile */
+    display: -webkit-box;
+    line-clamp: 2;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .stats {
+    padding: 0;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .stats > div {
+    font-size: 16px; /* Ícones e números maiores para toque fácil */
+    gap: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .footerWrapper {
+    padding: 14px 12px; /* Padding menor para não apertar o conteúdo */
+  }
+
+  .title {
+    font-size: 0.95rem; /* Título um pouco menor em telas muito pequenas */
+  }
+
+  .stats {
+    gap: 8px;
+  }
 }
