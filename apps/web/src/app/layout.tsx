@@ -30,7 +30,7 @@ export default function RootLayout({
         <AuthProvider>
           <QueryProvider>
             <Header />
-            <main className="flex-grow">{children}</main>
+            <main className="flex-grow w-full">{children}</main>
             <Toaster richColors position="top-right" />
           </QueryProvider>
         </AuthProvider>

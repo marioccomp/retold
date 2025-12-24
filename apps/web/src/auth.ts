@@ -5,7 +5,6 @@ import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import { userRepository } from "@repo/database";
 import bcrypt from "bcryptjs";
-import { loginUser } from "./services/auth/login.service";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -50,12 +49,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials) return null;
 
-        const user = await loginUser(
-          credentials.identifier as string,
-          credentials.password as string
-        );
+        const identifier = credentials.identifier as string;
+        const password = credentials.password as string;
 
-        return user;
+        if (!identifier || !password) return null;
+
+        const user = await userRepository.findByEmailOrUsername(identifier, identifier);
+
+        if (!user || !user.password) return null;
+
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) return null;
+
+        return {
+          id: String(user.id),
+          name: user.name,
+          role: user.role,
+          plan: user.plan,
+          image: user.image,
+        };
       },
     }),
   ],
