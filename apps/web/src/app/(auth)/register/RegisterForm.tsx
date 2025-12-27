@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { checkEmail } from "../_actions/check-email";
 import { checkUsername } from "../_actions/check-username";
+import { signIn } from "next-auth/react";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -33,20 +34,31 @@ export default function RegisterForm() {
 
   const registerMutation = useMutation({
     mutationFn: async (formData: FormData) => await register(formData),
-    onSuccess: (res) => {
-      if (res.success === false) {
+    onSuccess: async (res) => {
+      if (!res.success) {
         toast.error(res.message);
 
         if (res.fieldErrors) {
           setFieldErrors(res.fieldErrors);
         }
-
         return;
       }
 
-      toast.success("Account created successfully");
-      setFieldErrors(null);
-      router.push("/login");
+      // 🔐 autentica automaticamente
+      const loginResult = await signIn("credentials", {
+        email: res.data!.email,
+        password: passwordValue,
+        redirect: false,
+      });
+
+      if (loginResult?.error) {
+        toast.error("Account created, but login failed.");
+        return;
+      }
+
+      toast.success(`Welcome to Retold, @${res.data!.username}`);
+
+      router.push(`/${res.data!.username}`);
     },
 
     onError: () => {

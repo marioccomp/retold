@@ -6,7 +6,12 @@ import type { ActionResponse } from "@/lib/action-response";
 import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/domains/auth/auth.errors";
 import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
 
-export async function register(formData: FormData): Promise<ActionResponse> {
+type RegisterResponseData = {
+  email: string;
+  username: string;
+};
+
+export async function register(formData: FormData): Promise<ActionResponse<RegisterResponseData>> {
   const data = Object.fromEntries(formData.entries());
 
   const parsed = registerSchema.safeParse(data);
@@ -31,6 +36,10 @@ export async function register(formData: FormData): Promise<ActionResponse> {
     await registerUser({ name, email, username, password });
     return {
       success: true,
+      data: {
+        email,
+        username,
+      },
     };
   } catch (error: any) {
     if (error instanceof EmailAlreadyInUseError) {

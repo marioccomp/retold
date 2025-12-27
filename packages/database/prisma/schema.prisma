@@ -29,6 +29,7 @@ model User {
   email String @unique
   emailVerified DateTime?
   name  String?
+  title String?
   image String?
   bio String?
   password String? // null when OAuth

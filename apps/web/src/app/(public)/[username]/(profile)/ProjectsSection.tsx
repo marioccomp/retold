@@ -4,7 +4,13 @@ import styles from "./projects.module.css";
 import { FiPlus } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
 
-export default function ProjectsSection({ searchQuery }: { searchQuery: string }) {
+export default function ProjectsSection({
+  searchQuery,
+  ownProfile,
+}: {
+  searchQuery: string;
+  ownProfile: boolean;
+}) {
   const projects = [
     {
       id: 1,
@@ -32,7 +38,7 @@ export default function ProjectsSection({ searchQuery }: { searchQuery: string }
 
   return (
     <>
-      {searchQuery === "" && (
+      {ownProfile && searchQuery === "" && (
         <div
           className={styles.newProjectCard}
           onClick={handleNewProject}

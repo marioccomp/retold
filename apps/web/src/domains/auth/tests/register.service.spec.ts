@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerUser } from "../../domains/auth/services/register.service";
+import { registerUser } from "../services/register.service";
 
 vi.mock("@repo/database", () => {
   return {
