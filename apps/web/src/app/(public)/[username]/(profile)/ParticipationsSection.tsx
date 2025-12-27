@@ -4,7 +4,13 @@ import Image from "next/image";
 import styles from "./participations.module.css";
 import { FiPlus } from "react-icons/fi";
 
-export default function ParticipationsSection({ searchQuery }: { searchQuery: string }) {
+export default function ParticipationsSection({
+  searchQuery,
+  ownProfile,
+}: {
+  searchQuery: string;
+  ownProfile: boolean;
+}) {
   const FALLBACK_EVENT =
     "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop";
 
@@ -40,7 +46,7 @@ export default function ParticipationsSection({ searchQuery }: { searchQuery: st
   return (
     <>
       {/* Card de adicionar nova participação */}
-      {searchQuery === "" && (
+      {ownProfile && searchQuery === "" && (
         <div className={styles.newCard} onClick={handleNewParticipation} role="button" tabIndex={0}>
           <FiPlus className={styles.newIcon} />
           <span className={styles.newText}>Nova participação</span>

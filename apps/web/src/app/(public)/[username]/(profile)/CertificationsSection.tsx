@@ -4,7 +4,13 @@ import Image from "next/image";
 import styles from "./certifications.module.css";
 import { FiExternalLink, FiPlus } from "react-icons/fi";
 
-export default function CertificationsSection({ searchQuery }: { searchQuery: string }) {
+export default function CertificationsSection({
+  searchQuery,
+  ownProfile,
+}: {
+  searchQuery: string;
+  ownProfile: boolean;
+}) {
   const FALLBACK_CERT =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop";
 
@@ -48,7 +54,7 @@ export default function CertificationsSection({ searchQuery }: { searchQuery: st
   return (
     <>
       {/* Card de adicionar nova certificação */}
-      {searchQuery === "" && (
+      {ownProfile && searchQuery === "" && (
         <div className={styles.newCard} onClick={handleNewCertification} role="button" tabIndex={0}>
           <FiPlus className={styles.newIcon} />
           <span className={styles.newText}>Nova certificação</span>

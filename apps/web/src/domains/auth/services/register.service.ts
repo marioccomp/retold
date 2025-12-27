@@ -23,7 +23,7 @@ export async function registerUser(data: {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await userRepository.create({
+  const user = await userRepository.create({
     ...data,
     email,
     username,

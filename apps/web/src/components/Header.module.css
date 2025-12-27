@@ -1,31 +1,45 @@
+/* ===== HEADER BASE ===== */
 .header {
-  display: flex;
-  align-items: center;
-  height: 72px;
+  width: 100%;
   background-color: #f3f4f4;
-  color: black;
-  font-size: 22px;
-  padding: 0 40px;
+  border-bottom: 1px solid #e6e6e6;
 }
 
+/* ===== CONTAINER INTERNO ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 72px;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ===== LOGO ===== */
 .logoContainer {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .logoImg {
-  height: 55px;
+  height: 48px;
   width: auto;
   object-fit: contain;
 }
 
+/* ===== NAV ===== */
 .navContainer {
-  margin-left: 60px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .headerBtn {
   display: flex;
-  gap: 40px;
+  gap: 32px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -33,73 +47,129 @@
 
 .headerBtn li {
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
   white-space: nowrap;
+  position: relative;
 }
 
+/* underline hover */
+.headerBtn li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 2px;
+  background-color: #000;
+  transition: width 0.2s ease;
+}
+
+.headerBtn li:hover::after {
+  width: 100%;
+}
+
+/* ===== PROFILE ===== */
 .profileContainer {
-  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 24px;
-}
-
-.profileImgWrapper {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #e2e2e2;
+  gap: 16px;
   flex-shrink: 0;
 }
 
-.profileImg {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
+.profileImgWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #e2e2e2;
 
-.iconFallback {
-  color: #666;
-  font-size: 1.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* fallback icon */
+.iconFallback {
+  color: #666;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== USER NAME (opcional) ===== */
 .name {
   margin: 0;
-  white-space: nowrap;
+  font-size: 15px;
   font-weight: 500;
+  white-space: nowrap;
+  color: #333;
+}
+
+/* ===== LOGIN BUTTON (RETOLD STYLE) ===== */
+.loginButton {
+  height: 38px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: none;
+
+  background-color: #05dc7f;
+  color: #000;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.loginButton:hover {
+  background-color: #04c370;
+  box-shadow: 0 4px 10px rgba(5, 220, 127, 0.35);
+}
+
+.loginButton:active {
+  transform: scale(0.97);
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+  .headerBtn {
+    gap: 20px;
+    font-size: 15px;
+  }
 }
 
 @media (max-width: 480px) {
-  .header {
+  .container {
     padding: 0 16px;
-    height: 70px;
+    height: 64px;
   }
 
   .logoImg {
     height: 40px;
   }
 
-  .navContainer {
-    margin-left: 20px;
-  }
-
-  .headerBtn {
-    gap: 15px;
-    font-size: 16px;
+  .profileContainer {
+    gap: 0;
   }
 
   .name {
     display: none;
-  }
-
-  .profileContainer {
-    margin-left: auto;
-    gap: 0;
   }
 }

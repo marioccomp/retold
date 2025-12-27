@@ -58,6 +58,15 @@
   color: #152e2b;
 }
 
+.ownerName input {
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: 1px solid #e7eae9;
+  border-radius: 6px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
 .profileDetails {
   margin-top: 0.8rem;
   width: 100%;
@@ -75,6 +84,15 @@
   padding: 15px;
   text-align: center;
   border: 1px solid #e7eae9;
+}
+
+.description textarea {
+  width: 100%;
+  border: 1px solid #e7eae9;
+  border-radius: 6px;
+  padding: 8px;
+  resize: none;
+  font-family: inherit;
 }
 
 .title {
@@ -225,6 +243,91 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.avatarEditWrapper {
+  position: relative;
+}
+
+.editAvatarButton {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #05dc7f;
+  color: #0f2f28;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.editAvatarButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(5, 220, 127, 0.4);
+}
+
+.editableText {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.editIcon {
+  font-size: 1.2rem;
+  opacity: 1;
+  color: #6b7c7a; /* neutro forte */
+  background: #f3f6f5;
+  border-radius: 6px;
+  padding: 4px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+  position: absolute;
+  right: -26px; /* distância do texto */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.editableText:hover .editIcon {
+  background-color: rgba(5, 220, 127, 0.15);
+  color: #05dc7f;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.editableText:hover {
+  text-decoration-color: rgba(5, 220, 127, 0.4);
+}
+
+.ownerName input:focus,
+.description textarea:focus {
+  outline: none;
+  border-color: #05dc7f;
+  box-shadow: 0 0 0 2px rgba(5, 220, 127, 0.15);
+}
+
+.title input {
+  width: 100%;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: 1px solid #e7eae9;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: inherit;
+}
+
+.title input:focus {
+  outline: none;
+  border-color: #05dc7f;
+  box-shadow: 0 0 0 2px rgba(5, 220, 127, 0.15);
 }
 
 /* --- RESPONSIVIDADE --- */
