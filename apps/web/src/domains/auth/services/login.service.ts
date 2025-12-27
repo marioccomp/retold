@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { userRepository } from "@repo/database";
 import { ipRateLimit, bruteForceRateLimit, protectionRateLimit } from "@/lib/redis-rate-limit";
 import { getClientIp } from "@/lib/get-client-ip";
-import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/errors/auth.errors";
+import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
 
 export async function loginUser(identifier: string, password: string) {
   const login = identifier.toLowerCase().trim();

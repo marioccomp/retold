@@ -1,4 +1,4 @@
-import { auth } from "@/src/auth";
+import { auth } from "@/src/domains/auth/auth";
 
 export default async function DashboardPage() {
   const session = await auth(); // Busca a sessão no servidor
