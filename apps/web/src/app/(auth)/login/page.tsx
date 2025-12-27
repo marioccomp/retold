@@ -1,4 +1,4 @@
-import { auth } from "@/src/auth";
+import { auth } from "@/src/domains/auth/auth";
 import { redirect } from "next/navigation";
 import LoginForm from "./LoginForm";
 

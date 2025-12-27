@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { userRepository } from "@repo/database";
-import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/errors/auth.errors";
+import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/domains/auth/auth.errors";
 
 export async function registerUser(data: {
   name: string;

@@ -1,10 +1,10 @@
 "use server";
 
 import { z } from "zod";
-import { signIn } from "@/src/auth";
+import { signIn } from "@/src/domains/auth/auth";
 import type { ActionResponse } from "@/lib/action-response";
-import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/errors/auth.errors";
-import { loginUser } from "@/src/services/auth/login.service";
+import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
+import { loginUser } from "@/src/domains/auth/services/login.service";
 
 const loginSchema = z.object({
   identifier: z.string().min(3, "Email or username is required"),

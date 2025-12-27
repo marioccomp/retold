@@ -1,10 +1,10 @@
 "use server";
 
 import { z } from "zod";
-import { registerUser } from "@/src/services/auth/register.service";
+import { registerUser } from "@/src/domains/auth/services/register.service";
 import type { ActionResponse } from "@/lib/action-response";
-import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/errors/auth.errors";
-import { registerSchema } from "@/src/schemas/register.schema";
+import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/domains/auth/auth.errors";
+import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
 
 export async function register(formData: FormData): Promise<ActionResponse> {
   const data = Object.fromEntries(formData.entries());

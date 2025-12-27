@@ -3,7 +3,7 @@
 import { userRepository } from "@repo/database";
 import { z } from "zod";
 import { ActionResponse } from "@/lib/action-response";
-import { registerSchema } from "@/src/schemas/register.schema";
+import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
 
 const checkEmailSchema = registerSchema.pick({
   email: true,
