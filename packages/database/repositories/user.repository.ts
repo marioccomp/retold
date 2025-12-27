@@ -28,4 +28,11 @@ export const userRepository = {
       },
     });
   },
+
+  updatePassword(userId: number, passwordHash: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: { password: passwordHash },
+    });
+  },
 };
