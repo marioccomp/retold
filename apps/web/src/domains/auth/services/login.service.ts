@@ -45,5 +45,6 @@ export async function loginUser(identifier: string, password: string) {
     plan: user.plan,
     name: user.name,
     image: user.image,
+    username: user.username,
   };
 }

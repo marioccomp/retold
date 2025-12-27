@@ -1,4 +1,4 @@
-import { prisma } from "../index";
+import { prisma } from "@repo/database";
 
 export const userRepository = {
   findByEmailOrUsername(email: string, username: string) {
@@ -34,5 +34,20 @@ export const userRepository = {
       where: { id: userId },
       data: { password: passwordHash },
     });
+  },
+  findPublicProfileByUsername(username: string) {
+    const user = prisma.user.findUnique({
+      where: { username },
+      include: {
+        projects: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            tags: true,
+          },
+        },
+      },
+    });
+
+    return user;
   },
 };

@@ -6,6 +6,7 @@ declare module "next-auth" {
       id: string;
       role: "USER" | "RECRUITER" | "ADMIN";
       plan: "FREE" | "PREMIUM";
+      username: string;
     } & DefaultSession["user"];
   }
 }
@@ -15,5 +16,6 @@ declare module "next-auth/jwt" {
     id: string;
     role: "USER" | "RECRUITER" | "ADMIN";
     plan: "FREE" | "PREMIUM";
+    username: string;
   }
 }
