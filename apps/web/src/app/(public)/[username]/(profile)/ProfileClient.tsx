@@ -9,6 +9,8 @@ import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { FiEdit2, FiCamera } from "react-icons/fi";
+import { changeBio, changeName, changeTitle } from "../_actions/edit-profle";
+import { toast } from "sonner";
 
 import ProjectsSection from "./ProjectsSection";
 import CertificationsSection from "./CertificationsSection";
@@ -37,9 +39,71 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
   const [editingBio, setEditingBio] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
 
+  const [name, setName] = useState(profile.name ?? "");
   const [nameDraft, setNameDraft] = useState(profile.name ?? "");
+
+  const [bio, setBio] = useState(profile.bio ?? "");
   const [bioDraft, setBioDraft] = useState(profile.bio ?? "");
+
+  const [title, setTitle] = useState(profile.title ?? "");
   const [titleDraft, setTitleDraft] = useState(profile.title ?? "");
+
+  const submitName = async () => {
+    if (name === nameDraft) return;
+    const result = await changeName(nameDraft, profile.id);
+
+    if (result.success && result.data) {
+      setEditingName(false);
+      setName(result.data);
+      setNameDraft(result.data);
+      toast.success("Name changed successfully");
+      return;
+    }
+
+    if (result.success === false) {
+      setNameDraft(name);
+      toast.error(result.message);
+      setEditingName(false);
+    }
+  };
+
+  const submitTitle = async () => {
+    if (title === titleDraft) return;
+    const result = await changeTitle(titleDraft, profile.id);
+
+    if (result.success && result.data) {
+      setEditingTitle(false);
+      setTitle(result.data);
+      setTitleDraft(result.data);
+      toast.success("Title changed successfully");
+      return;
+    }
+
+    if (result.success === false) {
+      setTitleDraft(title);
+      toast.error(result.message);
+      setEditingTitle(false);
+    }
+  };
+
+  const submitBio = async () => {
+    if (bio === bioDraft) return;
+    const result = await changeBio(bioDraft, profile.id);
+
+    if (result.success && result.data) {
+      setEditingBio(false);
+      setBio(result.data);
+      setBioDraft(result.data);
+      toast.success("Bio changed successfully");
+      return;
+    }
+
+    if (result.success === false) {
+      setBioDraft(bio);
+      toast.error(result.message);
+      setEditingBio(false);
+    }
+  };
 
   return (
     <div className={styles.main}>
@@ -66,8 +130,13 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
                   value={nameDraft}
                   autoFocus
                   onChange={(e) => setNameDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      submitName();
+                    }
+                  }}
                   onBlur={() => setEditingName(false)}
-                  onKeyDown={(e) => e.key === "Enter" && setEditingName(false)}
                 />
               ) : (
                 <span
@@ -88,8 +157,13 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
                   value={titleDraft}
                   autoFocus
                   onChange={(e) => setTitleDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      submitTitle();
+                    }
+                  }}
                   onBlur={() => setEditingTitle(false)}
-                  onKeyDown={(e) => e.key === "Enter" && setEditingTitle(false)}
                   placeholder="Ex: Desenvolvedor Full Stack"
                 />
               ) : (
@@ -108,9 +182,15 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
                 <textarea
                   value={bioDraft}
                   autoFocus
-                  onChange={(e) => setBioDraft(e.target.value)}
-                  onBlur={() => setEditingBio(false)}
                   rows={4}
+                  onChange={(e) => setBioDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      submitBio();
+                    }
+                  }}
+                  onBlur={() => setEditingBio(false)}
                 />
               ) : (
                 <p
@@ -172,13 +252,25 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
 
           <div className={styles.projectsGrid}>
             {selected === "Projetos" && (
-              <ProjectsSection searchQuery={searchQuery} ownProfile={ownProfile} />
+              <ProjectsSection
+                searchQuery={searchQuery}
+                ownProfile={ownProfile}
+                profile={profile}
+              />
             )}
             {selected === "Certificações" && (
-              <CertificationsSection searchQuery={searchQuery} ownProfile={ownProfile} />
+              <CertificationsSection
+                searchQuery={searchQuery}
+                ownProfile={ownProfile}
+                profile={profile}
+              />
             )}
             {selected === "Participações" && (
-              <ParticipationsSection searchQuery={searchQuery} ownProfile={ownProfile} />
+              <ParticipationsSection
+                searchQuery={searchQuery}
+                ownProfile={ownProfile}
+                profile={profile}
+              />
             )}
           </div>
         </main>

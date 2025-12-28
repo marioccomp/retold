@@ -1,4 +1,8 @@
 import { prisma } from "@repo/database";
+import { User } from "@repo/database";
+
+type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title">;
+type UpdateProfileInput = Partial<UpdatableProfileFields>;
 
 export const userRepository = {
   findByEmailOrUsername(email: string, username: string) {
@@ -49,5 +53,16 @@ export const userRepository = {
     });
 
     return user;
+  },
+
+  updateProfileById(userId: number, data: UpdateProfileInput) {
+    if (Object.keys(data).length === 0) {
+      throw new Error("No fields to update");
+    }
+
+    return prisma.user.update({
+      where: { id: userId },
+      data,
+    });
   },
 };

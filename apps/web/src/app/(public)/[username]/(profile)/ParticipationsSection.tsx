@@ -3,14 +3,15 @@
 import Image from "next/image";
 import styles from "./participations.module.css";
 import { FiPlus } from "react-icons/fi";
+import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 
-export default function ParticipationsSection({
-  searchQuery,
-  ownProfile,
-}: {
-  searchQuery: string;
+type Props = {
+  profile: PublicProfileDTO;
   ownProfile: boolean;
-}) {
+  searchQuery: string;
+};
+
+export default function ParticipationsSection({ searchQuery, ownProfile, profile }: Props) {
   const FALLBACK_EVENT =
     "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop";
 

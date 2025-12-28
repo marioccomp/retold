@@ -44,9 +44,8 @@ export default function RegisterForm() {
         return;
       }
 
-      // 🔐 autentica automaticamente
       const loginResult = await signIn("credentials", {
-        email: res.data!.email,
+        identifier: res.data!.email,
         password: passwordValue,
         redirect: false,
       });
