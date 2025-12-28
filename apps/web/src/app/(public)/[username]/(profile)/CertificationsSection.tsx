@@ -3,14 +3,15 @@
 import Image from "next/image";
 import styles from "./certifications.module.css";
 import { FiExternalLink, FiPlus } from "react-icons/fi";
+import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 
-export default function CertificationsSection({
-  searchQuery,
-  ownProfile,
-}: {
-  searchQuery: string;
+type Props = {
+  profile: PublicProfileDTO;
   ownProfile: boolean;
-}) {
+  searchQuery: string;
+};
+
+export default function CertificationsSection({ searchQuery, ownProfile, profile }: Props) {
   const FALLBACK_CERT =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop";
 
