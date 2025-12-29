@@ -49,6 +49,18 @@ export const userRepository = {
             tags: true,
           },
         },
+        certifications: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            tags: true,
+          },
+        },
+        participations: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            tags: true,
+          },
+        },
       },
     });
 

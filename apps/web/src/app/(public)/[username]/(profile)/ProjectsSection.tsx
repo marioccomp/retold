@@ -60,7 +60,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
       )}
 
       {filteredProjects.map((project) => (
-        <ProjectCard key={project.id} />
+        <ProjectCard key={project.id} project={project} />
       ))}
     </>
   );

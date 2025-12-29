@@ -15,32 +15,34 @@ export default function CertificationsSection({ searchQuery, ownProfile, profile
   const FALLBACK_CERT =
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop";
 
-  const certifications = [
-    {
-      id: 1,
-      title: "Full Stack Developer",
-      issuer: "Rocketseat",
-      date: "2024",
-      link: "#",
-      image: null,
-    },
-    {
-      id: 2,
-      title: "Data Structures in Julia",
-      issuer: "MIT OpenCourseWare",
-      date: "2023",
-      link: "#",
-      image: null,
-    },
-    {
-      id: 3,
-      title: "Advanced React Patterns",
-      issuer: "Frontend Masters",
-      date: "2024",
-      link: "#",
-      image: null,
-    },
-  ];
+  // const certifications = [
+  //   {
+  //     id: 1,
+  //     title: "Full Stack Developer",
+  //     issuer: "Rocketseat",
+  //     date: "2024",
+  //     link: "#",
+  //     image: null,
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Data Structures in Julia",
+  //     issuer: "MIT OpenCourseWare",
+  //     date: "2023",
+  //     link: "#",
+  //     image: null,
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Advanced React Patterns",
+  //     issuer: "Frontend Masters",
+  //     date: "2024",
+  //     link: "#",
+  //     image: null,
+  //   },
+  // ];
+
+  const certifications = profile.certifications;
 
   const filtered = certifications.filter(
     (cert) =>
@@ -80,7 +82,7 @@ export default function CertificationsSection({ searchQuery, ownProfile, profile
                 {cert.issuer} • {cert.date}
               </p>
             </div>
-            <a href={cert.link} className={styles.cardLink} target="_blank">
+            <a href={cert.link ?? ""} className={styles.cardLink} target="_blank">
               <FiExternalLink />
             </a>
           </div>

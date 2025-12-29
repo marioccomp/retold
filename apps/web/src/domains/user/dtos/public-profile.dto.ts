@@ -1,3 +1,7 @@
+import { ProjectCardDTO } from "../../profile/dtos/project-card.dto";
+import { CertificationCardDTO } from "../../profile/dtos/certification-card.dto";
+import { ParticipationCardDTO } from "../../profile/dtos/participation-card.dto";
+
 export type PublicProfileDTO = {
   id: number;
   username: string;
@@ -5,15 +9,8 @@ export type PublicProfileDTO = {
   title: string | null;
   bio: string | null;
   image: string | null;
-  createdAt: Date;
-  projects: {
-    id: number;
-    title: string;
-    description: string;
-    createdAt: Date;
-    tags: {
-      id: number;
-      name: string;
-    }[];
-  }[];
+  createdAt: string;
+  projects: ProjectCardDTO[];
+  certifications: CertificationCardDTO[];
+  participations: ParticipationCardDTO[];
 };
