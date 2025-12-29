@@ -6,21 +6,26 @@ import { MdOutlineVisibility } from "react-icons/md";
 import imageProject from "@/assets/mockup-escalonador.jpg";
 import { useState } from "react";
 import ownerPic from "@/assets/foto.jpeg"; // Deve vir do banco
+import { ProjectCardDTO } from "../domains/profile/dtos/project-card.dto";
 
-export default function ProjectCard() {
+interface Props {
+  project: ProjectCardDTO;
+}
+
+export default function ProjectCard({ project }: Props) {
   const [isLiked, setIsLiked] = useState(false); // Isso aqui tem q ser carregado baseado se o usuario curtiu ou nao
 
-  const project = {
-    title: "Simulador de Escalonamento",
-    description: "Comparativo de desempenho entre algoritmos de CPU",
-    longerDescription:
-      "Sistema completo de adoção de animais. A API gerencia usuários, autenticação JWT, perfis de ONGs, processamento de imagens e chat em tempo real via WebSockets. ",
-    projectPic: "@/assets/mockup-escalonador.jpg", // pesquisar dps como armazenar imagens e buscar elas no banco
-    ownerId: 123,
-    mainTags: ["Julia", "Data Structures"],
-    likes: 102,
-    views: 127,
-  };
+  // const project = {
+  //   title: "Simulador de Escalonamento",
+  //   description: "Comparativo de desempenho entre algoritmos de CPU",
+  //   longerDescription:
+  //     "Sistema completo de adoção de animais. A API gerencia usuários, autenticação JWT, perfis de ONGs, processamento de imagens e chat em tempo real via WebSockets. ",
+  //   projectPic: "@/assets/mockup-escalonador.jpg", // pesquisar dps como armazenar imagens e buscar elas no banco
+  //   ownerId: 123,
+  //   mainTags: ["Julia", "Data Structures"],
+  //   likes: 102,
+  //   views: 127,
+  // };
 
   const ownerName: string = "Mario Junior";
 
@@ -42,8 +47,8 @@ export default function ProjectCard() {
             <p>{project.longerDescription}</p>
           </div>
           <ul className={styles.tags}>
-            {project.mainTags.map((tag) => (
-              <li key={tag}>{tag}</li>
+            {project.tags.map((tag) => (
+              <li key={tag.id}>{tag.name}</li>
             ))}
           </ul>
         </div>

@@ -86,6 +86,10 @@
   border: 1px solid #e7eae9;
 }
 
+.description {
+  text-align: left;
+}
+
 .description textarea {
   width: 100%;
   border: 1px solid #e7eae9;

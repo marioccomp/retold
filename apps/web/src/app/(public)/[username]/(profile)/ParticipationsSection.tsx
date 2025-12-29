@@ -15,28 +15,30 @@ export default function ParticipationsSection({ searchQuery, ownProfile, profile
   const FALLBACK_EVENT =
     "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop";
 
-  const participations = [
-    {
-      id: 1,
-      event: "JuliaCon 2024",
-      role: "Palestrante",
-      description: "Apresentação sobre simulações físicas em tempo real.",
-      date: "Jul 2024",
-      image: null,
-    },
-    {
-      id: 2,
-      event: "Hackathon Global",
-      role: "Finalista",
-      description: "Desenvolvimento de solução para cidades inteligentes.",
-      date: "Mai 2023",
-      image: null,
-    },
-  ];
+  // const participations = [
+  //   {
+  //     id: 1,
+  //     event: "JuliaCon 2024",
+  //     role: "Palestrante",
+  //     description: "Apresentação sobre simulações físicas em tempo real.",
+  //     date: "Jul 2024",
+  //     image: null,
+  //   },
+  //   {
+  //     id: 2,
+  //     event: "Hackathon Global",
+  //     role: "Finalista",
+  //     description: "Desenvolvimento de solução para cidades inteligentes.",
+  //     date: "Mai 2023",
+  //     image: null,
+  //   },
+  // ];
+
+  const participations = profile.participations;
 
   const filtered = participations.filter(
     (part) =>
-      part.event.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      part.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       part.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -59,7 +61,7 @@ export default function ParticipationsSection({ searchQuery, ownProfile, profile
           <div className={styles.cardImageWrapper}>
             <Image
               src={part.image || FALLBACK_EVENT}
-              alt={part.event}
+              alt={part.title}
               fill
               className={styles.cardImage}
               unoptimized
@@ -68,7 +70,7 @@ export default function ParticipationsSection({ searchQuery, ownProfile, profile
           </div>
           <div className={styles.genericCardContent}>
             <div className={styles.cardInfo}>
-              <h4>{part.event}</h4>
+              <h4>{part.title}</h4>
               <p className={styles.partDescription}>{part.description}</p>
               <small>{part.date}</small>
             </div>

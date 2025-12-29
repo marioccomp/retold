@@ -9,27 +9,36 @@ import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { FiEdit2, FiCamera } from "react-icons/fi";
-import { changeBio, changeName, changeTitle } from "../_actions/edit-profle";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { changeBio, changeName, changeTitle } from "../_actions/edit-profle";
+import { getProfile } from "../_actions/get-profile"; // Action de busca
 
 import ProjectsSection from "./ProjectsSection";
 import CertificationsSection from "./CertificationsSection";
 import ParticipationsSection from "./ParticipationsSection";
 
 type Props = {
-  profile: PublicProfileDTO;
+  username: string;
   ownProfile: boolean;
 };
 
-export default function ProfileClient({ profile, ownProfile }: Props) {
+export default function ProfileClient({ username, ownProfile }: Props) {
   const [selected, setSelected] = useState("Projetos");
   const tabs = ["Projetos", "Certificações", "Participações"];
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Apaixonado por criar soluções web robustas e escaláveis. Especialista em Node.js,
-  // React e arquitetura de software. Focado em construir produtos que impactam
+  const queryClient = useQueryClient();
 
-  const username = profile.name;
+  const { data: profile } = useQuery({
+    queryKey: ["profile", username],
+    queryFn: () => getProfile(username),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  if (!profile) return null;
+
   const userImage = profile.image;
   const userBio = profile.bio;
   const userProjects = profile.projects;
@@ -48,61 +57,92 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
   const [title, setTitle] = useState(profile.title ?? "");
   const [titleDraft, setTitleDraft] = useState(profile.title ?? "");
 
-  const submitName = async () => {
-    if (name === nameDraft) return;
-    const result = await changeName(nameDraft, profile.id);
+  function capitalizeFirstLetter(text: string) {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
 
-    if (result.success && result.data) {
+  const updateProfileMutation = useMutation({
+    mutationFn: async ({ type, value }: { type: "name" | "bio" | "title"; value: string }) => {
+      switch (type) {
+        case "name":
+          return changeName(value, profile.id);
+        case "bio":
+          return changeBio(value, profile.id);
+        case "title":
+          return changeTitle(value, profile.id);
+      }
+    },
+    onMutate: async ({ type, value }) => {
+      await queryClient.cancelQueries({ queryKey: ["profile", username] });
+
+      const previousProfile = queryClient.getQueryData<PublicProfileDTO>(["profile", username]);
+
+      if (previousProfile) {
+        queryClient.setQueryData<PublicProfileDTO>(["profile", username], {
+          ...previousProfile,
+          [type]: value,
+        });
+      }
+
+      return { previousProfile };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousProfile) {
+        queryClient.setQueryData(["profile", username], context.previousProfile);
+      }
+      toast.error("Failed to update profile");
+    },
+    onSuccess: (data, variables) => {
+      if (!data.success) {
+        toast.error(data.message);
+        return;
+      }
+      toast.success(`${capitalizeFirstLetter(variables.type)} updated successfully`);
       setEditingName(false);
-      setName(result.data);
-      setNameDraft(result.data);
-      toast.success("Name changed successfully");
+      setEditingBio(false);
+      setEditingTitle(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile", username] });
+    },
+  });
+
+  const handleSaveName = () => {
+    if (nameDraft === profile.name) {
+      setEditingName(false);
       return;
     }
-
-    if (result.success === false) {
-      setNameDraft(name);
-      toast.error(result.message);
-      setEditingName(false);
-    }
+    updateProfileMutation.mutate({ type: "name", value: nameDraft });
   };
 
-  const submitTitle = async () => {
-    if (title === titleDraft) return;
-    const result = await changeTitle(titleDraft, profile.id);
-
-    if (result.success && result.data) {
+  const handleSaveTitle = () => {
+    if (titleDraft === profile.title) {
       setEditingTitle(false);
-      setTitle(result.data);
-      setTitleDraft(result.data);
-      toast.success("Title changed successfully");
       return;
     }
-
-    if (result.success === false) {
-      setTitleDraft(title);
-      toast.error(result.message);
-      setEditingTitle(false);
-    }
+    updateProfileMutation.mutate({ type: "title", value: titleDraft });
   };
 
-  const submitBio = async () => {
-    if (bio === bioDraft) return;
-    const result = await changeBio(bioDraft, profile.id);
-
-    if (result.success && result.data) {
+  const handleSaveBio = () => {
+    if (bioDraft === profile.bio) {
       setEditingBio(false);
-      setBio(result.data);
-      setBioDraft(result.data);
-      toast.success("Bio changed successfully");
       return;
     }
+    updateProfileMutation.mutate({ type: "bio", value: bioDraft });
+  };
 
-    if (result.success === false) {
-      setBioDraft(bio);
-      toast.error(result.message);
-      setEditingBio(false);
-    }
+  const startEditingName = () => {
+    setNameDraft(profile.name ?? "");
+    setEditingName(true);
+  };
+  const startEditingTitle = () => {
+    setTitleDraft(profile.title ?? "");
+    setEditingTitle(true);
+  };
+  const startEditingBio = () => {
+    setBioDraft(profile.bio ?? "");
+    setEditingBio(true);
   };
 
   return (
@@ -133,17 +173,20 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-                      submitName();
+                      handleSaveName();
                     }
                   }}
                   onBlur={() => setEditingName(false)}
+                  disabled={updateProfileMutation.isPending}
+                  minLength={3}
+                  maxLength={20}
                 />
               ) : (
                 <span
                   className={styles.editableText}
-                  onClick={() => ownProfile && setEditingName(true)}
+                  onClick={ownProfile ? startEditingName : undefined}
                 >
-                  {nameDraft}
+                  {profile.name}
                   {ownProfile && <FiEdit2 className={styles.editIcon} />}
                 </span>
               )}
@@ -160,18 +203,20 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-                      submitTitle();
+                      handleSaveTitle();
                     }
                   }}
                   onBlur={() => setEditingTitle(false)}
+                  disabled={updateProfileMutation.isPending}
                   placeholder="Ex: Desenvolvedor Full Stack"
+                  maxLength={50}
                 />
               ) : (
                 <h3
                   className={styles.editableText}
-                  onClick={() => ownProfile && setEditingTitle(true)}
+                  onClick={ownProfile ? startEditingTitle : undefined}
                 >
-                  {titleDraft || "Sem título"}
+                  {profile.title || "Sem título"}
                   {ownProfile && <FiEdit2 className={styles.editIcon} />}
                 </h3>
               )}
@@ -187,17 +232,18 @@ export default function ProfileClient({ profile, ownProfile }: Props) {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      submitBio();
+                      handleSaveBio();
                     }
                   }}
                   onBlur={() => setEditingBio(false)}
+                  maxLength={280}
                 />
               ) : (
                 <p
                   className={styles.editableText}
-                  onClick={() => ownProfile && setEditingBio(true)}
+                  onClick={ownProfile ? startEditingBio : undefined}
                 >
-                  {bioDraft || "Sem descrição"}
+                  {profile.bio || "Sem descrição"}
                   {ownProfile && <FiEdit2 className={styles.editIcon} />}
                 </p>
               )}

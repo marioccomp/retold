@@ -32,13 +32,7 @@ export const registerSchema = z
 
 export const profileSchema = z.object({
   // MOVER ISSO AQUI PRA SCHEMA DE PROFILE
-  title: z.preprocess(
-    trim,
-    z
-      .string()
-      .min(3, "Title must have at least 3 characters")
-      .max(50, "Title must have at most 50 characters")
-  ),
+  title: z.preprocess(trim, z.string().max(50, "Title must have at most 50 characters")),
 
   bio: z.preprocess(trim, z.string().max(280, "Bio must have at most 280 characters")),
 });

@@ -3,6 +3,8 @@ import ProfileClient from "./ProfileClient";
 import { userRepository } from "@repo/database";
 import { mapUserToPublicProfile } from "@/src/domains/user/mappers/user-to-public-profile.mapper";
 import { auth } from "@/src/domains/auth/auth";
+import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
+import { getProfile } from "../_actions/get-profile";
 
 type PageProps = {
   params: Promise<{
@@ -14,13 +16,28 @@ export default async function Page({ params }: PageProps) {
   const { username } = await params;
   const session = await auth();
 
-  const user = await userRepository.findPublicProfileByUsername(username);
+  const queryClient = new QueryClient();
 
-  if (!user) notFound();
+  await queryClient.prefetchQuery({
+    queryKey: ["profile", username],
+    queryFn: () => getProfile(username),
+  });
 
-  const ownProfile: boolean = session?.user.username === user.username;
+  const profile = queryClient.getQueryData(["profile", username]);
 
-  const profile = mapUserToPublicProfile(user);
+  if (!profile) notFound();
 
-  return <ProfileClient profile={profile} ownProfile={ownProfile} />;
+  // const user = await userRepository.findPublicProfileByUsername(username);
+
+  // if (!user) notFound();
+
+  const ownProfile: boolean = session?.user.username === username;
+
+  // const profile = mapUserToPublicProfile(user);
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProfileClient ownProfile={ownProfile} username={username} />{" "}
+    </HydrationBoundary>
+  );
 }
