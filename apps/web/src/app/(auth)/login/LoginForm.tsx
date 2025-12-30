@@ -10,7 +10,7 @@ import Link from "next/link";
 import { login } from "../_actions/login";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -220,6 +220,7 @@ export default function LoginForm() {
             <span className="px-4">Or continue with</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
+
 
           {/* Social accounts */}
           <div className="flex justify-center gap-4">
