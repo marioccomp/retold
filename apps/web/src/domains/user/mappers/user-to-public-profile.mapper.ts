@@ -15,7 +15,7 @@ type UserWithProfileData = Prisma.UserGetPayload<typeof userWithProfileData>;
 export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfileDTO {
   return {
     id: user.id,
-    username: user.username,
+    username: user.username ?? "",
     name: user.name,
     title: user.title,
     bio: user.bio,
@@ -42,8 +42,8 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
         name: tag.name,
       })),
 
-      ownerName: user.name ?? user.username,
-      ownerUsername: user.username,
+      ownerName: user.name ?? user.username ?? "",
+      ownerUsername: user.username ?? "",
       ownerImage: user.image,
     })),
 

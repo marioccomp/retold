@@ -2,6 +2,8 @@ import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   interface Session {
+    accessToken: string;
+    scope: string;
     user: {
       id: string;
       role: "USER" | "RECRUITER" | "ADMIN";
@@ -17,5 +19,7 @@ declare module "next-auth/jwt" {
     role: "USER" | "RECRUITER" | "ADMIN";
     plan: "FREE" | "PREMIUM";
     username: string;
+    accessToken: string;
+    scope: string;
   }
 }
