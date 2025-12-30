@@ -1,52 +1,105 @@
 "use client";
 
 import Image from "next/image";
-import logo from "@/assets/image 15.png";
+import Link from "next/link";
+import logo from "@/assets/logo-full.svg";
 import profilePic from "@/assets/foto.jpeg";
-import styles from "./Header.module.css";
-import { FaRegUser } from "react-icons/fa";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
+
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 
 export default function Header() {
   const { data: session, status } = useSession();
 
-  let userImage: string | null = profilePic.src; // Aqui to pegando a imagem da pasta msm, dps so descomentar a linha de baixo que pega do banco
-  const userName = session?.user?.name;
-  // const userImage = session?.user?.image;
+  const userImage = profilePic.src; // TODO: substituir por session?.user?.image
+  const userName = session?.user?.name || "User";
+  const userInitials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
-    <header className={`${styles.header}`}>
-      <div className={styles.container}>
-        <div className={styles.logoContainer}>
-          <Image src={logo} alt="Logo" className={styles.logoImg} priority />
-        </div>
+    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-black/5">
+      <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center cursor-pointer">
+          <Image
+            src={logo}
+            alt="Retold Logo"
+            className="h-30 md:h-30 w-auto cursor-pointer"
+            priority
+          />
+        </Link>
 
-        <nav className={styles.navContainer}>
-          <ul className={styles.headerBtn}>
-            <li>Explorar</li>
-            <li>Sobre</li>
-          </ul>
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center gap-1">
+          <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer">
+            Explorar
+          </Button>
+          <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer">
+            Sobre
+          </Button>
         </nav>
 
-        <div className={styles.profileContainer}>
+        {/* Profile / Login */}
+        <div className="flex items-center gap-4">
           {status === "authenticated" ? (
-            <div className={styles.profileImgWrapper}>
-              {userImage ? (
-                <Image
-                  src={userImage}
-                  alt={`Foto de ${userName}`}
-                  width={40}
-                  height={40}
-                  className={styles.profileImg}
-                />
-              ) : (
-                <div className={styles.iconFallback}>
-                  <FaRegUser />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-[#05dc7f] focus:ring-offset-2 transition-all cursor-pointer">
+                  <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-[#05dc7f]/50 transition-all">
+                    {userImage ? (
+                      <AvatarImage src={userImage} alt={userName} />
+                    ) : null}
+                    <AvatarFallback className="bg-[#05dc7f]/10 text-[#047857] text-sm font-medium">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 mt-2">
+                <div className="px-3 py-2 border-b border-gray-100">
+                  <p className="text-sm font-medium text-gray-900">{userName}</p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {session?.user?.email}
+                  </p>
                 </div>
-              )}
-            </div>
+                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
+                  <FiUser className="h-4 w-4 text-gray-500" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
+                  <FiSettings className="h-4 w-4 text-gray-500" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 py-2 text-red-600 focus:text-red-600 focus:bg-red-50"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  <FiLogOut className="h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <button className={styles.loginButton}>Entrar</button>
+            <Link href="/login">
+              <Button className="bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(5,220,127,0.4)] active:scale-[0.98] cursor-pointer">
+                Entrar
+              </Button>
+            </Link>
           )}
         </div>
       </div>
