@@ -11,7 +11,7 @@ import { login } from "../_actions/login";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -100,7 +100,11 @@ export default function LoginForm() {
             <span>Or sign in with</span>
           </div>
           <div className={styles.accounts}>
-            <FiGithub className={styles.account} />
+            <FiGithub
+              className={styles.account}
+              onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
+              style={{ cursor: "pointer" }}
+            />
             <FiLinkedin className={styles.account} />
             <FaGoogle className={styles.account} />
           </div>
