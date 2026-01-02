@@ -3,7 +3,7 @@
 import { auth } from "@/src/domains/auth/auth";
 import ProjectsPage from "./ProjectsPage";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import { getUserRepositories } from "@/lib/github";
+import { getUserRepositories } from "@/src/domains/github/github";
 
 export default async function Projects() {
   const session = await auth();

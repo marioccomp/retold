@@ -1,4 +1,4 @@
-import { getUserRepositories } from "@/lib/github";
+import { getUserRepositories } from "@/src/domains/github/github";
 import { auth } from "@/src/domains/auth/auth";
 
 export default async function DashboardPage() {
@@ -8,7 +8,7 @@ export default async function DashboardPage() {
   let repositories: any = [];
 
   if (id) {
-    repositories = await getUserRepositories(Number(id));
+    repositories = await getUserRepositories();
   }
 
   if (repositories.length === 0) {
