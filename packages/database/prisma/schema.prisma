@@ -46,8 +46,25 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  githubInstallations GithubAppInstallation[]
+
   @@index([email])
   @@index([username])
+}
+
+model GithubAppInstallation {
+  id              Int      @id @default(autoincrement())
+  installationId  String   @unique 
+  accountLogin    String   
+  accountType     String   
+  
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Account {

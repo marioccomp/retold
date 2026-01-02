@@ -1,5 +1,5 @@
 "use server";
-import { signIn } from "@/src/domains/auth/auth"; // Importe do seu arquivo de configuração
+import { signIn } from "@/src/domains/auth/auth";
 
 export async function upgradeGithubPermissions(scope: string) {
   await signIn(

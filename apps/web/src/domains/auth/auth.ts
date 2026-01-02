@@ -54,6 +54,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     GitHub({
       allowDangerousEmailAccountLinking: true,
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+      authorization: {
+        params: {
+          scope: "read:user user:email",
+        },
+      },
     }),
     Credentials({
       name: "credentials",

@@ -77,4 +77,12 @@ export const userRepository = {
       data,
     });
   },
+
+  getUserInstallationId(userId: number) {
+    const installation = prisma.githubAppInstallation.findFirst({
+      where: { userId },
+    });
+
+    return installation;
+  },
 };
