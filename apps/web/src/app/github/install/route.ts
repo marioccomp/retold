@@ -8,14 +8,14 @@ export async function GET(req: Request) {
   const installationId = searchParams.get("installation_id");
   const setupAction = searchParams.get("setup_action");
 
-  if (!installationId || setupAction !== "install") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (!installationId || !["install", "update"].includes(setupAction ?? "")) {
+    return popupCloseResponse("ERROR");
   }
 
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return popupCloseResponse("NOT_AUTHENTICATED");
   }
 
   await saveGithubInstallation({
@@ -23,5 +23,35 @@ export async function GET(req: Request) {
     userId: Number(session.user.id),
   });
 
-  return NextResponse.redirect(new URL("/dashboard", req.url));
+  // 🔥 sempre avisa que repos mudaram
+  return popupCloseResponse("REPOSITORIES_UPDATED");
+}
+function popupCloseResponse(status: string) {
+  return new NextResponse(
+    `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHub App</title>
+  </head>
+  <body>
+    <script>
+      if (window.opener) {
+        window.opener.postMessage(
+          { type: "GITHUB_APP_${status}" },
+          window.location.origin
+        );
+      }
+      window.close();
+    </script>
+    <p>Finalizando instalação...</p>
+  </body>
+</html>
+    `,
+    {
+      headers: {
+        "Content-Type": "text/html",
+      },
+    }
+  );
 }

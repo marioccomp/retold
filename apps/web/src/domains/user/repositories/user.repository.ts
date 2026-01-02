@@ -85,4 +85,21 @@ export const userRepository = {
 
     return installation;
   },
+
+  deleteAllUserInstallationId(userId: number) {
+    return prisma.githubAppInstallation.deleteMany({
+      where: { userId },
+    });
+  },
+
+  getAllUserProjects(userId: number) {
+    return prisma.project.findMany({
+      where: {
+        userId: userId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  },
 };
