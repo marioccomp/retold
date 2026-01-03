@@ -5,14 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import type { ProjectDTO } from "@/src/domains/project/dtos/project.dto";
 
 type RepoInfo = {
   full_name: string;
 };
 
 type ProjectOverlayProps = {
-  project: any;
-  repo?: RepoInfo | null;
+  project: ProjectDTO;
+  repo?: ProjectDTO["repository"];
   onClose: () => void;
 };
 
@@ -61,7 +62,8 @@ const improvements = [
   "Add CI pipeline for pull requests",
 ];
 
-export function ProjectOverlay({ project, repo, onClose }: ProjectOverlayProps) {
+export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
+  const repo = project.repository;
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="relative w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-2xl bg-background shadow-xl">
@@ -72,12 +74,12 @@ export function ProjectOverlay({ project, repo, onClose }: ProjectOverlayProps) 
 
             {repo && (
               <a
-                href={`https://github.com/${repo.full_name}`}
+                href={`https://github.com/${repo.fullName}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-primary hover:underline"
               >
-                {repo.full_name}
+                {repo.fullName}
               </a>
             )}
 

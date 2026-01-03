@@ -21,6 +21,8 @@ import { createProjectAction } from "./actions/create-project.action";
 import { getUserProjectsAction } from "./actions/get-user-project.action";
 import { ProjectOverlay } from "./components/ProjectOverlay";
 
+import type { ProjectDTO } from "@/src/domains/project/dtos/project.dto";
+
 export default function ProjectsPage() {
   const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
@@ -72,7 +74,7 @@ export default function ProjectsPage() {
     queryFn: () => getRepositoriesAction(),
   });
 
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<ProjectDTO[]>({
     queryKey: ["projects"],
     queryFn: () => getUserProjectsAction(),
   });
@@ -97,12 +99,6 @@ export default function ProjectsPage() {
 
     openCenteredPopup(installUrl);
   };
-
-  function resolveRepository(repoId: number | null) {
-    if (!repoId) return null;
-
-    return repositories.find((repo) => repo.id === repoId) ?? null;
-  }
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -225,8 +221,6 @@ export default function ProjectsPage() {
         ) : (
           <div className="space-y-3">
             {projects.map((project) => {
-              const repo = resolveRepository(project.repositoryId);
-
               return (
                 <Card
                   key={project.id}
@@ -243,17 +237,17 @@ export default function ProjectsPage() {
                   <CardContent className="space-y-2">
                     <p className="text-sm text-muted-foreground">{project.description}</p>
 
-                    {repo ? (
+                    {project.repository && project.repository.isActive ? (
                       <a
-                        href={`https://github.com/${repo.full_name}`}
+                        href={project.repository.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                       >
-                        {repo.full_name}
+                        {project.repository.fullName}
                       </a>
                     ) : (
-                      <span className="text-xs text-muted-foreground">Repository not found</span>
+                      <span className="text-xs text-muted-foreground">Repository unavailable</span>
                     )}
 
                     <div className="text-xs text-muted-foreground">
@@ -267,11 +261,7 @@ export default function ProjectsPage() {
         )}
       </div>
       {selectedProject && (
-        <ProjectOverlay
-          project={selectedProject}
-          repo={resolveRepository(selectedProject.repositoryId)}
-          onClose={() => setSelectedProject(null)}
-        />
+        <ProjectOverlay project={selectedProject} onClose={() => setSelectedProject(null)} />
       )}
     </div>
   );

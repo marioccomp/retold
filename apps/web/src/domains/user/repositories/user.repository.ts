@@ -97,6 +97,17 @@ export const userRepository = {
       where: {
         userId: userId,
       },
+      include: {
+        repository: {
+          select: {
+            id: true,
+            fullName: true,
+            url: true,
+            name: true,
+            isActive: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },

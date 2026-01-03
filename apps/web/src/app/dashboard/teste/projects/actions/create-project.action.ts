@@ -2,6 +2,8 @@
 
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
+import { runAnalyzeWorker } from "@/lib/run-worker";
+import { getUserRepositories } from "@/lib/github";
 
 type CreateProjectInput = {
   title: string;
@@ -13,21 +15,37 @@ type CreateProjectInput = {
 export async function createProjectAction(input: CreateProjectInput) {
   const session = await auth();
 
+  await getUserRepositories();
+
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
-  return prisma.project.create({
+  const repository = await prisma.repository.findFirst({
+    where: {
+      id: input.repositoryId,
+      userId: Number(session.user.id),
+    },
+  });
+
+  if (!repository) {
+    throw new Error("Repository not found");
+  }
+
+  const project = await prisma.project.create({
     data: {
       title: input.title,
       description: input.description,
       longerDescription: input.description,
       images: [],
       userId: Number(session.user.id),
-      repositoryId: input.repositoryId,
-
-      // se você quiser relacionar repo futuramente
-      // repositoryId: input.repositoryId,
+      repositoryId: repository.id,
+      status: "PENDING",
     },
+  });
+
+  runAnalyzeWorker({
+    projectId: project.id,
+    repoUrl: repository.url,
   });
 }

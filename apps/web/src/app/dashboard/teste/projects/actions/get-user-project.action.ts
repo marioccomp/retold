@@ -9,5 +9,25 @@ export async function getUserProjectsAction() {
     throw new Error("Unauthorized");
   }
 
-  return userRepository.getAllUserProjects(Number(session.user.id));
+  const projects = await userRepository.getAllUserProjects(Number(session.user.id));
+
+  return projects.map((project) => ({
+    id: project.id,
+    title: project.title,
+    description: project.description,
+    status: project.status,
+
+    createdAt: project.createdAt.toISOString(),
+    updatedAt: project.updatedAt.toISOString(),
+
+    repository: project.repository
+      ? {
+          id: project.repository.id,
+          name: project.repository.name,
+          fullName: project.repository.fullName,
+          url: project.repository.url,
+          isActive: project.repository.isActive,
+        }
+      : null,
+  }));
 }

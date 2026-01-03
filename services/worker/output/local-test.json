@@ -1,0 +1,36 @@
+{
+  "scan": {
+    "files": [
+      ".gitignore",
+      "README.md",
+      "eslint.config.js",
+      "index.html",
+      "package-lock.json",
+      "package.json",
+      "vercel.json",
+      "vite.config.js"
+    ],
+    "folders": [
+      ".git",
+      "api",
+      "public",
+      "src"
+    ],
+    "signals": {
+      "hasPackageJson": true,
+      "hasDockerfile": false,
+      "hasTsconfig": false,
+      "hasGithubCI": false
+    }
+  },
+  "stack": {
+    "languages": [
+      "JavaScript"
+    ],
+    "frameworks": [
+      "React"
+    ],
+    "tools": []
+  },
+  "appType": "frontend"
+}

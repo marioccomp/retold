@@ -48,6 +48,8 @@ model User {
 
   githubInstallations GithubAppInstallation[]
 
+  repositories Repository[]
+
   @@index([email])
   @@index([username])
 }
@@ -114,6 +116,13 @@ model PasswordResetToken {
   @@index([userId])
 }
 
+enum ProjectStatus {
+  PENDING
+  ANALYZING
+  DONE
+  ERROR
+}
+
 model Project {
   id Int @id @default(autoincrement())
   title String
@@ -126,12 +135,55 @@ model Project {
   updatedAt DateTime @updatedAt
 
   repositoryId   Int?
+  repository Repository? @relation(fields: [repositoryId], references: [id])
+
+  status ProjectStatus @default(PENDING)
+  analysis RepositoryAnalysis?
+
 
   userId Int
   user User @relation(fields:[userId], references: [id])
 
   tags Tag[]
 }
+
+model Repository {
+  id Int @id @default(autoincrement())
+
+  githubId Int @unique
+  name String
+  fullName String
+  url String
+
+  private Boolean
+
+  isActive Boolean @default(true)
+
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projects Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RepositoryAnalysis {
+  id Int @id @default(autoincrement())
+
+  projectId Int @unique
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  appType String
+  stack Json
+  structure Json?
+  signals Json?
+
+  createdAt DateTime @default(now())
+}
+
 
 model Certification {
   id Int @id @default(autoincrement())
