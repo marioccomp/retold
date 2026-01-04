@@ -24,6 +24,8 @@ async function run() {
     await cloneRepository(repoUrl, tmpPath);
     const analysis = analyzeRepository(tmpPath);
 
+    console.log("[worker] analysis result:", JSON.stringify(analysis, null, 2));
+
     // TODO: save analysis in DB
 
     // TODO: update project status -> done
@@ -31,8 +33,10 @@ async function run() {
     console.error(err);
     // TODO: update project status -> error
   } finally {
-    fs.rmSync(tmpPath, { recursive: true, force: true });
+    if (process.env.NODE_ENV === "production") {
+      fs.rmSync(tmpPath, { recursive: true, force: true });
+    }
   }
 }
 
-run();
+await run();

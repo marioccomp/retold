@@ -25,6 +25,7 @@ export async function createProjectAction(input: CreateProjectInput) {
     where: {
       id: input.repositoryId,
       userId: Number(session.user.id),
+      isActive: true,
     },
   });
 
