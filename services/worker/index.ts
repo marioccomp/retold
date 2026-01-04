@@ -1,8 +1,12 @@
+import "dotenv/config";
 import path from "path";
 import fs from "fs";
+import { Worker } from "bullmq";
+import { redisConnection } from "@repo/queue/redis.js";
 import { cloneRepository } from "./clone.js";
-import { analyzeRepository } from "./analyze/index.js";
+import { prisma } from "@repo/database";
 import { analyzeProjectWithLLM } from "./llm/analyze-project.js";
+import { analyzeRepository } from "./analyze/index.js";
 
 function printOverview(overview: string, projectId: string) {
   const separator = "=".repeat(80);
@@ -20,61 +24,84 @@ function printOverview(overview: string, projectId: string) {
   console.log(`Saved overview to ${mdPath}`);
 }
 
-async function run() {
-  const raw = process.argv[2];
+console.log("[worker] Starting worker...");
 
-  if (!raw) {
-    throw new Error("Missing payload");
-  }
+const worker = new Worker(
+  "analyze-repo",
+  async (job) => {
+    const { projectId, repoUrl } = job.data;
 
-  const payload = JSON.parse(raw);
+    // Create a temporary path for this specific job
+    const tmpPath = path.resolve("/tmp/retold", String(projectId));
 
-  const { projectId, repoUrl } = payload;
-
-  const tmpPath = path.resolve("/tmp/retold", projectId);
-
-  try {
     console.log(`[worker] analyzing project ${projectId}`);
 
-    // TODO: update project status -> analyzing
+    try {
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { status: "ANALYZING" },
+      });
 
-    await cloneRepository(repoUrl, tmpPath);
-    const analysis = analyzeRepository(tmpPath);
+      let readmeContent = "";
+      const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
+      for (const fileName of possibleReadmePaths) {
+        const filePath = path.join(tmpPath, fileName);
+        if (fs.existsSync(filePath)) {
+          readmeContent = fs.readFileSync(filePath, "utf-8");
+          break;
+        }
+      }
 
-    let readmeContent = "";
-    const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
-    for (const fileName of possibleReadmePaths) {
-      const filePath = path.join(tmpPath, fileName);
-      if (fs.existsSync(filePath)) {
-        readmeContent = fs.readFileSync(filePath, "utf-8");
-        break;
+      await cloneRepository(repoUrl, tmpPath);
+      const analysis = await analyzeRepository(tmpPath);
+
+      const llmInsights = await analyzeProjectWithLLM({
+        ...analysis,
+        readme: readmeContent,
+      });
+      const result = {
+        ...analysis,
+        llm: {
+          overview: llmInsights,
+        },
+      };
+
+      printOverview(llmInsights ?? "", projectId);
+
+      console.log("[worker] analysis result:", JSON.stringify(analysis, null, 2));
+
+      await prisma.repositoryAnalysis.create({
+        data: {
+          projectId,
+          appType: analysis.summary.appType,
+          stack: analysis.stack,
+          structure: analysis.structure,
+        },
+      });
+
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { status: "DONE" },
+      });
+    } catch (err) {
+      console.error(err);
+
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { status: "ERROR" },
+      });
+
+      throw err;
+    } finally {
+      if (process.env.NODE_ENV === "production") {
+        fs.rmSync(tmpPath, { recursive: true, force: true });
       }
     }
-
-    const llmInsights = await analyzeProjectWithLLM({
-      ...analysis,
-      readme: readmeContent,
-    });
-    const result = {
-      ...analysis,
-      llm: {
-        overview: llmInsights,
-      },
-    };
-
-    printOverview(llmInsights ?? "", projectId);
-
-    // TODO: save analysis in DB
-
-    // TODO: update project status -> done
-  } catch (err) {
-    console.error(err);
-    // TODO: update project status -> error
-  } finally {
-    if (process.env.NODE_ENV === "production") {
-      fs.rmSync(tmpPath, { recursive: true, force: true });
-    }
+  },
+  {
+    connection: redisConnection,
+    concurrency: 2,
   }
-}
+);
 
-await run();
+console.log("Worker running...");

@@ -2,8 +2,10 @@
 
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
-import { runAnalyzeWorker } from "@/lib/run-worker";
+// import { runAnalyzeWorker } from "@/lib/run-worker";
 import { getUserRepositories } from "@/lib/github";
+import { analyzeRepoQueue } from "@repo/queue";
+
 
 type CreateProjectInput = {
   title: string;
@@ -45,8 +47,20 @@ export async function createProjectAction(input: CreateProjectInput) {
     },
   });
 
-  runAnalyzeWorker({
-    projectId: project.id,
-    repoUrl: repository.url,
-  });
+  await analyzeRepoQueue.add(
+    "analyze",
+    {
+      projectId: project.id,
+      repositoryId: repository.id,
+      repoUrl: repository.url,
+    },
+    {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 5000,
+      },
+      removeOnComplete: true,
+    }
+  );
 }

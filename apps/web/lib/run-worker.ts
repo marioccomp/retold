@@ -1,11 +1,18 @@
-import { spawn } from "child_process";
-import path from "path";
+import { analysisQueue } from "@services/worker/queue";
 
-export function runAnalyzeWorker(payload: { projectId: Number; repoUrl: string }) {
-  const workerPath = path.resolve(process.cwd(), "services/worker/index.ts");
+type AnalyzePayload = {
+  projectId: number;
+  repoUrl: string;
+};
 
-  spawn("node", ["--loader", "tsx", workerPath, JSON.stringify(payload)], {
-    detached: true,
-    stdio: "ignore",
-  }).unref();
+export async function runAnalyzeWorker(payload: AnalyzePayload) {
+  await analysisQueue.add("repository-analysis", payload, {
+    attempts: 3,
+    backoff: {
+      type: "exponential",
+      delay: 5_000,
+    },
+    removeOnComplete: true,
+    removeOnFail: false,
+  });
 }

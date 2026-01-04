@@ -6,7 +6,7 @@ import { classifyFile } from "./classify-file.js";
 import { buildInfraAndStats } from "./build-infra.js";
 import { buildStructure } from "./build-struct.js";
 
-export function analyzeRepository(repoPath: string) {
+export async function analyzeRepository(repoPath: string) {
   const { files } = scanRepository(repoPath);
 
   const { infra, stats } = buildInfraAndStats(files);
