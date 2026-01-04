@@ -16,5 +16,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.26.1"
+  "packageManager": "pnpm@10.26.1",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "groq-sdk": "^0.37.0"
+  }
 }

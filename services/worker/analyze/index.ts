@@ -3,9 +3,14 @@ import { detectLanguages } from "./detect-languages.js";
 import { detectStack } from "./detect-stack.js";
 import { detectAppType } from "./detect-app-type.js";
 import { classifyFile } from "./classify-file.js";
+import { buildInfraAndStats } from "./build-infra.js";
+import { buildStructure } from "./build-struct.js";
 
 export function analyzeRepository(repoPath: string) {
-  const { files, signals } = scanRepository(repoPath);
+  const { files } = scanRepository(repoPath);
+
+  const { infra, stats } = buildInfraAndStats(files);
+  const structure = buildStructure(files);
 
   const languages = detectLanguages(files);
   const stack = detectStack(files, languages);
@@ -13,7 +18,10 @@ export function analyzeRepository(repoPath: string) {
     frameworks: stack.frameworks,
     tools: stack.tools,
     languages,
-    signals,
+    signals: {
+      hasCI: infra.hasCI,
+      hasDockerfile: infra.hasDocker,
+    },
   });
 
   const testFiles = files.filter((f) => classifyFile(f) === "test");
@@ -24,9 +32,8 @@ export function analyzeRepository(repoPath: string) {
       appType,
     },
     stack,
-    stats: {
-      totalFiles: files.length,
-      testFiles: testFiles.length,
-    },
+    infra,
+    stats,
+    structure,
   };
 }

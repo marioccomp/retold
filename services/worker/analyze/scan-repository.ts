@@ -9,10 +9,6 @@ export type FileEntry = {
 
 export type RepositoryScanResult = {
   files: FileEntry[];
-  signals: {
-    hasDockerfile: boolean;
-    hasCI: boolean;
-  };
 };
 
 export function scanRepository(
@@ -24,7 +20,6 @@ export function scanRepository(
   if (currentDepth > maxDepth) {
     return {
       files: acc,
-      signals: computeSignals(acc),
     };
   }
 
@@ -48,7 +43,6 @@ export function scanRepository(
 
   return {
     files: acc,
-    signals: computeSignals(acc),
   };
 }
 
