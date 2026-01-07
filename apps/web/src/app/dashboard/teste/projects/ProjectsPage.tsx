@@ -100,6 +100,39 @@ export default function ProjectsPage() {
     openCenteredPopup(installUrl);
   };
 
+  const mockAnalysis = {
+    llm: {
+      overview: "Projeto bem estruturado, com separação clara entre código-fonte e configurações.",
+    },
+    summary: {
+      primaryLanguage: "TypeScript",
+      appType: "fullstack",
+    },
+    stack: {
+      languages: ["TypeScript", "JavaScript"],
+      frameworks: ["Next.js", "React"],
+      tools: ["ESLint", "Prettier", "Jest"],
+    },
+    infra: {
+      hasDocker: true,
+      hasCI: true,
+      hasLint: true,
+      hasTests: true,
+    },
+    stats: {
+      totalFiles: 128,
+      sourceFiles: 74,
+      testFiles: 18,
+      configFiles: 22,
+      docsFiles: 14,
+    },
+    structure: {
+      hasSrcFolder: true,
+      hasTestsFolder: true,
+      maxDepth: 6,
+    },
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       {/* Header */}
@@ -221,6 +254,8 @@ export default function ProjectsPage() {
         ) : (
           <div className="space-y-3">
             {projects.map((project) => {
+              const analysis = mockAnalysis;
+
               return (
                 <Card
                   key={project.id}
@@ -229,14 +264,44 @@ export default function ProjectsPage() {
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span>{project.title}</span>
+                      <div className="flex flex-col gap-1">
+                        <span>{project.title}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {analysis.summary.primaryLanguage} · {analysis.summary.appType}
+                        </span>
+                      </div>
+
                       <span className="text-xs text-muted-foreground capitalize">{visibility}</span>
                     </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-3">
                     <p className="text-sm text-muted-foreground">{project.description}</p>
 
+                    {/* Stack */}
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      {analysis.stack.frameworks.map((fw) => (
+                        <span key={fw} className="rounded-md bg-muted px-2 py-0.5">
+                          {fw}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Infra flags */}
+                    <div className="flex gap-3 text-xs text-muted-foreground">
+                      <span>CI: {analysis.infra.hasCI ? "✓" : "–"}</span>
+                      <span>Tests: {analysis.infra.hasTests ? "✓" : "–"}</span>
+                      <span>Lint: {analysis.infra.hasLint ? "✓" : "–"}</span>
+                      <span>Docker: {analysis.infra.hasDocker ? "✓" : "–"}</span>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="text-xs text-muted-foreground">
+                      {analysis.stats.sourceFiles} src · {analysis.stats.testFiles} tests ·{" "}
+                      {analysis.stats.configFiles} config
+                    </div>
+
+                    {/* Repo */}
                     {project.repository && project.repository.isActive ? (
                       <a
                         href={project.repository.url}

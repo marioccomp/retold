@@ -62,6 +62,40 @@ const improvements = [
   "Add CI pipeline for pull requests",
 ];
 
+const analysis = {
+  llm: {
+    overview:
+      "This repository shows strong consistency in structure and naming. The project follows modern best practices and demonstrates good separation of concerns. The main improvement opportunity lies in test coverage and CI automation.",
+  },
+  summary: {
+    primaryLanguage: "TypeScript",
+    appType: "Fullstack web app",
+  },
+  stack: {
+    languages: ["TypeScript", "JavaScript"],
+    frameworks: ["Next.js", "React"],
+    tools: ["TailwindCSS", "Prisma", "ESLint", "Jest"],
+  },
+  infra: {
+    hasDocker: true,
+    hasCI: false,
+    hasLint: true,
+    hasTests: true,
+  },
+  stats: {
+    totalFiles: 132,
+    sourceFiles: 78,
+    testFiles: 16,
+    configFiles: 24,
+    docsFiles: 14,
+  },
+  structure: {
+    hasSrcFolder: true,
+    hasTestsFolder: true,
+    maxDepth: 7,
+  },
+};
+
 export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
   const repo = project.repository;
   return (
@@ -111,29 +145,35 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
             {/* OVERVIEW */}
             <TabsContent value="overview">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* LLM Overview */}
                 <Card className="lg:col-span-2">
                   <CardHeader>
-                    <CardTitle>Project overview</CardTitle>
+                    <CardTitle>LLM overview</CardTitle>
                   </CardHeader>
-                  <CardContent className="text-sm text-muted-foreground space-y-2">
-                    <p>
-                      This project demonstrates practical usage of modern web development tools and
-                      patterns.
-                    </p>
-                    <p>
-                      Focus areas include maintainability, scalability and developer experience.
-                    </p>
+                  <CardContent className="text-sm text-muted-foreground space-y-3">
+                    <p>{analysis.llm.overview}</p>
+
+                    <div className="flex gap-2 pt-2">
+                      <Badge variant="secondary">{analysis.summary.primaryLanguage}</Badge>
+                      <Badge variant="secondary">{analysis.summary.appType}</Badge>
+                    </div>
                   </CardContent>
                 </Card>
 
+                {/* Stack */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Tech stack</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-wrap gap-2">
-                    {stack.map((tech) => (
-                      <Badge key={tech} variant="secondary">
-                        {tech}
+                    {analysis.stack.frameworks.map((fw) => (
+                      <Badge key={fw} variant="secondary">
+                        {fw}
+                      </Badge>
+                    ))}
+                    {analysis.stack.tools.map((tool) => (
+                      <Badge key={tool} variant="outline">
+                        {tool}
                       </Badge>
                     ))}
                   </CardContent>
@@ -143,58 +183,104 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
 
             {/* STATS */}
             <TabsContent value="stats">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {stats.map((stat) => (
-                  <Card key={stat.label}>
-                    <CardHeader>
-                      <CardTitle className="text-base">{stat.label}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-1">
-                      <p className="font-medium">{stat.value}</p>
-                      <p className="text-sm text-muted-foreground">{stat.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Files</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-xl font-semibold">
+                    {analysis.stats.totalFiles}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Source</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-xl font-semibold">
+                    {analysis.stats.sourceFiles}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Tests</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-xl font-semibold">
+                    {analysis.stats.testFiles}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Config</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-xl font-semibold">
+                    {analysis.stats.configFiles}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Docs</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-xl font-semibold">
+                    {analysis.stats.docsFiles}
+                  </CardContent>
+                </Card>
               </div>
 
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                {skillInsights.map((skill) => (
-                  <Card key={skill.title}>
-                    <CardHeader>
-                      <CardTitle className="text-base">{skill.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Badge>{skill.level}</Badge>
-                    </CardContent>
-                  </Card>
-                ))}
+              {/* Infra */}
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="py-4 text-sm">
+                    Docker: {analysis.infra.hasDocker ? "✓" : "—"}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="py-4 text-sm">
+                    CI: {analysis.infra.hasCI ? "✓" : "—"}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="py-4 text-sm">
+                    Lint: {analysis.infra.hasLint ? "✓" : "—"}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="py-4 text-sm">
+                    Tests: {analysis.infra.hasTests ? "✓" : "—"}
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 
             {/* ANALYSIS */}
             <TabsContent value="analysis">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Structure */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Repository insights</CardTitle>
+                    <CardTitle>Project structure</CardTitle>
                   </CardHeader>
-                  <CardContent className="text-sm text-muted-foreground space-y-2">
-                    <p>• Clear folder structure</p>
-                    <p>• Logical separation of concerns</p>
-                    <p>• Good usage of modern frameworks</p>
+                  <CardContent className="space-y-2 text-sm text-muted-foreground">
+                    <p>• Uses /src folder: {analysis.structure.hasSrcFolder ? "Yes" : "No"}</p>
+                    <p>• Has test folder: {analysis.structure.hasTestsFolder ? "Yes" : "No"}</p>
+                    <p>• Max folder depth: {analysis.structure.maxDepth}</p>
                   </CardContent>
                 </Card>
 
+                {/* LLM Insights */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Suggested improvements</CardTitle>
+                    <CardTitle>LLM insights</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    {improvements.map((item, index) => (
-                      <div key={index} className="text-sm text-muted-foreground">
-                        • {item}
-                      </div>
-                    ))}
+                  <CardContent className="space-y-2 text-sm text-muted-foreground">
+                    <p>• Good separation of concerns</p>
+                    <p>• Consistent naming conventions</p>
+                    <p>• Modern framework usage</p>
+                    <p>• Test coverage could be improved</p>
+                    <p>• CI automation would increase reliability</p>
                   </CardContent>
                 </Card>
               </div>
