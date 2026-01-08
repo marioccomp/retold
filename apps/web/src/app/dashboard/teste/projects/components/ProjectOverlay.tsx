@@ -1,15 +1,15 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import type { ProjectDTO } from "@/src/domains/project/dtos/project.dto";
-
-type RepoInfo = {
-  full_name: string;
-};
+import { toast } from "sonner";
+import { startProjectAnalysisAction } from "../actions/start-project-analysis.action";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProjectAnalysisAction } from "../actions/get-project-analysis.action";
 
 type ProjectOverlayProps = {
   project: ProjectDTO;
@@ -17,87 +17,52 @@ type ProjectOverlayProps = {
   onClose: () => void;
 };
 
-/**
- * Mock data — futuramente isso vem de uma LLM
- */
-const stats = [
-  {
-    label: "Commit style",
-    value: "Mostly semantic",
-    description: "Uses feat, fix, chore in most commits",
-  },
-  {
-    label: "Branching",
-    value: "Simple",
-    description: "Main + feature branches",
-  },
-  {
-    label: "Consistency",
-    value: "High",
-    description: "Naming patterns and structure are consistent",
-  },
-];
-
-const stack = ["Next.js", "React", "TypeScript", "TailwindCSS", "Prisma"];
-
-const skillInsights = [
-  {
-    title: "Code quality",
-    level: "Advanced",
-  },
-  {
-    title: "Architecture",
-    level: "Intermediate",
-  },
-  {
-    title: "Scalability awareness",
-    level: "Intermediate",
-  },
-];
-
-const improvements = [
-  "Increase automated test coverage",
-  "Add commit lint + husky",
-  "Introduce repository README badges",
-  "Add CI pipeline for pull requests",
-];
-
-const analysis = {
-  llm: {
-    overview:
-      "This repository shows strong consistency in structure and naming. The project follows modern best practices and demonstrates good separation of concerns. The main improvement opportunity lies in test coverage and CI automation.",
-  },
-  summary: {
-    primaryLanguage: "TypeScript",
-    appType: "Fullstack web app",
-  },
-  stack: {
-    languages: ["TypeScript", "JavaScript"],
-    frameworks: ["Next.js", "React"],
-    tools: ["TailwindCSS", "Prisma", "ESLint", "Jest"],
-  },
-  infra: {
-    hasDocker: true,
-    hasCI: false,
-    hasLint: true,
-    hasTests: true,
-  },
-  stats: {
-    totalFiles: 132,
-    sourceFiles: 78,
-    testFiles: 16,
-    configFiles: 24,
-    docsFiles: 14,
-  },
-  structure: {
-    hasSrcFolder: true,
-    hasTestsFolder: true,
-    maxDepth: 7,
-  },
-};
-
 export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
   const repo = project.repository;
+  const queryClient = useQueryClient();
+
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: ["project-analysis", project.id],
+    queryFn: () => getProjectAnalysisAction(project.id),
+    enabled: true, // ou !!project.id
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      if (status === "ANALYZING" || status === "PENDING") return 2000; // 2s
+      return false; // DONE/ERROR/null -> para
+    },
+  });
+
+  const handleAnalyzeRepo = async () => {
+    try {
+      const result = await startProjectAnalysisAction(project.id);
+      if (result.queued) {
+        toast.success("Analysis started");
+        refetch();
+        queryClient.invalidateQueries({ queryKey: ["projects"] });
+      } else {
+        toast.error("Failed to start analysis");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to start analysis");
+    }
+  };
+
+  // status atual (preferir o retornado do server)
+  const status = data?.status ?? project.status;
+  const analysis = data?.analysis ?? null;
+  const rawAnalysis = (analysis as any)?.rawAnalysis ?? null;
+
+  const llmOverview = analysis?.llmOverview ?? null;
+  const summary = rawAnalysis?.summary ?? null;
+  const stack = rawAnalysis?.stack ?? analysis?.stack ?? null;
+  const stats = rawAnalysis?.stats ?? null;
+  const infra = rawAnalysis?.infra ?? analysis?.signals ?? null;
+  const structure = rawAnalysis?.structure ?? analysis?.structure ?? null;
+
+  const frameworks: string[] = (stack?.frameworks ?? []) as string[];
+  const tools: string[] = (stack?.tools ?? []) as string[];
+
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="relative w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-2xl bg-background shadow-xl">
@@ -125,6 +90,9 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
           <Button size="icon" className="cursor-pointer" variant="ghost" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
+          <Button onClick={() => handleAnalyzeRepo()} disabled={status === "ANALYZING"}>
+            {status === "ANALYZING" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Analyze repo"}
+          </Button>
         </div>
 
         {/* Content */}
@@ -151,11 +119,18 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle>LLM overview</CardTitle>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground space-y-3">
-                    <p>{analysis.llm.overview}</p>
+                    <p>
+                      {llmOverview ??
+                        (isFetching
+                          ? "Loading analysis…"
+                          : "No analysis yet. Click “Analyze repo”.")}
+                    </p>
 
                     <div className="flex gap-2 pt-2">
-                      <Badge variant="secondary">{analysis.summary.primaryLanguage}</Badge>
-                      <Badge variant="secondary">{analysis.summary.appType}</Badge>
+                      <Badge variant="secondary">{summary?.primaryLanguage ?? "—"}</Badge>
+                      <Badge variant="secondary">
+                        {summary?.appType ?? analysis?.appType ?? "—"}
+                      </Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -166,16 +141,19 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle>Tech stack</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-wrap gap-2">
-                    {analysis.stack.frameworks.map((fw) => (
+                    {frameworks.map((fw: string) => (
                       <Badge key={fw} variant="secondary">
                         {fw}
                       </Badge>
                     ))}
-                    {analysis.stack.tools.map((tool) => (
+                    {tools.map((tool: string) => (
                       <Badge key={tool} variant="outline">
                         {tool}
                       </Badge>
                     ))}
+                    {!frameworks.length && !tools.length && (
+                      <span className="text-sm text-muted-foreground">—</span>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -189,7 +167,7 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle className="text-sm">Files</CardTitle>
                   </CardHeader>
                   <CardContent className="text-xl font-semibold">
-                    {analysis.stats.totalFiles}
+                    {stats?.totalFiles ?? "—"}
                   </CardContent>
                 </Card>
 
@@ -198,7 +176,7 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle className="text-sm">Source</CardTitle>
                   </CardHeader>
                   <CardContent className="text-xl font-semibold">
-                    {analysis.stats.sourceFiles}
+                    {stats?.sourceFiles ?? "—"}
                   </CardContent>
                 </Card>
 
@@ -207,7 +185,7 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle className="text-sm">Tests</CardTitle>
                   </CardHeader>
                   <CardContent className="text-xl font-semibold">
-                    {analysis.stats.testFiles}
+                    {stats?.testFiles ?? "—"}
                   </CardContent>
                 </Card>
 
@@ -216,7 +194,7 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle className="text-sm">Config</CardTitle>
                   </CardHeader>
                   <CardContent className="text-xl font-semibold">
-                    {analysis.stats.configFiles}
+                    {stats?.configFiles ?? "—"}
                   </CardContent>
                 </Card>
 
@@ -225,7 +203,7 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle className="text-sm">Docs</CardTitle>
                   </CardHeader>
                   <CardContent className="text-xl font-semibold">
-                    {analysis.stats.docsFiles}
+                    {stats?.docsFiles ?? "—"}
                   </CardContent>
                 </Card>
               </div>
@@ -234,22 +212,20 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
               <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="py-4 text-sm">
-                    Docker: {analysis.infra.hasDocker ? "✓" : "—"}
+                    Docker: {infra?.hasDocker ? "✓" : "—"}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="py-4 text-sm">CI: {infra?.hasCI ? "✓" : "—"}</CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="py-4 text-sm">
+                    Lint: {infra?.hasLint ? "✓" : "—"}
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="py-4 text-sm">
-                    CI: {analysis.infra.hasCI ? "✓" : "—"}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="py-4 text-sm">
-                    Lint: {analysis.infra.hasLint ? "✓" : "—"}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="py-4 text-sm">
-                    Tests: {analysis.infra.hasTests ? "✓" : "—"}
+                    Tests: {infra?.hasTests ? "✓" : "—"}
                   </CardContent>
                 </Card>
               </div>
@@ -264,9 +240,9 @@ export function ProjectOverlay({ project, onClose }: ProjectOverlayProps) {
                     <CardTitle>Project structure</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm text-muted-foreground">
-                    <p>• Uses /src folder: {analysis.structure.hasSrcFolder ? "Yes" : "No"}</p>
-                    <p>• Has test folder: {analysis.structure.hasTestsFolder ? "Yes" : "No"}</p>
-                    <p>• Max folder depth: {analysis.structure.maxDepth}</p>
+                    <p>• Uses /src folder: {structure?.hasSrcFolder ? "Yes" : "No"}</p>
+                    <p>• Has test folder: {structure?.hasTestsFolder ? "Yes" : "No"}</p>
+                    <p>• Max folder depth: {structure?.maxDepth ?? "—"}</p>
                   </CardContent>
                 </Card>
 

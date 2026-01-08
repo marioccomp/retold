@@ -13,7 +13,10 @@ export type RepositoryScanResult = {
 
 export function scanRepository(
   basePath: string,
-  maxDepth = 4,
+  // Default depth tuned to catch common layouts like:
+  // - src/main/java/... (Spring Boot)
+  // - apps/**/src/... (monorepos)
+  maxDepth = 7,
   currentDepth = 0,
   acc: FileEntry[] = []
 ): RepositoryScanResult {

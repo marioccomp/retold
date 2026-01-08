@@ -180,6 +180,8 @@ model RepositoryAnalysis {
   stack Json
   structure Json?
   signals Json?
+  rawAnalysis Json?
+  llmOverview String? @db.Text
 
   createdAt DateTime @default(now())
 }

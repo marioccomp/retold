@@ -24,6 +24,18 @@ function printOverview(overview: string, projectId: string) {
   console.log(`Saved overview to ${mdPath}`);
 }
 
+function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
+  const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
+  for (const fileName of possibleReadmePaths) {
+    const filePath = path.join(repoPath, fileName);
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      return content.length > maxChars ? content.slice(0, maxChars) : content;
+    }
+  }
+  return "";
+}
+
 console.log("[worker] Starting worker...");
 
 const worker = new Worker(
@@ -42,40 +54,37 @@ const worker = new Worker(
         data: { status: "ANALYZING" },
       });
 
-      let readmeContent = "";
-      const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
-      for (const fileName of possibleReadmePaths) {
-        const filePath = path.join(tmpPath, fileName);
-        if (fs.existsSync(filePath)) {
-          readmeContent = fs.readFileSync(filePath, "utf-8");
-          break;
-        }
-      }
-
       await cloneRepository(repoUrl, tmpPath);
+      const readmeContent = readRepositoryReadme(tmpPath);
       const analysis = await analyzeRepository(tmpPath);
 
       const llmInsights = await analyzeProjectWithLLM({
         ...analysis,
         readme: readmeContent,
       });
-      const result = {
-        ...analysis,
-        llm: {
-          overview: llmInsights,
-        },
-      };
 
       printOverview(llmInsights ?? "", projectId);
 
       console.log("[worker] analysis result:", JSON.stringify(analysis, null, 2));
 
-      await prisma.repositoryAnalysis.create({
-        data: {
+      await prisma.repositoryAnalysis.upsert({
+        where: { projectId },
+        create: {
           projectId,
           appType: analysis.summary.appType,
           stack: analysis.stack,
           structure: analysis.structure,
+          signals: analysis.infra,
+          rawAnalysis: analysis,
+          llmOverview: llmInsights,
+        },
+        update: {
+          appType: analysis.summary.appType,
+          stack: analysis.stack,
+          structure: analysis.structure,
+          signals: analysis.infra,
+          rawAnalysis: analysis,
+          llmOverview: llmInsights,
         },
       });
 

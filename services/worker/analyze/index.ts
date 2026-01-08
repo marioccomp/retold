@@ -12,12 +12,16 @@ export async function analyzeRepository(repoPath: string) {
   const { infra, stats } = buildInfraAndStats(files);
   const structure = buildStructure(files);
 
-  const languages = detectLanguages(files);
-  const stack = detectStack(files, languages);
+  // Languages detected by file extensions (best signal when scan depth includes source)
+  const detectedLanguages = detectLanguages(files);
+  // Stack detection can also infer languages from project files (pom.xml, go.mod, etc.)
+  const stack = detectStack(files, detectedLanguages);
+  // Keep appType consistent with stack: use union of both sources.
+  const languagesForAppType = [...new Set([...detectedLanguages, ...stack.languages])];
   const appType = detectAppType({
     frameworks: stack.frameworks,
     tools: stack.tools,
-    languages,
+    languages: languagesForAppType,
     signals: {
       hasCI: infra.hasCI,
       hasDockerfile: infra.hasDocker,
@@ -28,7 +32,8 @@ export async function analyzeRepository(repoPath: string) {
 
   return {
     summary: {
-      primaryLanguage: languages[0] ?? "unknown",
+      // Prefer extension-based detection; fallback to inferred stack languages.
+      primaryLanguage: detectedLanguages[0] ?? stack.languages[0] ?? "unknown",
       appType,
     },
     stack,
