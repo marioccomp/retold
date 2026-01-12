@@ -10,31 +10,31 @@ import { ProjectCardDTO } from "../domains/profile/dtos/project-card.dto";
 
 interface Props {
   project: ProjectCardDTO;
+  onClick?: () => void;
 }
 
-export default function ProjectCard({ project }: Props) {
+export default function ProjectCard({ project, onClick }: Props) {
   const [isLiked, setIsLiked] = useState(false); // Isso aqui tem q ser carregado baseado se o usuario curtiu ou nao
-
-  // const project = {
-  //   title: "Simulador de Escalonamento",
-  //   description: "Comparativo de desempenho entre algoritmos de CPU",
-  //   longerDescription:
-  //     "Sistema completo de adoção de animais. A API gerencia usuários, autenticação JWT, perfis de ONGs, processamento de imagens e chat em tempo real via WebSockets. ",
-  //   projectPic: "@/assets/mockup-escalonador.jpg", // pesquisar dps como armazenar imagens e buscar elas no banco
-  //   ownerId: 123,
-  //   mainTags: ["Julia", "Data Structures"],
-  //   likes: 102,
-  //   views: 127,
-  // };
 
   const ownerName: string = "Mario Junior";
 
-  const handleToggleLike = () => {
+  const handleToggleLike = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Impede que o clique no like propague para o card
     setIsLiked(!isLiked);
   };
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <section className={styles.card}>
+    <section
+      className={styles.card}
+      onClick={handleCardClick}
+      style={{ cursor: onClick ? "pointer" : "default" }}
+    >
       <div className={styles.img}>
         <img src={imageProject.src} alt="Imagem do projeto" />
 

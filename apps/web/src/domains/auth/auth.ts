@@ -14,40 +14,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   jwt: {
     maxAge: 60 * 60 * 24 * 7,
   },
-  callbacks: {
-    async jwt({ token, user, account }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as any).role;
-        token.plan = (user as any).plan;
-        token.name = user.name;
-        token.image = user.image;
-        token.username = (user as any).username;
-      }
-
-      if (account) {
-        token.accessToken = account.access_token as string;
-        token.scope = account.scope as string;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as any;
-        session.user.plan = token.plan as any;
-        session.user.name = token.name as string;
-        session.user.image = token.image as string;
-        session.user.username = token.username as string;
-      }
-
-      if (token.accessToken) {
-        session.accessToken = token.accessToken as string;
-        session.scope = token.scope as string;
-      }
-      return session;
-    },
-  },
   pages: {
     signIn: "/login",
   },
