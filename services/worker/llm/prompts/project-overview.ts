@@ -19,14 +19,6 @@ Rules:
 - Use any relevant information from the README.md to understand the purpose and structure of the project.
 - Be concise but precise.
 - Use bullet points.
-- Provide JSON at the end summarizing each framework/tool impact, for example:
-[
-  {
-    "framework": "Inertia.js",
-    "impact": "server-driven SPA, avoids REST APIs",
-    "notes": "Pages are rendered server-side, updates sent via XHR"
-  }
-]
 
 Repository metadata:
 ${JSON.stringify(input, null, 2)}
@@ -39,6 +31,5 @@ Return:
 3. Strengths
 4. Weaknesses
 5. Overall maturity level (prototype, MVP, production-ready)
-6. Framework/tool impact summary (as JSON)
 `;
 }

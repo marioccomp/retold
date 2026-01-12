@@ -19,7 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import verifyUserInstallation from "./actions/verify-user-instalation.action";
 import { createProjectAction } from "./actions/create-project.action";
 import { getUserProjectsAction } from "./actions/get-user-project.action";
-import { ProjectOverlay } from "./components/ProjectOverlay";
+import ProjectOverlay from "./components/ProjectOverlay";
 
 import type { ProjectDTO } from "@/src/domains/project/dtos/project.dto";
 
