@@ -21,7 +21,7 @@ interface ChooseUsernameFormProps {
 
 export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps) {
     const router = useRouter();
-    const { update } = useSession();
+    const { update, data: session } = useSession();
     const [usernameError, setUsernameError] = useState<string | null>(null);
     const [usernameAvailable, setUsernameAvailable] = useState(false);
     const [usernameHelpVisible, setUsernameHelpVisible] = useState(true);
@@ -42,18 +42,23 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
             toast.success(`Welcome to Retold, @${res.data!.username}`);
 
 
-            const newSession = await update();
+            const teste = await update({
+                user: {
+                    ...session?.user, // mantém os outros campos
+                    username: res.data!.username
+                }
+            });
+
+            console.log(teste);
+
+            router.push(`/${res.data!.username}`);
+
+            router.refresh();
 
 
-            if (newSession?.user?.username) {
 
-                window.location.href = `/${res.data!.username}`;
-            } else {
-                router.refresh();
-                setTimeout(() => {
-                    window.location.href = `/${res.data!.username}`;
-                }, 300);
-            }
+
+
         },
 
         onError: () => {

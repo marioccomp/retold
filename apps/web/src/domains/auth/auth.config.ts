@@ -7,7 +7,7 @@ export const authConfig = {
   },
 
   callbacks: {
-    async jwt({ token, user, account, trigger }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
@@ -19,17 +19,21 @@ export const authConfig = {
 
       // When session.update() is called, fetch fresh user data from DB
       if (trigger === "update" && token.id) {
-        const { prisma } = await import("@repo/database");
-        const freshUser = await prisma.user.findUnique({
-          where: { id: Number(token.id) },
-          select: { username: true, name: true, image: true, role: true, plan: true },
-        });
-        if (freshUser) {
-          token.username = freshUser.username;
-          token.name = freshUser.name;
-          token.image = freshUser.image;
-          token.role = freshUser.role;
-          token.plan = freshUser.plan;
+        if (session?.user?.username) {
+          token.username = session.user.username;
+        } else {
+          const { prisma } = await import("@repo/database");
+          const freshUser = await prisma.user.findUnique({
+            where: { id: Number(token.id) },
+            select: { username: true, name: true, image: true, role: true, plan: true },
+          });
+          if (freshUser) {
+            token.username = freshUser.username;
+            token.name = freshUser.name;
+            token.image = freshUser.image;
+            token.role = freshUser.role;
+            token.plan = freshUser.plan;
+          }
         }
       }
 
@@ -80,7 +84,7 @@ export const authConfig = {
 
       // Se o usuário está logado mas não tem username
       // Redireciona apenas se NÃO for rota pública e NÃO for rota de perfil
-      if (isLoggedIn && !username && !isPublicRoute && !isProfileRoute) {
+      if (isLoggedIn && !username && !isPublicRoute) {
         return NextResponse.redirect(new URL("/choose-username", nextUrl));
       }
 
