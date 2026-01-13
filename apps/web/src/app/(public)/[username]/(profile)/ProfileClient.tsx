@@ -35,6 +35,13 @@ export default function ProfileClient({ username, ownProfile }: Props) {
     queryKey: ["profile", username],
     queryFn: () => getProfile(username),
     staleTime: 1000 * 60 * 5,
+    refetchInterval: (query) => {
+      const projects = query.state.data?.projects;
+      const isAnalyzing = projects?.some(
+        (p: any) => p.status === "ANALYZING" || p.status === "PENDING"
+      );
+      return isAnalyzing ? 3000 : false;
+    },
   });
 
   if (!profile) return null;

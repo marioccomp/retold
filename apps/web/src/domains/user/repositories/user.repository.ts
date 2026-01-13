@@ -47,6 +47,7 @@ export const userRepository = {
           orderBy: { createdAt: "desc" },
           include: {
             tags: true,
+            repository: true,
           },
         },
         certifications: {

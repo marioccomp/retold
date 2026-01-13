@@ -3,6 +3,7 @@
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { getUserRepositories } from "@/src/domains/github/github";
+import { startProjectAnalysisAction } from "./start-project-analysis.action";
 // import { analyzeRepoQueue } from "@repo/queue";
 
 type CreateProjectInput = {
@@ -44,6 +45,10 @@ export async function createProjectAction(input: CreateProjectInput) {
             status: "PENDING",
         },
     });
+
+    const projectId = project.id;
+
+    await startProjectAnalysisAction(projectId);
 
     // TODO: Uncomment when queue is ready
     // await analyzeRepoQueue.add(

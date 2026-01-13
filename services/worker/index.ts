@@ -88,6 +88,37 @@ const worker = new Worker(
         },
       });
 
+      // Extract tags from analysis (max 4 tags)
+      const tagsToAssign: string[] = [];
+
+      // Primary language
+      if (analysis.summary.primaryLanguage && analysis.summary.primaryLanguage !== "unknown") {
+        tagsToAssign.push(analysis.summary.primaryLanguage);
+      }
+
+      // Frameworks (max 3 to keep total at 4)
+      if (analysis.stack.frameworks && Array.isArray(analysis.stack.frameworks)) {
+        for (const fw of analysis.stack.frameworks.slice(0, 3)) {
+          if (tagsToAssign.length < 4) tagsToAssign.push(fw);
+        }
+      }
+
+      // Connect or create tags
+      if (tagsToAssign.length > 0) {
+        await prisma.project.update({
+          where: { id: projectId },
+          data: {
+            tags: {
+              connectOrCreate: tagsToAssign.map((tagName) => ({
+                where: { name: tagName },
+                create: { name: tagName },
+              })),
+            },
+          },
+        });
+        console.log(`[worker] assigned tags: ${tagsToAssign.join(", ")}`);
+      }
+
       await prisma.project.update({
         where: { id: projectId },
         data: { status: "DONE" },

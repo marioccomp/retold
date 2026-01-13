@@ -1,35 +1,104 @@
 export function projectOverviewPrompt(input: {
-  summary: any;
-  stack: any;
-  infra: any;
-  stats: any;
+  summary: {
+    primaryLanguage: string;
+    appType: string;
+  };
+  stack: {
+    languages: string[];
+    frameworks: string[];
+    tools: string[];
+  };
+  infra: {
+    hasCI: boolean;
+    hasDocker: boolean;
+    hasKubernetes: boolean;
+    hasTerraform: boolean;
+    hasLint: boolean;
+    hasTests: boolean;
+  };
+  stats: {
+    totalFiles: number;
+    sourceFiles: number;
+    testFiles: number;
+    configFiles: number;
+    docsFiles: number;
+  };
   structure: any;
-  readme?: string; // opcional
+  readme?: string;
 }) {
-  return `
-You are a senior software architect.
+  return `You are an elite Software Architecture Consultant. Your task is to provide a high-level, professional executive summary of a software project based on repository metadata and its README.
 
-Analyze the following repository metadata and produce a technical overview.
+## Contextual Data
+The following metadata has been extracted from the repository:
 
-Rules:
-- Do NOT guess technologies not listed in the metadata.
-- Base all reasoning strictly on the provided data.
-- Consider each framework and tool listed, and explain how it influences the architecture, data flow, and application behavior.
-- If a framework implies server-driven SPA (e.g., Inertia.js) or SSR (e.g., Next.js), reflect that accurately.
-- Use any relevant information from the README.md to understand the purpose and structure of the project.
-- Be concise but precise.
-- Use bullet points.
+### Technical Stack & Summary
+- **Primary Language:** ${input.summary.primaryLanguage}
+- **Application Type:** ${input.summary.appType}
+- **Frameworks:** ${input.stack.frameworks.join(", ") || "None detected"}
+- **Tools & Libraries:** ${input.stack.tools.join(", ") || "None detected"}
 
-Repository metadata:
-${JSON.stringify(input, null, 2)}
+### Infrastructure & Quality Signals
+- **CI/CD Configured:** ${input.infra.hasCI ? "Yes" : "No"}
+- **Testing Suite Detected:** ${input.infra.hasTests ? "Yes" : "No"}
+- **Linting/Code Quality:** ${input.infra.hasLint ? "Yes" : "No"}
+- **Containerization (Docker):** ${input.infra.hasDocker ? "Yes" : "No"}
+- **Infrastructure as Code:** ${input.infra.hasKubernetes || input.infra.hasTerraform ? "Yes" : "No"}
 
-${input.readme ? `---\nREADME.md content:\n${input.readme}` : ""}
+### Project Scale & Composition
+- **Total Files:** ${input.stats.totalFiles}
+- **Source Files:** ${input.stats.sourceFiles}
+- **Test Files:** ${input.stats.testFiles}
+- **Configuration Files:** ${input.stats.configFiles}
+- **Documentation Files:** ${input.stats.docsFiles}
 
-Return:
-1. High-level description of the system
-2. Architectural style (monolith, layered, SPA + API, server-driven SPA, SSR, etc.)
-3. Strengths
-4. Weaknesses
-5. Overall maturity level (prototype, MVP, production-ready)
+### Directory Structure
+\`\`\`
+${JSON.stringify(input.structure, null, 2)}
+\`\`\`
+
+${input.readme ? `### README.md Snippet\n${input.readme}` : ""}
+
+## Instructions
+1.  **Analyze** the combination of frameworks, tools, and project structure.
+2.  **Synthesize** the project's purpose, architectural patterns, and overall quality.
+3.  **Strictly adhere** to the output format below. Use clean, professional Markdown without any emojis.
+4.  **Tone:** Professional, objective, and insightful (Senior Architect level).
+
+## Output Format Specification
+Generate your response using the following structure:
+
+# Project Executive Summary
+
+### Overview
+[Clear and concise 2-3 sentence description of the project's nature, core functionality, and value proposition.]
+
+---
+
+### Architectural Blueprint
+**System Style:** [e.g. Modern Web Monolith / Distributed Microservices / Event-Driven Architecture / etc.]
+
+**Analysis:**
+[Explain the architectural choices. How do the frameworks interact? Is it a standard pattern (like Hexagonal, MVC, or Layered)? Detail the data flow and component relationships based on the file structure.]
+
+---
+
+### Core Strengths
+- **[Strength Title]:** [Detailed explanation of a technical or organizational strength.]
+- **[Strength Title]:** [Detailed explanation of a technical or organizational strength.]
+- **[Strength Title]:** [Detailed explanation of a technical or organizational strength.]
+
+---
+
+### Strategic Recommendations
+- **[Recommendation Title]:** [Actionable advice for technical debt, scalability, or best practices.]
+- **[Recommendation Title]:** [Actionable advice for technical debt, scalability, or best practices.]
+
+---
+
+### Maturity & Production Readiness
+**Current Status:** [Prototype | Small-scale MVP | Mature Application | Enterprise Ready]
+
+**Justification:**
+[A professional assessment of why the project sits at this level, considering the presence of tests, infrastructure, and stack choices.]
 `;
 }

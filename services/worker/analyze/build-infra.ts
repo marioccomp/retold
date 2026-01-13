@@ -29,6 +29,8 @@ export function buildInfraAndStats(files: FileEntry[]) {
         (p) => p.includes("eslint") || p.includes("ruff") || p.includes("flake8")
       ),
       hasTests: testFiles > 0,
+      hasKubernetes: paths.some((p) => p.includes("k8s") || p.includes("kubernetes") || p.endsWith(".yaml") && p.includes("deployment")),
+      hasTerraform: paths.some((p) => p.endsWith(".tf")),
     },
     stats: {
       totalFiles: files.length,

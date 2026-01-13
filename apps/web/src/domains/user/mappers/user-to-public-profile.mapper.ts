@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 
 const userWithProfileData = Prisma.validator<Prisma.UserDefaultArgs>()({
   include: {
-    projects: { include: { tags: true } },
+    projects: { include: { tags: true, repository: true } },
     certifications: { include: { tags: true } },
     participations: { include: { tags: true } },
   },
@@ -26,9 +26,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
       id: project.id,
       title: project.title,
       description: project.description,
-
-      longerDescription: project.longerDescription ?? project.description,
-
+      status: project.status,
       images: project.images,
 
       createdAt: project.createdAt.toISOString(),
@@ -45,6 +43,9 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
       ownerName: user.name ?? user.username ?? "",
       ownerUsername: user.username ?? "",
       ownerImage: user.image,
+
+      repositoryUrl: project.repository?.url,
+      repositoryFullName: project.repository?.fullName,
     })),
 
     certifications: user.certifications.map((certification) => ({

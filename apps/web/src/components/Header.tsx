@@ -5,7 +5,7 @@ import Link from "next/link";
 import logo from "@/assets/logo-full.svg";
 import profilePic from "@/assets/foto.jpeg";
 import { useSession, signOut } from "next-auth/react";
-
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -19,6 +19,7 @@ import {
 import { FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 
 export default function Header() {
+  const router = useRouter();
   const { data: session, status } = useSession();
 
   const userImage = profilePic.src; // TODO: substituir por session?.user?.image
@@ -29,6 +30,11 @@ export default function Header() {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const handleProfileClick = () => {
+    console.log("clicou")
+    router.push(`/${session?.user?.username}`);
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-black/5">
@@ -76,9 +82,9 @@ export default function Header() {
                     {session?.user?.email}
                   </p>
                 </div>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
+                <DropdownMenuItem className="cursor-pointer gap-2 py-2" onClick={handleProfileClick}>
                   <FiUser className="h-4 w-4 text-gray-500" />
-                  <span>Profile</span>
+                  <span >Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer gap-2 py-2">
                   <FiSettings className="h-4 w-4 text-gray-500" />
