@@ -7,7 +7,7 @@ export const authConfig = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
@@ -15,6 +15,22 @@ export const authConfig = {
         token.name = user.name;
         token.image = user.image;
         token.username = (user as any).username;
+      }
+
+      // When session.update() is called, fetch fresh user data from DB
+      if (trigger === "update" && token.id) {
+        const { prisma } = await import("@repo/database");
+        const freshUser = await prisma.user.findUnique({
+          where: { id: Number(token.id) },
+          select: { username: true, name: true, image: true, role: true, plan: true },
+        });
+        if (freshUser) {
+          token.username = freshUser.username;
+          token.name = freshUser.name;
+          token.image = freshUser.image;
+          token.role = freshUser.role;
+          token.plan = freshUser.plan;
+        }
       }
 
       if (account) {
@@ -44,14 +60,28 @@ export const authConfig = {
       const role = auth?.user?.role;
       const plan = auth?.user?.plan;
       const username = auth?.user?.username;
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA");
-      console.log(isLoggedIn, username, role, plan);
 
       const pathname = nextUrl.pathname;
 
-      // Se o usuário está logado mas não tem username, e não está na página de onboarding
-      if (isLoggedIn && !username && pathname !== "/onboarding") {
-        return NextResponse.redirect(new URL("/onboarding", nextUrl));
+      // Rotas que não devem ser bloqueadas pelo middleware de username
+      const publicRoutes = [
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/reset-password",
+        "/choose-username",
+        "/api",
+        "/_next",
+        "/favicon.ico",
+      ];
+
+      const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+      const isProfileRoute = /^\/[a-zA-Z0-9_]+$/.test(pathname); // Rota de perfil /{username}
+
+      // Se o usuário está logado mas não tem username
+      // Redireciona apenas se NÃO for rota pública e NÃO for rota de perfil
+      if (isLoggedIn && !username && !isPublicRoute && !isProfileRoute) {
+        return NextResponse.redirect(new URL("/choose-username", nextUrl));
       }
 
       //  Rotas privadas
