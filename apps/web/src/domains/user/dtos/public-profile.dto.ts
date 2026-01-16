@@ -9,6 +9,8 @@ export type PublicProfileDTO = {
   title: string | null;
   bio: string | null;
   image: string | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
   createdAt: string;
   projects: ProjectCardDTO[];
   certifications: CertificationCardDTO[];

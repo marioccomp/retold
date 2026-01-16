@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import styles from "./projects.module.css";
 import { FiPlus, FiArrowLeft } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
 import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
 import { ProjectPanel } from "@/src/components/ProjectOverlay";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { ProjectCardDTO } from "@/src/domains/profile/dtos/project-card.dto";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   profile: PublicProfileDTO;
@@ -53,7 +53,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   };
 
   const handleProjectClick = (project: ProjectCardDTO) => {
-    // Adaptar ProjectCardDTO para o tipo mínimo que o overlay precisa
+
     setSelectedProject({
       id: project.id,
       userId: profile.id, // O dono dos projetos listados é o dono do perfil
@@ -77,11 +77,15 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   // Se está criando, mostrar apenas o painel de criação
   if (isCreating) {
     return (
-      <div className={styles.createPanelWrapper}>
-        <button className={styles.backButton} onClick={handlePanelClose}>
-          <FiArrowLeft size={18} />
+      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out]">
+        <Button
+          variant="ghost"
+          className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+          onClick={handlePanelClose}
+        >
+          <FiArrowLeft size={18} className=" transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>Voltar aos projetos</span>
-        </button>
+        </Button>
         <CreateProjectPanel
           onClose={handlePanelClose}
           onSuccess={handleProjectCreated}
@@ -93,11 +97,15 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   // Se um projeto está selecionado, mostrar o painel do projeto
   if (selectedProject) {
     return (
-      <div className={styles.createPanelWrapper}>
-        <button className={styles.backButton} onClick={handleProjectClose}>
-          <FiArrowLeft size={18} />
+      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out]">
+        <Button
+          variant="ghost"
+          className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+          onClick={handleProjectClose}
+        >
+          <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>Voltar aos projetos</span>
-        </button>
+        </Button>
         <ProjectPanel
           project={selectedProject}
           onClose={handleProjectClose}
@@ -109,16 +117,14 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   return (
     <>
       {ownProfile && searchQuery === "" && (
-        <div
-          className={styles.newProjectCard}
+        <Button
+          variant="ghost"
+          className="w-full min-h-[240px] h-full flex flex-col items-center justify-center gap-4 border-2 border-dashed border-[#e7eae9] rounded-xl bg-[#fafafa] text-[#6b7c7a] cursor-pointer transition-all duration-200 hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[rgba(5,220,127,0.04)] hover:-translate-y-[3px] whitespace-normal"
           onClick={handleNewProject}
-          onKeyDown={(e) => e.key === "Enter" && handleNewProject()}
-          role="button"
-          tabIndex={0}
         >
-          <FiPlus className={styles.newProjectIcon} />
-          <span className={styles.newProjectText}>Novo projeto</span>
-        </div>
+          <FiPlus className="w-9 h-9 stroke-[1.5px]" />
+          <span className="font-semibold text-[1.1rem]">Novo projeto</span>
+        </Button>
       )}
 
       {filteredProjects.map((project) => (

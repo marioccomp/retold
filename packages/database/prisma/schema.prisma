@@ -32,6 +32,8 @@ model User {
   title String?
   image String?
   bio String?
+  githubUrl String?
+  linkedinUrl String?
   password String? // null when OAuth
   role Role @default(USER)
   plan Plan @default(FREE)

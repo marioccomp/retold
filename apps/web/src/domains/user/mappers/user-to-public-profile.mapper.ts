@@ -20,6 +20,8 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
     title: user.title,
     bio: user.bio,
     image: user.image,
+    githubUrl: user.githubUrl,
+    linkedinUrl: user.linkedinUrl,
     createdAt: user.createdAt.toISOString(),
 
     projects: user.projects.map((project) => ({

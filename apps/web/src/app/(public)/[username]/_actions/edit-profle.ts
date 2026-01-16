@@ -1,5 +1,7 @@
 "use server";
 
+import { z } from "zod";
+
 import { userRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
@@ -59,7 +61,7 @@ export async function changeBio(bio: string, userId: number): Promise<ActionResp
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid name format",
+      message: "Invalid bio format",
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -108,6 +110,113 @@ export async function changeName(name: string, userId: number): Promise<ActionRe
     return {
       success: true,
       data: user.name,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: "Unexpected error, try again later",
+    };
+  }
+}
+
+const checkGithubUrlSchema = profileSchema.pick({
+  githubUrl: true,
+});
+
+const checkLinkedinUrlSchema = profileSchema.pick({
+  linkedinUrl: true,
+});
+
+export async function changeGithubUrl(githubUrl: string, userId: number): Promise<ActionResponse<string | null>> {
+  const parsed = checkGithubUrlSchema.safeParse({ githubUrl });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Invalid URL format",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const user = await userRepository.updateProfileById(userId, {
+      githubUrl: parsed.data.githubUrl || null
+    });
+
+    return {
+      success: true,
+      data: user.githubUrl,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: "Unexpected error, try again later",
+    };
+  }
+}
+
+export async function changeLinkedinUrl(linkedinUrl: string, userId: number): Promise<ActionResponse<string | null>> {
+  const parsed = checkLinkedinUrlSchema.safeParse({ linkedinUrl });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Invalid URL format",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const user = await userRepository.updateProfileById(userId, {
+      linkedinUrl: parsed.data.linkedinUrl || null
+    });
+
+    return {
+      success: true,
+      data: user.linkedinUrl,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: "Unexpected error, try again later",
+    };
+  }
+}
+
+const updateProfileSchema = z.object({
+  name: checkNameSchema.shape.name,
+  title: checkTitleSchema.shape.title,
+  bio: checkBioSchema.shape.bio,
+  githubUrl: checkGithubUrlSchema.shape.githubUrl,
+  linkedinUrl: checkLinkedinUrlSchema.shape.linkedinUrl,
+});
+
+export async function updateProfile(
+  data: z.infer<typeof updateProfileSchema>,
+  userId: number
+): Promise<ActionResponse<any>> {
+  const parsed = updateProfileSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Invalid data",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const user = await userRepository.updateProfileById(userId, {
+      name: parsed.data.name,
+      title: parsed.data.title,
+      bio: parsed.data.bio,
+      githubUrl: parsed.data.githubUrl || null,
+      linkedinUrl: parsed.data.linkedinUrl || null,
+    });
+
+    return {
+      success: true,
+      data: user,
     };
   } catch (err) {
     return {
