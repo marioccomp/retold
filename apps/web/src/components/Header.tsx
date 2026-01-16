@@ -86,9 +86,11 @@ export default function Header() {
                   <FiUser className="h-4 w-4 text-gray-500" />
                   <span >Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <FiSettings className="h-4 w-4 text-gray-500" />
-                  <span>Settings</span>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="cursor-pointer gap-2 py-2 w-full flex items-center">
+                    <FiSettings className="h-4 w-4 text-gray-500" />
+                    <span>Settings</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
