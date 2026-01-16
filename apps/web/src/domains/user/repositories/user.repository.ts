@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database";
 import { User } from "@repo/database";
 
-type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title">;
+type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title" | "githubUrl" | "linkedinUrl">;
 type UpdateProfileInput = Partial<UpdatableProfileFields>;
 
 export const userRepository = {
