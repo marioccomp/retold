@@ -25,7 +25,7 @@ enum Plan {
 
 model User {
   id    Int     @id @default(autoincrement())
-  username String @unique
+  username String? @unique
   email String @unique
   emailVerified DateTime?
   name  String?
@@ -46,8 +46,27 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  githubInstallations GithubAppInstallation[]
+
+  repositories Repository[]
+
   @@index([email])
   @@index([username])
+}
+
+model GithubAppInstallation {
+  id              Int      @id @default(autoincrement())
+  installationId  String   @unique 
+  accountLogin    String   
+  accountType     String   
+  
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Account {
@@ -97,6 +116,13 @@ model PasswordResetToken {
   @@index([userId])
 }
 
+enum ProjectStatus {
+  PENDING
+  ANALYZING
+  DONE
+  ERROR
+}
+
 model Project {
   id Int @id @default(autoincrement())
   title String
@@ -108,11 +134,58 @@ model Project {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  repositoryId   Int?
+  repository Repository? @relation(fields: [repositoryId], references: [id])
+
+  status ProjectStatus @default(PENDING)
+  analysis RepositoryAnalysis?
+
+
   userId Int
   user User @relation(fields:[userId], references: [id])
 
   tags Tag[]
 }
+
+model Repository {
+  id Int @id @default(autoincrement())
+
+  githubId Int @unique
+  name String
+  fullName String
+  url String
+
+  private Boolean
+
+  isActive Boolean @default(true)
+
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projects Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RepositoryAnalysis {
+  id Int @id @default(autoincrement())
+
+  projectId Int @unique
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  appType String
+  stack Json
+  structure Json?
+  signals Json?
+  rawAnalysis Json?
+  llmOverview String? @db.Text
+
+  createdAt DateTime @default(now())
+}
+
 
 model Certification {
   id Int @id @default(autoincrement())

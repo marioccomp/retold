@@ -13,5 +13,7 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-export * from "@prisma/client";
+export { Prisma } from "@prisma/client";
+export type { User, Project, Tag, Certification, Participation, Repository, RepositoryAnalysis } from "@prisma/client";
 export * from "./repositories";
+

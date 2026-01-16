@@ -1,0 +1,253 @@
+/* Inline Panel - No overlay */
+.panel {
+    background-color: #fff;
+    border-radius: 16px;
+    border: 1px solid #e7eae9;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid #e7eae9;
+    background: linear-gradient(135deg, #fafafa 0%, #fff 100%);
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #152e2b;
+}
+
+.subtitle {
+    margin: 6px 0 0;
+    font-size: 0.9rem;
+    color: #6b7c7a;
+}
+
+.content {
+    padding: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+}
+
+@media (max-width: 900px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Form Section */
+.formSection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #152e2b;
+}
+
+.field input,
+.field textarea,
+.field select {
+    padding: 12px 14px;
+    border: 1px solid #e7eae9;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #152e2b;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    background-color: #fff;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+    outline: none;
+    border-color: #05dc7f;
+    box-shadow: 0 0 0 3px rgba(5, 220, 127, 0.12);
+}
+
+.field textarea {
+    resize: none;
+    min-height: 100px;
+}
+
+.field select {
+    cursor: pointer;
+}
+
+/* Repositories Section */
+.reposSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reposSection h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #152e2b;
+}
+
+.reposSubtitle {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7c7a;
+}
+
+.reposList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.repoItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border: 1px solid #e7eae9;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.repoItem:hover {
+    border-color: #b8bfbd;
+    background-color: #fafafa;
+}
+
+.repoItem.selected {
+    border-color: #05dc7f;
+    background-color: rgba(5, 220, 127, 0.06);
+}
+
+.repoName {
+    font-size: 0.9rem;
+    color: #152e2b;
+    font-weight: 500;
+}
+
+.selectIndicator {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #05dc7f;
+}
+
+.emptyRepos {
+    padding: 24px;
+    text-align: center;
+    color: #6b7c7a;
+    font-size: 0.9rem;
+    border: 1px dashed #e7eae9;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.addReposButton {
+    width: 100%;
+    padding: 12px;
+    margin-top: 4px;
+    border: 1px dashed #e7eae9;
+    border-radius: 10px;
+    background-color: #fafafa;
+    color: #6b7c7a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.addReposButton:hover {
+    border-color: #05dc7f;
+    color: #05dc7f;
+    background-color: rgba(5, 220, 127, 0.04);
+}
+
+/* Footer */
+.footer {
+    padding: 20px 28px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid #e7eae9;
+    background-color: #fafafa;
+}
+
+.cancelButton {
+    padding: 12px 24px;
+    border: 1px solid #e7eae9;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #6b7c7a;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+    border-color: #152e2b;
+    color: #152e2b;
+}
+
+.createButton {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 10px;
+    background-color: #05dc7f;
+    color: #0f2f28;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.createButton:hover:not(:disabled) {
+    background-color: #03c56f;
+}
+
+.createButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Loading */
+.loading {
+    padding: 30px;
+    text-align: center;
+    color: #6b7c7a;
+    font-size: 0.9rem;
+}

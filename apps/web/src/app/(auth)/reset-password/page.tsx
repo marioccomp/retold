@@ -1,17 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { resetPassword } from "../_actions/reset-password";
+import Link from "next/link";
+import Image from "next/image";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
 
-export default function ResetPasswordTestPage() {
+import { resetPassword } from "../_actions/reset-password";
+import retoldImg from "@/assets/retold-login.png";
+import retoldLogo from "@/assets/retold-footer.png";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]> | null>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisible = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
 
   const resetMutation = useMutation({
     mutationFn: async (formData: FormData) => await resetPassword(formData),
@@ -22,12 +37,12 @@ export default function ResetPasswordTestPage() {
         return;
       }
 
-      toast.success("Senha alterada com sucesso!");
+      toast.success("Password changed successfully!");
       setFieldErrors(null);
       router.push("/login");
     },
     onError: () => {
-      toast.error("Erro crítico ao tentar alterar a senha.");
+      toast.error("Critical error while trying to change password.");
     },
   });
 
@@ -41,47 +56,159 @@ export default function ResetPasswordTestPage() {
 
   if (!token) {
     return (
-      <div className="p-10 text-center">
-        <p className="text-red-500">Erro: Token não encontrado na URL.</p>
-        <p className="text-sm text-gray-400">Certifique-se de acessar via link do e-mail.</p>
+      <div className="min-h-screen flex items-center justify-center bg-white p-6">
+        <div className="max-w-md w-full text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">Invalid Link</h1>
+          <p className="text-gray-500">
+            Token not found in URL. Please make sure you accessed this page from the link sent to
+            your email.
+          </p>
+          <Button asChild className="mt-4 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900">
+            <Link href="/login">Return to Login</Link>
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <main className="max-w-md mx-auto mt-20 p-8 border border-zinc-800 rounded-xl bg-black text-white">
-      <h1 className="text-xl font-bold mb-6">Teste de Nova Senha (TanStack)</h1>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input type="hidden" name="token" value={token} />
-
-        <div className="flex flex-col gap-1">
-          <input
-            name="password"
-            type="password"
-            placeholder="Digite a nova senha"
-            className="p-2 rounded bg-zinc-900 border border-zinc-700 focus:outline-none focus:border-blue-500"
-            required
-          />
-          {fieldErrors?.password && (
-            <p className="text-red-500 text-xs">{fieldErrors.password[0]}</p>
-          )}
+    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
+      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-[#05dc7f] via-[#a7f3d0] to-white p-12 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#047857" strokeWidth="1" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
         </div>
 
-        <button
-          type="submit"
-          disabled={resetMutation.isPending}
-          className="bg-blue-600 p-2 rounded font-semibold disabled:bg-zinc-700 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
-        >
-          {resetMutation.isPending ? "Processando..." : "Confirmar Alteração"}
-        </button>
-      </form>
+        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-[#05dc7f]/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-white/40 rounded-full blur-3xl" />
 
-      <div className="mt-6 p-4 bg-zinc-900 rounded text-xs text-gray-400 break-all">
-        <p>
-          <strong>Debug Token:</strong> {token}
-        </p>
+        <div className="relative z-10 text-center">
+          <Image
+            src={retoldLogo}
+            alt="Retold Logo"
+            priority
+            className="w-32 h-auto mx-auto mb-12"
+          />
+
+          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+            Reset Password
+          </h1>
+          <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
+            Create a new password to secure your account and get back on track.
+          </p>
+        </div>
       </div>
-    </main>
+
+      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-white">
+        <div className="w-full max-w-[400px]">
+          <div className="flex justify-center mb-8 lg:hidden">
+            <Image src={retoldImg} alt="Retold Logo" priority className="w-50 h-auto" />
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
+              New Password
+            </h2>
+            <p className="text-gray-500 text-center">Enter your new password below</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input type="hidden" name="token" value={token} />
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-700 font-medium">
+                New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={isPasswordVisible ? "text" : "password"}
+                  placeholder="••••••••"
+                  required
+                  className="h-11 pr-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                  disabled={resetMutation.isPending}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisible}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                >
+                  {isPasswordVisible ? (
+                    <FaEye className="text-lg" />
+                  ) : (
+                    <FaEyeSlash className="text-lg" />
+                  )}
+                </button>
+              </div>
+              {fieldErrors?.password && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.password[0]}</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={resetMutation.isPending}
+              className="w-full h-11 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
+            >
+              {resetMutation.isPending ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Updating...
+                </span>
+              ) : (
+                "Confirm Change"
+              )}
+            </Button>
+          </form>
+
+          <p className="text-center text-gray-500 text-sm mt-8">
+            Remember your password?{" "}
+            <Link href="/login" className="text-[#05dc7f] font-semibold hover:underline">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#05dc7f]"></div>
+            <p className="text-gray-500">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

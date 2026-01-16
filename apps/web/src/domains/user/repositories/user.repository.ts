@@ -47,6 +47,7 @@ export const userRepository = {
           orderBy: { createdAt: "desc" },
           include: {
             tags: true,
+            repository: true,
           },
         },
         certifications: {
@@ -75,6 +76,42 @@ export const userRepository = {
     return prisma.user.update({
       where: { id: userId },
       data,
+    });
+  },
+
+  getUserInstallationId(userId: number) {
+    const installation = prisma.githubAppInstallation.findFirst({
+      where: { userId },
+    });
+
+    return installation;
+  },
+
+  deleteAllUserInstallationId(userId: number) {
+    return prisma.githubAppInstallation.deleteMany({
+      where: { userId },
+    });
+  },
+
+  getAllUserProjects(userId: number) {
+    return prisma.project.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        repository: {
+          select: {
+            id: true,
+            fullName: true,
+            url: true,
+            name: true,
+            isActive: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   },
 };

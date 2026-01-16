@@ -1,0 +1,281 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background-color: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e7eae9;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #152e2b;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #6b7c7a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+    background-color: #f3f6f5;
+    color: #152e2b;
+}
+
+.content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #152e2b;
+}
+
+.field input,
+.field textarea,
+.field select {
+    padding: 12px 14px;
+    border: 1px solid #e7eae9;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #152e2b;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+    outline: none;
+    border-color: #05dc7f;
+    box-shadow: 0 0 0 3px rgba(5, 220, 127, 0.12);
+}
+
+.field textarea {
+    resize: none;
+    min-height: 80px;
+}
+
+.field select {
+    cursor: pointer;
+    background-color: #fff;
+}
+
+/* Repositories Section */
+.reposSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reposSection h3 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #152e2b;
+}
+
+.reposList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.repoItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 1px solid #e7eae9;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.repoItem.selected {
+    border-color: #05dc7f;
+    background-color: rgba(5, 220, 127, 0.06);
+}
+
+.repoName {
+    font-size: 0.9rem;
+    color: #152e2b;
+    font-weight: 500;
+}
+
+.selectButton {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.selectButton.default {
+    background-color: #f3f6f5;
+    border: 1px solid #e7eae9;
+    color: #6b7c7a;
+}
+
+.selectButton.default:hover {
+    border-color: #05dc7f;
+    color: #05dc7f;
+}
+
+.selectButton.active {
+    background-color: #05dc7f;
+    border: 1px solid #05dc7f;
+    color: #0f2f28;
+}
+
+.emptyRepos {
+    padding: 20px;
+    text-align: center;
+    color: #6b7c7a;
+    font-size: 0.9rem;
+    border: 1px dashed #e7eae9;
+    border-radius: 10px;
+}
+
+.addReposButton {
+    width: 100%;
+    padding: 12px;
+    border: 1px dashed #e7eae9;
+    border-radius: 10px;
+    background-color: #fafafa;
+    color: #6b7c7a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.addReposButton:hover {
+    border-color: #05dc7f;
+    color: #05dc7f;
+    background-color: rgba(5, 220, 127, 0.04);
+}
+
+/* Footer */
+.footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: 12px;
+}
+
+.cancelButton {
+    flex: 1;
+    padding: 14px;
+    border: 1px solid #e7eae9;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #6b7c7a;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+    border-color: #152e2b;
+    color: #152e2b;
+}
+
+.createButton {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #05dc7f;
+    color: #0f2f28;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.createButton:hover:not(:disabled) {
+    background-color: #03c56f;
+}
+
+.createButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Loading */
+.loading {
+    padding: 30px;
+    text-align: center;
+    color: #6b7c7a;
+    font-size: 0.9rem;
+}

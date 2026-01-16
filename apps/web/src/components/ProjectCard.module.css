@@ -17,7 +17,8 @@
 /* --- SEÇÃO DA IMAGEM --- */
 .img {
   width: 100%;
-  height: 260px; /* Altura fixa para manter o padrão */
+  height: 260px;
+  /* Altura fixa para manter o padrão */
   position: relative;
   overflow: hidden;
 }
@@ -90,9 +91,11 @@
   gap: 6px;
   list-style: none;
   padding: 0;
-  margin-top: auto; /* Empurra as tags para o fim do container */
+  margin-top: auto;
+  /* Empurra as tags para o fim do container */
   flex-wrap: wrap;
-  max-height: 50px; /* Limita para não subir demais */
+  max-height: 50px;
+  /* Limita para não subir demais */
   overflow: hidden;
 }
 
@@ -125,17 +128,35 @@
   /* Mudanças para quebrar linha */
   display: -webkit-box;
   line-clamp: 2;
-  -webkit-line-clamp: 2; /* Mostra até 2 linhas antes de colocar reticências */
+  -webkit-line-clamp: 2;
+  /* Mostra até 2 linhas antes de colocar reticências */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: normal; /* Permite quebra de linha */
+  white-space: normal;
+  /* Permite quebra de linha */
 }
 
 .description {
   color: #718096;
   font-size: 14px;
   margin-top: 4px;
+}
+
+.footerTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.footerTag {
+  background-color: rgba(5, 220, 127, 0.12);
+  color: #047857;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .stats {
@@ -146,7 +167,7 @@
   color: #4a5568;
 }
 
-.stats > div {
+.stats>div {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -159,12 +180,14 @@
 
 .likes {
   cursor: pointer;
-  user-select: none; /* Evita selecionar o texto ao clicar rápido */
+  user-select: none;
+  /* Evita selecionar o texto ao clicar rápido */
   transition: transform 0.1s ease;
 }
 
 .likes:active {
-  transform: scale(0.9); /* Efeito de "apertar" o botão ao clicar */
+  transform: scale(0.9);
+  /* Efeito de "apertar" o botão ao clicar */
 }
 
 /* Estilo do ícone de borda (não curtido) */
@@ -176,11 +199,13 @@
 }
 
 .likes:hover svg {
-  color: #ff4d4d; /* Fica levemente vermelho no hover */
+  color: #ff4d4d;
+  /* Fica levemente vermelho no hover */
 }
 
 .likedAnimation {
-  color: #ff4d4d !important; /* Vermelho vibrante */
+  color: #ff4d4d !important;
+  /* Vermelho vibrante */
   animation: heartPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -189,12 +214,15 @@
   0% {
     transform: scale(1);
   }
+
   25% {
     transform: scale(1.4);
   }
+
   50% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1);
   }
@@ -213,6 +241,7 @@
 /* === RESPONSIVIDADE (O SEGREDO ESTÁ AQUI) === */
 
 @media (max-width: 650px) {
+
   /* 1. Reduzimos a altura total para o card não ficar gigante no celular */
   .img {
     height: 320px;
@@ -222,7 +251,8 @@
   /* 2. Voltamos ao fundo sólido, mas fixado apenas no fundo (bottom) */
   .longerDescription {
     height: auto;
-    max-height: 80%; /* Não deixa o texto cobrir a imagem toda */
+    max-height: 80%;
+    /* Não deixa o texto cobrir a imagem toda */
     top: auto;
     bottom: 0;
     opacity: 1;
@@ -272,7 +302,8 @@
   /* 4. Rodapé do Card (Título e Stats) */
   .footerWrapper {
     flex-direction: row;
-    align-items: flex-start; /* Alinha ícones ao topo se o título tiver 2 linhas */
+    align-items: flex-start;
+    /* Alinha ícones ao topo se o título tiver 2 linhas */
     justify-content: space-between;
     padding: 16px 20px;
     gap: 10px;
@@ -291,9 +322,14 @@
     display: none;
   }
 
+  .footerTags {
+    display: none;
+  }
+
   .title {
     font-size: 1.1rem;
-    white-space: normal; /* Permite quebra de linha no mobile */
+    white-space: normal;
+    /* Permite quebra de linha no mobile */
     display: -webkit-box;
     line-clamp: 2;
     -webkit-line-clamp: 2;
@@ -309,19 +345,22 @@
     flex-shrink: 0;
   }
 
-  .stats > div {
-    font-size: 16px; /* Ícones e números maiores para toque fácil */
+  .stats>div {
+    font-size: 16px;
+    /* Ícones e números maiores para toque fácil */
     gap: 8px;
   }
 }
 
 @media (max-width: 380px) {
   .footerWrapper {
-    padding: 14px 12px; /* Padding menor para não apertar o conteúdo */
+    padding: 14px 12px;
+    /* Padding menor para não apertar o conteúdo */
   }
 
   .title {
-    font-size: 0.95rem; /* Título um pouco menor em telas muito pequenas */
+    font-size: 0.95rem;
+    /* Título um pouco menor em telas muito pequenas */
   }
 
   .stats {

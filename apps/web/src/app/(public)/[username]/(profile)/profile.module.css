@@ -87,7 +87,7 @@
 }
 
 .description {
-  text-align: left;
+  text-align: center;
 }
 
 .description textarea {
@@ -102,6 +102,7 @@
 .title {
   border-color: #05dc7f;
 }
+
 .title h3 {
   margin: 0;
 }
@@ -164,7 +165,7 @@
   color: #152e2b;
 }
 
-.stats p + p {
+.stats p+p {
   border-left: 1px solid #e7eae9;
 }
 
@@ -213,6 +214,7 @@
 .contentHeader button.selected {
   color: #152e2b;
 }
+
 .contentHeader button.selected {
   border-bottom-color: #05dc7f;
   text-shadow: 0.6px 0 0 currentColor;
@@ -243,6 +245,7 @@
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -286,7 +289,8 @@
 .editIcon {
   font-size: 1.2rem;
   opacity: 1;
-  color: #6b7c7a; /* neutro forte */
+  color: #6b7c7a;
+  /* neutro forte */
   background: #f3f6f5;
   border-radius: 6px;
   padding: 4px;
@@ -295,7 +299,8 @@
     color 0.2s ease,
     transform 0.2s ease;
   position: absolute;
-  right: -26px; /* distância do texto */
+  right: -26px;
+  /* distância do texto */
   top: 50%;
   transform: translateY(-50%);
 }
@@ -341,6 +346,7 @@
     grid-template-columns: 350px 1fr;
     gap: 2rem;
   }
+
   .projectsGrid {
     grid-template-columns: repeat(3, 1fr);
     gap: 2.5rem;
@@ -351,11 +357,13 @@
   .header {
     padding: 1.5rem 3rem 2rem 6rem;
   }
+
   .layout {
     grid-template-columns: 350px 1fr;
     gap: 2rem;
     padding: 0 3rem 0 4rem;
   }
+
   .projectsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -365,19 +373,23 @@
   .header {
     padding: 1.5rem 2rem 2rem 4rem;
   }
+
   .layout {
     padding: 0 2rem 0 2rem;
     grid-template-columns: 260px 1fr;
     gap: 2rem;
   }
+
   .projectsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
+
   .avatar {
     width: 190px;
     height: 190px;
   }
+
   .avatarWrapper {
     margin-top: -110px;
   }
@@ -387,30 +399,38 @@
   .header {
     padding: 1.5rem 2rem 2rem 2rem;
   }
+
   .banner {
     height: 200px;
   }
+
   .layout {
     grid-template-columns: 1fr;
     padding: 0 2rem;
   }
+
   .profileAside {
     width: 100%;
     padding-left: 0;
   }
+
   .avatarWrapper {
     margin-top: -100px;
   }
+
   .avatar {
     width: 200px;
     height: 200px;
   }
+
   .content {
     margin-top: 3rem;
   }
+
   .profileDetails {
     max-width: 100%;
   }
+
   .projectsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
@@ -421,28 +441,35 @@
   .header {
     padding: 1rem;
   }
+
   .banner {
     height: 160px;
   }
+
   .layout {
     padding: 0 1.25rem;
     gap: 1.5rem;
   }
+
   .avatarWrapper {
     margin-top: -80px;
   }
+
   .avatar {
     width: 150px;
     height: 150px;
   }
+
   .contentHeader {
     flex-direction: column;
     align-items: stretch;
     gap: 15px;
   }
+
   .contentHeader input {
     order: -1;
   }
+
   .projectsGrid {
     grid-template-columns: 1fr;
   }

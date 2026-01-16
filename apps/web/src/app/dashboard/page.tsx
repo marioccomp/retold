@@ -1,7 +1,21 @@
+import { getUserRepositories } from "@/src/domains/github/github";
 import { auth } from "@/src/domains/auth/auth";
 
 export default async function DashboardPage() {
   const session = await auth(); // Busca a sessão no servidor
+  const id = session?.user.id;
+
+  let repositories: any = [];
+
+  if (id) {
+    repositories = await getUserRepositories();
+  }
+
+  if (repositories.length === 0) {
+    console.log("nada de repos");
+  } else {
+    console.log(repositories);
+  }
 
   return (
     <div style={{ padding: "2rem" }}>
