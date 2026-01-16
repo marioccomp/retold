@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const trim = (v: unknown) => (typeof v === "string" ? v.trim() : v);
 
+export const passwordSchema = z.string().min(6, "Password must have at least 6 characters").max(17, "Password must have at most 17 characters");
+
 export const registerSchema = z
   .object({
     name: z.preprocess(
@@ -16,7 +18,7 @@ export const registerSchema = z
       z.string().email("Invalid email format").transform((e) => e.toLowerCase())
     ),
 
-    password: z.string().min(6, "Password must have at least 6 characters").max(17, "Password must have at most 17 characters"),
+    password: passwordSchema,
 
     confirmPassword: z.string(),
   })
@@ -29,6 +31,16 @@ export const registerSchema = z
       });
     }
   });
+
+// Schema for updating password in settings
+export const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: passwordSchema,
+  confirmPassword: z.string().min(1, "Confirm password is required"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
 
 export const profileSchema = z.object({
   // MOVER ISSO AQUI PRA SCHEMA DE PROFILE
