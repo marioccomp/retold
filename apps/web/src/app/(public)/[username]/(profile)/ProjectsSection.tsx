@@ -7,7 +7,7 @@ import ProjectCard from "@/src/components/ProjectCard";
 import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
 import { ProjectPanel } from "@/src/components/ProjectOverlay";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
-import { ProjectCardDTO } from "@/src/domains/profile/dtos/project-card.dto";
+import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
 
 type Props = {

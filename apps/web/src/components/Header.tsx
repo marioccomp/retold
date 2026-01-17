@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/logo-full.svg";
 import profilePic from "@/assets/foto.jpeg";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -17,10 +17,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import { Session } from "next-auth";
 
-export default function Header() {
+export default function Header({ session }: { session: Session | null }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const status = session?.user ? "authenticated" : "unauthenticated";
 
   const userImage = profilePic.src; // TODO: substituir por session?.user?.image
   const userName = session?.user?.name || "User";
@@ -34,6 +36,14 @@ export default function Header() {
   const handleProfileClick = () => {
     console.log("clicou")
     router.push(`/${session?.user?.username}`);
+  }
+
+  const handleExploreClick = () => {
+    if (pathname === "/") {
+      document.getElementById('feed-content')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      router.push('/#feed-content');
+    }
   }
 
   return (
@@ -51,7 +61,11 @@ export default function Header() {
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center gap-1">
-          <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer">
+          <Button
+            variant="ghost"
+            className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer"
+            onClick={handleExploreClick}
+          >
             Explorar
           </Button>
           <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer">

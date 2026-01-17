@@ -38,7 +38,7 @@ export function ProjectPanel({ project, onClose }: ProjectPanelProps) {
     const StatusIcon = statusConfig.icon;
 
     return (
-        <div className="bg-white rounded-2xl border border-[#e7eae9] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="bg-white rounded-2xl border border-[#e7eae9] shadow-[0_4px_20px_rgba(0,0,0,0.06)] animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Header */}
             <div className="bg-gradient-to-br from-[#04a660] to-[#037d45] px-7 py-6 text-white flex justify-between items-start gap-4">
                 <div className="flex-1">
