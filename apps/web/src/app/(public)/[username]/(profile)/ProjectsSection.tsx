@@ -5,10 +5,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FiPlus, FiArrowLeft } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
 import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
-import { ProjectPanel } from "@/src/components/ProjectOverlay";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
+import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 
 type Props = {
   profile: PublicProfileDTO;
@@ -106,7 +106,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
           <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>Voltar aos projetos</span>
         </Button>
-        <ProjectPanel
+        <FeedProjectPanel
           project={selectedProject}
           onClose={handleProjectClose}
         />

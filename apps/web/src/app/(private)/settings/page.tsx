@@ -116,19 +116,19 @@ export default function SettingsPage() {
                                 <CardDescription>Update your password to keep your account secure.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form id="password-form" action={handleUpdatePassword} className="space-y-4">
+                                <form id="password-form" action={handleUpdatePassword} className="space-y-4" noValidate>
                                     <div className="grid gap-2">
                                         <Label htmlFor="currentPassword">Current Password</Label>
-                                        <Input id="currentPassword" name="currentPassword" type="password" required />
+                                        <Input id="currentPassword" name="currentPassword" type="password" />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="grid gap-2">
                                             <Label htmlFor="newPassword">New Password</Label>
-                                            <Input id="newPassword" name="newPassword" type="password" minLength={6} required />
+                                            <Input id="newPassword" name="newPassword" type="password" />
                                         </div>
                                         <div className="grid gap-2">
                                             <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                            <Input id="confirmPassword" name="confirmPassword" type="password" minLength={6} required />
+                                            <Input id="confirmPassword" name="confirmPassword" type="password" />
                                         </div>
                                     </div>
                                     <div className="flex justify-end pt-2">
