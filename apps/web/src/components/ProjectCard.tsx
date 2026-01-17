@@ -7,7 +7,7 @@ import { FaGithub } from "react-icons/fa";
 import imageProject from "@/assets/mockup-escalonador.jpg";
 import { useState } from "react";
 import ownerPic from "@/assets/foto.jpeg"; // Deve vir do banco
-import { ProjectCardDTO } from "../domains/profile/dtos/project-card.dto";
+import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
 import { ProjectSettings } from "./ProjectOverlay/components/ProjectSettings";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
@@ -18,9 +18,11 @@ interface Props {
   project: ProjectCardDTO;
   onClick?: () => void;
   ownProfile?: boolean;
+  disableHover?: boolean;
+  disableConfig?: boolean;
 }
 
-export default function ProjectCard({ project, onClick, ownProfile }: Props) {
+export default function ProjectCard({ project, onClick, ownProfile, disableHover, disableConfig }: Props) {
   const { data: session } = useSession();
   const [isLiked, setIsLiked] = useState(false); // Isso aqui tem q ser carregado baseado se o usuario curtiu ou nao
 
@@ -42,7 +44,7 @@ export default function ProjectCard({ project, onClick, ownProfile }: Props) {
 
   return (
     <Card
-      className="group flex flex-col w-full border border-[#f0f0f0] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden bg-white transition-transform duration-200 ease-in-out hover:-translate-y-0.5 p-0"
+      className={`group flex flex-col w-full border border-[#f0f0f0] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden bg-white transition-transform duration-200 ease-in-out p-0 ${!disableHover ? 'hover:-translate-y-0.5' : ''}`}
       onClick={handleCardClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
@@ -83,7 +85,7 @@ export default function ProjectCard({ project, onClick, ownProfile }: Props) {
           </ul>
         </div>
 
-        {isOwner && (
+        {isOwner && !disableConfig && (
           <div className="absolute top-3 right-3 z-[10]">
             <ProjectSettings
               project={project}

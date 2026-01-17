@@ -1,6 +1,6 @@
 export interface ProjectCardTagDTO {
-  id: number;
   name: string;
+  id: number;
 }
 
 export interface ProjectCardDTO {

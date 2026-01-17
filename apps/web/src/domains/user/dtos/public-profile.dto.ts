@@ -1,4 +1,4 @@
-import { ProjectCardDTO } from "../../profile/dtos/project-card.dto";
+import { ProjectCardDTO } from "../../project/dtos/project-card.dto";
 import { CertificationCardDTO } from "../../profile/dtos/certification-card.dto";
 import { ParticipationCardDTO } from "../../profile/dtos/participation-card.dto";
 
