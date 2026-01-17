@@ -94,7 +94,7 @@ export default function SettingsPage() {
                         <TabsTrigger
                             key={item.id}
                             value={item.id}
-                            className={`!flex-none justify-start gap-3 px-4 h-12 text-left rounded-lg border transition-all
+                            className={`cursor-pointer !flex-none justify-start gap-3 px-4 h-12 text-left rounded-lg border transition-all
                                 border-transparent data-[state=active]:bg-gray-100 data-[state=active]:border-gray-200 data-[state=active]:shadow-sm
                                 hover:bg-gray-50 w-full
                                 ${item.id === "danger" ? "text-red-600 data-[state=active]:text-red-700" : "text-gray-700"}
@@ -132,7 +132,7 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
                                     <div className="flex justify-end pt-2">
-                                        <Button type="submit" disabled={pendingPassword} className="bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium">
+                                        <Button type="submit" disabled={pendingPassword} className="cursor-pointer bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium">
                                             {pendingPassword ? "Updating..." : "Update Password"}
                                         </Button>
                                     </div>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
                                                 <FiCheckCircle className="h-3 w-3" /> Connected
                                             </Badge>
                                         ) : (
-                                            <Button variant="outline" size="sm" onClick={handleLinkGithub}>
+                                            <Button variant="outline" className="cursor-pointer" size="sm" onClick={handleLinkGithub}>
                                                 Connect
                                             </Button>
                                         )}
@@ -179,24 +179,27 @@ export default function SettingsPage() {
 
                     {/* Danger Zone */}
                     <TabsContent value="danger" className="mt-0 space-y-6">
-                        <Card className="border-red-200 bg-red-50/20 shadow-sm overflow-hidden">
-                            <CardHeader className="border-b border-red-100 bg-red-50/50">
-                                <CardTitle className="text-red-700">Delete Account</CardTitle>
-                                <CardDescription className="text-red-600/80">
-                                    Permanently delete your account and all of your data. This action cannot be undone.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="pt-6">
-                                <div className="flex items-center justify-between flex-wrap gap-4">
-                                    <p className="text-sm text-gray-600 max-w-xl">
-                                        Deleting your account will remove all your projects, certifications, and personal data from our servers.
-                                    </p>
-                                    <Button variant="destructive" onClick={handleDeleteAccount} disabled={pendingDelete} className="bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow-red-200">
-                                        {pendingDelete ? "Deleting..." : "Delete Account"}
-                                    </Button>
+                        <div className="bg-red-50/40 border border-red-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-red-100/50 p-3 rounded-xl border border-red-200 text-red-600 shrink-0">
+                                    <FiAlertTriangle size={24} />
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <div className="space-y-1">
+                                    <h3 className="text-red-900 font-bold text-lg">Delete Account</h3>
+                                    <p className="text-sm text-red-800/70 leading-relaxed max-w-md">
+                                        Permanently delete your account and all of your data. This action cannot be undone. All your project data will be lost.
+                                    </p>
+                                </div>
+                            </div>
+                            <Button
+                                variant="destructive"
+                                onClick={handleDeleteAccount}
+                                disabled={pendingDelete}
+                                className="cursor-pointer bg-red-600 text-white font-bold h-11 px-8 rounded-lg shadow-md opacity-60 hover:opacity-100 transition-all duration-300 active:scale-[0.98] shrink-0"
+                            >
+                                {pendingDelete ? "Deleting..." : "Delete Account"}
+                            </Button>
+                        </div>
                     </TabsContent>
                 </div>
             </Tabs>
