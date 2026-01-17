@@ -44,9 +44,9 @@ export function detectAppType(input: {
 
   /* ================= Decision ================= */
 
-  if (frontendScore > 0 && backendScore > 0) return "fullstack";
-  if (frontendScore > backendScore) return "frontend";
-  if (backendScore > frontendScore) return "backend";
+  if (frontendScore > 0 && backendScore > 0) return "Fullstack";
+  if (frontendScore > backendScore) return "Frontend";
+  if (backendScore > frontendScore) return "Backend";
 
-  return "unknown";
+  return "Unknown";
 }

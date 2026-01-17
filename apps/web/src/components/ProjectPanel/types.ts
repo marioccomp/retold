@@ -4,6 +4,11 @@ export type ProjectForOverlay = {
     title: string;
     description: string | null;
     status?: string;
+    owner?: {
+        name: string;
+        image: string | null;
+        username: string;
+    };
     repository?: {
         id: number;
         name: string;

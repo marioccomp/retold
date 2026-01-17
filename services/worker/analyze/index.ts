@@ -33,7 +33,7 @@ export async function analyzeRepository(repoPath: string) {
   return {
     summary: {
       // Prefer extension-based detection; fallback to inferred stack languages.
-      primaryLanguage: detectedLanguages[0] ?? stack.languages[0] ?? "unknown",
+      primaryLanguage: detectedLanguages[0] ?? stack.languages[0] ?? "Unknown",
       appType,
     },
     stack,

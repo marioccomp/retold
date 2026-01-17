@@ -8,7 +8,7 @@ import imageProject from "@/assets/mockup-escalonador.jpg";
 import { useState } from "react";
 import ownerPic from "@/assets/foto.jpeg"; // Deve vir do banco
 import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
-import { ProjectSettings } from "./ProjectOverlay/components/ProjectSettings";
+import { ProjectSettings } from "./ProjectPanel/components/ProjectSettings";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import ProjectCard from "@/src/components/ProjectCard";
-import { ProjectPanel } from "@/src/components/ProjectOverlay";
 import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { FiArrowRight, FiCheckCircle, FiPlus, FiSearch, FiTrendingUp, FiArrowLeft } from "react-icons/fi";
@@ -10,15 +9,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Session } from "next-auth";
+import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 
-type ProjectForOverlay = {
-    id: number;
-    userId?: number;
-    title: string;
-    description: string | null;
-    status: string;
-    repository: any;
-};
+import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 
 type Props = {
     projectDTO: ProjectCardDTO | null;
@@ -38,6 +31,11 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
             title: projectDTO.title,
             description: projectDTO.description,
             status: "PENDING",
+            owner: {
+                name: projectDTO.ownerName,
+                image: projectDTO.ownerImage,
+                username: projectDTO.ownerUsername
+            },
             repository: projectDTO.repositoryUrl ? {
                 id: 0,
                 url: projectDTO.repositoryUrl,
@@ -82,8 +80,8 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
     if (selectedProject) {
         return (
-            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl w-full max-w-5xl h-[90vh] overflow-y-auto flex flex-col relative animate-in fade-in zoom-in-95 duration-200">
+            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl w-full max-w-5xl h-[90vh] overflow-y-auto flex flex-col relative animate-in fade-in zoom-in-95 duration-300 shadow-2xl scrollbar-fintech">
                     <Button
                         variant="ghost"
                         size="icon"
@@ -92,7 +90,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                     >
                         <span className="text-xl">×</span>
                     </Button>
-                    <ProjectPanel
+                    <FeedProjectPanel
                         project={selectedProject}
                         onClose={handleProjectClose}
                     />
