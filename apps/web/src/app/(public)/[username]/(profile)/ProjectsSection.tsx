@@ -9,6 +9,7 @@ import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
+import { useTranslation } from "@/src/i18n/client";
 
 type Props = {
   profile: PublicProfileDTO;
@@ -27,6 +28,7 @@ type ProjectForOverlay = {
 };
 
 export default function ProjectsSection({ searchQuery, ownProfile, profile }: Props) {
+  const { dict } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
   const queryClient = useQueryClient();
@@ -84,7 +86,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
           onClick={handlePanelClose}
         >
           <FiArrowLeft size={18} className=" transition-transform duration-200 group-hover:-translate-x-[3px]" />
-          <span>Voltar aos projetos</span>
+          <span>{dict.profile.back_to_projects}</span>
         </Button>
         <CreateProjectPanel
           onClose={handlePanelClose}
@@ -104,7 +106,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
           onClick={handleProjectClose}
         >
           <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
-          <span>Voltar aos projetos</span>
+          <span>{dict.profile.back_to_projects}</span>
         </Button>
         <FeedProjectPanel
           project={selectedProject}
@@ -123,7 +125,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
           onClick={handleNewProject}
         >
           <FiPlus className="w-9 h-9 stroke-[1.5px]" />
-          <span className="font-semibold text-[1.1rem]">Novo projeto</span>
+          <span className="font-semibold text-[1.1rem]">{dict.profile.new_project}</span>
         </Button>
       )}
 

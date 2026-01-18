@@ -32,6 +32,8 @@ model User {
   title String?
   image String?
   bio String?
+  longBio String?
+  skills String[] @default([])
   githubUrl String?
   linkedinUrl String?
   password String? // null when OAuth
@@ -44,6 +46,7 @@ model User {
   projects Project[]
   certifications Certification[]
   participations Participation[]
+  educations Education[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -232,4 +235,20 @@ model Tag {
   projects Project[]
   certifications Certification[]
   participations Participation[]
+}
+
+model Education {
+  id          Int      @id @default(autoincrement())
+  degree      String
+  institution String
+  startDate   DateTime
+  endDate     DateTime? // Null means "In Progress"
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }

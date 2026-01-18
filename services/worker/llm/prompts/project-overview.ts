@@ -25,7 +25,12 @@ export function projectOverviewPrompt(input: {
   };
   structure: any;
   readme?: string;
-}) {
+}, locale: string = "en") {
+  const languageInstruction =
+    locale === "pt"
+      ? "IMPORTANT: The user speaks Portuguese. You MUST generate the entire response in Portuguese (pt-BR). Even the headers."
+      : "IMPORTANT: The user speaks English. You MUST generate the entire response in English.";
+
   return `You are an elite Software Architecture Consultant. Your task is to provide a high-level, professional executive summary of a software project based on repository metadata and its README.
 
 ## Contextual Data
@@ -63,6 +68,7 @@ ${input.readme ? `### README.md Snippet\n${input.readme}` : ""}
 2.  **Synthesize** the project's purpose, architectural patterns, and overall quality.
 3.  **Strictly adhere** to the output format below. Use clean, professional Markdown without any emojis.
 4.  **Tone:** Professional, objective, and insightful (Senior Architect level).
+5.  ${languageInstruction}
 
 ## Output Format Specification
 Generate your response using the following structure:

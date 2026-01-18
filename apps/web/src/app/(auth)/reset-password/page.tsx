@@ -15,8 +15,10 @@ import retoldLogo from "@/assets/retold-footer.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/src/i18n/client";
 
 function ResetPasswordForm() {
+  const { dict } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -37,12 +39,12 @@ function ResetPasswordForm() {
         return;
       }
 
-      toast.success("Password changed successfully!");
+      toast.success(dict.auth.reset_password.success_message);
       setFieldErrors(null);
       router.push("/login");
     },
     onError: () => {
-      toast.error("Critical error while trying to change password.");
+      toast.error(dict.validation.generic_error);
     },
   });
 
@@ -58,13 +60,12 @@ function ResetPasswordForm() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white p-6">
         <div className="max-w-md w-full text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">Invalid Link</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{dict.auth.reset_password.invalid_link_title}</h1>
           <p className="text-gray-500">
-            Token not found in URL. Please make sure you accessed this page from the link sent to
-            your email.
+            {dict.auth.reset_password.invalid_link_desc}
           </p>
           <Button asChild className="mt-4 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900">
-            <Link href="/login">Return to Login</Link>
+            <Link href="/login">{dict.auth.reset_password.back_to_login}</Link>
           </Button>
         </div>
       </div>
@@ -97,10 +98,10 @@ function ResetPasswordForm() {
           />
 
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-            Reset Password
+            {dict.auth.reset_password.welcome_title}
           </h1>
           <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
-            Create a new password to secure your account and get back on track.
+            {dict.auth.reset_password.welcome_subtitle}
           </p>
         </div>
       </div>
@@ -113,9 +114,9 @@ function ResetPasswordForm() {
 
           <div className="mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
-              New Password
+              {dict.auth.reset_password.title}
             </h2>
-            <p className="text-gray-500 text-center">Enter your new password below</p>
+            <p className="text-gray-500 text-center">{dict.auth.reset_password.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -123,7 +124,7 @@ function ResetPasswordForm() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-gray-700 font-medium">
-                New Password
+                {dict.auth.reset_password.password_label}
               </Label>
               <div className="relative">
                 <Input
@@ -139,7 +140,7 @@ function ResetPasswordForm() {
                   type="button"
                   onClick={togglePasswordVisible}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                  aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                  aria-label={isPasswordVisible ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
                 >
                   {isPasswordVisible ? (
                     <FaEye className="text-lg" />
@@ -176,18 +177,18 @@ function ResetPasswordForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Updating...
+                  {dict.auth.reset_password.submitting}
                 </span>
               ) : (
-                "Confirm Change"
+                dict.auth.reset_password.submit
               )}
             </Button>
           </form>
 
           <p className="text-center text-gray-500 text-sm mt-8">
-            Remember your password?{" "}
+            {dict.auth.forgot_password.remember_password}{" "}
             <Link href="/login" className="text-[#05dc7f] font-semibold hover:underline">
-              Sign in
+              {dict.auth.forgot_password.sign_in}
             </Link>
           </p>
         </div>
@@ -197,13 +198,14 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
+  const { dict } = useTranslation();
   return (
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-white">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#05dc7f]"></div>
-            <p className="text-gray-500">Loading...</p>
+            <p className="text-gray-500">{dict.auth.reset_password.loading}</p>
           </div>
         </div>
       }

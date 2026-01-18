@@ -18,8 +18,10 @@ import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/src/i18n/client";
 
 export default function RegisterForm() {
+  const { dict } = useTranslation();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -56,17 +58,17 @@ export default function RegisterForm() {
       });
 
       if (loginResult?.error) {
-        toast.error("Account created, but login failed.");
+        toast.error(dict.auth.register.login_failed);
         return;
       }
 
-      toast.success(`Welcome to Retold, @${res.data!.username}`);
+      toast.success(`${dict.auth.register.success}, @${res.data!.username}`);
 
       router.push(`/${res.data!.username}`);
     },
 
     onError: () => {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(dict.validation.generic_error);
     },
   });
 
@@ -135,25 +137,25 @@ export default function RegisterForm() {
           />
 
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-            Join Retold
+            {dict.auth.register.welcome_title}
           </h1>
           <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
-            Start your professional journey today. Create your portfolio and get discovered.
+            {dict.auth.register.welcome_subtitle}
           </p>
 
           {/* Feature highlights */}
           <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
             <div className="flex items-center gap-3 text-gray-700">
               <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-              <span>Showcase your professional journey</span>
+              <span>{dict.auth.login.feature_journey}</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-              <span>Connect with industry leaders</span>
+              <span>{dict.auth.login.feature_leaders}</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-              <span>Discover new opportunities</span>
+              <span>{dict.auth.login.feature_opportunities}</span>
             </div>
           </div>
         </div>
@@ -175,10 +177,10 @@ export default function RegisterForm() {
           {/* Form header */}
           <div className="mb-4">
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
-              Create account
+              {dict.auth.register.title}
             </h2>
             <p className="text-gray-500 text-center">
-              Fill in your details to get started
+              {dict.auth.register.subtitle}
             </p>
           </div>
 
@@ -186,12 +188,12 @@ export default function RegisterForm() {
             {/* Name Input */}
             <div className="space-y-1">
               <Label htmlFor="name" className="text-gray-700 font-medium">
-                Name
+                {dict.auth.register.name_label}
               </Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Your full name"
+                placeholder={dict.profile.edit_modal.name_placeholder}
                 required
                 className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
                 onChange={(e) => {
@@ -205,7 +207,7 @@ export default function RegisterForm() {
                 }}
               />
               {nameHelpVisible && (
-                <p className="text-xs text-gray-400 mt-1">3–40 characters</p>
+                <p className="text-xs text-gray-400 mt-1">{dict.validation.name_help}</p>
               )}
               {fieldErrors?.name && (
                 <p className="text-red-500 text-xs mt-1">{fieldErrors.name[0]}</p>
@@ -215,12 +217,12 @@ export default function RegisterForm() {
             {/* Username Input */}
             <div className="space-y-1">
               <Label htmlFor="username" className="text-gray-700 font-medium">
-                Username
+                {dict.auth.register.username_label}
               </Label>
               <Input
                 id="username"
                 name="username"
-                placeholder="yourhandle"
+                placeholder={dict.auth.register.username_placeholder}
                 required
                 className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
                 onChange={(e) => {
@@ -247,13 +249,13 @@ export default function RegisterForm() {
                 }}
               />
               {usernameHelpVisible && (
-                <p className="text-xs text-gray-400 mt-1">3–20 characters, no spaces</p>
+                <p className="text-xs text-gray-400 mt-1">{dict.validation.username_help}</p>
               )}
               {checkUsernameMutation.isPending && (
-                <p className="text-xs text-gray-400 mt-1">Checking username...</p>
+                <p className="text-xs text-gray-400 mt-1">{dict.validation.username_checking}</p>
               )}
               {usernameAvailable && (
-                <p className="text-xs text-green-500 mt-1">Username available</p>
+                <p className="text-xs text-green-500 mt-1">{dict.validation.username_available}</p>
               )}
               {(usernameError || fieldErrors?.username) && (
                 <p className="text-red-500 text-xs mt-1">
@@ -265,7 +267,7 @@ export default function RegisterForm() {
             {/* Email Input */}
             <div className="space-y-1">
               <Label htmlFor="email" className="text-gray-700 font-medium">
-                Email
+                {dict.auth.register.email_label}
               </Label>
               <Input
                 id="email"
@@ -290,10 +292,10 @@ export default function RegisterForm() {
                 }}
               />
               {checkEmailMutation.isPending && (
-                <p className="text-xs text-gray-400 mt-1">Checking email...</p>
+                <p className="text-xs text-gray-400 mt-1">{dict.validation.email_checking}</p>
               )}
               {emailAvailable && (
-                <p className="text-xs text-green-500 mt-1">Email available</p>
+                <p className="text-xs text-green-500 mt-1">{dict.validation.email_available}</p>
               )}
               {(emailError || fieldErrors?.email) && (
                 <p className="text-red-500 text-xs mt-1">
@@ -305,7 +307,7 @@ export default function RegisterForm() {
             {/* Password Input */}
             <div className="space-y-1">
               <Label htmlFor="password" className="text-gray-700 font-medium">
-                Password
+                {dict.auth.register.password_label}
               </Label>
               <div className="relative">
                 <Input
@@ -330,7 +332,7 @@ export default function RegisterForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
                 >
                   {showPassword ? (
                     <FaEye className="text-lg" />
@@ -340,7 +342,7 @@ export default function RegisterForm() {
                 </button>
               </div>
               {passwordHelpVisible && (
-                <p className="text-xs text-gray-400 mt-1">6–17 characters</p>
+                <p className="text-xs text-gray-400 mt-1">{dict.validation.password_help}</p>
               )}
               {fieldErrors?.password && (
                 <p className="text-red-500 text-xs mt-1">{fieldErrors.password[0]}</p>
@@ -350,7 +352,7 @@ export default function RegisterForm() {
             {/* Confirm Password Input */}
             <div className="space-y-1">
               <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
-                Confirm Password
+                {dict.auth.register.confirm_password_label}
               </Label>
               <div className="relative">
                 <Input
@@ -374,7 +376,7 @@ export default function RegisterForm() {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={showConfirmPassword ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
                 >
                   {showConfirmPassword ? (
                     <FaEye className="text-lg" />
@@ -384,7 +386,7 @@ export default function RegisterForm() {
                 </button>
               </div>
               {confirmPasswordHelpVisible && (
-                <p className="text-xs text-gray-400 mt-1">Passwords must match</p>
+                <p className="text-xs text-gray-400 mt-1">{dict.validation.passwords_dont_match}</p>
               )}
               {fieldErrors?.confirmPassword && (
                 <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword[0]}</p>
@@ -411,10 +413,10 @@ export default function RegisterForm() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Creating account...
+                  {dict.auth.register.submitting}
                 </span>
               ) : (
-                "Create account"
+                dict.auth.register.submit
               )}
             </Button>
           </form>
@@ -422,7 +424,7 @@ export default function RegisterForm() {
           {/* Divider */}
           <div className="flex items-center mt-8 mb-5 text-gray-400 text-sm">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="px-4">Or continue with</span>
+            <span className="px-4">{dict.auth.login.social_divider}</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -441,12 +443,12 @@ export default function RegisterForm() {
 
           {/* Login link */}
           <p className="text-center text-gray-500 text-sm mt-4">
-            Already have an account?{" "}
+            {dict.auth.register.has_account}{" "}
             <Link
               href="/login"
               className="text-[#05dc7f] font-semibold hover:underline"
             >
-              Sign in
+              {dict.auth.register.sign_in}
             </Link>
           </p>
         </div>

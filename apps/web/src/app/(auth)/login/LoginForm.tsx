@@ -18,8 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/src/i18n/client";
 
 export default function LoginForm() {
+  const { dict } = useTranslation();
   const router = useRouter();
   const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -39,13 +41,13 @@ export default function LoginForm() {
         return;
       }
 
-      toast.success("Signed in successfully");
+      toast.success(dict.auth.login.success);
       await update();
       router.push("/dashboard");
     },
 
     onError: () => {
-      toast.error("Unexpected error. Please try again.");
+      toast.error(dict.validation.generic_error);
     },
   });
 
@@ -87,25 +89,25 @@ export default function LoginForm() {
           />
 
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-            Welcome to Retold
+            {dict.auth.login.welcome_title}
           </h1>
           <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
-            Connecting talent with opportunity. Build your professional story and unlock new possibilities.
+            {dict.auth.login.welcome_subtitle}
           </p>
 
           {/* Feature highlights */}
           <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
             <div className="flex items-center gap-3 text-gray-700">
               <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-              <span>Showcase your professional journey</span>
+              <span>{dict.auth.login.feature_journey}</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-              <span>Connect with industry leaders</span>
+              <span>{dict.auth.login.feature_leaders}</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-              <span>Discover new opportunities</span>
+              <span>{dict.auth.login.feature_opportunities}</span>
             </div>
           </div>
         </div>
@@ -127,17 +129,17 @@ export default function LoginForm() {
           {/* Form header */}
           <div className="mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
-              Sign in
+              {dict.auth.login.title}
             </h2>
             <p className="text-gray-500 text-center">
-              Enter your credentials to access your account
+              {dict.auth.login.subtitle}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="identifier" className="text-gray-700 font-medium">
-                Email or Username
+                {dict.auth.login.identifier_label}
               </Label>
               <Input
                 id="identifier"
@@ -151,7 +153,7 @@ export default function LoginForm() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-gray-700 font-medium">
-                Password
+                {dict.auth.login.password_label}
               </Label>
               <div className="relative">
                 <Input
@@ -166,7 +168,7 @@ export default function LoginForm() {
                   type="button"
                   onClick={togglePasswordVisible}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                  aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                  aria-label={isPasswordVisible ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
                 >
                   {isPasswordVisible ? (
                     <FaEye className="text-lg" />
@@ -184,14 +186,14 @@ export default function LoginForm() {
                   className="data-[state=checked]:bg-[#05dc7f] data-[state=checked]:border-[#05dc7f] cursor-pointer"
                 />
                 <Label htmlFor="remember" className="text-gray-500 text-sm cursor-pointer">
-                  Remember me
+                  {dict.auth.login.remember_me}
                 </Label>
               </div>
               <Link
                 href="/forgot-password"
                 className="text-[#05dc7f] text-sm font-semibold hover:underline hover:opacity-80 transition-opacity"
               >
-                Forgot password?
+                {dict.auth.login.forgot_password}
               </Link>
             </div>
 
@@ -206,10 +208,10 @@ export default function LoginForm() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Signing in...
+                  {dict.auth.login.submitting}
                 </span>
               ) : (
-                "Sign in"
+                dict.auth.login.submit
               )}
             </Button>
           </form>
@@ -217,7 +219,7 @@ export default function LoginForm() {
           {/* Divider */}
           <div className="flex items-center my-8 text-gray-400 text-sm">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="px-4">Or continue with</span>
+            <span className="px-4">{dict.auth.login.social_divider}</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -239,12 +241,12 @@ export default function LoginForm() {
 
           {/* Create account */}
           <p className="text-center text-gray-500 text-sm mt-8">
-            Don&apos;t have an account?{" "}
+            {dict.auth.login.no_account}{" "}
             <Link
               href="/register"
               className="text-[#05dc7f] font-semibold hover:underline"
             >
-              Create one
+              {dict.auth.login.create_one}
             </Link>
           </p>
         </div>

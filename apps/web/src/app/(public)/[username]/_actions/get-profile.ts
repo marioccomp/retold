@@ -6,5 +6,5 @@ import { mapUserToPublicProfile } from "@/src/domains/user/mappers/user-to-publi
 export async function getProfile(username: string) {
   const user = await userRepository.findPublicProfileByUsername(username);
   if (!user) return null;
-  return mapUserToPublicProfile(user);
+  return mapUserToPublicProfile(user!);
 }

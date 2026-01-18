@@ -6,8 +6,9 @@ import { QueryProvider } from "../providers/QueryProvider";
 import { Toaster } from "sonner";
 
 import "./globals.css";
-import ProjectCard from "../components/ProjectCard";
 import { auth } from "../domains/auth/auth";
+import { getLocale } from "../i18n/server";
+import { LanguageProvider } from "../i18n/client";
 
 const questrial = Questrial({
   subsets: ["latin"],
@@ -26,16 +27,20 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth()
+  const lang = await getLocale();
+
   return (
-    <html lang="en" className={questrial.variable}>
+    <html lang={lang} className={questrial.variable}>
       <body className={`${questrial.className} antialiased min-h-screen flex flex-col`}>
-        <AuthProvider>
-          <QueryProvider>
-            <Header session={session} />
-            <main className="flex-grow w-full">{children}</main>
-            <Toaster richColors position="top-right" />
-          </QueryProvider>
-        </AuthProvider>
+        <LanguageProvider lang={lang}>
+          <AuthProvider>
+            <QueryProvider>
+              <Header session={session} />
+              <main className="flex-grow w-full">{children}</main>
+              <Toaster richColors position="top-right" />
+            </QueryProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
