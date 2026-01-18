@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Settings, Edit3, Trash2, X, AlertTriangle } from "lucide-react";
+import { Settings, Edit3, Trash2, X, AlertTriangle, ImagePlus, Loader2 } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { deleteProjectAction, updateProjectAction } from "@/src/domains/project/actions";
+import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
 import { useQueryClient } from "@tanstack/react-query";
 
 type ProjectSettingsProps = {
@@ -22,6 +23,7 @@ type ProjectSettingsProps = {
         id: number;
         title: string;
         description: string | null;
+        images?: string[];
     };
     onUpdate?: () => void;
     onDelete?: () => void;
@@ -36,6 +38,9 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
 
     const [title, setTitle] = useState(project.title);
     const [description, setDescription] = useState(project.description || "");
+    const [coverPreview, setCoverPreview] = useState<string | null>(project.images?.[0] ?? null);
+    const [isUploadingCover, setIsUploadingCover] = useState(false);
+    const coverInputRef = useRef<HTMLInputElement>(null);
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
@@ -67,6 +72,37 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
             toast.error("Erro ao atualizar projeto");
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Show preview immediately
+        const previewUrl = URL.createObjectURL(file);
+        setCoverPreview(previewUrl);
+
+        setIsUploadingCover(true);
+        const formData = new FormData();
+        formData.append("images", file);
+
+        try {
+            const result = await uploadProjectImagesAction(project.id, formData);
+            if (result.error) {
+                toast.error(result.error);
+                setCoverPreview(project.images?.[0] ?? null);
+            } else {
+                toast.success("Cover image updated!");
+                queryClient.invalidateQueries({ queryKey: ["project-analysis", project.id] });
+                queryClient.invalidateQueries({ queryKey: ["profile"] });
+            }
+        } catch {
+            toast.error("Unexpected error uploading cover.");
+            setCoverPreview(project.images?.[0] ?? null);
+        } finally {
+            setIsUploadingCover(false);
+            URL.revokeObjectURL(previewUrl);
         }
     };
 
@@ -144,6 +180,41 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
                             </button>
                         </div>
                         <div className="p-4 space-y-4">
+                            {/* Cover Image Upload */}
+                            <div className="space-y-2">
+                                <Label className="text-slate-950 font-semibold">Cover Image</Label>
+                                <div
+                                    className="relative w-full h-32 rounded-lg border-2 border-dashed border-slate-300 overflow-hidden cursor-pointer hover:border-[#05dc7f] transition-colors bg-slate-50"
+                                    onClick={() => coverInputRef.current?.click()}
+                                >
+                                    {coverPreview ? (
+                                        <img
+                                            src={coverPreview}
+                                            alt="Cover preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                                            <ImagePlus className="w-8 h-8 mb-2" />
+                                            <span className="text-sm">Click to upload</span>
+                                        </div>
+                                    )}
+                                    {isUploadingCover && (
+                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                            <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    ref={coverInputRef}
+                                    type="file"
+                                    name="images"
+                                    accept="image/*"
+                                    onChange={handleCoverChange}
+                                    className="hidden"
+                                />
+                            </div>
+
                             <div className="space-y-2">
                                 <Label htmlFor="edit-title" className="text-slate-950 font-semibold">Título</Label>
                                 <Input

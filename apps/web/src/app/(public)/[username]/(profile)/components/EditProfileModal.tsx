@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { FiX, FiGithub, FiLinkedin, FiUser, FiType, FiAlignLeft } from "react-icons/fi";
+import { useState, useEffect, useRef } from "react";
+import { FiX, FiGithub, FiLinkedin, FiUser, FiType, FiAlignLeft, FiCamera } from "react-icons/fi";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfile } from "../../_actions/edit-profle";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { uploadAvatarAction } from "@/src/domains/user/actions/upload-avatar.actions";
 
 type Props = {
     isOpen: boolean;
@@ -24,6 +26,9 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
     const [bio, setBio] = useState(profile.bio ?? "");
     const [githubUrl, setGithubUrl] = useState(profile.githubUrl ?? "");
     const [linkedinUrl, setLinkedinUrl] = useState(profile.linkedinUrl ?? "");
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.image ?? null);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const queryClient = useQueryClient();
 
@@ -34,6 +39,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             setBio(profile.bio ?? "");
             setGithubUrl(profile.githubUrl ?? "");
             setLinkedinUrl(profile.linkedinUrl ?? "");
+            setAvatarPreview(profile.image ?? null);
         }
     }, [isOpen, profile]);
 
@@ -70,6 +76,37 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
         },
     });
 
+    async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Show preview immediately
+        const previewUrl = URL.createObjectURL(file);
+        setAvatarPreview(previewUrl);
+
+        // Upload the file
+        setIsUploadingAvatar(true);
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        try {
+            const result = await uploadAvatarAction(formData);
+            if (result.error) {
+                toast.error(result.error);
+                setAvatarPreview(profile.image ?? null);
+            } else {
+                toast.success("Avatar updated successfully!");
+                queryClient.invalidateQueries({ queryKey: ["profile", username] });
+            }
+        } catch {
+            toast.error("Unexpected error uploading avatar.");
+            setAvatarPreview(profile.image ?? null);
+        } finally {
+            setIsUploadingAvatar(false);
+            URL.revokeObjectURL(previewUrl);
+        }
+    }
+
     if (!isOpen) return null;
 
     const handleOverlayMouseDown = (e: React.MouseEvent) => {
@@ -97,6 +134,46 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
                 {/* Content */}
                 <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-5">
+                    {/* Avatar Upload */}
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="relative">
+                            <Avatar className="w-24 h-24 border-2 border-[#e7eae9]">
+                                <AvatarImage
+                                    src={avatarPreview ?? undefined}
+                                    alt="Profile avatar"
+                                    className="object-cover"
+                                />
+                                <AvatarFallback className="text-2xl font-bold text-[#152e2b] bg-[#f3f6f5]">
+                                    {(profile.name || username || "U").charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
+                            <Button
+                                size="icon"
+                                type="button"
+                                disabled={isUploadingAvatar}
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute bottom-0 right-0 w-8 h-8 rounded-full border-none bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] hover:scale-105 transition-all duration-200 cursor-pointer"
+                            >
+                                {isUploadingAvatar ? (
+                                    <span className="w-4 h-4 border-2 border-[#0f2f28] border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                    <FiCamera size={14} />
+                                )}
+                            </Button>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                name="avatar"
+                                accept="image/*"
+                                onChange={handleAvatarChange}
+                                className="hidden"
+                            />
+                        </div>
+                        <span className="text-xs text-[#6b7c7a]">Click to upload a new avatar</span>
+                    </div>
+
+                    <div className="h-px bg-[#e7eae9] my-1" />
+
                     {/* Name */}
                     <div className="flex flex-col gap-2">
                         <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">

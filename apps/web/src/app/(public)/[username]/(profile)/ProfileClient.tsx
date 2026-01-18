@@ -3,8 +3,7 @@
 import Image from "next/image";
 import { useState, memo } from "react";
 import capa from "@/assets/capa.jpg";
-import ownerPic from "@/assets/foto.jpeg";
-import { FiGithub, FiLinkedin, FiCamera, FiEdit2 } from "react-icons/fi";
+import { FiGithub, FiLinkedin, FiCamera } from "react-icons/fi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getProfile } from "../_actions/get-profile";
@@ -99,7 +98,7 @@ export default function ProfileClient({ username, ownProfile }: Props) {
             <div className="relative">
               <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-white shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.08)] bg-white">
                 <AvatarImage
-                  src={ownerPic.src}
+                  src={profile.image ?? undefined}
                   alt="Foto de perfil"
                   className="object-cover"
                 />
@@ -111,13 +110,9 @@ export default function ProfileClient({ username, ownProfile }: Props) {
               {ownProfile && (
                 <Button
                   size="icon"
-                  className="absolute bottom-3 right-3 w-9 h-9 rounded-full border-none bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] hover:scale-105 hover:shadow-[0_6px_16px_rgba(5,220,127,0.4)] transition-all duration-200"
-                  title="Alterar foto"
-                  onClick={() => {
-                    // TODO: Implementar edição de foto separado ou no modal? 
-                    // Como não está no scopo atual manteremos ou adicionaremos depois.
-                    // O usuário pediu modal para nome, titulo, descrição e links.
-                  }}
+                  className="absolute bottom-3 right-3 w-9 h-9 rounded-full border-none bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] hover:scale-105 hover:shadow-[0_6px_16px_rgba(5,220,127,0.4)] transition-all duration-200 cursor-pointer"
+                  title="Change photo"
+                  onClick={() => setIsEditModalOpen(true)}
                 >
                   <FiCamera />
                 </Button>
