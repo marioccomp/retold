@@ -13,8 +13,10 @@ import retoldLogo from "@/assets/retold-footer.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/src/i18n/client";
 
 export default function ForgotPasswordForm() {
+  const { dict } = useTranslation();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]> | null>(null);
 
   const forgotMutation = useMutation({
@@ -26,11 +28,11 @@ export default function ForgotPasswordForm() {
         return;
       }
 
-      toast.success(res.data || "Check your email for instructions.");
+      toast.success(res.data || dict.auth.forgot_password.success_message);
       setFieldErrors(null);
     },
     onError: () => {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(dict.validation.generic_error);
     },
   });
 
@@ -70,10 +72,10 @@ export default function ForgotPasswordForm() {
           />
 
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-            Password Recovery
+            {dict.auth.forgot_password.welcome_title}
           </h1>
           <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
-            Don&apos;t worry, we&apos;ve got you covered. Enter your email to reset your password.
+            {dict.auth.forgot_password.welcome_subtitle}
           </p>
         </div>
       </div>
@@ -87,17 +89,17 @@ export default function ForgotPasswordForm() {
 
           <div className="mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
-              Forgot password?
+              {dict.auth.forgot_password.title}
             </h2>
             <p className="text-gray-500 text-center">
-              Enter your email address to verify your account
+              {dict.auth.forgot_password.subtitle}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-gray-700 font-medium">
-                Email
+                {dict.auth.register.email_label}
               </Label>
               <Input
                 id="email"
@@ -139,18 +141,18 @@ export default function ForgotPasswordForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Sending...
+                  {dict.auth.forgot_password.submitting}
                 </span>
               ) : (
-                "Send Recovery Link"
+                dict.auth.forgot_password.submit
               )}
             </Button>
           </form>
 
           <p className="text-center text-gray-500 text-sm mt-8">
-            Remember your password?{" "}
+            {dict.auth.forgot_password.remember_password}{" "}
             <Link href="/login" className="text-[#05dc7f] font-semibold hover:underline">
-              Sign in
+              {dict.auth.forgot_password.sign_in}
             </Link>
           </p>
         </div>

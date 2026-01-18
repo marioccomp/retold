@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database";
 import { User } from "@repo/database";
 
-type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title" | "githubUrl" | "linkedinUrl">;
+type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title" | "githubUrl" | "linkedinUrl" | "longBio" | "skills">;
 type UpdateProfileInput = Partial<UpdatableProfileFields>;
 
 export const userRepository = {
@@ -62,6 +62,9 @@ export const userRepository = {
             tags: true,
           },
         },
+        educations: {
+          orderBy: { startDate: "desc" },
+        },
       },
     });
 
@@ -112,6 +115,47 @@ export const userRepository = {
       orderBy: {
         createdAt: "desc",
       },
+    });
+  },
+
+  async updateProfileDetails(userId: number, data: {
+    longBio?: string | null;
+    skills?: string[];
+    educations?: { degree: string; institution: string; startDate: Date; endDate: Date | null }[];
+  }) {
+    return prisma.$transaction(async (tx) => {
+      // Update user fields if provided
+      const updateData: any = {};
+      if (data.longBio !== undefined) updateData.longBio = data.longBio;
+      if (data.skills !== undefined) updateData.skills = data.skills;
+
+      let user;
+      if (Object.keys(updateData).length > 0) {
+        user = await tx.user.update({
+          where: { id: userId },
+          data: updateData,
+        });
+      } else {
+        user = await tx.user.findUnique({ where: { id: userId } });
+      }
+
+      // Sync educations ONLY IF provided in the call
+      if (data.educations !== undefined) {
+        await tx.education.deleteMany({
+          where: { userId },
+        });
+
+        if (data.educations.length > 0) {
+          await tx.education.createMany({
+            data: data.educations.map(edu => ({
+              ...edu,
+              userId,
+            })),
+          });
+        }
+      }
+
+      return user;
     });
   },
 };

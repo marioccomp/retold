@@ -7,6 +7,7 @@ const userWithProfileData = Prisma.validator<Prisma.UserDefaultArgs>()({
     projects: { include: { tags: true, repository: true } },
     certifications: { include: { tags: true } },
     participations: { include: { tags: true } },
+    educations: true,
   },
 });
 
@@ -19,10 +20,20 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
     name: user.name,
     title: user.title,
     bio: user.bio,
+    longBio: user.longBio ?? null,
+    skills: user.skills || [],
     image: user.image,
     githubUrl: user.githubUrl,
     linkedinUrl: user.linkedinUrl,
     createdAt: user.createdAt.toISOString(),
+
+    educations: (user.educations || []).map((edu) => ({
+      id: edu.id,
+      degree: edu.degree,
+      institution: edu.institution,
+      startDate: edu.startDate.toISOString(),
+      endDate: edu.endDate?.toISOString() ?? null,
+    })),
 
     projects: user.projects.map((project) => ({
       id: project.id,

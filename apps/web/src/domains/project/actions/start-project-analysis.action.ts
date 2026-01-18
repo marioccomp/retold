@@ -4,8 +4,11 @@ import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { analyzeRepoQueue } from "@repo/queue";
 
+import { getLocale } from "@/src/i18n/server";
+
 export async function startProjectAnalysisAction(projectId: number) {
     const session = await auth();
+    const locale = await getLocale();
 
     if (!session?.user?.id) {
         throw new Error("Unauthorized");
@@ -35,6 +38,7 @@ export async function startProjectAnalysisAction(projectId: number) {
         {
             projectId: project.id,
             repoUrl: project.repository.url,
+            locale: locale,
         },
         {
             attempts: 3,

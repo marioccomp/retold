@@ -1,0 +1,253 @@
+{
+    "settings": {
+        "title": "Configurações",
+        "description": "Gerencie as configurações e preferências da sua conta.",
+        "language": {
+            "title": "Idioma",
+            "description": "Selecione seu idioma de preferência",
+            "label": "Idioma da Interface"
+        },
+        "security": "Segurança",
+        "integrations": "Integrações",
+        "danger": "Zona de Perigo",
+        "dangerZone": {
+            "title": "Excluir Conta",
+            "description": "Exclua permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita. Todos os seus dados de projeto serão perdidos.",
+            "button": "Excluir Conta",
+            "buttonDeleting": "Excluindo..."
+        },
+        "password": {
+            "title": "Alterar Senha",
+            "description": "Atualize sua senha para manter sua conta segura.",
+            "current": "Senha Atual",
+            "new": "Nova Senha",
+            "confirm": "Confirmar Nova Senha",
+            "button": "Atualizar Senha",
+            "buttonUpdating": "Atualizando..."
+        },
+        "connectedAccounts": {
+            "title": "Contas Conectadas",
+            "description": "Gerencie suas contas conectadas para facilitar o login.",
+            "github": "Conecte sua conta do GitHub",
+            "connected": "Conectado",
+            "connect": "Conectar",
+            "loading": "Carregando..."
+        }
+    },
+    "project": {
+        "status": {
+            "PENDING": "Pendente",
+            "ANALYZING": "Processando",
+            "DONE": "Auditado",
+            "ERROR": "Erro"
+        },
+        "metrics": {
+            "language": "Linguagem",
+            "architecture": "Arquitetura",
+            "complexity": "Complexidade"
+        }
+    },
+    "feed": {
+        "feedhero": {
+            "title_prefix": "Destaque seu",
+            "title_highlight": "portfólio",
+            "subtitle": "Mais que código, mostre impacto. O lugar onde desenvolvedores constroem autoridade através de projetos reais.",
+            "create_profile": "Criar meu perfil",
+            "new_project": "Novo projeto",
+            "explore_projects": "Explorar projetos",
+            "free_portfolio": "Portfólio Grátis",
+            "community_feedback": "Feedback da Comunidade",
+            "featured_week": "Destaque da semana",
+            "loading_featured": "Carregando destaque...",
+            "worker_analysis": "Análise do Worker",
+            "tests": "Testes",
+            "performance": "Performance",
+            "excellent": "Excelente",
+            "clean_code": "Código limpo e otimizado"
+        },
+        "feedcontent": {
+            "tabs": {
+                "projects": "Projetos",
+                "people": "Pessoas"
+            },
+            "search_placeholder": "Buscar projetos, pessoas, tags...",
+            "people_coming_soon": {
+                "title": "Em breve",
+                "description": "A busca de pessoas estará disponível em breve"
+            }
+        },
+        "feedprojectsgrid": {
+            "back_to_projects": "Voltar para projetos",
+            "no_projects": {
+                "title": "Nenhum projeto encontrado",
+                "description": "Tente buscar por outro termo"
+            }
+        }
+    },
+    "header": {
+        "explore": "Explorar",
+        "about": "Sobre",
+        "login": "Entrar",
+        "profile": "Perfil",
+        "settings": "Configurações",
+        "logout": "Sair"
+    },
+    "profile": {
+        "alt_cover": "Capa do perfil",
+        "alt_avatar": "Foto de perfil",
+        "change_photo": "Alterar foto",
+        "no_title": "Nenhum título definido",
+        "no_description": "Nenhuma descrição",
+        "about_section": "Sobre",
+        "education_section": "Educação",
+        "skills_section": "Habilidades",
+        "education_mock": {
+            "degree": "Ciência da Computação",
+            "school": "Universidade de Tecnologia",
+            "year": "2018 - 2022"
+        },
+        "skills_empty": "Nenhuma habilidade listada",
+        "stats_section": "Estatísticas",
+        "pinned_projects_section": "Projetos em Destaque",
+        "stat_commits": "Commits",
+        "stat_prs": "Pull Requests",
+        "stat_issues": "Issues",
+        "stat_projects": "Projetos analisados",
+        "pinned_projects_empty": "Nenhum projeto em destaque ainda",
+        "currently": "Atualmente",
+        "views": "visualizações",
+        "likes": "curtidas",
+        "edit_profile": "Editar Perfil",
+        "edit_details": "Editar detalhes",
+        "contact": "Contato",
+        "search_placeholder": "Buscar...",
+        "tabs": {
+            "projects": "Projetos",
+            "profile": "Perfil",
+            "certifications": "Certificações",
+            "participations": "Participações"
+        },
+        "back_to_projects": "Voltar para projetos",
+        "new_project": "Novo projeto",
+        "new_certification": "Nova certificação",
+        "new_participation": "Nova participação",
+        "edit_modal": {
+            "title": "Editar Perfil",
+            "name_label": "Nome",
+            "name_placeholder": "Seu nome completo",
+            "job_label": "Título / Cargo",
+            "job_placeholder": "Ex: Desenvolvedor Full Stack",
+            "headline_label": "Headline",
+            "headline_placeholder": "Descreva brevemente seu foco (ex: React | Node.js | UI/UX)",
+            "social_title": "Redes Sociais",
+            "github_label": "URL do GitHub",
+            "github_placeholder": "github.com/seu-usuario",
+            "linkedin_label": "URL do LinkedIn",
+            "linkedin_placeholder": "linkedin.com/in/seu-usuario",
+            "cancel": "Cancelar",
+            "save": "Salvar Alterações",
+            "saving": "Salvando...",
+            "success": "Perfil atualizado com sucesso!",
+            "error": "Erro ao atualizar perfil",
+            "unexpected_error": "Erro inesperado ao atualizar perfil"
+        },
+        "edit_section_modal": {
+            "title": "Editar Detalhes do Perfil",
+            "long_bio_label": "Sobre Mim (Detalhado)",
+            "long_bio_placeholder": "Descreva sua jornada profissional em detalhes...",
+            "education_label": "Formação Acadêmica",
+            "add_button": "Adicionar",
+            "course_label": "Curso",
+            "course_placeholder": "Ex: Engenharia de Software",
+            "institution_label": "Instituição",
+            "institution_placeholder": "Ex: USP, UFRJ, etc.",
+            "start_label": "Início",
+            "end_label": "Término",
+            "currently_label": "Em andamento",
+            "skills_label": "Habilidades",
+            "skills_placeholder": "Digite uma habilidade e aperte Enter",
+            "skills_none": "Nenhuma habilidade adicionada",
+            "education_none": "Nenhuma formação listada"
+        }
+    },
+    "validation": {
+        "name_help": "3–40 caracteres",
+        "username_help": "3–20 caracteres, sem espaços",
+        "username_checking": "Verificando disponibilidade...",
+        "username_available": "Nome de usuário disponível",
+        "email_invalid": "Formato de e-mail inválido",
+        "email_checking": "Verificando e-mail...",
+        "email_available": "E-mail disponível",
+        "email_in_use": "Este e-mail já está em uso",
+        "password_min": "A senha deve ter pelo menos 6 caracteres",
+        "password_max": "A senha deve ter no máximo 17 caracteres",
+        "password_help": "6–17 caracteres",
+        "passwords_dont_match": "As senhas não coincidem",
+        "fields_invalid": "Campos inválidos",
+        "generic_error": "Erro inesperado. Por favor, tente novamente."
+    },
+    "auth": {
+        "login": {
+            "welcome_title": "Bem-vindo ao Retold",
+            "welcome_subtitle": "Conectando talento com oportunidade. Construa sua história profissional e abra novas possibilidades.",
+            "feature_journey": "Destaque sua jornada profissional",
+            "feature_leaders": "Conecte-se com líderes da indústria",
+            "feature_opportunities": "Descubra novas oportunidades",
+            "title": "Entrar",
+            "subtitle": "Digite suas credenciais para acessar sua conta",
+            "identifier_label": "E-mail ou Usuário",
+            "password_label": "Senha",
+            "remember_me": "Lembrar de mim",
+            "forgot_password": "Esqueceu a senha?",
+            "submit": "Entrar",
+            "submitting": "Entrando...",
+            "social_divider": "Ou continue com",
+            "no_account": "Não tem uma conta?",
+            "create_one": "Crie uma agora",
+            "success": "Logado com sucesso"
+        },
+        "register": {
+            "welcome_title": "Junte-se ao Retold",
+            "welcome_subtitle": "Comece sua jornada profissional hoje. Crie seu portfólio e seja descoberto.",
+            "title": "Criar conta",
+            "subtitle": "Preencha seus dados para começar",
+            "name_label": "Nome",
+            "username_label": "Usuário",
+            "email_label": "E-mail",
+            "password_label": "Senha",
+            "confirm_password_label": "Confirmar Senha",
+            "username_placeholder": "seunome",
+            "submit": "Criar conta",
+            "submitting": "Criando conta...",
+            "has_account": "Já tem uma conta?",
+            "sign_in": "Entrar",
+            "success": "Bem-vindo ao Retold",
+            "login_failed": "Conta criada, mas o login falhou."
+        },
+        "forgot_password": {
+            "welcome_title": "Recuperação de Senha",
+            "welcome_subtitle": "Não se preocupe, estamos aqui para ajudar. Digite seu e-mail para redefinir sua senha.",
+            "title": "Esqueceu a senha?",
+            "subtitle": "Digite seu endereço de e-mail para verificar sua conta",
+            "submit": "Enviar Link de Recuperação",
+            "submitting": "Enviando...",
+            "success_message": "Verifique seu e-mail para instruções.",
+            "remember_password": "Lembrou da sua senha?",
+            "sign_in": "Entrar"
+        },
+        "reset_password": {
+            "welcome_title": "Redefinir Senha",
+            "welcome_subtitle": "Crie uma nova senha para proteger sua conta e voltar ao trabalho.",
+            "title": "Nova Senha",
+            "subtitle": "Digite sua nova senha abaixo",
+            "password_label": "Nova Senha",
+            "submit": "Confirmar Alteração",
+            "submitting": "Atualizando...",
+            "success_message": "Senha alterada com sucesso!",
+            "invalid_link_title": "Link Inválido",
+            "invalid_link_desc": "Token não encontrado na URL. Certifique-se de que você acessou esta página a partir do link enviado para o seu e-mail.",
+            "back_to_login": "Voltar para o Login",
+            "loading": "Carregando..."
+        }
+    }
+}

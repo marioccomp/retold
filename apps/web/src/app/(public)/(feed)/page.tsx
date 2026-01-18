@@ -4,6 +4,7 @@ import HeroSectionV2 from "./HeroSectionV2";
 import FeedContent from "./FeedContent";
 import { auth } from "@/src/domains/auth/auth";
 
+
 export default async function Home() {
   const [projectDTO, feedProjects] = await Promise.all([
     getHighlightedProject(),
@@ -15,7 +16,9 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       <HeroSectionV2 projectDTO={projectDTO} session={session} />
+
       <FeedContent projects={feedProjects} />
     </div>
   );
 }
+

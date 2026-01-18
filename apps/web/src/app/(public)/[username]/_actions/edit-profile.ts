@@ -5,7 +5,7 @@ import { z } from "zod";
 import { userRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
-import { profileSchema } from "@/src/domains/auth/schemas/register.schema";
+import { profileSchema, profileDetailsSchema } from "@/src/domains/profile/schemas/profile.schema";
 
 const checkNameSchema = registerSchema.pick({
   name: true,
@@ -222,6 +222,46 @@ export async function updateProfile(
     return {
       success: false,
       message: "Unexpected error, try again later",
+    };
+  }
+}
+
+const updateProfileDetailsSchema = profileDetailsSchema.partial();
+
+export async function updateProfileDetails(
+  data: z.infer<typeof updateProfileDetailsSchema>,
+  userId: number
+): Promise<ActionResponse<any>> {
+  const parsed = updateProfileDetailsSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Invalid data",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const user = await userRepository.updateProfileDetails(userId, {
+      longBio: parsed.data.longBio ?? undefined,
+      skills: parsed.data.skills ?? undefined,
+      educations: parsed.data.educations?.map(edu => ({
+        ...edu,
+        startDate: new Date(edu.startDate),
+        endDate: edu.endDate ? new Date(edu.endDate) : null,
+      })) ?? undefined,
+    });
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      success: false,
+      message: "Unexpected error updating details",
     };
   }
 }

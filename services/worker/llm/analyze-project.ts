@@ -28,8 +28,9 @@ export async function analyzeProjectWithLLM(analysis: {
   };
   structure: any;
   readme?: string;
+  locale?: string;
 }) {
-  const prompt = projectOverviewPrompt(analysis);
+  const prompt = projectOverviewPrompt(analysis, analysis.locale);
 
   const completion = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",

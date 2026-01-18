@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FiPlus } from "react-icons/fi";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
+import { useTranslation } from "@/src/i18n/client";
 
 type Props = {
   profile: PublicProfileDTO;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function ParticipationsSection({ searchQuery, ownProfile, profile }: Props) {
+  const { dict } = useTranslation();
   const FALLBACK_EVENT =
     "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop";
 
@@ -37,7 +39,7 @@ export default function ParticipationsSection({ searchQuery, ownProfile, profile
           tabIndex={0}
         >
           <FiPlus className="w-9 h-9 stroke-[1.5px]" />
-          <span className="font-semibold text-[1.1rem]">Nova participação</span>
+          <span className="font-semibold text-[1.1rem]">{dict.profile.new_participation}</span>
         </div>
       )}
 

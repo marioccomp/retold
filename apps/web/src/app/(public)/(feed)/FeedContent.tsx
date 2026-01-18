@@ -6,15 +6,24 @@ import { Input } from "@/components/ui/input";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import FeedProjectsGrid from "./FeedProjectsGrid";
 import { FiSearch } from "react-icons/fi";
+import { useTranslation } from "@/src/i18n/client";
+
 
 type Props = {
     projects: ProjectCardDTO[];
 };
 
 export default function FeedContent({ projects }: Props) {
+    const { dict } = useTranslation();
     const [searchQuery, setSearchQuery] = useState("");
     const [isProjectSelected, setIsProjectSelected] = useState(false);
-    const tabs = ["Projetos", "Pessoas"];
+
+    // Define tabs using keys that we can map to translations
+    const tabs = [
+        { key: "projects", label: dict.feed.feedcontent.tabs.projects },
+        { key: "people", label: dict.feed.feedcontent.tabs.people }
+    ];
+
 
     // Auto-scroll to feed when navigating with hash
     useEffect(() => {
@@ -30,20 +39,23 @@ export default function FeedContent({ projects }: Props) {
             {/* Gradient transition from hero */}
             <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#f8fdf5] to-transparent pointer-events-none -z-10" />
 
-            <Tabs defaultValue="Projetos" className="w-full">
+            <Tabs defaultValue="projects" className="w-full">
                 {/* Sticky Tabs Header */}
+
                 {!isProjectSelected && (
                     <div className="sticky top-16 z-40 bg-gradient-to-b from-[#fafdf8] to-white/95 backdrop-blur-lg pt-4 pb-4 -mx-6 px-6 md:-mx-12 md:px-12 border-b border-[#d4e5d7] mb-8 flex flex-row gap-6 items-center w-[calc(100%+48px)] md:w-[calc(100%+96px)] shadow-sm">
                         <TabsList className="bg-transparent p-0 h-auto gap-6 justify-start shrink-0">
                             {tabs.map((tab) => (
                                 <TabsTrigger
-                                    key={tab}
-                                    value={tab}
+                                    key={tab.key}
+                                    value={tab.key}
+
                                     onClick={() => setSearchQuery("")}
                                     className="bg-transparent border-0 border-b-[3px] border-solid border-b-transparent py-1 px-0 text-base font-medium text-[#6b7c7a] cursor-pointer transition-colors duration-300 hover:text-[#152e2b] data-[state=active]:!text-[#152e2b] data-[state=active]:!border-b-[#33bd19] data-[state=active]:[text-shadow:0.6px_0_0_currentColor] data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap"
                                 >
-                                    {tab}
+                                    {tab.label}
                                 </TabsTrigger>
+
                             ))}
                         </TabsList>
 
@@ -51,8 +63,9 @@ export default function FeedContent({ projects }: Props) {
                             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af] pointer-events-none" size={18} />
                             <Input
                                 type="text"
-                                placeholder="Pesquisar projetos, pessoas, tags..."
+                                placeholder={dict.feed.feedcontent.search_placeholder}
                                 value={searchQuery}
+
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full py-2.5 pl-10 pr-4 border-[#d4e5d7] rounded-xl text-[0.9rem] text-[#152e2b] focus-visible:ring-[#33bd19]/30 focus-visible:border-[#33bd19] h-auto bg-white/80 placeholder:text-[#9ca3af]"
                             />
@@ -62,20 +75,22 @@ export default function FeedContent({ projects }: Props) {
 
                 {/* Projects Grid */}
                 <div className="animate-[fadeIn_0.6s_ease-out_forwards] pb-20">
-                    <TabsContent value="Projetos" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 m-0 p-0 ring-0 focus-visible:ring-0">
+                    <TabsContent value="projects" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 m-0 p-0 ring-0 focus-visible:ring-0">
                         <FeedProjectsGrid
+
                             projects={projects}
                             searchQuery={searchQuery}
                             onProjectSelectChange={setIsProjectSelected}
                         />
                     </TabsContent>
 
-                    <TabsContent value="Pessoas" className="m-0 p-0 ring-0 focus-visible:ring-0">
+                    <TabsContent value="people" className="m-0 p-0 ring-0 focus-visible:ring-0">
                         <div className="flex flex-col items-center justify-center py-16 text-center">
-                            <p className="text-[#6b7c7a] text-lg">Em breve</p>
-                            <p className="text-[#a0aaa8] text-sm mt-1">A pesquisa por pessoas estará disponível em breve</p>
+                            <p className="text-[#6b7c7a] text-lg">{dict.feed.feedcontent.people_coming_soon.title}</p>
+                            <p className="text-[#a0aaa8] text-sm mt-1">{dict.feed.feedcontent.people_coming_soon.description}</p>
                         </div>
                     </TabsContent>
+
 
                 </div>
             </Tabs>
