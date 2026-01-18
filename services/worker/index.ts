@@ -41,7 +41,7 @@ console.log("[worker] Starting worker...");
 const worker = new Worker(
   "analyze-repo",
   async (job) => {
-    const { projectId, repoUrl } = job.data;
+    const { projectId, repoUrl, locale } = job.data;
 
     // Create a temporary path for this specific job
     const tmpPath = path.resolve("/tmp/retold", String(projectId));
@@ -61,6 +61,7 @@ const worker = new Worker(
       const llmInsights = await analyzeProjectWithLLM({
         ...analysis,
         readme: readmeContent,
+        locale: locale || "en",
       });
 
       printOverview(llmInsights ?? "", projectId);

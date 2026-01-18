@@ -1,0 +1,25 @@
+import { cookies, headers } from 'next/headers';
+import pt from '@/src/locales/pt.json';
+import en from '@/src/locales/en.json';
+
+export async function getDictionary() {
+    const lang = await getLocale();
+    return lang === 'pt' ? pt : en;
+}
+
+export async function getLocale() {
+    const cookieStore = await cookies();
+    const cookieLang = cookieStore.get('NEXT_LOCALE')?.value;
+
+    if (cookieLang) return cookieLang;
+
+    // Se não tiver cookie, tenta detectar pelo Header do browser
+    const headerStack = await headers();
+    const acceptLanguage = headerStack.get('accept-language');
+
+    if (acceptLanguage?.toLowerCase().includes('pt')) {
+        return 'pt';
+    }
+
+    return 'en';
+}

@@ -1,0 +1,253 @@
+{
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your account settings and preferences.",
+        "language": {
+            "title": "Language",
+            "description": "Select your preferred language",
+            "label": "Interface Language"
+        },
+        "security": "Security",
+        "integrations": "Integrations",
+        "danger": "Danger Zone",
+        "dangerZone": {
+            "title": "Delete Account",
+            "description": "Permanently delete your account and all of your data. This action cannot be undone. All your project data will be lost.",
+            "button": "Delete Account",
+            "buttonDeleting": "Deleting..."
+        },
+        "password": {
+            "title": "Change Password",
+            "description": "Update your password to keep your account secure.",
+            "current": "Current Password",
+            "new": "New Password",
+            "confirm": "Confirm Password",
+            "button": "Update Password",
+            "buttonUpdating": "Updating..."
+        },
+        "connectedAccounts": {
+            "title": "Connected Accounts",
+            "description": "Manage your connected accounts for easier login.",
+            "github": "Connect your GitHub account",
+            "connected": "Connected",
+            "connect": "Connect",
+            "loading": "Loading..."
+        }
+    },
+    "project": {
+        "status": {
+            "PENDING": "Pending",
+            "ANALYZING": "Processing",
+            "DONE": "Audited",
+            "ERROR": "Error"
+        },
+        "metrics": {
+            "language": "Language",
+            "architecture": "Architecture",
+            "complexity": "Complexity"
+        }
+    },
+    "feed": {
+        "feedhero": {
+            "title_prefix": "Showcase your",
+            "title_highlight": "portfolio",
+            "subtitle": "More than code, show impact. The place where developers build authority through real projects.",
+            "create_profile": "Create my profile",
+            "new_project": "New project",
+            "explore_projects": "Explore projects",
+            "free_portfolio": "Free Portfolio",
+            "community_feedback": "Community Feedback",
+            "featured_week": "Featured of the week",
+            "loading_featured": "Loading featured...",
+            "worker_analysis": "Worker Analysis",
+            "tests": "Tests",
+            "performance": "Performance",
+            "excellent": "Excellent",
+            "clean_code": "Clean and optimized code"
+        },
+        "feedcontent": {
+            "tabs": {
+                "projects": "Projects",
+                "people": "People"
+            },
+            "search_placeholder": "Search projects, people, tags...",
+            "people_coming_soon": {
+                "title": "Coming soon",
+                "description": "People search will be available soon"
+            }
+        },
+        "feedprojectsgrid": {
+            "back_to_projects": "Back to projects",
+            "no_projects": {
+                "title": "No projects found",
+                "description": "Try searching for another term"
+            }
+        }
+    },
+    "header": {
+        "explore": "Explore",
+        "about": "About",
+        "login": "Login",
+        "profile": "Profile",
+        "settings": "Settings",
+        "logout": "Log out"
+    },
+    "profile": {
+        "alt_cover": "Profile cover",
+        "alt_avatar": "Profile picture",
+        "change_photo": "Change photo",
+        "no_title": "No title defined",
+        "no_description": "No description",
+        "about_section": "About",
+        "education_section": "Education",
+        "skills_section": "Skills",
+        "education_mock": {
+            "degree": "Computer Science",
+            "school": "University of Technology",
+            "year": "2018 - 2022"
+        },
+        "skills_empty": "No skills listed",
+        "stats_section": "Statistics",
+        "pinned_projects_section": "Featured Projects",
+        "stat_commits": "Commits",
+        "stat_prs": "Pull Requests",
+        "stat_issues": "Issues",
+        "stat_projects": "Projects analyzed",
+        "pinned_projects_empty": "No featured projects yet",
+        "currently": "Currently",
+        "views": "views",
+        "likes": "likes",
+        "edit_profile": "Edit Profile",
+        "edit_details": "Edit details",
+        "contact": "Contact",
+        "search_placeholder": "Search...",
+        "tabs": {
+            "projects": "Projects",
+            "profile": "Profile",
+            "certifications": "Certifications",
+            "participations": "Participations"
+        },
+        "back_to_projects": "Back to projects",
+        "new_project": "New project",
+        "new_certification": "New certification",
+        "new_participation": "New participation",
+        "edit_modal": {
+            "title": "Edit Profile",
+            "name_label": "Name",
+            "name_placeholder": "Your full name",
+            "job_label": "Title / Job",
+            "job_placeholder": "Ex: Full Stack Developer",
+            "headline_label": "Headline",
+            "headline_placeholder": "Briefly describe your focus (e.g. React | Node.js | UI/UX)",
+            "social_title": "Social Media",
+            "github_label": "GitHub URL",
+            "github_placeholder": "github.com/your-username",
+            "linkedin_label": "LinkedIn URL",
+            "linkedin_placeholder": "linkedin.com/in/your-username",
+            "cancel": "Cancel",
+            "save": "Save Changes",
+            "saving": "Saving...",
+            "success": "Profile updated successfully!",
+            "error": "Error updating profile",
+            "unexpected_error": "Unexpected error updating profile"
+        },
+        "edit_section_modal": {
+            "title": "Edit Profile Details",
+            "long_bio_label": "About Me (Detailed)",
+            "long_bio_placeholder": "Describe your professional journey in detail...",
+            "education_label": "Academic Formation",
+            "add_button": "Add",
+            "course_label": "Course",
+            "course_placeholder": "Ex: Software Engineering",
+            "institution_label": "Institution",
+            "institution_placeholder": "Ex: MIT, Stanford, etc.",
+            "start_label": "Start",
+            "end_label": "End",
+            "currently_label": "Currently",
+            "skills_label": "Skills",
+            "skills_placeholder": "Type a skill and press Enter",
+            "skills_none": "No skills added",
+            "education_none": "No education listed"
+        }
+    },
+    "validation": {
+        "name_help": "3–40 characters",
+        "username_help": "3–20 characters, no spaces",
+        "username_checking": "Checking username...",
+        "username_available": "Username available",
+        "email_invalid": "Invalid email format",
+        "email_checking": "Checking email...",
+        "email_available": "Email available",
+        "email_in_use": "This email is already in use",
+        "password_min": "Password must have at least 6 characters",
+        "password_max": "Password must have at most 17 characters",
+        "password_help": "6–17 characters",
+        "passwords_dont_match": "Passwords do not match",
+        "fields_invalid": "Invalid fields",
+        "generic_error": "Unexpected error. Please try again."
+    },
+    "auth": {
+        "login": {
+            "welcome_title": "Welcome to Retold",
+            "welcome_subtitle": "Connecting talent with opportunity. Build your professional story and unlock new possibilities.",
+            "feature_journey": "Showcase your professional journey",
+            "feature_leaders": "Connect with industry leaders",
+            "feature_opportunities": "Discover new opportunities",
+            "title": "Sign in",
+            "subtitle": "Enter your credentials to access your account",
+            "identifier_label": "Email or Username",
+            "password_label": "Password",
+            "remember_me": "Remember me",
+            "forgot_password": "Forgot password?",
+            "submit": "Sign in",
+            "submitting": "Signing in...",
+            "social_divider": "Or continue with",
+            "no_account": "Don't have an account?",
+            "create_one": "Create one",
+            "success": "Signed in successfully"
+        },
+        "register": {
+            "welcome_title": "Join Retold",
+            "welcome_subtitle": "Start your professional journey today. Create your portfolio and get discovered.",
+            "title": "Create account",
+            "subtitle": "Fill in your details to get started",
+            "name_label": "Name",
+            "username_label": "Username",
+            "email_label": "Email",
+            "password_label": "Password",
+            "confirm_password_label": "Confirm Password",
+            "username_placeholder": "yourhandle",
+            "submit": "Create account",
+            "submitting": "Creating account...",
+            "has_account": "Already have an account?",
+            "sign_in": "Sign in",
+            "success": "Welcome to Retold",
+            "login_failed": "Account created, but login failed."
+        },
+        "forgot_password": {
+            "welcome_title": "Password Recovery",
+            "welcome_subtitle": "Don't worry, we've got you covered. Enter your email to reset your password.",
+            "title": "Forgot password?",
+            "subtitle": "Enter your email address to verify your account",
+            "submit": "Send Recovery Link",
+            "submitting": "Sending...",
+            "success_message": "Check your email for instructions.",
+            "remember_password": "Remember your password?",
+            "sign_in": "Sign in"
+        },
+        "reset_password": {
+            "welcome_title": "Reset Password",
+            "welcome_subtitle": "Create a new password to secure your account and get back on track.",
+            "title": "New Password",
+            "subtitle": "Enter your new password below",
+            "password_label": "New Password",
+            "submit": "Confirm Change",
+            "submitting": "Updating...",
+            "success_message": "Password changed successfully!",
+            "invalid_link_title": "Invalid Link",
+            "invalid_link_desc": "Token not found in URL. Please make sure you accessed this page from the link sent to your email.",
+            "back_to_login": "Return to Login",
+            "loading": "Loading..."
+        }
+    }
+}

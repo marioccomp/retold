@@ -6,8 +6,10 @@ import ProjectCard from "@/src/components/ProjectCard";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/src/i18n/client";
 
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
+
 
 type Props = {
     projects: ProjectCardDTO[];
@@ -16,9 +18,11 @@ type Props = {
 };
 
 export default function FeedProjectsGrid({ projects, searchQuery, onProjectSelectChange }: Props) {
+    const { dict } = useTranslation();
     const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
 
     const filteredProjects = projects.filter(
+
         (project) =>
             project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             project.tags.some((tag) => tag.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -63,9 +67,10 @@ export default function FeedProjectsGrid({ projects, searchQuery, onProjectSelec
                         onClick={handleProjectClose}
                     >
                         <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
-                        <span>Voltar aos projetos</span>
+                        <span>{dict.feed.feedprojectsgrid.back_to_projects}</span>
                     </Button>
                 </div>
+
                 <FeedProjectPanel
                     project={selectedProject}
                     onClose={handleProjectClose}
@@ -77,10 +82,11 @@ export default function FeedProjectsGrid({ projects, searchQuery, onProjectSelec
     if (filteredProjects.length === 0) {
         return (
             <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-[#6b7c7a] text-lg">Nenhum projeto encontrado</p>
-                <p className="text-[#a0aaa8] text-sm mt-1">Tente buscar por outro termo</p>
+                <p className="text-[#6b7c7a] text-lg">{dict.feed.feedprojectsgrid.no_projects.title}</p>
+                <p className="text-[#a0aaa8] text-sm mt-1">{dict.feed.feedprojectsgrid.no_projects.description}</p>
             </div>
         );
+
     }
 
     return (

@@ -18,10 +18,12 @@ import {
 
 import { FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 import { Session } from "next-auth";
+import { useTranslation } from "../i18n/client";
 
 export default function Header({ session }: { session: Session | null }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { dict } = useTranslation();
   const status = session?.user ? "authenticated" : "unauthenticated";
 
   const userImage = profilePic.src; // TODO: substituir por session?.user?.image
@@ -66,10 +68,10 @@ export default function Header({ session }: { session: Session | null }) {
             className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer"
             onClick={handleExploreClick}
           >
-            Explorar
+            {dict.header.explore}
           </Button>
           <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer">
-            Sobre
+            {dict.header.about}
           </Button>
         </nav>
 
@@ -98,12 +100,12 @@ export default function Header({ session }: { session: Session | null }) {
                 </div>
                 <DropdownMenuItem className="cursor-pointer gap-2 py-2" onClick={handleProfileClick}>
                   <FiUser className="h-4 w-4 text-gray-500" />
-                  <span >Profile</span>
+                  <span >{dict.header.profile}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings" className="cursor-pointer gap-2 py-2 w-full flex items-center">
                     <FiSettings className="h-4 w-4 text-gray-500" />
-                    <span>Settings</span>
+                    <span>{dict.header.settings}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -112,14 +114,14 @@ export default function Header({ session }: { session: Session | null }) {
                   onClick={() => signOut({ callbackUrl: "/" })}
                 >
                   <FiLogOut className="h-4 w-4" />
-                  <span>Log out</span>
+                  <span>{dict.header.logout}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login">
               <Button className="bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(5,220,127,0.4)] active:scale-[0.98] cursor-pointer">
-                Entrar
+                {dict.header.login}
               </Button>
             </Link>
           )}

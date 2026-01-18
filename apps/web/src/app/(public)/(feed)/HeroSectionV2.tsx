@@ -12,15 +12,19 @@ import { Session } from "next-auth";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
+import { useTranslation } from "@/src/i18n/client";
 
 type Props = {
     projectDTO: ProjectCardDTO | null;
+
     session: Session | null;
 };
 
 export default function HeroSectionV2({ projectDTO, session }: Props) {
+    const { dict } = useTranslation();
     const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
     const [isCreating, setIsCreating] = useState(false);
+
 
     const handleProjectClick = () => {
         if (!projectDTO) return;
@@ -114,9 +118,9 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                         {/* Removed Community Active Badge */}
 
                         <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-bold text-[#052e16] leading-[1.05] tracking-tight">
-                            Dê vida ao seu <br className="hidden lg:block" />
+                            {dict.feed.feedhero.title_prefix} <br className="hidden lg:block" />
                             <span className="relative inline-block bg-gradient-to-r from-[#33bd19] via-[#5ac82d] to-[#c2fa11] bg-clip-text text-transparent">
-                                portfólio
+                                {dict.feed.feedhero.title_highlight}
                                 {/* Underline decoration with gradient */}
                                 <svg className="absolute w-full h-4 -bottom-1 left-0" viewBox="0 0 100 10" preserveAspectRatio="none">
                                     <defs>
@@ -132,8 +136,9 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                         </h1>
 
                         <p className="text-xl md:text-2xl text-[#374151] leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
-                            Mais que código, mostre o impacto. O lugar onde desenvolvedores constroem autoridade através de projetos reais.
+                            {dict.feed.feedhero.subtitle}
                         </p>
+
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-6">
                             {!session ? (
@@ -142,9 +147,10 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                     className="h-14 px-8 bg-gradient-to-r from-[#33bd19] to-[#7dd634] hover:from-[#2ca516] hover:to-[#6bc12c] text-white text-lg font-bold rounded-full shadow-lg shadow-[#33bd19]/30 hover:shadow-xl hover:shadow-[#33bd19]/40 transition-all hover:-translate-y-1 border border-[#33bd19]/20"
                                 >
                                     <Link href="/register">
-                                        Criar meu perfil
+                                        {dict.feed.feedhero.create_profile}
                                         <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                                     </Link>
+
                                 </Button>
                             ) : (
                                 <Button
@@ -152,8 +158,9 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                     onClick={() => setIsCreating(true)}
                                 >
                                     <FiPlus className="mr-2" />
-                                    Novo projeto
+                                    {dict.feed.feedhero.new_project}
                                 </Button>
+
                             )}
 
                             <Button
@@ -162,8 +169,9 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                 onClick={() => document.getElementById('feed-content')?.scrollIntoView({ behavior: 'smooth' })}
                             >
                                 <FiSearch className="mr-2" />
-                                Explorar projetos
+                                {dict.feed.feedhero.explore_projects}
                             </Button>
+
                         </div>
 
                         <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-3 pt-6 text-sm font-semibold text-[#4b5563]">
@@ -171,14 +179,15 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                 <div className="p-1.5 rounded-full bg-gradient-to-br from-[#c2fa11]/30 to-[#33bd19]/30">
                                     <FiCheckCircle className="text-[#33bd19]" />
                                 </div>
-                                <span>Portfólio Grátis</span>
+                                <span>{dict.feed.feedhero.free_portfolio}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="p-1.5 rounded-full bg-gradient-to-br from-[#c2fa11]/30 to-[#33bd19]/30">
                                     <FiCheckCircle className="text-[#33bd19]" />
                                 </div>
-                                <span>Feedback da Comunidade</span>
+                                <span>{dict.feed.feedhero.community_feedback}</span>
                             </div>
+
                         </div>
                     </div>
 
@@ -201,8 +210,9 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                         </div>
                                         <div className="px-3 py-1.5 bg-gradient-to-r from-[#c2fa11]/40 to-[#33bd19]/30 rounded-full text-[11px] font-bold text-[#1d6b22] uppercase tracking-wider flex items-center gap-1.5 border border-[#7dd634]/30">
                                             <FiTrendingUp className="text-[#33bd19]" size={14} />
-                                            Destaque da semana
+                                            {dict.feed.feedhero.featured_week}
                                         </div>
+
                                     </div>
 
                                     {/* O Card em si */}
@@ -216,9 +226,10 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                             />
                                         ) : (
                                             <div className="h-[300px] bg-gray-50 flex items-center justify-center text-gray-400 font-medium">
-                                                Carregando destaque...
+                                                {dict.feed.feedhero.loading_featured}
                                             </div>
                                         )}
+
                                     </div>
                                 </div>
                             </div>
@@ -228,13 +239,14 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                                 <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-bottom-4 fade-in duration-700 delay-150">
                                     <div className="bg-white p-4 rounded-2xl border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                                         <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#dcfce7] to-transparent rounded-bl-full opacity-50 transition-opacity group-hover:opacity-100" />
-                                        <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-2">Análise do Worker</p>
+                                        <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-2">{dict.feed.feedhero.worker_analysis}</p>
 
                                         <div className="flex flex-col gap-2">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-sm text-[#4b5563] font-medium">Testes</span>
+                                                <span className="text-sm text-[#4b5563] font-medium">{dict.feed.feedhero.tests}</span>
                                                 <Badge variant="outline" className="bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0] font-bold">98%</Badge>
                                             </div>
+
                                             <div className="w-full h-1.5 bg-[#f3f4f6] rounded-full overflow-hidden">
                                                 <div className="h-full bg-[#22c55e] w-[98%] rounded-full" />
                                             </div>
@@ -243,14 +255,15 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
                                     <div className="bg-white p-4 rounded-2xl border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                                         <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#fef08a] to-transparent rounded-bl-full opacity-30 transition-opacity group-hover:opacity-60" />
-                                        <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-2">Performance</p>
+                                        <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-2">{dict.feed.feedhero.performance}</p>
 
                                         <div className="flex items-end gap-2 mt-1">
                                             <span className="text-3xl font-bold text-[#1f2937]">A+</span>
-                                            <span className="text-xs font-medium text-[#16a34a] mb-2">Excelente</span>
+                                            <span className="text-xs font-medium text-[#16a34a] mb-2">{dict.feed.feedhero.excellent}</span>
                                         </div>
-                                        <p className="text-[10px] text-[#6b7c7a] mt-1">Código limpo e otimizado</p>
+                                        <p className="text-[10px] text-[#6b7c7a] mt-1">{dict.feed.feedhero.clean_code}</p>
                                     </div>
+
                                 </div>
                             )}
                         </div>
