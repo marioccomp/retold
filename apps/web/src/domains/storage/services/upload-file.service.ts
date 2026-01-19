@@ -7,13 +7,20 @@ import { randomUUID } from "crypto";
 type UploadFilesParams = {
   file: File;
   folder: "avatars" | "projects";
+  userId: number;
+  projectId?: number;
 };
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; //10MB PODE SER ALTERADO FUTURAMENTE (PESQUISAR SOBRE)
 
-export async function uploadFileService({ file, folder }: UploadFilesParams): Promise<string> {
+export async function uploadFileService({
+  file,
+  folder,
+  userId,
+  projectId,
+}: UploadFilesParams): Promise<string> {
   if (!file || file.size === 0) {
     throw new Error("Invalid file.");
   }
@@ -48,7 +55,16 @@ export async function uploadFileService({ file, folder }: UploadFilesParams): Pr
       .toBuffer();
   }
 
-  const objectName = `${folder}/${randomUUID()}.webp`;
+  let objectName: string;
+
+  if (folder === "avatars") {
+    objectName = `users/${userId}/avatar/${randomUUID()}.webp`;
+  } else {
+    if (!projectId) {
+      throw new Error("projectId is required for project images");
+    }
+    objectName = `users/${userId}/projects/${projectId}/${randomUUID()}.webp`;
+  }
 
   await minioClient.putObject(MINIO_BUCKET, objectName, outputBuffer, outputBuffer.length, {
     "Content-Type": "image/webp",

@@ -56,7 +56,7 @@ export async function uploadProjectImagesAction(
     const oldImages = project.images;
 
     const uploadPromises = validFiles.map((file) =>
-      uploadFileService({ file, folder: "projects" })
+      uploadFileService({ file, folder: "projects", userId: Number(session.user.id), projectId })
     );
     const uploadedUrls = await Promise.all(uploadPromises);
 

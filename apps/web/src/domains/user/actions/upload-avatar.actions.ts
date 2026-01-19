@@ -33,6 +33,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<ActionResp
     imageUrl = await uploadFileService({
       file,
       folder: "avatars",
+      userId: Number(session.user.id),
     });
   } catch (error) {
     return { success: false, message: "Failed to upload image." };
