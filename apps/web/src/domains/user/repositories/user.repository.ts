@@ -158,4 +158,26 @@ export const userRepository = {
       return user;
     });
   },
+
+  searchUsers(query: string) {
+    return prisma.user.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { username: { contains: query, mode: "insensitive" } },
+          { title: { contains: query, mode: "insensitive" } },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+        title: true,
+        bio: true,
+        skills: true,
+      },
+      take: 20,
+    });
+  },
 };
