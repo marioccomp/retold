@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import FeedProjectsGrid from "./FeedProjectsGrid";
+import FeedPeopleGrid from "./FeedPeopleGrid";
 import { FiSearch } from "react-icons/fi";
 import { useTranslation } from "@/src/i18n/client";
 
@@ -16,7 +18,10 @@ type Props = {
 export default function FeedContent({ projects }: Props) {
     const { dict } = useTranslation();
     const [searchQuery, setSearchQuery] = useState("");
-    const [isProjectSelected, setIsProjectSelected] = useState(false);
+
+    // Get project selection from URL
+    const searchParams = useSearchParams();
+    const isProjectSelected = !!searchParams.get("project");
 
     // Define tabs using keys that we can map to translations
     const tabs = [
@@ -77,18 +82,13 @@ export default function FeedContent({ projects }: Props) {
                 <div className="animate-[fadeIn_0.6s_ease-out_forwards] pb-20">
                     <TabsContent value="projects" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 m-0 p-0 ring-0 focus-visible:ring-0">
                         <FeedProjectsGrid
-
                             projects={projects}
                             searchQuery={searchQuery}
-                            onProjectSelectChange={setIsProjectSelected}
                         />
                     </TabsContent>
 
                     <TabsContent value="people" className="m-0 p-0 ring-0 focus-visible:ring-0">
-                        <div className="flex flex-col items-center justify-center py-16 text-center">
-                            <p className="text-[#6b7c7a] text-lg">{dict.feed.feedcontent.people_coming_soon.title}</p>
-                            <p className="text-[#a0aaa8] text-sm mt-1">{dict.feed.feedcontent.people_coming_soon.description}</p>
-                        </div>
+                        <FeedPeopleGrid searchQuery={searchQuery} />
                     </TabsContent>
 
 

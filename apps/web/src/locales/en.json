@@ -82,6 +82,18 @@
                 "title": "No projects found",
                 "description": "Try searching for another term"
             }
+        },
+        "feedpeoplegrid": {
+            "loading": "Finding people...",
+            "no_users": {
+                "title": "No people found",
+                "description": "Try searching for a name or username"
+            }
+        },
+        "usercard": {
+            "no_title": "No title defined",
+            "no_skills": "No skills listed",
+            "view_profile": "View Profile"
         }
     },
     "header": {

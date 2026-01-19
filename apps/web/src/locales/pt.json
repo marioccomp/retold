@@ -82,6 +82,18 @@
                 "title": "Nenhum projeto encontrado",
                 "description": "Tente buscar por outro termo"
             }
+        },
+        "feedpeoplegrid": {
+            "loading": "Buscando pessoas...",
+            "no_users": {
+                "title": "Nenhuma pessoa encontrada",
+                "description": "Tente buscar por um nome ou usuário"
+            }
+        },
+        "usercard": {
+            "no_title": "Nenhum título definido",
+            "no_skills": "Nenhuma habilidade listada",
+            "view_profile": "Ver Perfil"
         }
     },
     "header": {

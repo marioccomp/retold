@@ -7,6 +7,8 @@ import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/src/i18n/client";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 
@@ -14,12 +16,50 @@ import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 type Props = {
     projects: ProjectCardDTO[];
     searchQuery: string;
-    onProjectSelectChange?: (isSelected: boolean) => void;
 };
 
-export default function FeedProjectsGrid({ projects, searchQuery, onProjectSelectChange }: Props) {
+export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
     const { dict } = useTranslation();
-    const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const selectedProjectId = searchParams.get("project");
+
+    // Find project data based on URL param
+    const projectData = selectedProjectId ? projects.find(p => String(p.id) === selectedProjectId) : null;
+
+    // Transform to overlay format if found
+    const selectedProject: ProjectForOverlay | null = projectData ? {
+        id: projectData.id,
+        userId: undefined,
+        title: projectData.title,
+        description: projectData.description,
+        status: "PENDING",
+        owner: {
+            name: projectData.ownerName,
+            image: projectData.ownerImage,
+            username: projectData.ownerUsername
+        },
+        repository: projectData.repositoryUrl ? {
+            id: 0,
+            url: projectData.repositoryUrl,
+            fullName: projectData.repositoryFullName || "",
+            name: projectData.repositoryFullName?.split("/")[1] || "",
+            isActive: true
+        } : null,
+    } : null;
+
+    // Scroll to project content when opening a project
+    useEffect(() => {
+        if (selectedProject) {
+            const feedContent = document.getElementById('feed-content');
+            if (feedContent) {
+                // We use smooth scroll to give context, and scroll-mt-4 in FeedContent handles the offset
+                feedContent.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [selectedProject?.id]);
 
     const filteredProjects = projects.filter(
 
@@ -29,46 +69,27 @@ export default function FeedProjectsGrid({ projects, searchQuery, onProjectSelec
     );
 
     const handleProjectClick = (project: ProjectCardDTO) => {
-        setSelectedProject({
-            id: project.id,
-            userId: undefined,
-            title: project.title,
-            description: project.description,
-            status: "PENDING",
-            owner: {
-                name: project.ownerName,
-                image: project.ownerImage,
-                username: project.ownerUsername
-            },
-            repository: project.repositoryUrl ? {
-                id: 0,
-                url: project.repositoryUrl,
-                fullName: project.repositoryFullName || "",
-                name: project.repositoryFullName?.split("/")[1] || "",
-                isActive: true
-            } : null,
-        });
-        onProjectSelectChange?.(true);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("project", String(project.id));
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
     const handleProjectClose = () => {
-        setSelectedProject(null);
-        onProjectSelectChange?.(false);
+        router.back();
     };
 
     // Se um projeto está selecionado, mostrar o painel do projeto
     if (selectedProject) {
         return (
             <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] max-w-[1400px] mx-auto w-full">
-                <div className="sticky top-16 z-40 bg-gradient-to-b from-[#fafdf8] to-white/95 backdrop-blur-lg pt-4 pb-4 -mx-6 px-6 md:-mx-12 md:px-12 border-b border-[#d4e5d7] mb-4 flex items-center w-[calc(100%+48px)] md:w-[calc(100%+96px)] shadow-sm">
-                    <Button
-                        variant="ghost"
-                        className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+                <div className="sticky top-16 z-40 pt-4 pb-2 mb-2 bg-white/40 backdrop-blur-sm -mx-4 px-4 md:-mx-0 md:px-0">
+                    <button
+                        className="cursor-pointer inline-flex items-center gap-2.5 text-sm font-semibold text-gray-400 hover:text-[#05dc7f] transition-all duration-300 group bg-white/80 border border-gray-100 px-3 py-1.5 rounded-full shadow-sm hover:shadow-md hover:border-[#05dc7f]/30"
                         onClick={handleProjectClose}
                     >
-                        <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
-                        <span>{dict.feed.feedprojectsgrid.back_to_projects}</span>
-                    </Button>
+                        <FiArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+                        <span className="tracking-tight">{dict.feed.feedprojectsgrid.back_to_projects}</span>
+                    </button>
                 </div>
 
                 <FeedProjectPanel
