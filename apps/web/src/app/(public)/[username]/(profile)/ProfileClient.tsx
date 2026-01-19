@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+
 import { getProfile } from "../_actions/get-profile";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 

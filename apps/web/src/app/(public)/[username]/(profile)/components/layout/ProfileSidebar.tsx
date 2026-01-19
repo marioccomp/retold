@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { useTranslation } from "@/src/i18n/client";
-import ownerPic from "@/assets/foto.jpeg";
 
 const SocialLinkItem = memo(function SocialLinkItem({
     type,
@@ -55,7 +54,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                 <div className="relative">
                     <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-white shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.08)] bg-white">
                         <AvatarImage
-                            src={ownerPic.src}
+                            src={profile.image ?? undefined}
                             alt={dict.profile.alt_avatar}
                             className="object-cover"
                         />
@@ -69,7 +68,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                             size="icon"
                             className="absolute bottom-3 right-3 w-9 h-9 rounded-full border-none bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] hover:scale-105 hover:shadow-[0_6px_16px_rgba(5,220,127,0.4)] transition-all duration-200 cursor-pointer"
                             title={dict.profile.change_photo}
-                            onClick={() => { }}
+                            onClick={onEditClick}
                         >
                             <FiCamera />
                         </Button>

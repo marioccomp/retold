@@ -4,9 +4,9 @@
 import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
 import { MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
-import imageProject from "@/assets/mockup-escalonador.jpg";
+import placeholderImage from "@/assets/mockup-escalonador.jpg";
 import { useState } from "react";
-import ownerPic from "@/assets/foto.jpeg"; // Deve vir do banco
+import ownerPic from "@/assets/foto.jpeg";
 import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
 import { ProjectSettings } from "./ProjectPanel/components/ProjectSettings";
 import { useSession } from "next-auth/react";
@@ -50,7 +50,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
     >
       <div className="w-full h-[320px] min-[650px]:h-[260px] relative overflow-hidden">
         <img
-          src={imageProject.src}
+          src={project.images?.[0] || placeholderImage.src}
           alt="Imagem do projeto"
           className="w-full h-full object-cover block"
         />
