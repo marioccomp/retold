@@ -5,13 +5,13 @@ import { prisma } from "@repo/database";
 import { revalidatePath } from "next/cache";
 import { uploadFileService } from "../../storage/services/upload-file.service";
 import { ActionResponse } from "@/lib/action-response";
+import { deleteFileByUrlService } from "../../storage/services/delete-file.service";
 
 export async function uploadAvatarAction(formData: FormData): Promise<ActionResponse<string>> {
   const session = await auth();
 
   if (!session?.user?.id) {
     return { success: false, message: "Unauthorized" };
-    // return { error: "Unauthorized" };
   }
 
   const file = formData.get("avatar") as File | null;
@@ -19,6 +19,13 @@ export async function uploadAvatarAction(formData: FormData): Promise<ActionResp
   if (!file) {
     return { success: false, message: "Invalid file." };
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: Number(session.user.id) },
+    select: { image: true, username: true },
+  });
+
+  const oldImageUrl = user?.image ?? null;
 
   let imageUrl: string;
 
@@ -29,13 +36,16 @@ export async function uploadAvatarAction(formData: FormData): Promise<ActionResp
     });
   } catch (error) {
     return { success: false, message: "Failed to upload image." };
-    // return { error: error instanceof Error ? error.message : "Failed to upload image." };
   }
 
   await prisma.user.update({
     where: { id: Number(session.user.id) },
     data: { image: imageUrl },
   });
+
+  if (oldImageUrl) {
+    await deleteFileByUrlService(oldImageUrl);
+  }
 
   revalidatePath(`/${session.user.username}`);
   revalidatePath(`/settings`);
