@@ -33,7 +33,7 @@ export default async function RootLayout({
     <html lang={lang} className={questrial.variable}>
       <body className={`${questrial.className} antialiased min-h-screen flex flex-col`}>
         <LanguageProvider lang={lang}>
-          <AuthProvider>
+          <AuthProvider session={session}>
             <QueryProvider>
               <Header session={session} />
               <main className="flex-grow w-full">{children}</main>

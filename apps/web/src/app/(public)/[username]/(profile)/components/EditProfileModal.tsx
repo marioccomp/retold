@@ -14,6 +14,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { uploadAvatarAction } from "@/src/domains/user/actions/upload-avatar.actions";
 import { useTranslation } from "@/src/i18n/client";
 
+import { useSession } from "next-auth/react";
+
 type Props = {
     isOpen: boolean;
     onClose: () => void;
@@ -23,6 +25,7 @@ type Props = {
 
 export default function EditProfileModal({ isOpen, onClose, profile, username }: Props) {
     const { dict } = useTranslation();
+    const { data: session, update } = useSession();
     const [name, setName] = useState(profile.name ?? "");
     const [title, setTitle] = useState(profile.title ?? "");
     const [bio, setBio] = useState(profile.bio ?? "");
@@ -70,7 +73,9 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 return;
             }
             toast.success(dict.profile.edit_modal.success);
+            update(); // Refresh session to update header name etc
             queryClient.invalidateQueries({ queryKey: ["profile", username] });
+            queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             onClose();
         },
         onError: () => {
@@ -98,7 +103,15 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 setAvatarPreview(profile.image ?? null);
             } else {
                 toast.success("Avatar updated successfully!");
+                await update({
+                    ...session,
+                    user: {
+                        ...session?.user,
+                        image: result.imageUrl
+                    }
+                });
                 queryClient.invalidateQueries({ queryKey: ["profile", username] });
+                queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             }
         } catch {
             toast.error("Unexpected error uploading avatar.");
