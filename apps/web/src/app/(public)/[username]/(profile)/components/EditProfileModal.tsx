@@ -50,13 +50,16 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
     const updateProfileMutation = useMutation({
         mutationFn: async () => {
-            return updateProfile({
-                name,
-                title,
-                bio,
-                githubUrl,
-                linkedinUrl,
-            }, profile.id);
+            return updateProfile(
+                {
+                    name,
+                    title,
+                    bio,
+                    githubUrl,
+                    linkedinUrl,
+                },
+                profile.id
+            );
         },
         onSuccess: (data) => {
             if (!data.success) {
@@ -98,8 +101,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
         try {
             const result = await uploadAvatarAction(formData);
-            if (result.error) {
-                toast.error(result.error);
+            if (!result.success) {
+                toast.error(result.message);
                 setAvatarPreview(profile.image ?? null);
             } else {
                 toast.success("Avatar updated successfully!");
@@ -107,8 +110,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                     ...session,
                     user: {
                         ...session?.user,
-                        image: result.imageUrl
-                    }
+                        image: result.data,
+                    },
                 });
                 queryClient.invalidateQueries({ queryKey: ["profile", username] });
                 queryClient.invalidateQueries({ queryKey: ["currentUser"] });
@@ -242,7 +245,9 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
                     {/* Social Links */}
                     <div className="flex flex-col gap-4">
-                        <h3 className="text-sm font-semibold text-[#6b7c7a] uppercase tracking-wider">{dict.profile.edit_modal.social_title}</h3>
+                        <h3 className="text-sm font-semibold text-[#6b7c7a] uppercase tracking-wider">
+                            {dict.profile.edit_modal.social_title}
+                        </h3>
 
                         <div className="flex flex-col gap-2">
                             <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
@@ -288,7 +293,9 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                         disabled={updateProfileMutation.isPending}
                         className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] transition-all cursor-pointer hover:scale-[1.02] shadow-[0_4px_12px_rgba(5,220,127,0.2)]"
                     >
-                        {updateProfileMutation.isPending ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
+                        {updateProfileMutation.isPending
+                            ? dict.profile.edit_modal.saving
+                            : dict.profile.edit_modal.save}
                     </Button>
                 </div>
             </div>

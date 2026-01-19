@@ -89,8 +89,8 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
 
         try {
             const result = await uploadProjectImagesAction(project.id, formData);
-            if (result.error) {
-                toast.error(result.error);
+            if (!result.success) {
+                toast.error(result.message);
                 setCoverPreview(project.images?.[0] ?? null);
             } else {
                 toast.success("Cover image updated!");
