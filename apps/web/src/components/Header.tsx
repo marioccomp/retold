@@ -3,8 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/logo-full.svg";
-import profilePic from "@/assets/foto.jpeg";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -19,15 +18,29 @@ import {
 import { FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 import { Session } from "next-auth";
 import { useTranslation } from "../i18n/client";
+import { useQuery } from "@tanstack/react-query";
+import { getMeAction } from "@/src/domains/user/actions/get-me";
 
-export default function Header({ session }: { session: Session | null }) {
+export default function Header({ session: initialSession }: { session: Session | null }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { dict } = useTranslation();
-  const status = session?.user ? "authenticated" : "unauthenticated";
 
-  const userImage = profilePic.src; // TODO: substituir por session?.user?.image
-  const userName = session?.user?.name || "User";
+  // React Query para buscar dados frescos do usuário
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: () => getMeAction(),
+    enabled: !!(session?.user || initialSession?.user), // Só busca se estiver logado
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache
+  });
+
+  // Prioriza os dados do React Query (frescos), depois a sessão do hook, depois a inicial
+  const userData = currentUser || session?.user || initialSession?.user;
+  const status = userData ? "authenticated" : "unauthenticated";
+
+  const userImage = userData?.image;
+  const userName = userData?.name || "User";
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])
@@ -36,8 +49,7 @@ export default function Header({ session }: { session: Session | null }) {
     .slice(0, 2);
 
   const handleProfileClick = () => {
-    console.log("clicou")
-    router.push(`/${session?.user?.username}`);
+    router.push(`/${userData?.username}`);
   }
 
   const handleExploreClick = () => {
@@ -80,10 +92,10 @@ export default function Header({ session }: { session: Session | null }) {
           {status === "authenticated" ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-[#05dc7f] focus:ring-offset-2 transition-all cursor-pointer">
+                <button className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-[#05dc7f] focus:ring-offset-2 transition-all cursor-pointer border-none bg-transparent p-0">
                   <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-[#05dc7f]/50 transition-all">
                     {userImage ? (
-                      <AvatarImage src={userImage} alt={userName} />
+                      <AvatarImage src={userImage} alt={userName} className="object-cover" />
                     ) : null}
                     <AvatarFallback className="bg-[#05dc7f]/10 text-[#047857] text-sm font-medium">
                       {userInitials}
@@ -95,7 +107,7 @@ export default function Header({ session }: { session: Session | null }) {
                 <div className="px-3 py-2 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{userName}</p>
                   <p className="text-xs text-gray-500 truncate">
-                    {session?.user?.email}
+                    {userData?.email}
                   </p>
                 </div>
                 <DropdownMenuItem className="cursor-pointer gap-2 py-2" onClick={handleProfileClick}>
@@ -130,3 +142,4 @@ export default function Header({ session }: { session: Session | null }) {
     </header>
   );
 }
+
