@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import emptyImage from "@/assets/empty_file.png";
 import { toggleLike } from "../domains/project/actions/toggle-like.action";
+import { useTranslation } from "@/src/i18n/client";
+import { FiLoader } from "react-icons/fi";
 
 interface Props {
   project: ProjectCardDTO;
@@ -26,6 +28,7 @@ interface Props {
 
 export default function ProjectCard({ project, onClick, ownProfile, disableHover, disableConfig }: Props) {
   const { data: session } = useSession();
+  const { dict } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
   const [isLiked, setIsLiked] = useState(project.hasLiked ?? false);
@@ -105,12 +108,25 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
 
         </div>
 
+
         {isOwner && !disableConfig && (
           <div className="absolute top-3 right-3 z-[10]">
             <ProjectSettings
               project={project}
               triggerClassName="p-1.5 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition-all text-white shadow-lg border border-white/10 focus:outline-none outline-none focus-visible:ring-0 cursor-pointer"
             />
+          </div>
+        )}
+
+        {/* Analyzing Overlay */}
+        {(project.status === 'PENDING' || project.status === 'ANALYZING') && (
+          <div className="absolute inset-0 bg-black/60 z-[20] flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
+            <div className="animate-spin mb-3">
+              <FiLoader size={28} className="text-[#05dc7f]" />
+            </div>
+            <p className="font-semibold text-sm tracking-wide">
+              {dict.project.status.ANALYZING}...
+            </p>
           </div>
         )}
       </div>

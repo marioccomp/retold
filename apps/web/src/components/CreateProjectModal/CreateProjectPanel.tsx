@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { FiPlus, FiGithub, FiCheck } from "react-icons/fi";
 // import styles from "./CreateProjectPanel.module.css";
 import {
@@ -49,7 +49,6 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState<"public" | "private">("public");
     const [selectedRepoId, setSelectedRepoId] = useState<number | null>(null);
-    const [isCreating, setIsCreating] = useState(false);
     const [images, setImages] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
@@ -156,40 +155,55 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         openCenteredPopup(installUrl);
     };
 
-    const handleCreate = async () => {
-        if (!title || !description || !selectedRepoId) return;
+    // Create Project Mutation
+    const { mutate: createProject, isPending: mutationIsCreating } = useMutation({
+        mutationFn: async () => {
+            if (!title || !description || !selectedRepoId) return;
 
-        setIsCreating(true);
-        try {
-            const project = await createProjectAction({
+            const result = await createProjectAction({
                 title,
                 description,
                 visibility,
                 repositoryId: selectedRepoId,
             });
 
-            if (images.length > 0) {
-                setIsUploadingImages(true);
-                const formData = new FormData();
-                images.forEach((file) => {
-                    formData.append("images", file);
-                });
-
-                await uploadProjectImagesAction(project.id, formData);
+            if (!result.success) {
+                throw new Error(result.message || t.toast.error);
             }
 
+            const project = result.data;
+            if (!project) throw new Error(t.toast.error);
+
+            if (images.length > 0) {
+                setIsUploadingImages(true);
+                try {
+                    const formData = new FormData();
+                    images.forEach((file) => {
+                        formData.append("images", file);
+                    });
+                    await uploadProjectImagesAction(project.id, formData);
+                } finally {
+                    setIsUploadingImages(false);
+                }
+            }
+
+            return project;
+        },
+        onSuccess: () => {
             toast.success(t.toast.success);
             onSuccess();
-        } catch (error) {
+        },
+        onError: (error: any) => {
             console.error(error);
-            toast.error(t.toast.error);
-        } finally {
-            setIsCreating(false);
-            setIsUploadingImages(false);
+            toast.error(error.message || t.toast.error);
         }
+    });
+
+    const handleCreate = () => {
+        createProject();
     };
 
-    const canCreate = title.trim() && description.trim() && selectedRepoId && !isCreating;
+    const canCreate = title.trim() && description.trim() && selectedRepoId && !mutationIsCreating && !isUploadingImages;
 
     return (
         <div className="bg-white rounded-[16px] border border-[#e7eae9] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-[fadeIn_0.3s_ease-out]">
@@ -370,7 +384,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                     disabled={!canCreate}
                     className="cursor-pointer bg-[#05dc7f] hover:bg-[#03c56f] text-[#0f2f28] rounded-[10px] h-auto py-3 px-7 font-semibold text-[0.95rem] disabled:opacity-50"
                 >
-                    {isCreating || isUploadingImages ? (
+                    {mutationIsCreating || isUploadingImages ? (
                         <>
                             {isUploadingImages ? t.uploading_images : t.submitting}
                         </>

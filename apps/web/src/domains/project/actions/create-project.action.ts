@@ -4,6 +4,9 @@ import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { getUserRepositories } from "@/src/domains/github/github";
 import { startProjectAnalysisAction } from "./start-project-analysis.action";
+import { ActionResponse } from "@/lib/action-response";
+import { Project } from "@prisma/client";
+import { getDictionary } from "@/src/i18n/server";
 // import { analyzeRepoQueue } from "@repo/queue";
 
 type CreateProjectInput = {
@@ -13,13 +16,23 @@ type CreateProjectInput = {
     repositoryId: number;
 };
 
-export async function createProjectAction(input: CreateProjectInput) {
+export async function createProjectAction(input: CreateProjectInput): Promise<ActionResponse<Project>> {
     const session = await auth();
+    const dict = await getDictionary();
+    const t = dict.project.create_panel.toast;
 
     await getUserRepositories();
 
     if (!session?.user?.id) {
-        throw new Error("Unauthorized");
+        return { success: false, message: dict.auth.errors.unauthorized }
+    }
+
+    const existingProject = await prisma.project.findFirst({
+        where: { repositoryId: input.repositoryId }
+    })
+
+    if (existingProject) {
+        return { success: false, message: t.already_exists }
     }
 
     const repository = await prisma.repository.findFirst({
@@ -31,7 +44,7 @@ export async function createProjectAction(input: CreateProjectInput) {
     });
 
     if (!repository) {
-        throw new Error("Repository not found");
+        return { success: false, message: t.repo_not_found }
     }
 
     const project = await prisma.project.create({
@@ -68,5 +81,5 @@ export async function createProjectAction(input: CreateProjectInput) {
     //   }
     // );
 
-    return project;
+    return { success: true, data: project };
 }

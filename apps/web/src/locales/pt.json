@@ -54,7 +54,7 @@
         "status": {
             "PENDING": "Pendente",
             "ANALYZING": "Processando",
-            "DONE": "Auditado",
+            "DONE": "Analisado",
             "ERROR": "Erro"
         },
         "analysis": {
@@ -163,7 +163,11 @@
             "toast": {
                 "success": "Projeto criado com sucesso!",
                 "error": "Erro ao criar projeto. Tente novamente.",
-                "max_images": "Máximo de 3 imagens permitido."
+                "max_images": "Máximo de 3 imagens permitido.",
+                "already_exists": "Você já tem um projeto para este repositório.",
+                "repo_not_found": "Repositório não encontrado ou desconectado.",
+                "no_files": "Nenhuma imagem selecionada.",
+                "upload_failed": "Falha ao enviar as imagens do projeto."
             }
         },
         "settings_modal": {

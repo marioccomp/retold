@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { uploadFileService } from "../../storage/services/upload-file.service";
 import { ActionResponse } from "@/lib/action-response";
 import { deleteFileByUrlService } from "../../storage/services/delete-file.service";
+import { getDictionary } from "@/src/i18n/server";
 
 const MAX_IMAGES_PER_UPLOAD = 3;
 
@@ -14,16 +15,18 @@ export async function uploadProjectImagesAction(
   formData: FormData
 ): Promise<ActionResponse<string[]>> {
   const session = await auth();
+  const dict = await getDictionary();
+  const t = dict.project.create_panel.toast;
 
   if (!session?.user?.id) {
-    return { success: false, message: "Unauthorized" };
+    return { success: false, message: dict.auth.errors.unauthorized };
   }
 
   const files = formData.getAll("images") as File[];
   const validFiles = files.filter((f) => f && f.size > 0);
 
   if (validFiles.length === 0) {
-    return { success: false, message: "No valid files provided." };
+    return { success: false, message: t.no_files };
   }
 
   try {
@@ -38,7 +41,7 @@ export async function uploadProjectImagesAction(
     });
 
     if (!project) {
-      return { success: false, message: "Project not found." };
+      return { success: false, message: t.error };
     }
 
     const currentImages = project.images || [];
@@ -46,7 +49,7 @@ export async function uploadProjectImagesAction(
     if (currentImages.length + validFiles.length > MAX_IMAGES_PER_UPLOAD) {
       return {
         success: false,
-        message: `You can have at most ${MAX_IMAGES_PER_UPLOAD} images. You currently have ${currentImages.length}.`,
+        message: t.max_images,
       };
     }
 
@@ -71,6 +74,6 @@ export async function uploadProjectImagesAction(
     return { success: true, data: updated.images };
   } catch (error) {
     console.error(error);
-    return { success: false, message: "Failed to upload images." };
+    return { success: false, message: t.upload_failed };
   }
 }
