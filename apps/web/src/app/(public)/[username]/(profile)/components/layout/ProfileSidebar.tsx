@@ -204,52 +204,13 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                         />
                     )}
 
-                    {ownProfile ? (
+                    {ownProfile && (
                         <Button
                             onClick={onEditClick}
                             className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20 flex items-center justify-center gap-2"
                         >
                             {dict.profile.edit_profile}
                         </Button>
-                    ) : (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20"
-                                >
-                                    {dict.profile.contact}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="center" className="w-[200px] rounded-xl border-[#e7eae9] bg-white shadow-xl p-2">
-                                <DropdownMenuItem
-                                    className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
-                                    onClick={() => {
-                                        if (profile.email) {
-                                            navigator.clipboard.writeText(profile.email);
-                                            toast.success(dict.profile.email_copied);
-                                        } else {
-                                            toast.error(dict.profile.no_email_error);
-                                        }
-                                    }}
-                                >
-                                    <FiCopy className="text-[#6b7c7a]" />
-                                    <span className="font-medium">{dict.profile.copy_email}</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
-                                    onClick={() => {
-                                        if (profile.email) {
-                                            window.location.href = `mailto:${profile.email}`;
-                                        } else {
-                                            toast.error(dict.profile.no_email_error);
-                                        }
-                                    }}
-                                >
-                                    <FiSend className="text-[#6b7c7a]" />
-                                    <span className="font-medium">{dict.profile.send_email}</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     )}
                 </div>
             </section>

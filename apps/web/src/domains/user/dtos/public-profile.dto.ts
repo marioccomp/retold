@@ -14,6 +14,7 @@ export type PublicProfileDTO = {
   id: number;
   username: string;
   email: string | null;
+  phone: string | null;
   name: string | null;
   title: string | null;
   bio: string | null;

@@ -10,11 +10,13 @@ import ProfilePinnedProject from "./components/sections/ProfilePinnedProject";
 import ProfileStats from "./components/sections/ProfileStats";
 import ProfileEducation from "./components/sections/ProfileEducation";
 import ProfileSkills from "./components/sections/ProfileSkills";
+import ProfileContact from "./components/sections/ProfileContact";
 
 // Individual Modals
 import EditAboutModal from "./components/modals/EditAboutModal";
 import EditEducationModal from "./components/modals/EditEducationModal";
 import EditSkillsModal from "./components/modals/EditSkillsModal";
+import EditContactModal from "./components/modals/EditContactModal";
 
 type Props = {
     profile: PublicProfileDTO;
@@ -28,6 +30,7 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
     const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
     const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
     const [isSkillsModalOpen, setIsSkillsModalOpen] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
     // Initial check for data
     const skills = profile.skills || [
@@ -80,6 +83,13 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
                 />
             </div>
 
+            {/* 5. Contact Section */}
+            <ProfileContact
+                profile={profile}
+                ownProfile={ownProfile}
+                onEditClick={() => setIsContactModalOpen(true)}
+            />
+
             {/* Individual Section Modals */}
             <EditAboutModal
                 isOpen={isAboutModalOpen}
@@ -96,6 +106,12 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
             <EditSkillsModal
                 isOpen={isSkillsModalOpen}
                 onClose={() => setIsSkillsModalOpen(false)}
+                profile={profile}
+            />
+
+            <EditContactModal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
                 profile={profile}
             />
         </div>

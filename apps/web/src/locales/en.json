@@ -378,6 +378,25 @@
             "skills_placeholder": "Type a skill and press Enter",
             "skills_none": "No skills added",
             "education_none": "No education listed"
+        },
+        "contact_section": {
+            "title": "Contact",
+            "phone_label": "Phone Number",
+            "email_label": "Email",
+            "copy": "Copy",
+            "copied": "Copied!",
+            "edit": "Edit",
+            "save": "Save",
+            "cancel": "Cancel",
+            "country_selector": "Select Country",
+            "phone_placeholder": "+55 (11) 99999-9999",
+            "email_placeholder": "example@email.com",
+            "no_phone": "No phone added",
+            "no_email": "No email added",
+            "validation": {
+                "phone_invalid": "Invalid phone number",
+                "email_invalid": "Invalid email address"
+            }
         }
     },
     "validation": {

@@ -73,6 +73,21 @@ export const getProfileSchema = (dict: any) => z.object({
             })
             .optional()
     ),
+
+    phone: z.preprocess(
+        trim,
+        z.string()
+            .refine(
+                (val) => {
+                    if (!val || val === "") return true;
+                    // Validação simples de telefone (apenas números, +, -, (, ), espaços)
+                    const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+                    return val.length > 5;
+                },
+                { message: dict.contact_section.validation.phone_invalid }
+            )
+            .optional()
+    ),
 });
 
 export const getProfileDetailsSchema = (dict: any) => z.object({

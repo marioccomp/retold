@@ -378,6 +378,25 @@
             "skills_placeholder": "Digite uma habilidade e aperte Enter",
             "skills_none": "Nenhuma habilidade adicionada",
             "education_none": "Nenhuma formação listada"
+        },
+        "contact_section": {
+            "title": "Contato",
+            "phone_label": "Número de Celular",
+            "email_label": "E-mail",
+            "copy": "Copiar",
+            "copied": "Copiado!",
+            "edit": "Editar",
+            "save": "Salvar",
+            "cancel": "Cancelar",
+            "country_selector": "Selecione o País",
+            "phone_placeholder": "+55 (11) 99999-9999",
+            "email_placeholder": "exemplo@email.com",
+            "no_phone": "Nenhum telefone adicionado",
+            "no_email": "Nenhum e-mail adicionado",
+            "validation": {
+                "phone_invalid": "Número de telefone inválido",
+                "email_invalid": "Endereço de e-mail inválido"
+            }
         }
     },
     "validation": {

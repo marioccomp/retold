@@ -27,6 +27,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData, currentUserId?
     id: user.id,
     username: user.username ?? "",
     email: user.email,
+    phone: user.phone || null,
     name: user.name,
     title: user.title,
     bio: user.bio,
