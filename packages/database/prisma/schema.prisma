@@ -143,6 +143,8 @@ model Project {
   repositoryId   Int?
   repository Repository? @relation(fields: [repositoryId], references: [id])
 
+  isPinned Boolean @default(false)
+  
   status ProjectStatus @default(PENDING)
   analysis RepositoryAnalysis?
 

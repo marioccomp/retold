@@ -30,7 +30,6 @@ export const getProfileSchema = (dict: any) => z.object({
                 return val.replace(/^(https?:\/\/)www\./, "$1");
             })
             .optional()
-            .or(z.literal(""))
     ),
 
     linkedinUrl: z.preprocess(
@@ -52,7 +51,6 @@ export const getProfileSchema = (dict: any) => z.object({
                 return val.replace(/^(https?:\/\/)www\./, "$1");
             })
             .optional()
-            .or(z.literal(""))
     ),
     websiteUrl: z.preprocess(
         trim,
@@ -74,7 +72,6 @@ export const getProfileSchema = (dict: any) => z.object({
                 return val;
             })
             .optional()
-            .or(z.literal(""))
     ),
 });
 

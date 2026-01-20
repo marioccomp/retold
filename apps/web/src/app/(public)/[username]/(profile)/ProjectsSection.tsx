@@ -95,13 +95,13 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   // Se está criando, mostrar apenas o painel de criação
   if (isCreating) {
     return (
-      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out]">
+      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] relative">
         <Button
           variant="ghost"
-          className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-[#6b7c7a] hover:bg-[#05dc7f]/5 hover:text-[#05dc7f] w-fit group h-auto transition-all rounded-full md:rounded-none bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-gray-100 md:border-transparent shadow-sm md:shadow-none"
           onClick={handlePanelClose}
         >
-          <FiArrowLeft size={18} className=" transition-transform duration-200 group-hover:-translate-x-[3px]" />
+          <FiArrowLeft size={16} className=" transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>{dict.profile.back_to_projects}</span>
         </Button>
         <CreateProjectPanel
@@ -115,13 +115,13 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   // Se um projeto está selecionado, mostrar o painel do projeto
   if (selectedProject) {
     return (
-      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out]">
+      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] relative">
         <Button
           variant="ghost"
-          className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-[#6b7c7a] hover:bg-[#05dc7f]/5 hover:text-[#05dc7f] w-fit group h-auto transition-all rounded-full md:rounded-none bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-gray-100 md:border-transparent shadow-sm md:shadow-none"
           onClick={handleProjectClose}
         >
-          <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
+          <FiArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>{dict.profile.back_to_projects}</span>
         </Button>
         <FeedProjectPanel

@@ -61,6 +61,8 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
 
       repositoryUrl: project.repository?.url,
       repositoryFullName: project.repository?.fullName,
+
+      isPinned: project.isPinned,
     })),
 
     certifications: user.certifications.map((certification) => ({
