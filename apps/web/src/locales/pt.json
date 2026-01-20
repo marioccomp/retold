@@ -32,9 +32,14 @@
             "errors": {
                 "user_not_found": "Usuário não encontrado ou senha não definida",
                 "incorrect_password": "Senha incorreta",
-                "unauthorized": "Não autorizado"
+                "unauthorized": "Não autorizado",
+                "email_mismatch": "O e-mail não corresponde ao e-mail da sua conta"
             },
-            "success_message": "Senha atualizada com sucesso"
+            "success_message": "Senha atualizada com sucesso",
+            "create_title": "Criar Senha",
+            "create_description": "Você não tem uma senha definida. Crie uma para ativar o login por e-mail.",
+            "confirm_email_label": "Confirme seu e-mail",
+            "button_create": "Criar Senha"
         },
         "connectedAccounts": {
             "title": "Contas Conectadas",
@@ -446,7 +451,7 @@
             "email_label": "E-mail",
             "password_label": "Senha",
             "confirm_password_label": "Confirmar Senha",
-            "username_placeholder": "seunome",
+            "username_placeholder": "Seu nome de usuário",
             "submit": "Criar conta",
             "submitting": "Criando conta...",
             "has_account": "Já tem uma conta?",

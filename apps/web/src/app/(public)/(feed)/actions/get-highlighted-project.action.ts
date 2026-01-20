@@ -25,8 +25,9 @@ export async function getHighlightedProject() {
             name: tag.name,
             id: tag.id,
         })),
-        likes: 10,
-        views: 15,
+        likes: project._count.likes,
+        views: project.views,
+        hasLiked: project.likes && project.likes.length > 0,
     });
 
     return projectDTO

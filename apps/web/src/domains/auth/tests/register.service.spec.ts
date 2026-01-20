@@ -53,7 +53,7 @@ describe("registerUser", () => {
         username: "johndoe",
         password: "123456",
       })
-    ).rejects.toThrow("E-mail already in use");
+    ).rejects.toThrow("EMAIL_ALREADY_IN_USE");
   });
 
   it("should throw error if username already exists", async () => {
@@ -69,6 +69,6 @@ describe("registerUser", () => {
         username: "johndoe",
         password: "123456",
       })
-    ).rejects.toThrow("Username already in use");
+    ).rejects.toThrow("USERNAME_ALREADY_IN_USE");
   });
 });

@@ -55,3 +55,17 @@ export const getUpdatePasswordSchema = (dict: any) =>
     path: ["confirmPassword"],
   });
 
+
+// Schema for creating password (when user has no password)
+export const getCreatePasswordSchema = (dict: any) =>
+  z.object({
+    email: z.preprocess(
+      trim,
+      z.string().email(dict.validation.email_invalid).transform((e) => e.toLowerCase())
+    ),
+    newPassword: getPasswordSchema(dict),
+    confirmPassword: z.string().min(1, dict.validation.confirm_password_required),
+  }).refine((data) => data.newPassword === data.confirmPassword, {
+    message: dict.auth.errors.passwords_mismatch,
+    path: ["confirmPassword"],
+  });

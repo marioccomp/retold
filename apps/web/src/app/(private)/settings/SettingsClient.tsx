@@ -147,15 +147,31 @@ export function SettingsClient() {
                     <TabsContent value="security" className="mt-0 space-y-6">
                         <Card className="border-gray-200 shadow-sm">
                             <CardHeader>
-                                <CardTitle>{dict.settings.password.title}</CardTitle>
-                                <CardDescription>{dict.settings.password.description}</CardDescription>
+                                <CardTitle>
+                                    {session?.user?.hasPassword
+                                        ? dict.settings.password.title
+                                        : dict.settings.password.create_title}
+                                </CardTitle>
+                                <CardDescription>
+                                    {session?.user?.hasPassword
+                                        ? dict.settings.password.description
+                                        : dict.settings.password.create_description}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form id="password-form" action={handleUpdatePassword} className="space-y-4" noValidate>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="currentPassword">{dict.settings.password.current}</Label>
-                                        <Input id="currentPassword" name="currentPassword" type="password" />
-                                    </div>
+                                    {session?.user?.hasPassword ? (
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="currentPassword">{dict.settings.password.current}</Label>
+                                            <Input id="currentPassword" name="currentPassword" type="password" />
+                                        </div>
+                                    ) : (
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="email">{dict.settings.password.confirm_email_label}</Label>
+                                            <Input id="email" name="email" type="email" placeholder="name@example.com" />
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="grid gap-2">
                                             <Label htmlFor="newPassword">{dict.settings.password.new}</Label>
@@ -168,7 +184,11 @@ export function SettingsClient() {
                                     </div>
                                     <div className="flex justify-end pt-2">
                                         <Button type="submit" disabled={pendingPassword} className="cursor-pointer bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium">
-                                            {pendingPassword ? dict.settings.password.buttonUpdating : dict.settings.password.button}
+                                            {pendingPassword
+                                                ? dict.settings.password.buttonUpdating
+                                                : (session?.user?.hasPassword
+                                                    ? dict.settings.password.button
+                                                    : dict.settings.password.button_create)}
                                         </Button>
                                     </div>
                                 </form>

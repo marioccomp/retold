@@ -1,7 +1,7 @@
 "use server";
 
 import { auth, signOut } from "@/src/domains/auth/auth";
-import { getUpdatePasswordSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getUpdatePasswordSchema, getCreatePasswordSchema } from "@/src/domains/auth/schemas/register.schema";
 import { prisma, userRepository } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
@@ -18,31 +18,45 @@ export async function updatePasswordAction(
         return { error: dict.settings.password.errors.unauthorized };
     }
 
-    const updatePasswordSchema = getUpdatePasswordSchema(dict);
+    const userId = parseInt(session.user.id);
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    if (!user) {
+        return { error: dict.settings.password.errors.user_not_found };
+    }
+
+    // Determine correct schema based on whether user has a password set
+    const hasPassword = !!user.password;
+    const schema = hasPassword
+        ? getUpdatePasswordSchema(dict)
+        : getCreatePasswordSchema(dict);
 
     const rawData = Object.fromEntries(formData.entries());
-    const validatedFields = updatePasswordSchema.safeParse(rawData);
+    const validatedFields = schema.safeParse(rawData);
 
     if (!validatedFields.success) {
         return { error: validatedFields.error.flatten().fieldErrors };
     }
 
-    const { currentPassword, newPassword } = validatedFields.data;
-    const userId = parseInt(session.user.id);
+    const { newPassword } = validatedFields.data;
 
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-    });
+    // Verify ownership
+    if (hasPassword) {
+        // Standard flow: Verify current password
+        const { currentPassword } = validatedFields.data as any; // Type assertion since schema varies
+        const isValid = await bcrypt.compare(currentPassword, user.password!);
 
-    if (!user || !user.password) {
-        return { error: dict.settings.password.errors.user_not_found };
-    }
-
-    const isValid = await bcrypt.compare(currentPassword, user.password);
-
-    if (!isValid) {
-        // Return a generic error or specific one if preferred
-        return { error: { currentPassword: [dict.settings.password.errors.incorrect_password] } };
+        if (!isValid) {
+            return { error: { currentPassword: [dict.settings.password.errors.incorrect_password] } };
+        }
+    } else {
+        // Create flow: Verify email confirmation
+        const { email } = validatedFields.data as any;
+        if (email !== user.email && email !== user.email?.toLowerCase()) {
+            return { error: { email: [dict.settings.password.errors.email_mismatch] } };
+        }
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

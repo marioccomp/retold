@@ -32,9 +32,14 @@
             "errors": {
                 "user_not_found": "User not found or password not set",
                 "incorrect_password": "Incorrect password",
-                "unauthorized": "Unauthorized"
+                "unauthorized": "Unauthorized",
+                "email_mismatch": "Email does not match your account email"
             },
-            "success_message": "Password updated successfully"
+            "success_message": "Password updated successfully",
+            "create_title": "Create Password",
+            "create_description": "You don't have a password set. Create one to enable email login.",
+            "confirm_email_label": "Confirm your email",
+            "button_create": "Create Password"
         },
         "connectedAccounts": {
             "title": "Connected Accounts",
