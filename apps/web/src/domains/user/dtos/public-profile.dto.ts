@@ -20,6 +20,7 @@ export type PublicProfileDTO = {
   longBio: string | null;
   skills: string[];
   image: string | null;
+  cover: string | null;
   githubUrl: string | null;
   linkedinUrl: string | null;
   websiteUrl: string | null;

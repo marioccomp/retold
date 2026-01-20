@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FiX, FiGithub, FiLinkedin, FiUser, FiType, FiAlignLeft, FiCamera, FiGlobe } from "react-icons/fi";
+import { FiX, FiGithub, FiLinkedin, FiUser, FiType, FiAlignLeft, FiCamera, FiGlobe, FiImage } from "react-icons/fi";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfile } from "../../_actions/edit-profile";
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { uploadAvatarAction } from "@/src/domains/user/actions/upload-avatar.actions";
+import { uploadCoverAction } from "@/src/domains/user/actions/upload-cover.actions";
 import { useTranslation } from "@/src/i18n/client";
 
 import { useSession } from "next-auth/react";
@@ -33,9 +34,13 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
     const [linkedinUrl, setLinkedinUrl] = useState(profile.linkedinUrl ?? "");
     const [websiteUrl, setWebsiteUrl] = useState(profile.websiteUrl ?? "");
     const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.image ?? null);
+    const [coverPreview, setCoverPreview] = useState<string | null>(profile.cover ?? null);
     const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const [isUploadingCover, setIsUploadingCover] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [isDraggingCover, setIsDraggingCover] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
 
     const queryClient = useQueryClient();
 
@@ -48,6 +53,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             setLinkedinUrl(profile.linkedinUrl ?? "");
             setWebsiteUrl(profile.websiteUrl ?? "");
             setAvatarPreview(profile.image ?? null);
+            setCoverPreview(profile.cover ?? null);
         }
     }, [isOpen, profile]);
 
@@ -155,6 +161,61 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
         handleAvatarChange(e);
     };
 
+    async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) {
+        let file: File | undefined;
+
+        if ('target' in e && (e.target as HTMLInputElement).files) {
+            file = (e.target as HTMLInputElement).files?.[0];
+        } else if ('dataTransfer' in e) {
+            file = e.dataTransfer.files?.[0];
+        }
+
+        if (!file) return;
+
+        const previewUrl = URL.createObjectURL(file);
+        setCoverPreview(previewUrl);
+
+        setIsUploadingCover(true);
+        const formData = new FormData();
+        formData.append("cover", file);
+
+        try {
+            const result = await uploadCoverAction(formData);
+            if (!result.success) {
+                toast.error(result.message);
+                setCoverPreview(profile.cover ?? null);
+            } else {
+                toast.success("Capa atualizada com sucesso!");
+                queryClient.invalidateQueries({ queryKey: ["profile", username] });
+                queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+            }
+        } catch {
+            toast.error("Erro ao atualizar capa.");
+            setCoverPreview(profile.cover ?? null);
+        } finally {
+            setIsUploadingCover(true);
+            setTimeout(() => {
+                setIsUploadingCover(false);
+                URL.revokeObjectURL(previewUrl);
+            }, 500);
+        }
+    }
+
+    const onCoverDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDraggingCover(true);
+    };
+
+    const onCoverDragLeave = () => {
+        setIsDraggingCover(false);
+    };
+
+    const onCoverDrop = async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDraggingCover(false);
+        handleCoverChange(e);
+    };
+
     if (!isOpen) return null;
 
     const handleOverlayMouseDown = (e: React.MouseEvent) => {
@@ -234,6 +295,66 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                                 {isDragging ? "Solte para enviar" : dict.profile.edit_modal.avatar_hint + " ou arraste uma foto"}
                             </span>
                         </div>
+                    </div>
+
+                    {/* Cover Upload */}
+                    <div
+                        className={`flex flex-col items-center justify-center py-4 rounded-2xl border-2 border-dashed transition-all duration-200 relative group cursor-pointer overflow-hidden h-[100px]
+                            ${isDraggingCover ? 'border-[#05dc7f] bg-[rgba(5,220,127,0.05)] scale-[1.01]' : 'border-[#e7eae9] bg-[#fcfdfd] hover:border-[#05dc7f] hover:bg-[#f3faf8]'}
+                            ${isUploadingCover ? 'pointer-events-none opacity-80' : ''}
+                        `}
+                        onDragOver={onCoverDragOver}
+                        onDragLeave={onCoverDragLeave}
+                        onDrop={onCoverDrop}
+                        onClick={() => coverInputRef.current?.click()}
+                    >
+                        {coverPreview ? (
+                            <>
+                                <img
+                                    src={coverPreview}
+                                    alt="Cover preview"
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div className="flex items-center gap-2 text-white">
+                                        {isUploadingCover ? (
+                                            <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <FiImage size={20} />
+                                        )}
+                                        <span className="text-sm font-medium">Alterar capa</span>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center gap-2">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all
+                                    ${isDraggingCover ? 'bg-[#05dc7f] text-white' : 'bg-[#e7eae9] text-[#6b7c7a] group-hover:bg-[#05dc7f] group-hover:text-white'}
+                                `}>
+                                    {isUploadingCover ? (
+                                        <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <FiImage size={20} />
+                                    )}
+                                </div>
+                                <div className="flex flex-col items-center gap-0.5">
+                                    <span className="text-sm font-semibold text-[#152e2b]">
+                                        {isUploadingCover ? "Salvando..." : "Adicionar capa"}
+                                    </span>
+                                    <span className="text-xs text-[#6b7c7a]">
+                                        {isDraggingCover ? "Solte para enviar" : "1065 x 250 pixels"}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        <input
+                            ref={coverInputRef}
+                            type="file"
+                            name="cover"
+                            accept="image/*"
+                            onChange={handleCoverChange}
+                            className="hidden"
+                        />
                     </div>
 
                     <div className="h-px bg-[#e7eae9] my-1" />

@@ -31,6 +31,7 @@ model User {
   name  String?
   title String?
   image String?
+  cover String?
   bio String?
   longBio String?
   skills String[] @default([])
