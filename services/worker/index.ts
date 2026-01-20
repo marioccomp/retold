@@ -7,6 +7,7 @@ import { cloneRepository } from "./clone.js";
 import { prisma } from "@repo/database";
 import { analyzeProjectWithLLM } from "./llm/analyze-project.js";
 import { analyzeRepository } from "./analyze/index.js";
+import { getToken } from "./workerRepository/worker.repository.js";
 
 function printOverview(overview: string, projectId: string) {
   const separator = "=".repeat(80);
@@ -54,7 +55,9 @@ const worker = new Worker(
         data: { status: "ANALYZING" },
       });
 
-      await cloneRepository(repoUrl, tmpPath);
+      const token = await getToken(projectId);
+
+      await cloneRepository(repoUrl, tmpPath, token);
       const readmeContent = readRepositoryReadme(tmpPath);
       const analysis = await analyzeRepository(tmpPath);
 

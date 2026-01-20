@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FiPlus, FiGithub, FiCheck } from "react-icons/fi";
 // import styles from "./CreateProjectPanel.module.css";
@@ -9,7 +9,10 @@ import {
     getRepositoriesAction,
     verifyUserInstallation,
 } from "@/src/domains/project/actions";
+import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
+import { FiX, FiArrowLeft, FiArrowRight, FiUpload } from "react-icons/fi";
 import { toast } from "sonner";
+import { useTranslation } from "@/src/i18n/client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -37,7 +40,9 @@ type Props = {
 };
 
 export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
+    const { dict } = useTranslation();
     const queryClient = useQueryClient();
+    const t = dict.project.create_panel;
 
     // Form state
     const [title, setTitle] = useState("");
@@ -45,6 +50,12 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     const [visibility, setVisibility] = useState<"public" | "private">("public");
     const [selectedRepoId, setSelectedRepoId] = useState<number | null>(null);
     const [isCreating, setIsCreating] = useState(false);
+    const [images, setImages] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
+    const [isUploadingImages, setIsUploadingImages] = useState(false);
+
+    // Track object URLs for cleanup
+    const generatedUrls = useRef<string[]>([]);
 
     // Fetch repositories
     const { data: repositories = [], isLoading: isLoadingRepos } = useQuery<Repository[]>({
@@ -66,6 +77,60 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         window.addEventListener("message", handleMessage);
         return () => window.removeEventListener("message", handleMessage);
     }, [queryClient]);
+
+    // Cleanup previews on unmount
+    useEffect(() => {
+        return () => {
+            generatedUrls.current.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, []);
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const newFiles = Array.from(e.target.files);
+            const totalImages = images.length + newFiles.length;
+
+            if (totalImages > 3) {
+                toast.error(t.toast.max_images);
+                return;
+            }
+
+            const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+            generatedUrls.current = [...generatedUrls.current, ...newPreviews];
+            setImages([...images, ...newFiles]);
+            setPreviews([...previews, ...newPreviews]);
+        }
+    };
+
+    const handleRemoveImage = (index: number) => {
+        const newImages = [...images];
+        const newPreviews = [...previews];
+
+        // Revoke the removed URL and update ref
+        const urlToRemove = newPreviews[index];
+        URL.revokeObjectURL(urlToRemove);
+        generatedUrls.current = generatedUrls.current.filter(u => u !== urlToRemove);
+
+        newImages.splice(index, 1);
+        newPreviews.splice(index, 1);
+        setImages(newImages);
+        setPreviews(newPreviews);
+    };
+
+    const handleMoveImage = (index: number, direction: "left" | "right") => {
+        if (direction === "left" && index === 0) return;
+        if (direction === "right" && index === images.length - 1) return;
+
+        const newImages = [...images];
+        const newPreviews = [...previews];
+        const targetIndex = direction === "left" ? index - 1 : index + 1;
+
+        [newImages[index], newImages[targetIndex]] = [newImages[targetIndex], newImages[index]];
+        [newPreviews[index], newPreviews[targetIndex]] = [newPreviews[targetIndex], newPreviews[index]];
+
+        setImages(newImages);
+        setPreviews(newPreviews);
+    };
 
     // GitHub App install URL
     const appSlug = "retold-inc";
@@ -96,20 +161,31 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
 
         setIsCreating(true);
         try {
-            await createProjectAction({
+            const project = await createProjectAction({
                 title,
                 description,
                 visibility,
                 repositoryId: selectedRepoId,
             });
 
-            toast.success("Projeto criado com sucesso!");
+            if (images.length > 0) {
+                setIsUploadingImages(true);
+                const formData = new FormData();
+                images.forEach((file) => {
+                    formData.append("images", file);
+                });
+
+                await uploadProjectImagesAction(project.id, formData);
+            }
+
+            toast.success(t.toast.success);
             onSuccess();
         } catch (error) {
             console.error(error);
-            toast.error("Erro ao criar projeto. Tente novamente.");
+            toast.error(t.toast.error);
         } finally {
             setIsCreating(false);
+            setIsUploadingImages(false);
         }
     };
 
@@ -126,8 +202,8 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
 
             {/* Header */}
             <div className="px-7 py-5 border-b border-[#e7eae9] bg-gradient-to-br from-[#fafafa] to-white">
-                <h2 className="m-0 text-[1.4rem] font-semibold text-[#152e2b]">Novo projeto</h2>
-                <p className="m-[6px_0_0] text-[0.9rem] text-[#6b7c7a]">Preencha as informações do seu novo projeto</p>
+                <h2 className="m-0 text-[1.4rem] font-semibold text-[#152e2b]">{t.title}</h2>
+                <p className="m-[6px_0_0] text-[0.9rem] text-[#6b7c7a]">{t.subtitle}</p>
             </div>
 
             {/* Content */}
@@ -136,11 +212,11 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                 <div className="flex flex-col gap-5">
                     {/* Title */}
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="project-title" className="text-[0.875rem] font-medium text-[#152e2b]">Título</Label>
+                        <Label htmlFor="project-title" className="text-[0.875rem] font-medium text-[#152e2b]">{t.labels.title}</Label>
                         <Input
                             id="project-title"
                             type="text"
-                            placeholder="Nome do seu projeto"
+                            placeholder={t.placeholders.title}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             maxLength={100}
@@ -150,10 +226,10 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
 
                     {/* Description */}
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="project-description" className="text-[0.875rem] font-medium text-[#152e2b]">Descrição</Label>
+                        <Label htmlFor="project-description" className="text-[0.875rem] font-medium text-[#152e2b]">{t.labels.description}</Label>
                         <Textarea
                             id="project-description"
-                            placeholder="Uma breve descrição do projeto"
+                            placeholder={t.placeholders.description}
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             maxLength={280}
@@ -163,74 +239,120 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
 
                     {/* Visibility */}
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="project-visibility" className="text-[0.875rem] font-medium text-[#152e2b]">Visibilidade</Label>
+                        <Label htmlFor="project-visibility" className="text-[0.875rem] font-medium text-[#152e2b]">{t.labels.visibility}</Label>
                         <Select
                             value={visibility}
                             onValueChange={(val) => setVisibility(val as "public" | "private")}
                         >
                             <SelectTrigger id="project-visibility" className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-[0.95rem] focus:ring-[#05dc7f]/30 focus:border-[#05dc7f]">
-                                <SelectValue placeholder="Selecione a visibilidade" />
+                                <SelectValue placeholder={t.placeholders.visibility} />
                             </SelectTrigger>
                             <SelectContent className="bg-white">
-                                <SelectItem value="public" className="cursor-pointer">Público</SelectItem>
-                                <SelectItem value="private" className="cursor-pointer">Privado</SelectItem>
+                                <SelectItem value="public" className="cursor-pointer">{t.visibility_options.public}</SelectItem>
+                                <SelectItem value="private" className="cursor-pointer">{t.visibility_options.private}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
 
-                {/* Repositories Section */}
-                <div className="flex flex-col gap-3">
-                    <div>
-                        <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">Repositório</h3>
-                        <p className="m-0 text-[0.85rem] text-[#6b7c7a]">Selecione um repositório do GitHub</p>
+                {/* Right Column: Images & Repo */}
+                <div className="flex flex-col gap-6">
+                    {/* Images Section */}
+                    <div className="flex flex-col gap-3">
+                        <div>
+                            <div className="flex justify-between items-center">
+                                <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">{t.labels.images}</h3>
+                                <span className="text-[0.8rem] text-[#6b7c7a]">{images.length}/3</span>
+                            </div>
+                            <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.images_hint}</p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                            {previews.map((preview, index) => (
+                                <div key={index} className="relative aspect-video group rounded-md overflow-hidden border border-[#e7eae9] bg-[#fafafa]">
+                                    <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                        {index > 0 && (
+                                            <button onClick={() => handleMoveImage(index, "left")} className="p-1 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors" title={t.tooltips.move_left}>
+                                                <FiArrowLeft size={14} />
+                                            </button>
+                                        )}
+                                        <button onClick={() => handleRemoveImage(index)} className="p-1 rounded-full bg-white/20 hover:bg-red-500/80 text-white transition-colors" title={t.tooltips.remove}>
+                                            <FiX size={14} />
+                                        </button>
+                                        {index < images.length - 1 && (
+                                            <button onClick={() => handleMoveImage(index, "right")} className="p-1 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors" title={t.tooltips.move_right}>
+                                                <FiArrowRight size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {images.length < 3 && (
+                                <label className="flex flex-col items-center justify-center aspect-video border-2 border-dashed border-[#e7eae9] rounded-md cursor-pointer hover:border-[#05dc7f] hover:bg-[#05dc7f]/5 transition-all group">
+                                    <FiUpload className="text-[#6b7c7a] group-hover:text-[#05dc7f]" size={20} />
+                                    <span className="text-[0.75rem] text-[#6b7c7a] mt-1 group-hover:text-[#05dc7f]">{t.add}</span>
+                                    <input type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" />
+                                </label>
+                            )}
+                        </div>
                     </div>
 
-                    {isLoadingRepos ? (
-                        <div className="p-[30px] text-center text-[#6b7c7a] text-[0.9rem]">Carregando repositórios...</div>
-                    ) : repositories.length > 0 ? (
-                        <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1">
-                            {repositories.map((repo) => {
-                                const isSelected = selectedRepoId === repo.id;
-                                return (
-                                    <div
-                                        key={repo.id}
-                                        className={cn(
-                                            "flex items-center justify-between p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200",
-                                            isSelected
-                                                ? "border-[#05dc7f] bg-[#05dc7f]/6"
-                                                : "border-[#e7eae9] hover:border-[#b8bfbd] hover:bg-[#fafafa]"
-                                        )}
-                                        onClick={() => setSelectedRepoId(repo.id)}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === "Enter" && setSelectedRepoId(repo.id)}
-                                    >
-                                        <span className="text-[0.9rem] text-[#152e2b] font-medium flex items-center gap-2">
-                                            <FiGithub />
-                                            {repo.name}
-                                        </span>
-                                        <span className="text-[0.8rem] font-medium text-[#05dc7f]">
-                                            {isSelected ? <span className="flex items-center gap-1"><FiCheck /> Selecionado</span> : ""}
-                                        </span>
-                                    </div>
-                                );
-                            })}
+                    {/* Repositories Section */}
+                    <div className="flex flex-col gap-3">
+                        <div>
+                            <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">{t.labels.repository}</h3>
+                            <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.repo_hint}</p>
                         </div>
-                    ) : (
-                        <div className="p-6 text-center text-[#6b7c7a] text-[0.9rem] border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa]">
-                            Nenhum repositório conectado ainda.
-                        </div>
-                    )}
 
-                    <Button
-                        variant="ghost"
-                        onClick={handleAddRepository}
-                        className="cursor-pointer w-full mt-1 border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa] text-[#6b7c7a] text-[0.9rem] font-medium hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[#05dc7f]/4 h-auto py-3 gap-2"
-                    >
-                        <FiPlus size={18} />
-                        {repositories.length > 0 ? "Gerenciar repositórios" : "Conectar repositórios"}
-                    </Button>
+                        {isLoadingRepos ? (
+                            <div className="p-[30px] text-center text-[#6b7c7a] text-[0.9rem]">{t.repo_loading}</div>
+                        ) : repositories.length > 0 ? (
+                            <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1">
+                                {repositories.map((repo) => {
+                                    const isSelected = selectedRepoId === repo.id;
+                                    return (
+                                        <div
+                                            key={repo.id}
+                                            className={cn(
+                                                "flex items-center justify-between p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200",
+                                                isSelected
+                                                    ? "border-[#05dc7f] bg-[#05dc7f]/6"
+                                                    : "border-[#e7eae9] hover:border-[#b8bfbd] hover:bg-[#fafafa]"
+                                            )}
+                                            onClick={() => setSelectedRepoId(repo.id)}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => e.key === "Enter" && setSelectedRepoId(repo.id)}
+                                        >
+                                            <span className="text-[0.9rem] text-[#152e2b] font-medium flex items-center gap-2">
+                                                <FiGithub />
+                                                {repo.name}
+                                            </span>
+                                            <span className="text-[0.8rem] font-medium text-[#05dc7f]">
+                                                {isSelected ? <span className="flex items-center gap-1"><FiCheck /> {t.repo_selected}</span> : ""}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="p-6 text-center text-[#6b7c7a] text-[0.9rem] border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa]">
+                                {t.repo_none}
+                            </div>
+                        )}
+
+                        <Button
+                            variant="ghost"
+                            onClick={handleAddRepository}
+                            className="cursor-pointer w-full mt-1 border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa] text-[#6b7c7a] text-[0.9rem] font-medium hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[#05dc7f]/4 h-auto py-3 gap-2"
+                        >
+                            <FiPlus size={18} />
+                            {repositories.length > 0 ? t.repo_manage : t.repo_connect}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -241,14 +363,20 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                     onClick={onClose}
                     className="cursor-pointer border-[#e7eae9] text-[#6b7c7a] hover:text-[#152e2b] hover:border-[#152e2b] hover:bg-white rounded-[10px] h-auto py-3 px-6 font-medium text-[0.95rem]"
                 >
-                    Cancelar
+                    {t.cancel}
                 </Button>
                 <Button
                     onClick={handleCreate}
                     disabled={!canCreate}
                     className="cursor-pointer bg-[#05dc7f] hover:bg-[#03c56f] text-[#0f2f28] rounded-[10px] h-auto py-3 px-7 font-semibold text-[0.95rem] disabled:opacity-50"
                 >
-                    {isCreating ? "Criando..." : "Criar projeto"}
+                    {isCreating || isUploadingImages ? (
+                        <>
+                            {isUploadingImages ? t.uploading_images : t.submitting}
+                        </>
+                    ) : (
+                        t.submit
+                    )}
                 </Button>
             </div>
         </div>

@@ -44,7 +44,146 @@
         "metrics": {
             "language": "Linguagem",
             "architecture": "Arquitetura",
-            "complexity": "Complexidade"
+            "complexity": "Complexidade",
+            "files": "{count} arquivos"
+        },
+        "overlay": {
+            "analysis_not_started": {
+                "title": "Análise não Iniciada",
+                "description": "O proprietário ainda não processou este projeto."
+            },
+            "analysis_error": {
+                "title": "Erro na Análise",
+                "description": "Não foi possível analisar os detalhes técnicos deste projeto."
+            },
+            "pending_view": {
+                "title": "Análise de Projeto",
+                "description": "Gere um relatório técnico completo com insights sobre arquitetura, stack e qualidade de código.",
+                "button": "Executar Análise"
+            },
+            "analyzing_view": {
+                "title": "Analisando Repositório",
+                "description": "Identificando tecnologias e padrões..."
+            },
+            "error_view": {
+                "title": "Falha na Análise",
+                "description": "Não foi possível processar os dados do repositório.",
+                "button": "Tentar Novamente"
+            },
+            "sections": {
+                "summary": "Resumo Executivo",
+                "tech_stack": "Stack Tecnológica",
+                "files": "Arquivos",
+                "infra": "Infra & Qualidade",
+                "structure": "Estrutura"
+            },
+            "stats": {
+                "source": "Fonte",
+                "tests": "Testes",
+                "config": "Config",
+                "docs": "Docs"
+            },
+            "infra": {
+                "ci_cd": "Pipeline CI/CD",
+                "docker": "Container (Docker)",
+                "lint": "Linting / Formatação",
+                "tests": "Cobertura de Testes",
+                "active": "Ativo",
+                "missing": "Ausente"
+            },
+            "structure": {
+                "src": "/src",
+                "tests": "/tests",
+                "depth": "Profundidade Máx",
+                "present": "Presente",
+                "missing": "Ausente"
+            },
+            "gallery": {
+                "alt_preview": "Prévia do projeto",
+                "alt_active": "Prévia ativa do projeto",
+                "alt_index": "Prévia {index}"
+            }
+        },
+        "create_panel": {
+            "title": "Novo projeto",
+            "subtitle": "Preencha as informações do seu novo projeto",
+            "labels": {
+                "title": "Título",
+                "description": "Descrição",
+                "visibility": "Visibilidade",
+                "images": "Imagens do Projeto",
+                "repository": "Repositório"
+            },
+            "placeholders": {
+                "title": "Nome do seu projeto",
+                "description": "Uma breve descrição do projeto",
+                "visibility": "Selecione a visibilidade"
+            },
+            "visibility_options": {
+                "public": "Público",
+                "private": "Privado"
+            },
+            "images_hint": "Adicione até 3 imagens para destacar seu projeto",
+            "tooltips": {
+                "move_left": "Mover para esquerda",
+                "move_right": "Mover para direita",
+                "remove": "Remover"
+            },
+            "add": "Adicionar",
+            "repo_hint": "Selecione um repositório do GitHub",
+            "repo_loading": "Carregando repositórios...",
+            "repo_selected": "Selecionado",
+            "repo_none": "Nenhum repositório conectado ainda.",
+            "repo_manage": "Gerenciar repositórios",
+            "repo_connect": "Conectar repositórios",
+            "cancel": "Cancelar",
+            "submit": "Criar projeto",
+            "submitting": "Criando...",
+            "uploading_images": "Enviando imagens...",
+            "toast": {
+                "success": "Projeto criado com sucesso!",
+                "error": "Erro ao criar projeto. Tente novamente.",
+                "max_images": "Máximo de 3 imagens permitido."
+            }
+        },
+        "settings_modal": {
+            "edit_project": "Editar projeto",
+            "delete_project": "Excluir projeto",
+            "title": "Editar Projeto",
+            "images_label": "Imagens do Projeto",
+            "max_images_hint": "Máximo de 3 imagens",
+            "remove_image_tooltip": "Remover imagem",
+            "add": "Adicionar",
+            "labels": {
+                "title": "Título",
+                "description": "Descrição"
+            },
+            "placeholders": {
+                "title": "Nome do projeto",
+                "description": "Descrição breve"
+            },
+            "cancel": "Cancelar",
+            "save": "Salvar alterações",
+            "saving": "Salvando...",
+            "remove_img_modal": {
+                "title": "Remover imagem?",
+                "description": "Esta imagem será removida quando você salvar as alterações.",
+                "confirm": "Remover"
+            },
+            "delete_project_modal": {
+                "title": "Excluir Projeto?",
+                "description": "Tem certeza que deseja excluir \"{title}\"? Esta ação não pode ser desfeita.",
+                "confirm": "Sim, excluir projeto",
+                "deleting": "Excluindo..."
+            },
+            "toast": {
+                "success": "Projeto atualizado com sucesso!",
+                "error": "Erro ao salvar alterações",
+                "delete_success": "Projeto excluído com sucesso!",
+                "delete_error": "Erro ao excluir projeto",
+                "title_required": "O título não pode estar vazio",
+                "max_images": "Máximo de 3 imagens permitido."
+            }
         }
     },
     "feed": {
@@ -161,7 +300,10 @@
             "saving": "Salvando...",
             "success": "Perfil atualizado com sucesso!",
             "error": "Erro ao atualizar perfil",
-            "unexpected_error": "Erro inesperado ao atualizar perfil"
+            "unexpected_error": "Erro inesperado ao atualizar perfil",
+            "avatar_success": "Avatar atualizado com sucesso!",
+            "avatar_error": "Erro inesperado ao enviar avatar.",
+            "avatar_hint": "Clique para enviar um novo avatar"
         },
         "edit_section_modal": {
             "title": "Editar Detalhes do Perfil",

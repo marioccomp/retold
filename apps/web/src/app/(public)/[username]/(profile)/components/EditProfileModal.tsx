@@ -105,7 +105,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 toast.error(result.message);
                 setAvatarPreview(profile.image ?? null);
             } else {
-                toast.success("Avatar updated successfully!");
+                toast.success(dict.profile.edit_modal.avatar_success);
                 await update({
                     ...session,
                     user: {
@@ -117,7 +117,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             }
         } catch {
-            toast.error("Unexpected error uploading avatar.");
+            toast.error(dict.profile.edit_modal.avatar_error);
             setAvatarPreview(profile.image ?? null);
         } finally {
             setIsUploadingAvatar(false);
@@ -158,7 +158,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                             <Avatar className="w-24 h-24 border-2 border-[#e7eae9]">
                                 <AvatarImage
                                     src={avatarPreview ?? undefined}
-                                    alt="Profile avatar"
+                                    alt={dict.profile.alt_avatar}
                                     className="object-cover"
                                 />
                                 <AvatarFallback className="text-2xl font-bold text-[#152e2b] bg-[#f3f6f5]">
@@ -187,7 +187,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                                 className="hidden"
                             />
                         </div>
-                        <span className="text-xs text-[#6b7c7a]">Click to upload a new avatar</span>
+                        <span className="text-xs text-[#6b7c7a]">{dict.profile.edit_modal.avatar_hint}</span>
                     </div>
 
                     <div className="h-px bg-[#e7eae9] my-1" />
