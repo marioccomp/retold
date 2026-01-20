@@ -4,6 +4,7 @@ export type ProjectForOverlay = {
     title: string;
     description: string | null;
     status?: string;
+    images?: string[];
     owner?: {
         name: string;
         image: string | null;

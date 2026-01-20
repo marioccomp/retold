@@ -36,6 +36,7 @@ export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
         title: projectData.title,
         description: projectData.description,
         status: "PENDING",
+        images: projectData.images,
         owner: {
             name: projectData.ownerName,
             image: projectData.ownerImage,

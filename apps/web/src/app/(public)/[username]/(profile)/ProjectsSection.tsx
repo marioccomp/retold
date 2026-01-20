@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { FiPlus, FiArrowLeft } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
@@ -25,15 +26,40 @@ type ProjectForOverlay = {
   description: string | null;
   status: string;
   repository: any;
+  images: string[];
 };
 
 export default function ProjectsSection({ searchQuery, ownProfile, profile }: Props) {
   const { dict } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   const projects = profile.projects;
+  const selectedProjectId = searchParams.get("project");
+
+  // Find project data based on URL param
+  const projectData = selectedProjectId ? projects.find(p => String(p.id) === selectedProjectId) : null;
+
+  // Transform to overlay format if found
+  const selectedProject: ProjectForOverlay | null = projectData ? {
+    id: projectData.id,
+    userId: profile.id,
+    title: projectData.title,
+    description: projectData.description,
+    status: "PENDING",
+    images: projectData.images, // Pass images directly
+    repository: projectData.repositoryUrl ? {
+      id: 0,
+      url: projectData.repositoryUrl,
+      fullName: projectData.repositoryFullName || "",
+      name: projectData.repositoryFullName?.split("/")[1] || "",
+      isActive: true
+    } : null,
+  } : null;
 
   const filteredProjects = projects.filter(
     (project) =>
@@ -55,25 +81,14 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   };
 
   const handleProjectClick = (project: ProjectCardDTO) => {
-
-    setSelectedProject({
-      id: project.id,
-      userId: profile.id, // O dono dos projetos listados é o dono do perfil
-      title: project.title,
-      description: project.description,
-      status: "PENDING", // Status será buscado pelo overlay via action
-      repository: project.repositoryUrl ? {
-        id: 0, // Mock ID or add to DTO if strictly needed
-        url: project.repositoryUrl,
-        fullName: project.repositoryFullName || "",
-        name: project.repositoryFullName?.split("/")[1] || "",
-        isActive: true
-      } : null,
-    });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("project", String(project.id));
+    // Use scroll: false to prevent jumping to top if possible, though FeedProjectPanel is an overlay
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleProjectClose = () => {
-    setSelectedProject(null);
+    router.back();
   };
 
   // Se está criando, mostrar apenas o painel de criação

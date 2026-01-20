@@ -44,7 +44,146 @@
         "metrics": {
             "language": "Language",
             "architecture": "Architecture",
-            "complexity": "Complexity"
+            "complexity": "Complexity",
+            "files": "{count} files"
+        },
+        "overlay": {
+            "analysis_not_started": {
+                "title": "Analysis Not Started",
+                "description": "The owner has not processed this project yet."
+            },
+            "analysis_error": {
+                "title": "Analysis Error",
+                "description": "Could not analyze the technical details of this project."
+            },
+            "pending_view": {
+                "title": "Project Analysis",
+                "description": "Generate a full technical report with insights about architecture, stack, and code quality.",
+                "button": "Run Analysis"
+            },
+            "analyzing_view": {
+                "title": "Analyzing Repository",
+                "description": "Identifying technologies and patterns..."
+            },
+            "error_view": {
+                "title": "Analysis Failed",
+                "description": "Could not process the repository data.",
+                "button": "Try Again"
+            },
+            "sections": {
+                "summary": "Executive Summary",
+                "tech_stack": "Tech Stack",
+                "files": "Files",
+                "infra": "Infra & Quality",
+                "structure": "Structure"
+            },
+            "stats": {
+                "source": "Source",
+                "tests": "Tests",
+                "config": "Config",
+                "docs": "Docs"
+            },
+            "infra": {
+                "ci_cd": "CI/CD Pipeline",
+                "docker": "Container (Docker)",
+                "lint": "Linting / Formatting",
+                "tests": "Test Coverage",
+                "active": "Active",
+                "missing": "Missing"
+            },
+            "structure": {
+                "src": "/src",
+                "tests": "/tests",
+                "depth": "Max Depth",
+                "present": "Present",
+                "missing": "Missing"
+            },
+            "gallery": {
+                "alt_preview": "Project preview",
+                "alt_active": "Active project preview",
+                "alt_index": "Preview {index}"
+            }
+        },
+        "create_panel": {
+            "title": "New project",
+            "subtitle": "Fill in the information for your new project",
+            "labels": {
+                "title": "Title",
+                "description": "Description",
+                "visibility": "Visibility",
+                "images": "Project Images",
+                "repository": "Repository"
+            },
+            "placeholders": {
+                "title": "Name of your project",
+                "description": "A brief description of the project",
+                "visibility": "Select visibility"
+            },
+            "visibility_options": {
+                "public": "Public",
+                "private": "Private"
+            },
+            "images_hint": "Add up to 3 images to highlight your project",
+            "tooltips": {
+                "move_left": "Move left",
+                "move_right": "Move right",
+                "remove": "Remove"
+            },
+            "add": "Add",
+            "repo_hint": "Select a GitHub repository",
+            "repo_loading": "Loading repositories...",
+            "repo_selected": "Selected",
+            "repo_none": "No repository connected yet.",
+            "repo_manage": "Manage repositories",
+            "repo_connect": "Connect repositories",
+            "cancel": "Cancel",
+            "submit": "Create project",
+            "submitting": "Creating...",
+            "uploading_images": "Uploading images...",
+            "toast": {
+                "success": "Project created successfully!",
+                "error": "Error creating project. Try again.",
+                "max_images": "Maximum of 3 images allowed."
+            }
+        },
+        "settings_modal": {
+            "edit_project": "Edit project",
+            "delete_project": "Delete project",
+            "title": "Edit Project",
+            "images_label": "Project Images",
+            "max_images_hint": "Max 3 images",
+            "remove_image_tooltip": "Remove image",
+            "add": "Add",
+            "labels": {
+                "title": "Title",
+                "description": "Description"
+            },
+            "placeholders": {
+                "title": "Project name",
+                "description": "Short description"
+            },
+            "cancel": "Cancel",
+            "save": "Save changes",
+            "saving": "Saving...",
+            "remove_img_modal": {
+                "title": "Remove image?",
+                "description": "This image will be removed when you save changes.",
+                "confirm": "Remove"
+            },
+            "delete_project_modal": {
+                "title": "Delete Project?",
+                "description": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+                "confirm": "Yes, delete project",
+                "deleting": "Deleting..."
+            },
+            "toast": {
+                "success": "Project updated successfully!",
+                "error": "Error saving changes",
+                "delete_success": "Project deleted successfully!",
+                "delete_error": "Error deleting project",
+                "title_required": "Title cannot be empty",
+                "max_images": "Maximum of 3 images allowed."
+            }
         }
     },
     "feed": {
@@ -161,7 +300,10 @@
             "saving": "Saving...",
             "success": "Profile updated successfully!",
             "error": "Error updating profile",
-            "unexpected_error": "Unexpected error updating profile"
+            "unexpected_error": "Unexpected error updating profile",
+            "avatar_success": "Avatar updated successfully!",
+            "avatar_error": "Unexpected error uploading avatar.",
+            "avatar_hint": "Click to upload a new avatar"
         },
         "edit_section_modal": {
             "title": "Edit Profile Details",
