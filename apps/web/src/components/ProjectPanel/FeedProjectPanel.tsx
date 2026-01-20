@@ -85,7 +85,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
 
                         <div className="flex flex-col items-center w-full max-w-full overflow-hidden">
                             <h2 className="m-0 text-2xl sm:text-5xl font-black text-gray-900 tracking-tight leading-tight break-all whitespace-pre-wrap line-clamp-3 overflow-hidden w-full">{project.title}</h2>
-                            {repo && (
+                            {repo && !repo.private && (
                                 <a
                                     href={repo.url}
                                     target="_blank"

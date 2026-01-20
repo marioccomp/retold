@@ -8,16 +8,26 @@ const userWithProfileData = Prisma.validator<Prisma.UserDefaultArgs>()({
     certifications: { include: { tags: true } },
     participations: { include: { tags: true } },
     educations: true,
+    _count: {
+      select: {
+        followers: true,
+        following: true,
+      },
+    },
+    followers: true,
   },
 });
 
 type UserWithProfileData = Prisma.UserGetPayload<typeof userWithProfileData>;
 
-export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfileDTO {
+export function mapUserToPublicProfile(user: UserWithProfileData, currentUserId?: number): PublicProfileDTO {
+  const isFollowing = user.followers && user.followers.length > 0;
+
   return {
     id: user.id,
     username: user.username ?? "",
     email: user.email,
+    phone: user.phone || null,
     name: user.name,
     title: user.title,
     bio: user.bio,
@@ -29,6 +39,9 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
     linkedinUrl: user.linkedinUrl,
     websiteUrl: user.websiteUrl,
     createdAt: user.createdAt.toISOString(),
+    followersCount: user._count.followers,
+    followingCount: user._count.following,
+    isFollowing: isFollowing,
 
     educations: (user.educations || []).map((edu) => ({
       id: edu.id,
@@ -59,9 +72,12 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
       ownerName: user.name ?? user.username ?? "",
       ownerUsername: user.username ?? "",
       ownerImage: user.image,
+      ownerId: user.id,
+      isFollowingOwner: isFollowing,
 
       repositoryUrl: project.repository?.url,
       repositoryFullName: project.repository?.fullName,
+      repositoryIsPrivate: project.repository?.private ?? false,
 
       isPinned: project.isPinned,
     })),

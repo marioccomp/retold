@@ -4,6 +4,7 @@
 import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
 import { MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
+import { ExternalLink } from "lucide-react";
 import placeholderImage from "@/assets/mockup-escalonador.jpg";
 import { useState, useEffect, useTransition } from "react";
 import ownerPic from "@/assets/foto.jpeg";
@@ -15,6 +16,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import emptyImage from "@/assets/empty_file.png";
 import { toggleLike } from "../domains/project/actions/toggle-like.action";
+import { useTranslation } from "@/src/i18n/client";
+import { FiLoader } from "react-icons/fi";
+import { FollowButton } from "./FollowButton";
 
 interface Props {
   project: ProjectCardDTO;
@@ -26,6 +30,7 @@ interface Props {
 
 export default function ProjectCard({ project, onClick, ownProfile, disableHover, disableConfig }: Props) {
   const { data: session } = useSession();
+  const { dict } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
   const [isLiked, setIsLiked] = useState(project.hasLiked ?? false);
@@ -96,6 +101,15 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
               </AvatarFallback>
             </Avatar>
             <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold">{ownerName}</p>
+            {!isOwner && project.ownerId && (
+              <FollowButton
+                targetUserId={project.ownerId}
+                initialIsFollowing={project.isFollowingOwner ?? false}
+                variant="ghost"
+                size="sm"
+                className="text-[12px] h-7 px-2 border-white/20 text-white hover:bg-white/10 hover:text-white"
+              />
+            )}
           </div>
           <div className="text-[15px] leading-relaxed text-[#f0fdf4] mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
             max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:text-[#e2e8f0] max-[650px]:line-clamp-3"
@@ -105,12 +119,25 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
 
         </div>
 
+
         {isOwner && !disableConfig && (
           <div className="absolute top-3 right-3 z-[10]">
             <ProjectSettings
               project={project}
               triggerClassName="p-1.5 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full transition-all text-white shadow-lg border border-white/10 focus:outline-none outline-none focus-visible:ring-0 cursor-pointer"
             />
+          </div>
+        )}
+
+        {/* Analyzing Overlay */}
+        {(project.status === 'PENDING' || project.status === 'ANALYZING') && (
+          <div className="absolute inset-0 bg-black/60 z-[20] flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
+            <div className="animate-spin mb-3">
+              <FiLoader size={28} className="text-[#05dc7f]" />
+            </div>
+            <p className="font-semibold text-sm tracking-wide">
+              {dict.project.status.ANALYZING}...
+            </p>
           </div>
         )}
       </div>
@@ -141,7 +168,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
         <div className="flex p-[10px_24px_20px_24px] gap-4 justify-end text-[#4a5568]
           max-[650px]:p-0 max-[650px]:gap-3 max-[650px]:shrink-0 max-[380px]:gap-2"
         >
-          {project.repositoryUrl && (
+          {project.repositoryUrl && !project.repositoryIsPrivate && (
             <a
               href={project.repositoryUrl}
               target="_blank"
@@ -150,7 +177,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
               onClick={(e) => e.stopPropagation()}
               title={project.repositoryFullName || "View Code"}
             >
-              <FaGithub size={20} />
+              <ExternalLink size={20} />
             </a>
           )}
 

@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database";
 import { User } from "@repo/database";
 
-type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title" | "githubUrl" | "linkedinUrl" | "websiteUrl" | "longBio" | "skills">;
+type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title" | "githubUrl" | "linkedinUrl" | "websiteUrl" | "longBio" | "skills" | "phone" | "email">;
 type UpdateProfileInput = Partial<UpdatableProfileFields>;
 
 export const userRepository = {
@@ -53,16 +53,34 @@ export const userRepository = {
                 likes: true,
               },
             },
-            likes: currentUserId ? {
-              where: {
-                userId: currentUserId,
-              },
-              select: {
-                userId: true,
-              },
-            } : false,
+            ...(currentUserId ? {
+              likes: {
+                where: {
+                  userId: currentUserId,
+                },
+                select: {
+                  userId: true,
+                },
+              }
+            } : {}),
           },
         },
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+          },
+        },
+        ...(currentUserId ? {
+          followers: {
+            where: {
+              followerId: currentUserId,
+            },
+            select: {
+              followerId: true,
+            }
+          }
+        } : {}),
         certifications: {
           orderBy: { createdAt: "desc" },
           include: {
@@ -172,7 +190,7 @@ export const userRepository = {
     });
   },
 
-  searchUsers(query: string) {
+  searchUsers(query: string, currentUserId?: number) {
     return prisma.user.findMany({
       where: {
         OR: [
@@ -189,6 +207,16 @@ export const userRepository = {
         title: true,
         bio: true,
         skills: true,
+        ...(currentUserId ? {
+          followers: {
+            where: {
+              followerId: currentUserId,
+            },
+            select: {
+              followerId: true,
+            }
+          }
+        } : {}),
       },
       take: 20,
     });

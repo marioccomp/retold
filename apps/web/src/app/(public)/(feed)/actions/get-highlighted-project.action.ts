@@ -1,6 +1,6 @@
 "use server"
 
-import { projectRepository } from "@/src/domains/profile/repositories/project.repository"
+import { projectRepository } from "@/src/domains/project/repository/project.repository"
 import { mapProjectToProjectDTO } from "@/src/domains/project/mapper/project-to-project-dto.mapper"
 
 export async function getHighlightedProject() {
@@ -13,6 +13,7 @@ export async function getHighlightedProject() {
     const projectDTO = mapProjectToProjectDTO({
         project: project!,
         user: {
+            id: project.user.id,
             name: project.user.name!,
             image: project.user.image!,
             username: project.user.username!,
@@ -25,8 +26,10 @@ export async function getHighlightedProject() {
             name: tag.name,
             id: tag.id,
         })),
-        likes: 10,
-        views: 15,
+        likes: project._count.likes,
+        views: project.views,
+        hasLiked: project.likes && project.likes.length > 0,
+        isFollowingOwner: (project.user as any).followers?.length > 0,
     });
 
     return projectDTO

@@ -17,6 +17,7 @@ import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 import { useTranslation } from "@/src/i18n/client";
 
 import { FiArrowRight, FiCheckCircle, FiPlus, FiSearch, FiTrendingUp } from "react-icons/fi";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 
@@ -30,6 +31,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
     const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const uid = useId();
+    const queryClient = useQueryClient();
 
     const featuredProject = useMemo<ProjectForOverlay | null>(() => {
         if (!projectDTO) return null;
@@ -84,7 +86,10 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                             onClose={() => setIsCreating(false)}
                             onSuccess={() => {
                                 setIsCreating(false);
-                                window.location.reload();
+                                queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+                                setTimeout(() => {
+                                    document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
+                                }, 100);
                             }}
                         />
                     </div>
@@ -116,7 +121,10 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
     return (
         <section className="relative w-full overflow-hidden bg-white">
             {/* Fundo no estilo do login: gradiente + grid sutil + orbs */}
-            <div className="pointer-events-none absolute inset-0">
+            <div className="pointer-events-none absolute inset-0" style={{
+                maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)'
+            }}>
                 <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-[#f3fff9]" />
                 <div className="absolute inset-0 opacity-[0.03]">
                     <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +144,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
             </div>
 
             {/* Conteúdo (aumentei o padding inferior para dar espaço à transição suave) */}
-            <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 pt-12 md:pt-14 pb-24 md:pb-32">
+            <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 pt-12 md:pt-14 pb-24 md:pb-32 z-20">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
                     {/* LEFT */}
                     <div className="lg:col-span-6 flex flex-col gap-6 text-center lg:text-left">
@@ -260,8 +268,6 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 </div>
             </div>
 
-            {/* Transição pro FeedContent - Gradiente equilibrado para um blend suave sem cobrir o conteúdo */}
-            <div className="absolute bottom-0 left-0 w-full h-64 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
 
             {/* keyframes */}
             <style jsx global>{`

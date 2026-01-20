@@ -32,9 +32,14 @@
             "errors": {
                 "user_not_found": "User not found or password not set",
                 "incorrect_password": "Incorrect password",
-                "unauthorized": "Unauthorized"
+                "unauthorized": "Unauthorized",
+                "email_mismatch": "Email does not match your account email"
             },
-            "success_message": "Password updated successfully"
+            "success_message": "Password updated successfully",
+            "create_title": "Create Password",
+            "create_description": "You don't have a password set. Create one to enable email login.",
+            "confirm_email_label": "Confirm your email",
+            "button_create": "Create Password"
         },
         "connectedAccounts": {
             "title": "Connected Accounts",
@@ -49,7 +54,7 @@
         "status": {
             "PENDING": "Pending",
             "ANALYZING": "Processing",
-            "DONE": "Audited",
+            "DONE": "Analyzed",
             "ERROR": "Error"
         },
         "analysis": {
@@ -158,7 +163,11 @@
             "toast": {
                 "success": "Project created successfully!",
                 "error": "Error creating project. Try again.",
-                "max_images": "Maximum of 3 images allowed."
+                "max_images": "Maximum of 3 images allowed.",
+                "already_exists": "You already have a project for this repository.",
+                "repo_not_found": "Repository not found or disconnected.",
+                "no_files": "No images provided.",
+                "upload_failed": "Failed to upload project images."
             }
         },
         "settings_modal": {
@@ -292,6 +301,19 @@
         "currently": "Currently",
         "views": "views",
         "likes": "likes",
+        "followers": "followers",
+        "following": "following",
+        "follow": "Follow",
+        "unfollow": "Following",
+        "follows_you": "Follows you",
+        "network": {
+            "followers": "Followers",
+            "following": "Following",
+            "search_placeholder": "Search users...",
+            "no_results": "No results found",
+            "no_results_desc": "Try searching for another name or username.",
+            "loading": "Loading..."
+        },
         "edit_profile": "Edit Profile",
         "edit_details": "Edit details",
         "contact": "Contact",
@@ -356,6 +378,25 @@
             "skills_placeholder": "Type a skill and press Enter",
             "skills_none": "No skills added",
             "education_none": "No education listed"
+        },
+        "contact_section": {
+            "title": "Contact",
+            "phone_label": "Phone Number",
+            "email_label": "Email",
+            "copy": "Copy",
+            "copied": "Copied!",
+            "edit": "Edit",
+            "save": "Save",
+            "cancel": "Cancel",
+            "country_selector": "Select Country",
+            "phone_placeholder": "+55 (11) 99999-9999",
+            "email_placeholder": "example@email.com",
+            "no_phone": "No phone added",
+            "no_email": "No email added",
+            "validation": {
+                "phone_invalid": "Invalid phone number",
+                "email_invalid": "Invalid email address"
+            }
         }
     },
     "validation": {

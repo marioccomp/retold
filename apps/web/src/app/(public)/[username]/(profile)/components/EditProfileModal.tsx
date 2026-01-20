@@ -80,7 +80,6 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             if (!data.success) {
                 // Se houver erros de campo específicos, mostre o primeiro encontrado
                 if (data.fieldErrors) {
-                    console.log(data.fieldErrors);
                     const firstError = Object.values(data.fieldErrors).flat()[0];
                     if (firstError) {
                         toast.error(firstError);

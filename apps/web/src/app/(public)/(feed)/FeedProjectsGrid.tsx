@@ -35,7 +35,7 @@ export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
         userId: undefined,
         title: projectData.title,
         description: projectData.description,
-        status: "PENDING",
+        status: projectData.status,
         images: projectData.images,
         owner: {
             name: projectData.ownerName,
@@ -47,7 +47,8 @@ export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
             url: projectData.repositoryUrl,
             fullName: projectData.repositoryFullName || "",
             name: projectData.repositoryFullName?.split("/")[1] || "",
-            isActive: true
+            isActive: true,
+            private: projectData.repositoryIsPrivate ?? false,
         } : null,
     } : null;
 

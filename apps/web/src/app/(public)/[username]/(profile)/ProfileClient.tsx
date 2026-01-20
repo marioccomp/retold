@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
 import { getProfile } from "../_actions/get-profile";
@@ -22,13 +23,25 @@ type Props = {
 };
 
 export default function ProfileClient({ username, ownProfile }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const urlTab = searchParams.get("tab") || "profile";
+  const [activeTab, setActiveTab] = useState(urlTab);
+
+  // Sync local state when URL changes (e.g. back button)
+  useEffect(() => {
+    setActiveTab(urlTab);
+  }, [urlTab]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", username],
     queryFn: () => getProfile(username),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache
+    refetchOnWindowFocus: false, // Não atualiza ao focar na janela
     refetchInterval: (query) => {
       const projects = query.state.data?.projects;
       const isAnalyzing = projects?.some(
@@ -37,6 +50,14 @@ export default function ProfileClient({ username, ownProfile }: Props) {
       return isAnalyzing ? 3000 : false;
     },
   });
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchQuery("");
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", value);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   if (!profile) return null;
 
@@ -61,7 +82,7 @@ export default function ProfileClient({ username, ownProfile }: Props) {
 
         {/* 4. Main Content Area */}
         <main className="min-h-[200px] mt-0 md:mt-0 max-md:mt-12">
-          <Tabs defaultValue="Perfil" className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
 
             {/* 5. Tabs & Search */}
             <ProfileTabsHeader
@@ -71,11 +92,11 @@ export default function ProfileClient({ username, ownProfile }: Props) {
 
             {/* 6. Tabs Content */}
             <div className="pb-20">
-              <TabsContent value="Perfil" className="m-0 p-0 ring-0 focus-visible:ring-0 outline-none">
+              <TabsContent value="profile" className="m-0 p-0 ring-0 focus-visible:ring-0 outline-none">
                 <ProfileSection profile={profile} ownProfile={ownProfile} />
               </TabsContent>
 
-              <TabsContent value="Projetos" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 m-0 p-0 ring-0 focus-visible:ring-0 outline-none">
+              <TabsContent value="projects" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 m-0 p-0 ring-0 focus-visible:ring-0 outline-none">
                 <ProjectsSection
                   searchQuery={searchQuery}
                   ownProfile={ownProfile}

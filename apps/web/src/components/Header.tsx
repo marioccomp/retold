@@ -35,21 +35,40 @@ export default function Header({ session: initialSession }: { session: Session |
     staleTime: 1000 * 60 * 5, // 5 minutos de cache
   });
 
-  // Prioriza os dados do React Query (frescos), depois a sessão do hook, depois a inicial
-  const userData = currentUser || session?.user || initialSession?.user;
-  const status = userData ? "authenticated" : "unauthenticated";
+  // Une os dados priorizando o que for preenchido
+  const userData = {
+    ...(initialSession?.user || {}),
+    ...(session?.user || {}),
+    ...(currentUser || {}),
+  } as any;
+
+  // Se o React Query tiver dados velhos (null), mas a sessão já tiver o dado novo, use o da sessão
+  if (!userData.username && session?.user?.username) userData.username = session.user.username;
+  if (!userData.name && session?.user?.name) userData.name = session.user.name;
+  if (!userData.email && session?.user?.email) userData.email = session.user.email;
+  if (!userData.image && session?.user?.image) userData.image = session.user.image;
+
+  const status = (session?.user || initialSession?.user) ? "authenticated" : "unauthenticated";
 
   const userImage = userData?.image;
   const userName = userData?.name || "User";
   const userInitials = userName
     .split(" ")
-    .map((n) => n[0])
+    .map((n: string) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 
   const handleProfileClick = () => {
-    router.push(`/${userData?.username}`);
+    if (userData?.username) {
+      router.push(`/${userData.username}`);
+    } else {
+      // Caso ainda não tenha username (ex: logo após login Git), tenta buscar da sessão
+      const currentUsername = session?.user?.username || initialSession?.user?.username;
+      if (currentUsername) {
+        router.push(`/${currentUsername}`);
+      }
+    }
   }
 
   const handleExploreClick = () => {

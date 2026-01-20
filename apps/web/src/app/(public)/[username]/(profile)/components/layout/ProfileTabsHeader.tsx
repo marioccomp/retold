@@ -13,8 +13,8 @@ export default function ProfileTabsHeader({ searchQuery, setSearchQuery }: Props
     const { dict } = useTranslation();
 
     const tabItems = [
-        { value: "Perfil", label: dict.profile.tabs.profile },
-        { value: "Projetos", label: dict.profile.tabs.projects },
+        { value: "profile", label: dict.profile.tabs.profile },
+        { value: "projects", label: dict.profile.tabs.projects },
     ];
 
     return (
@@ -24,7 +24,6 @@ export default function ProfileTabsHeader({ searchQuery, setSearchQuery }: Props
                     <TabsTrigger
                         key={tab.value}
                         value={tab.value}
-                        onClick={() => setSearchQuery("")}
                         className="bg-transparent border-0 border-b-[3px] border-solid border-b-transparent py-1 px-0 text-base font-bold text-[#6b7c7a] cursor-pointer transition-all duration-300 hover:text-[#152e2b] data-[state=active]:!text-[#152e2b] data-[state=active]:!border-b-[#05dc7f] data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap"
                     >
                         {tab.label}

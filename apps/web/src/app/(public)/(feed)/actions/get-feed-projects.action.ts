@@ -18,6 +18,16 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
                     name: true,
                     username: true,
                     image: true,
+                    ...(currentUserId ? {
+                        followers: {
+                            where: {
+                                followerId: currentUserId
+                            },
+                            select: {
+                                followerId: true
+                            }
+                        }
+                    } : {})
                 }
             },
             tags: {
@@ -30,6 +40,7 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
                 select: {
                     url: true,
                     fullName: true,
+                    private: true,
                 }
             },
             _count: {
@@ -37,14 +48,16 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
                     likes: true
                 }
             },
-            likes: currentUserId ? {
-                where: {
-                    userId: currentUserId
-                },
-                select: {
-                    userId: true
+            ...(currentUserId ? {
+                likes: {
+                    where: {
+                        userId: currentUserId
+                    },
+                    select: {
+                        userId: true
+                    }
                 }
-            } : false
+            } : {})
         }
     })
 
@@ -57,7 +70,7 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
         likes: project._count.likes,
         views: project.views,
         hasLiked: project.likes && project.likes.length > 0,
-        tags: project.tags.map((tag) => ({
+        tags: project.tags.map((tag: any) => ({
             id: tag.id,
             name: tag.name,
         })),
@@ -65,7 +78,10 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
         ownerName: project.user.name || "",
         ownerImage: project.user.image || "",
         ownerUsername: project.user.username || "",
+        ownerId: project.user.id,
+        isFollowingOwner: (project.user as any).followers?.length > 0,
         repositoryUrl: project.repository?.url || undefined,
         repositoryFullName: project.repository?.fullName || undefined,
+        repositoryIsPrivate: project.repository?.private ?? false,
     }))
 }

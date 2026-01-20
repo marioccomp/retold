@@ -6,7 +6,7 @@ import retoldImg from "@/assets/retold-login.png";
 import retoldLogo from "@/assets/retold-footer.png";
 import { setUsername } from "../_actions/set-username";
 import { checkUsername } from "../_actions/check-username";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ interface ChooseUsernameFormProps {
 export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps) {
     const { dict } = useTranslation();
     const router = useRouter();
+    const queryClient = useQueryClient();
     const { update, data: session } = useSession();
     const [usernameError, setUsernameError] = useState<string | null>(null);
     const [usernameAvailable, setUsernameAvailable] = useState(false);
@@ -41,26 +42,25 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                 return;
             }
 
-            toast.success(dict.auth.choose_username.toast_welcome.replace("{username}", res.data!.username));
+            toast.success(dict.auth.choose_username.toast_welcome.replace("{username}", res.data!.username), {
+                duration: 2000,
+            });
 
-
-            const teste = await update({
+            // Atualiza a sessão client-side
+            await update({
+                ...session,
                 user: {
-                    ...session?.user, // mantém os outros campos
+                    ...session?.user,
                     username: res.data!.username
                 }
             });
 
-            console.log(teste);
+            // Invalida o cache do React Query para forçar o Header a buscar os dados novos
+            await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
 
+            // Redireciona para o novo perfil
             router.push(`/${res.data!.username}`);
-
             router.refresh();
-
-
-
-
-
         },
 
         onError: () => {

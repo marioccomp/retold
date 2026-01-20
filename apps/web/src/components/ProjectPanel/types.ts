@@ -16,5 +16,6 @@ export type ProjectForOverlay = {
         fullName: string;
         url: string;
         isActive: boolean;
+        private: boolean;
     } | null;
 };

@@ -32,9 +32,14 @@
             "errors": {
                 "user_not_found": "Usuário não encontrado ou senha não definida",
                 "incorrect_password": "Senha incorreta",
-                "unauthorized": "Não autorizado"
+                "unauthorized": "Não autorizado",
+                "email_mismatch": "O e-mail não corresponde ao e-mail da sua conta"
             },
-            "success_message": "Senha atualizada com sucesso"
+            "success_message": "Senha atualizada com sucesso",
+            "create_title": "Criar Senha",
+            "create_description": "Você não tem uma senha definida. Crie uma para ativar o login por e-mail.",
+            "confirm_email_label": "Confirme seu e-mail",
+            "button_create": "Criar Senha"
         },
         "connectedAccounts": {
             "title": "Contas Conectadas",
@@ -49,7 +54,7 @@
         "status": {
             "PENDING": "Pendente",
             "ANALYZING": "Processando",
-            "DONE": "Auditado",
+            "DONE": "Analisado",
             "ERROR": "Erro"
         },
         "analysis": {
@@ -158,7 +163,11 @@
             "toast": {
                 "success": "Projeto criado com sucesso!",
                 "error": "Erro ao criar projeto. Tente novamente.",
-                "max_images": "Máximo de 3 imagens permitido."
+                "max_images": "Máximo de 3 imagens permitido.",
+                "already_exists": "Você já tem um projeto para este repositório.",
+                "repo_not_found": "Repositório não encontrado ou desconectado.",
+                "no_files": "Nenhuma imagem selecionada.",
+                "upload_failed": "Falha ao enviar as imagens do projeto."
             }
         },
         "settings_modal": {
@@ -292,6 +301,19 @@
         "currently": "Atualmente",
         "views": "visualizações",
         "likes": "curtidas",
+        "followers": "seguidores",
+        "following": "seguindo",
+        "follow": "Seguir",
+        "unfollow": "Seguindo",
+        "follows_you": "Segue você",
+        "network": {
+            "followers": "Seguidores",
+            "following": "Seguindo",
+            "search_placeholder": "Buscar usuários...",
+            "no_results": "Nenhum resultado encontrado",
+            "no_results_desc": "Tente buscar por outro nome ou username.",
+            "loading": "Carregando..."
+        },
         "edit_profile": "Editar Perfil",
         "edit_details": "Editar detalhes",
         "contact": "Contato",
@@ -356,6 +378,25 @@
             "skills_placeholder": "Digite uma habilidade e aperte Enter",
             "skills_none": "Nenhuma habilidade adicionada",
             "education_none": "Nenhuma formação listada"
+        },
+        "contact_section": {
+            "title": "Contato",
+            "phone_label": "Número de Celular",
+            "email_label": "E-mail",
+            "copy": "Copiar",
+            "copied": "Copiado!",
+            "edit": "Editar",
+            "save": "Salvar",
+            "cancel": "Cancelar",
+            "country_selector": "Selecione o País",
+            "phone_placeholder": "+55 (11) 99999-9999",
+            "email_placeholder": "exemplo@email.com",
+            "no_phone": "Nenhum telefone adicionado",
+            "no_email": "Nenhum e-mail adicionado",
+            "validation": {
+                "phone_invalid": "Número de telefone inválido",
+                "email_invalid": "Endereço de e-mail inválido"
+            }
         }
     },
     "validation": {
@@ -446,7 +487,7 @@
             "email_label": "E-mail",
             "password_label": "Senha",
             "confirm_password_label": "Confirmar Senha",
-            "username_placeholder": "seunome",
+            "username_placeholder": "Seu nome de usuário",
             "submit": "Criar conta",
             "submitting": "Criando conta...",
             "has_account": "Já tem uma conta?",

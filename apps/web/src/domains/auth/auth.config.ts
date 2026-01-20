@@ -15,6 +15,8 @@ export const authConfig = {
         token.name = user.name;
         token.image = user.image;
         token.username = (user as any).username;
+        // Check if user has password (password field exists and is not null in DB user object)
+        token.hasPassword = !!(user as any).password;
       }
 
       // When session.update() is called, fetch fresh user data from DB
@@ -25,7 +27,7 @@ export const authConfig = {
           const { prisma } = await import("@repo/database");
           const freshUser = await prisma.user.findUnique({
             where: { id: Number(token.id) },
-            select: { username: true, name: true, image: true, role: true, plan: true },
+            select: { username: true, name: true, image: true, role: true, plan: true, password: true },
           });
           if (freshUser) {
             token.username = freshUser.username;
@@ -33,6 +35,7 @@ export const authConfig = {
             token.image = freshUser.image;
             token.role = freshUser.role;
             token.plan = freshUser.plan;
+            token.hasPassword = !!freshUser.password;
           }
         }
       }
@@ -51,6 +54,7 @@ export const authConfig = {
         session.user.name = token.name as string;
         session.user.image = token.image as string;
         session.user.username = token.username as string;
+        session.user.hasPassword = token.hasPassword as boolean;
       }
 
       if (token.accessToken) {
@@ -122,6 +126,7 @@ declare module "next-auth" {
     role?: string;
     plan?: string;
     username?: string | null;
+    hasPassword?: boolean;
   }
 
   interface Session {
