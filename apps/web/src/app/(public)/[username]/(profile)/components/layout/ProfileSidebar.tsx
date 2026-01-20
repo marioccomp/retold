@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { FiGithub, FiLinkedin, FiCamera, FiGlobe, FiMail, FiCopy, FiSend } from "react-icons/fi";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,16 @@ type Props = {
 
 export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Props) {
     const { dict } = useTranslation();
+
+    const stats = useMemo(() => {
+        const totalViews = profile.projects.reduce((acc, p) => acc + (p.views || 0), 0);
+        const totalLikes = profile.projects.reduce((acc, p) => acc + (p.likes || 0), 0);
+
+        return {
+            views: totalViews >= 1000 ? `${(totalViews / 1000).toFixed(1)}k` : totalViews,
+            likes: totalLikes >= 1000 ? `${(totalLikes / 1000).toFixed(1)}k` : totalLikes
+        };
+    }, [profile.projects]);
 
     return (
         <aside className="flex flex-col items-center w-full md:pl-0 lg:pl-12">
@@ -127,10 +137,10 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                 {/* Stats */}
                 <div className="w-full flex border border-[#e7eae9] rounded-xl overflow-hidden bg-white shadow-sm">
                     <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] font-medium">
-                        <span className="block text-[1.1rem] font-bold text-[#152e2b]">12.5k</span> {dict.profile.views}
+                        <span className="block text-[1.1rem] font-bold text-[#152e2b]">{stats.views}</span> {dict.profile.views}
                     </p>
                     <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] border-l border-[#e7eae9] font-medium">
-                        <span className="block text-[1.1rem] font-bold text-[#152e2b]">482</span> {dict.profile.likes}
+                        <span className="block text-[1.1rem] font-bold text-[#152e2b]">{stats.likes}</span> {dict.profile.likes}
                     </p>
                 </div>
 
