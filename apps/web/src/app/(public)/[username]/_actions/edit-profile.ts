@@ -4,32 +4,24 @@ import { z } from "zod";
 
 import { userRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
-import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
-import { profileSchema, profileDetailsSchema } from "@/src/domains/profile/schemas/profile.schema";
-
-const checkNameSchema = registerSchema.pick({
-  name: true,
-});
-
-const checkUsernameSchema = registerSchema.pick({
-  username: true,
-});
-
-const checkBioSchema = profileSchema.pick({
-  bio: true,
-});
-
-const checkTitleSchema = profileSchema.pick({
-  title: true,
-});
+import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getProfileSchema, getProfileDetailsSchema } from "@/src/domains/profile/schemas/profile.schema";
+import { getDictionary } from "@/src/i18n/server";
 
 export async function changeTitle(title: string, userId: number): Promise<ActionResponse<string>> {
+  const dict = await getDictionary();
+  const profileSchema = getProfileSchema(dict);
+
+  const checkTitleSchema = profileSchema.pick({
+    title: true,
+  });
+
   const parsed = checkTitleSchema.safeParse({ title });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid title format",
+      message: dict.validation.title_format_invalid,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -40,7 +32,7 @@ export async function changeTitle(title: string, userId: number): Promise<Action
     if (!user.title) {
       return {
         success: false,
-        message: "User has no title set",
+        message: dict.validation.title_empty,
       };
     }
     return {
@@ -50,18 +42,25 @@ export async function changeTitle(title: string, userId: number): Promise<Action
   } catch (err) {
     return {
       success: false,
-      message: "Unexpected error, try again later",
+      message: dict.validation.generic_error,
     };
   }
 }
 
 export async function changeBio(bio: string, userId: number): Promise<ActionResponse<string>> {
+  const dict = await getDictionary();
+  const profileSchema = getProfileSchema(dict);
+
+  const checkBioSchema = profileSchema.pick({
+    bio: true,
+  });
+
   const parsed = checkBioSchema.safeParse({ bio });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid bio format",
+      message: dict.validation.bio_format_invalid,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -72,7 +71,7 @@ export async function changeBio(bio: string, userId: number): Promise<ActionResp
     if (!user.bio) {
       return {
         success: false,
-        message: "User has no bio set",
+        message: dict.validation.bio_empty,
       };
     }
     return {
@@ -82,18 +81,25 @@ export async function changeBio(bio: string, userId: number): Promise<ActionResp
   } catch (err) {
     return {
       success: false,
-      message: "Unexpected error, try again later",
+      message: dict.validation.generic_error,
     };
   }
 }
 
 export async function changeName(name: string, userId: number): Promise<ActionResponse<string>> {
+  const dict = await getDictionary();
+  const registerSchema = getRegisterSchema(dict);
+
+  const checkNameSchema = registerSchema.pick({
+    name: true,
+  });
+
   const parsed = checkNameSchema.safeParse({ name });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid name format",
+      message: dict.validation.name_format_invalid,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -104,7 +110,7 @@ export async function changeName(name: string, userId: number): Promise<ActionRe
     if (!user.name) {
       return {
         success: false,
-        message: "User has no name set",
+        message: dict.validation.name_empty,
       };
     }
     return {
@@ -114,26 +120,25 @@ export async function changeName(name: string, userId: number): Promise<ActionRe
   } catch (err) {
     return {
       success: false,
-      message: "Unexpected error, try again later",
+      message: dict.validation.generic_error,
     };
   }
 }
 
-const checkGithubUrlSchema = profileSchema.pick({
-  githubUrl: true,
-});
-
-const checkLinkedinUrlSchema = profileSchema.pick({
-  linkedinUrl: true,
-});
-
 export async function changeGithubUrl(githubUrl: string, userId: number): Promise<ActionResponse<string | null>> {
+  const dict = await getDictionary();
+  const profileSchema = getProfileSchema(dict);
+
+  const checkGithubUrlSchema = profileSchema.pick({
+    githubUrl: true,
+  });
+
   const parsed = checkGithubUrlSchema.safeParse({ githubUrl });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid URL format",
+      message: dict.validation.url_format_invalid,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -150,18 +155,25 @@ export async function changeGithubUrl(githubUrl: string, userId: number): Promis
   } catch (err) {
     return {
       success: false,
-      message: "Unexpected error, try again later",
+      message: dict.validation.generic_error,
     };
   }
 }
 
 export async function changeLinkedinUrl(linkedinUrl: string, userId: number): Promise<ActionResponse<string | null>> {
+  const dict = await getDictionary();
+  const profileSchema = getProfileSchema(dict);
+
+  const checkLinkedinUrlSchema = profileSchema.pick({
+    linkedinUrl: true,
+  });
+
   const parsed = checkLinkedinUrlSchema.safeParse({ linkedinUrl });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid URL format",
+      message: dict.validation.url_format_invalid,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -178,29 +190,40 @@ export async function changeLinkedinUrl(linkedinUrl: string, userId: number): Pr
   } catch (err) {
     return {
       success: false,
-      message: "Unexpected error, try again later",
+      message: dict.validation.generic_error,
     };
   }
 }
 
-const updateProfileSchema = z.object({
-  name: checkNameSchema.shape.name,
-  title: checkTitleSchema.shape.title,
-  bio: checkBioSchema.shape.bio,
-  githubUrl: checkGithubUrlSchema.shape.githubUrl,
-  linkedinUrl: checkLinkedinUrlSchema.shape.linkedinUrl,
-});
-
 export async function updateProfile(
-  data: z.infer<typeof updateProfileSchema>,
+  data: any, // Using any here because inferred Zod type depends on dict
   userId: number
 ): Promise<ActionResponse<any>> {
+  const dict = await getDictionary();
+  const registerSchema = getRegisterSchema(dict);
+  const profileSchema = getProfileSchema(dict);
+
+  const checkNameSchema = registerSchema.pick({ name: true });
+  const checkTitleSchema = profileSchema.pick({ title: true });
+  const checkBioSchema = profileSchema.pick({ bio: true });
+  const checkGithubUrlSchema = profileSchema.pick({ githubUrl: true });
+  const checkLinkedinUrlSchema = profileSchema.pick({ linkedinUrl: true });
+
+  const updateProfileSchema = z.object({
+    name: checkNameSchema.shape.name,
+    title: checkTitleSchema.shape.title,
+    bio: checkBioSchema.shape.bio,
+    githubUrl: checkGithubUrlSchema.shape.githubUrl,
+    linkedinUrl: checkLinkedinUrlSchema.shape.linkedinUrl,
+    websiteUrl: profileSchema.shape.websiteUrl,
+  });
+
   const parsed = updateProfileSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid data",
+      message: dict.auth.errors.invalid_fields,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -212,6 +235,7 @@ export async function updateProfile(
       bio: parsed.data.bio,
       githubUrl: parsed.data.githubUrl || null,
       linkedinUrl: parsed.data.linkedinUrl || null,
+      websiteUrl: parsed.data.websiteUrl || null,
     });
 
     return {
@@ -221,23 +245,25 @@ export async function updateProfile(
   } catch (err) {
     return {
       success: false,
-      message: "Unexpected error, try again later",
+      message: dict.validation.generic_error,
     };
   }
 }
 
-const updateProfileDetailsSchema = profileDetailsSchema.partial();
-
 export async function updateProfileDetails(
-  data: z.infer<typeof updateProfileDetailsSchema>,
+  data: any, // Using any because inferred type depends on dict
   userId: number
 ): Promise<ActionResponse<any>> {
+  const dict = await getDictionary();
+  const profileDetailsSchema = getProfileDetailsSchema(dict);
+  const updateProfileDetailsSchema = profileDetailsSchema.partial();
+
   const parsed = updateProfileDetailsSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid data",
+      message: dict.auth.errors.invalid_fields,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -246,7 +272,7 @@ export async function updateProfileDetails(
     const user = await userRepository.updateProfileDetails(userId, {
       longBio: parsed.data.longBio ?? undefined,
       skills: parsed.data.skills ?? undefined,
-      educations: parsed.data.educations?.map(edu => ({
+      educations: parsed.data.educations?.map((edu: any) => ({
         ...edu,
         startDate: new Date(edu.startDate),
         endDate: edu.endDate ? new Date(edu.endDate) : null,
@@ -261,7 +287,7 @@ export async function updateProfileDetails(
     console.error(err);
     return {
       success: false,
-      message: "Unexpected error updating details",
+      message: dict.validation.details_update_error,
     };
   }
 }

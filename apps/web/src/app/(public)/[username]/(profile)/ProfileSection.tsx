@@ -47,8 +47,6 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
         projectsCount: profile.projects.length
     };
 
-    const pinnedProject = profile.projects[0];
-
     return (
         <div className="flex flex-col gap-10 animate-[fadeIn_0.6s_ease-out_forwards] pb-24 relative">
             {/* 1. About Section */}
@@ -60,7 +58,10 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
             />
 
             {/* 2. Pinned Projects Section */}
-            <ProfilePinnedProject project={pinnedProject} />
+            <ProfilePinnedProject
+                allProjects={profile.projects}
+                ownProfile={ownProfile}
+            />
 
             {/* 3. Stats Section */}
             <ProfileStats stats={stats} />

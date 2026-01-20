@@ -17,6 +17,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
   return {
     id: user.id,
     username: user.username ?? "",
+    email: user.email,
     name: user.name,
     title: user.title,
     bio: user.bio,
@@ -25,6 +26,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
     image: user.image,
     githubUrl: user.githubUrl,
     linkedinUrl: user.linkedinUrl,
+    websiteUrl: user.websiteUrl,
     createdAt: user.createdAt.toISOString(),
 
     educations: (user.educations || []).map((edu) => ({
@@ -35,7 +37,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
       endDate: edu.endDate?.toISOString() ?? null,
     })),
 
-    projects: user.projects.map((project) => ({
+    projects: user.projects.map((project: any) => ({
       id: project.id,
       title: project.title,
       description: project.description,
@@ -44,11 +46,11 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
 
       createdAt: project.createdAt.toISOString(),
 
-      // tem q implementar
-      likes: 0,
-      views: 0,
+      likes: project._count?.likes ?? 0,
+      views: project.views ?? 0,
+      hasLiked: project.likes && project.likes.length > 0,
 
-      tags: project.tags.map((tag) => ({
+      tags: project.tags.map((tag: any) => ({
         id: tag.id,
         name: tag.name,
       })),
@@ -59,6 +61,8 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
 
       repositoryUrl: project.repository?.url,
       repositoryFullName: project.repository?.fullName,
+
+      isPinned: project.isPinned,
     })),
 
     certifications: user.certifications.map((certification) => ({

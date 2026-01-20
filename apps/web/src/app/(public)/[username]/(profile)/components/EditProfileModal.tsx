@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FiX, FiGithub, FiLinkedin, FiUser, FiType, FiAlignLeft, FiCamera } from "react-icons/fi";
+import { FiX, FiGithub, FiLinkedin, FiUser, FiType, FiAlignLeft, FiCamera, FiGlobe } from "react-icons/fi";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProfile } from "../../_actions/edit-profile";
@@ -31,8 +31,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
     const [bio, setBio] = useState(profile.bio ?? "");
     const [githubUrl, setGithubUrl] = useState(profile.githubUrl ?? "");
     const [linkedinUrl, setLinkedinUrl] = useState(profile.linkedinUrl ?? "");
+    const [websiteUrl, setWebsiteUrl] = useState(profile.websiteUrl ?? "");
     const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.image ?? null);
     const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const queryClient = useQueryClient();
@@ -44,6 +46,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             setBio(profile.bio ?? "");
             setGithubUrl(profile.githubUrl ?? "");
             setLinkedinUrl(profile.linkedinUrl ?? "");
+            setWebsiteUrl(profile.websiteUrl ?? "");
             setAvatarPreview(profile.image ?? null);
         }
     }, [isOpen, profile]);
@@ -57,6 +60,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                     bio,
                     githubUrl,
                     linkedinUrl,
+                    websiteUrl,
                 },
                 profile.id
             );
@@ -65,6 +69,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             if (!data.success) {
                 // Se houver erros de campo específicos, mostre o primeiro encontrado
                 if (data.fieldErrors) {
+                    console.log(data.fieldErrors);
                     const firstError = Object.values(data.fieldErrors).flat()[0];
                     if (firstError) {
                         toast.error(firstError);
@@ -86,8 +91,15 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
         },
     });
 
-    async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
+    async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) {
+        let file: File | undefined;
+
+        if ('target' in e && (e.target as HTMLInputElement).files) {
+            file = (e.target as HTMLInputElement).files?.[0];
+        } else if ('dataTransfer' in e) {
+            file = e.dataTransfer.files?.[0];
+        }
+
         if (!file) return;
 
         // Show preview immediately
@@ -120,10 +132,28 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             toast.error(dict.profile.edit_modal.avatar_error);
             setAvatarPreview(profile.image ?? null);
         } finally {
-            setIsUploadingAvatar(false);
-            URL.revokeObjectURL(previewUrl);
+            setIsUploadingAvatar(true); // Wait a bit before clearing to avoid jump
+            setTimeout(() => {
+                setIsUploadingAvatar(false);
+                URL.revokeObjectURL(previewUrl);
+            }, 500);
         }
     }
+
+    const onDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const onDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const onDrop = async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        handleAvatarChange(e);
+    };
 
     if (!isOpen) return null;
 
@@ -153,31 +183,40 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 {/* Content */}
                 <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-5">
                     {/* Avatar Upload */}
-                    <div className="flex flex-col items-center gap-3">
+                    <div
+                        className={`flex flex-col items-center py-6 rounded-2xl border-2 border-dashed transition-all duration-200 relative group cursor-pointer
+                            ${isDragging ? 'border-[#05dc7f] bg-[rgba(5,220,127,0.05)] scale-[1.01]' : 'border-[#e7eae9] bg-[#fcfdfd] hover:border-[#05dc7f] hover:bg-[#f3faf8]'}
+                            ${isUploadingAvatar ? 'pointer-events-none opacity-80' : ''}
+                        `}
+                        onDragOver={onDragOver}
+                        onDragLeave={onDragLeave}
+                        onDrop={onDrop}
+                        onClick={() => fileInputRef.current?.click()}
+                    >
                         <div className="relative">
-                            <Avatar className="w-24 h-24 border-2 border-[#e7eae9]">
+                            <Avatar className={`w-28 h-28 border-4 border-white shadow-md transition-transform duration-300 ${isDragging ? 'scale-110' : 'group-hover:scale-105'}`}>
                                 <AvatarImage
                                     src={avatarPreview ?? undefined}
                                     alt={dict.profile.alt_avatar}
                                     className="object-cover"
                                 />
-                                <AvatarFallback className="text-2xl font-bold text-[#152e2b] bg-[#f3f6f5]">
+                                <AvatarFallback className="text-3xl font-bold text-[#152e2b] bg-[#f3f6f5]">
                                     {(profile.name || username || "U").charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
-                            <Button
-                                size="icon"
-                                type="button"
-                                disabled={isUploadingAvatar}
-                                onClick={() => fileInputRef.current?.click()}
-                                className="absolute bottom-0 right-0 w-8 h-8 rounded-full border-none bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] hover:scale-105 transition-all duration-200 cursor-pointer"
-                            >
+
+                            {/* Overlay on hover inside modal */}
+                            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <FiCamera className="text-white" size={24} />
+                            </div>
+
+                            <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-white bg-[#05dc7f] text-[#0f2f28] flex items-center justify-center shadow-sm z-10 transition-transform group-hover:scale-110">
                                 {isUploadingAvatar ? (
                                     <span className="w-4 h-4 border-2 border-[#0f2f28] border-t-transparent rounded-full animate-spin" />
                                 ) : (
-                                    <FiCamera size={14} />
+                                    <FiCamera size={16} />
                                 )}
-                            </Button>
+                            </div>
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -187,7 +226,14 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                                 className="hidden"
                             />
                         </div>
-                        <span className="text-xs text-[#6b7c7a]">{dict.profile.edit_modal.avatar_hint}</span>
+                        <div className="mt-4 flex flex-col items-center gap-1">
+                            <span className="text-sm font-semibold text-[#152e2b]">
+                                {isUploadingAvatar ? dict.profile.edit_modal.saving : dict.profile.change_photo}
+                            </span>
+                            <span className="text-xs text-[#6b7c7a] text-center px-4">
+                                {isDragging ? "Solte para enviar" : dict.profile.edit_modal.avatar_hint + " ou arraste uma foto"}
+                            </span>
+                        </div>
                     </div>
 
                     <div className="h-px bg-[#e7eae9] my-1" />
@@ -274,6 +320,20 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                                 onChange={(e) => setLinkedinUrl(e.target.value)}
                                 className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
                                 placeholder={dict.profile.edit_modal.linkedin_placeholder}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
+                                <FiGlobe className="text-[#05dc7f]" />
+                                {dict.profile.edit_modal.website_label}
+                            </Label>
+                            <Input
+                                type="text"
+                                value={websiteUrl}
+                                onChange={(e) => setWebsiteUrl(e.target.value)}
+                                className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
+                                placeholder={dict.profile.edit_modal.website_placeholder}
                             />
                         </div>
                     </div>

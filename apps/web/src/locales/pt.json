@@ -14,7 +14,12 @@
             "title": "Excluir Conta",
             "description": "Exclua permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita. Todos os seus dados de projeto serão perdidos.",
             "button": "Excluir Conta",
-            "buttonDeleting": "Excluindo..."
+            "buttonDeleting": "Excluindo...",
+            "toast": {
+                "update_error": "Falha ao atualizar senha",
+                "delete_error": "Falha ao excluir conta",
+                "delete_confirm": "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita e excluirá todos os seus projetos e dados."
+            }
         },
         "password": {
             "title": "Alterar Senha",
@@ -23,7 +28,13 @@
             "new": "Nova Senha",
             "confirm": "Confirmar Nova Senha",
             "button": "Atualizar Senha",
-            "buttonUpdating": "Atualizando..."
+            "buttonUpdating": "Atualizando...",
+            "errors": {
+                "user_not_found": "Usuário não encontrado ou senha não definida",
+                "incorrect_password": "Senha incorreta",
+                "unauthorized": "Não autorizado"
+            },
+            "success_message": "Senha atualizada com sucesso"
         },
         "connectedAccounts": {
             "title": "Contas Conectadas",
@@ -40,6 +51,10 @@
             "ANALYZING": "Processando",
             "DONE": "Auditado",
             "ERROR": "Erro"
+        },
+        "analysis": {
+            "started": "Análise iniciada",
+            "start_error": "Falha ao iniciar análise"
         },
         "metrics": {
             "language": "Linguagem",
@@ -264,13 +279,26 @@
         "stat_prs": "Pull Requests",
         "stat_issues": "Issues",
         "stat_projects": "Projetos analisados",
-        "pinned_projects_empty": "Nenhum projeto em destaque ainda",
+        "pinned_projects_empty": "Este usuário ainda não fixou nenhum projeto.",
+        "add_pinned_project": "Adicionar Projeto Fixado",
+        "select_project_to_pin": "Selecione um projeto para fixar",
+        "pin_error_limit_reached": "Você só pode fixar até 3 projetos.",
+        "unpin_project": "Desafixar Projeto",
+        "search_projects_placeholder": "Buscar projetos...",
+        "success": "Sucesso",
+        "error": "Erro",
+        "unexpected_error": "Ocorreu um erro inesperado.",
+        "saving": "Salvando...",
         "currently": "Atualmente",
         "views": "visualizações",
         "likes": "curtidas",
         "edit_profile": "Editar Perfil",
         "edit_details": "Editar detalhes",
         "contact": "Contato",
+        "copy_email": "Copiar E-mail",
+        "send_email": "Enviar E-mail",
+        "email_copied": "E-mail copiado para a área de transferência!",
+        "no_email_error": "Este usuário não disponibilizou e-mail",
         "search_placeholder": "Buscar...",
         "tabs": {
             "projects": "Projetos",
@@ -282,6 +310,10 @@
         "new_project": "Novo projeto",
         "new_certification": "Nova certificação",
         "new_participation": "Nova participação",
+        "no_projects_found": {
+            "title": "Nenhum projeto ainda",
+            "description": "Este usuário ainda não publicou nenhum projeto aqui."
+        },
         "edit_modal": {
             "title": "Editar Perfil",
             "name_label": "Nome",
@@ -295,6 +327,8 @@
             "github_placeholder": "github.com/seu-usuario",
             "linkedin_label": "URL do LinkedIn",
             "linkedin_placeholder": "linkedin.com/in/seu-usuario",
+            "website_label": "Website / Portfólio",
+            "website_placeholder": "seu-site.com",
             "cancel": "Cancelar",
             "save": "Salvar Alterações",
             "saving": "Salvando...",
@@ -338,9 +372,51 @@
         "password_help": "6–17 caracteres",
         "passwords_dont_match": "As senhas não coincidem",
         "fields_invalid": "Campos inválidos",
-        "generic_error": "Erro inesperado. Por favor, tente novamente."
+        "generic_error": "Erro inesperado. Por favor, tente novamente.",
+        "identifier_required": "E-mail ou usuário é obrigatório",
+        "password_required": "Senha é obrigatória",
+        "name_min": "Nome deve ter pelo menos 3 caracteres",
+        "name_max": "Nome deve ter no máximo 20 caracteres",
+        "username_min": "Usuário deve ter pelo menos 3 caracteres",
+        "username_max": "Usuário deve ter no máximo 20 caracteres",
+        "username_regex": "Usuário deve conter apenas letras, números e sublinhados",
+        "current_password_required": "Senha atual é obrigatória",
+        "confirm_password_required": "Confirmação de senha é obrigatória",
+        "title_max": "Título deve ter no máximo 50 caracteres",
+        "headline_max": "Headline deve ter no máximo 100 caracteres",
+        "github_invalid": "Use o formato: github.com/seu-usuario",
+        "linkedin_invalid": "Use o formato: linkedin.com/in/seu-usuario",
+        "url_invalid": "URL inválida",
+        "course_required": "Curso é obrigatório",
+        "institution_required": "Instituição é obrigatória",
+        "start_date_required": "Data de início é obrigatória",
+        "title_format_invalid": "Formato de título inválido",
+        "title_empty": "Usuário não possui título definido",
+        "bio_format_invalid": "Formato de bio inválido",
+        "bio_empty": "Usuário não possui bio definida",
+        "name_format_invalid": "Formato de nome inválido",
+        "name_empty": "Usuário não possui nome definido",
+        "url_format_invalid": "Formato de URL inválido",
+        "details_update_error": "Erro inesperado ao atualizar detalhes"
     },
     "auth": {
+        "errors": {
+            "title": "Erro de Autenticação",
+            "incorrect_credentials": "E-mail/usuário ou senha incorretos",
+            "too_many_attempts": "Muitas tentativas de login. Tente novamente mais tarde.",
+            "login_generic": "Não foi possível entrar. Tente novamente.",
+            "invalid_fields": "Campos inválidos",
+            "passwords_mismatch": "As senhas não coincidem",
+            "email_in_use": "Este e-mail já está em uso",
+            "username_in_use": "Este nome de usuário já está em uso",
+            "create_account_generic": "Não foi possível criar conta. Tente novamente.",
+            "unauthorized": "Você precisa estar logado",
+            "invalid_username": "Nome de usuário inválido",
+            "invalid_email": "Endereço de e-mail inválido",
+            "user_not_found": "Usuário resultante não encontrado",
+            "forgot_password_success": "Se este endereço de e-mail estiver registrado, você receberá um link de recuperação.",
+            "reset_password_error": "Link de recuperação inválido ou expirado."
+        },
         "login": {
             "welcome_title": "Bem-vindo ao Retold",
             "welcome_subtitle": "Conectando talento com oportunidade. Construa sua história profissional e abra novas possibilidades.",
@@ -402,6 +478,27 @@
             "invalid_link_desc": "Token não encontrado na URL. Certifique-se de que você acessou esta página a partir do link enviado para o seu e-mail.",
             "back_to_login": "Voltar para o Login",
             "loading": "Carregando..."
+        },
+        "choose_username": {
+            "welcome_title": "Quase lá!",
+            "welcome_subtitle": "Apenas mais um passo para completar seu perfil. Escolha um nome de usuário único que represente você.",
+            "feature_identity": "Sua identidade única no Retold",
+            "feature_share": "Fácil de compartilhar e lembrar",
+            "feature_url": "Sua URL de portfólio pessoal",
+            "title": "Escolha seu nome de usuário",
+            "welcome_prefix": "Bem-vindo, ",
+            "welcome_suffix": "! Escolha um nome de usuário único para continuar.",
+            "subtitle_default": "Escolha um nome de usuário único que será sua identidade no Retold.",
+            "username_label": "Nome de usuário",
+            "username_placeholder": "seu nome de usuário",
+            "error_generic": "Algo deu errado. Por favor, tente novamente.",
+            "toast_welcome": "Bem-vindo ao Retold, @{username}",
+            "continue": "Continuar",
+            "setting_up": "Configurando...",
+            "preview_label": "Seu perfil estará disponível em:",
+            "help_text": "3–20 caracteres, apenas letras, números e sublinhados",
+            "checking": "Verificando nome de usuário...",
+            "available": "Nome de usuário disponível"
         }
     }
 }

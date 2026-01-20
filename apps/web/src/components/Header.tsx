@@ -92,7 +92,7 @@ export default function Header({ session: initialSession }: { session: Session |
           {status === "authenticated" ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-[#05dc7f] focus:ring-offset-2 transition-all cursor-pointer border-none bg-transparent p-0">
+                <button className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#05dc7f] focus-visible:ring-offset-2 transition-all cursor-pointer border-none bg-transparent p-0">
                   <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-[#05dc7f]/50 transition-all">
                     {userImage ? (
                       <AvatarImage src={userImage} alt={userName} className="object-cover" />

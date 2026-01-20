@@ -17,10 +17,11 @@ interface ProjectRequestDTO {
     tags: ProjectCardTagDTO[];
     likes: number;
     views: number;
+    hasLiked?: boolean;
 }
 
 export function mapProjectToProjectDTO(request: ProjectRequestDTO): ProjectCardDTO {
-    const { project, user, repository, tags, likes, views } = request;
+    const { project, user, repository, tags, likes, views, hasLiked } = request;
     return {
         id: project.id,
         title: project.title,
@@ -29,6 +30,7 @@ export function mapProjectToProjectDTO(request: ProjectRequestDTO): ProjectCardD
         images: project.images,
         likes: likes,
         views: views,
+        hasLiked: hasLiked,
         tags: tags,
         createdAt: project.createdAt.toISOString(),
         ownerName: user.name,

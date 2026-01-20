@@ -5,26 +5,28 @@ import { userRepository, prisma } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 import { auth } from "@/src/domains/auth/auth";
 import { revalidatePath } from "next/cache";
-
-const usernameSchema = z.object({
-    username: z
-        .string()
-        .min(3, "Username must have at least 3 characters")
-        .max(20, "Username must have at most 20 characters")
-        .regex(
-            /^[a-zA-Z0-9_]+$/,
-            "Username can only contain letters, numbers, and underscores"
-        )
-        .transform((u) => u.toLowerCase()),
-});
+import { getDictionary } from "@/src/i18n/server";
 
 export async function setUsername(formData: FormData): Promise<ActionResponse<{ username: string }>> {
     const session = await auth();
+    const dict = await getDictionary();
+
+    const usernameSchema = z.object({
+        username: z
+            .string()
+            .min(3, dict.validation.username_min)
+            .max(20, dict.validation.username_max)
+            .regex(
+                /^[a-zA-Z0-9_]+$/,
+                dict.validation.username_regex
+            )
+            .transform((u) => u.toLowerCase()),
+    });
 
     if (!session?.user?.id) {
         return {
             success: false,
-            message: "You must be logged in",
+            message: dict.auth.errors.unauthorized,
         };
     }
 
@@ -37,7 +39,7 @@ export async function setUsername(formData: FormData): Promise<ActionResponse<{ 
     if (!parsed.success) {
         return {
             success: false,
-            message: "Invalid username",
+            message: dict.auth.errors.invalid_username,
             fieldErrors: parsed.error.flatten().fieldErrors,
         };
     }
@@ -49,9 +51,9 @@ export async function setUsername(formData: FormData): Promise<ActionResponse<{ 
     if (existing && existing.id !== userId) {
         return {
             success: false,
-            message: "Username already in use",
+            message: dict.auth.errors.username_in_use,
             fieldErrors: {
-                username: ["Username already in use"],
+                username: [dict.auth.errors.username_in_use],
             },
         };
     }

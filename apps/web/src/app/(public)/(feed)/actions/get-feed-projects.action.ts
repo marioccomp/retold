@@ -2,8 +2,12 @@
 
 import { prisma } from "@repo/database"
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto"
+import { auth } from "@/src/domains/auth/auth"
 
 export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
+    const session = await auth()
+    const currentUserId = session?.user?.id ? Number(session.user.id) : null
+
     const projects = await prisma.project.findMany({
         take: 20,
         orderBy: { createdAt: "desc" },
@@ -27,7 +31,20 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
                     url: true,
                     fullName: true,
                 }
-            }
+            },
+            _count: {
+                select: {
+                    likes: true
+                }
+            },
+            likes: currentUserId ? {
+                where: {
+                    userId: currentUserId
+                },
+                select: {
+                    userId: true
+                }
+            } : false
         }
     })
 
@@ -37,8 +54,9 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
         description: project.description,
         status: project.status,
         images: project.images,
-        likes: 0, // TODO: implement likes count
-        views: 0, // TODO: implement views count
+        likes: project._count.likes,
+        views: project.views,
+        hasLiked: project.likes && project.likes.length > 0,
         tags: project.tags.map((tag) => ({
             id: tag.id,
             name: tag.name,

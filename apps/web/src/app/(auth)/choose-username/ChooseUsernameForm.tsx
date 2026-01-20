@@ -10,6 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { useTranslation } from "@/src/i18n/client";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface ChooseUsernameFormProps {
 }
 
 export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps) {
+    const { dict } = useTranslation();
     const router = useRouter();
     const { update, data: session } = useSession();
     const [usernameError, setUsernameError] = useState<string | null>(null);
@@ -39,7 +41,7 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                 return;
             }
 
-            toast.success(`Welcome to Retold, @${res.data!.username}`);
+            toast.success(dict.auth.choose_username.toast_welcome.replace("{username}", res.data!.username));
 
 
             const teste = await update({
@@ -62,7 +64,7 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
         },
 
         onError: () => {
-            toast.error("Something went wrong. Please try again.");
+            toast.error(dict.auth.choose_username.error_generic);
         },
     });
 
@@ -117,25 +119,25 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                     />
 
                     <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-                        Almost there!
+                        {dict.auth.choose_username.welcome_title}
                     </h1>
                     <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
-                        Just one more step to complete your profile. Choose a unique username that represents you.
+                        {dict.auth.choose_username.welcome_subtitle}
                     </p>
 
                     {/* Feature highlights */}
                     <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
                         <div className="flex items-center gap-3 text-gray-700">
                             <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-                            <span>Your unique identity on Retold</span>
+                            <span>{dict.auth.choose_username.feature_identity}</span>
                         </div>
                         <div className="flex items-center gap-3 text-gray-700">
                             <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-                            <span>Easy to share and remember</span>
+                            <span>{dict.auth.choose_username.feature_share}</span>
                         </div>
                         <div className="flex items-center gap-3 text-gray-700">
                             <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
-                            <span>Your personal portfolio URL</span>
+                            <span>{dict.auth.choose_username.feature_url}</span>
                         </div>
                     </div>
                 </div>
@@ -157,13 +159,13 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                     {/* Form header */}
                     <div className="mb-8">
                         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
-                            Choose your username
+                            {dict.auth.choose_username.title}
                         </h2>
                         <p className="text-gray-500 text-center">
                             {userName ? (
-                                <>Welcome, <span className="font-medium text-gray-700">{userName}</span>! Pick a unique username to continue.</>
+                                <>{dict.auth.choose_username.welcome_prefix}<span className="font-medium text-gray-700">{userName}</span>{dict.auth.choose_username.welcome_suffix}</>
                             ) : (
-                                <>Pick a unique username that will be your identity on Retold.</>
+                                <>{dict.auth.choose_username.subtitle_default}</>
                             )}
                         </p>
                     </div>
@@ -172,7 +174,7 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                         {/* Username Input */}
                         <div className="space-y-1">
                             <Label htmlFor="username" className="text-gray-700 font-medium">
-                                Username
+                                {dict.auth.choose_username.username_label}
                             </Label>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 select-none">
@@ -181,7 +183,7 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                                 <Input
                                     id="username"
                                     name="username"
-                                    placeholder="yourhandle"
+                                    placeholder={dict.auth.choose_username.username_placeholder}
                                     required
                                     autoFocus
                                     className="h-11 pl-8 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
@@ -230,13 +232,13 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                                 />
                             </div>
                             {usernameHelpVisible && (
-                                <p className="text-xs text-gray-400 mt-1">3–20 characters, letters, numbers, and underscores only</p>
+                                <p className="text-xs text-gray-400 mt-1">{dict.auth.choose_username.help_text}</p>
                             )}
                             {checkUsernameMutation.isPending && (
-                                <p className="text-xs text-gray-400 mt-1">Checking username...</p>
+                                <p className="text-xs text-gray-400 mt-1">{dict.auth.choose_username.checking}</p>
                             )}
                             {usernameAvailable && (
-                                <p className="text-xs text-green-500 mt-1">Username available</p>
+                                <p className="text-xs text-green-500 mt-1">{dict.auth.choose_username.available}</p>
                             )}
                             {usernameError && (
                                 <p className="text-red-500 text-xs mt-1">
@@ -249,7 +251,7 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                         {!usernameHelpVisible && usernameAvailable && (
                             <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mt-4">
                                 <p className="text-sm text-emerald-800">
-                                    Your profile will be available at:
+                                    {dict.auth.choose_username.preview_label}
                                 </p>
                                 <p className="text-sm font-medium text-emerald-900 mt-1">
                                     retold.com.br/<span className="text-[#05dc7f]">{lastCheckedUsername}</span>
@@ -274,10 +276,10 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
-                                    Setting up...
+                                    {dict.auth.choose_username.setting_up}
                                 </span>
                             ) : (
-                                "Continue"
+                                dict.auth.choose_username.continue
                             )}
                         </Button>
                     </form>

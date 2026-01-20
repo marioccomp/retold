@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslation } from "@/src/i18n/client";
 import {
     getProjectAnalysisAction,
     startProjectAnalysisAction,
@@ -8,6 +9,7 @@ import {
 import { ProjectForOverlay } from "../types";
 
 export function useProjectAnalysis(project: ProjectForOverlay) {
+    const { dict } = useTranslation();
     const queryClient = useQueryClient();
 
     const { data, isFetching, refetch } = useQuery({
@@ -25,15 +27,15 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
         try {
             const result = await startProjectAnalysisAction(project.id);
             if (result.queued) {
-                toast.success("Analysis started");
+                toast.success(dict.project.analysis.started);
                 refetch();
                 queryClient.invalidateQueries({ queryKey: ["projects"] });
             } else {
-                toast.error("Failed to start analysis");
+                toast.error(dict.project.analysis.start_error);
             }
         } catch (err) {
             console.error(err);
-            toast.error("Failed to start analysis");
+            toast.error(dict.project.analysis.start_error);
         }
     };
 

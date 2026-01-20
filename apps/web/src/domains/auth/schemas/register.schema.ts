@@ -2,51 +2,56 @@ import { z } from "zod";
 
 const trim = (v: unknown) => (typeof v === "string" ? v.trim() : v);
 
-export const passwordSchema = z.string().min(6, "Password must have at least 6 characters").max(17, "Password must have at most 17 characters");
+export const getPasswordSchema = (dict: any) =>
+  z.string()
+    .min(6, dict.validation.password_min)
+    .max(17, dict.validation.password_max);
 
-export const registerSchema = z
-  .object({
+export const getRegisterSchema = (dict: any) =>
+  z.object({
     name: z.preprocess(
       trim,
-      z.string().min(3, "Name must have at least 3 characters").max(20, "Name must have at most 20 characters")
+      z.string()
+        .min(3, dict.validation.name_min)
+        .max(20, dict.validation.name_max)
     ),
 
-    username: z.preprocess(trim, z.string().min(3, "Username must have at least 3 characters").max(20, "Username must have at most 20 characters")),
+    username: z.preprocess(
+      trim,
+      z.string()
+        .min(3, dict.validation.username_min)
+        .max(20, dict.validation.username_max)
+    ),
 
     email: z.preprocess(
       trim,
-      z.string().email("Invalid email format").transform((e) => e.toLowerCase())
+      z.string()
+        .email(dict.validation.email_invalid)
+        .transform((e) => e.toLowerCase())
     ),
 
-    password: passwordSchema,
+    password: getPasswordSchema(dict),
 
     confirmPassword: z.string(),
   })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
-      ctx.addIssue({
-        path: ["confirmPassword"],
-        message: "Passwords do not match",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  });
+    .superRefine((data, ctx) => {
+      if (data.password !== data.confirmPassword) {
+        ctx.addIssue({
+          path: ["confirmPassword"],
+          message: dict.auth.errors.passwords_mismatch,
+          code: z.ZodIssueCode.custom,
+        });
+      }
+    });
 
 // Schema for updating password in settings
-export const updatePasswordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: passwordSchema,
-  confirmPassword: z.string().min(1, "Confirm password is required"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+export const getUpdatePasswordSchema = (dict: any) =>
+  z.object({
+    currentPassword: z.string().min(1, dict.validation.current_password_required),
+    newPassword: getPasswordSchema(dict),
+    confirmPassword: z.string().min(1, dict.validation.confirm_password_required),
+  }).refine((data) => data.newPassword === data.confirmPassword, {
+    message: dict.auth.errors.passwords_mismatch,
+    path: ["confirmPassword"],
+  });
 
-
-
-// password: z    --> PRA USAR REGEX
-// .string()
-// .min(8)
-// .max(64)
-// .regex(/[A-Z]/, "Must contain an uppercase letter")
-// .regex(/[0-9]/, "Must contain a number"),

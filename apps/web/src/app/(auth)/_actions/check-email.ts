@@ -3,19 +3,23 @@
 import { userRepository } from "@repo/database";
 import { z } from "zod";
 import { ActionResponse } from "@/lib/action-response";
-import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
-
-const checkEmailSchema = registerSchema.pick({
-  email: true,
-});
+import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getDictionary } from "@/src/i18n/server";
 
 export async function checkEmail(email: string): Promise<ActionResponse> {
+  const dict = await getDictionary();
+  const registerSchema = getRegisterSchema(dict);
+
+  const checkEmailSchema = registerSchema.pick({
+    email: true,
+  });
+
   const parsed = checkEmailSchema.safeParse({ email });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid email address",
+      message: dict.auth.errors.invalid_email,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -25,9 +29,9 @@ export async function checkEmail(email: string): Promise<ActionResponse> {
   if (user) {
     return {
       success: false,
-      message: "Email already in use",
+      message: dict.auth.errors.email_in_use,
       fieldErrors: {
-        email: ["Email already in use"],
+        email: [dict.auth.errors.email_in_use],
       },
     };
   }

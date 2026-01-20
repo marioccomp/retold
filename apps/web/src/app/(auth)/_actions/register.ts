@@ -4,7 +4,8 @@ import { z } from "zod";
 import { registerUser } from "@/src/domains/auth/services/register.service";
 import type { ActionResponse } from "@/lib/action-response";
 import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/domains/auth/auth.errors";
-import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getDictionary } from "@/src/i18n/server";
 
 type RegisterResponseData = {
   email: string;
@@ -12,6 +13,9 @@ type RegisterResponseData = {
 };
 
 export async function register(formData: FormData): Promise<ActionResponse<RegisterResponseData>> {
+  const dict = await getDictionary();
+  const registerSchema = getRegisterSchema(dict);
+
   const data = Object.fromEntries(formData.entries());
 
   const parsed = registerSchema.safeParse(data);
@@ -19,13 +23,13 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors;
 
-    if (fieldErrors.password?.includes("Passwords do not match")) {
-      fieldErrors.password = ["Passwords do not match"];
+    if (fieldErrors.password?.includes(dict.auth.errors.passwords_mismatch)) {
+      fieldErrors.password = [dict.auth.errors.passwords_mismatch];
     }
 
     return {
       success: false,
-      message: "Invalid fields",
+      message: dict.auth.errors.invalid_fields,
       fieldErrors,
     };
   }
@@ -45,9 +49,9 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
     if (error instanceof EmailAlreadyInUseError) {
       return {
         success: false,
-        message: "This email is already in use",
+        message: dict.auth.errors.email_in_use,
         fieldErrors: {
-          email: ["This email is already in use"],
+          email: [dict.auth.errors.email_in_use],
         },
       };
     }
@@ -55,9 +59,9 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
     if (error instanceof UsernameAlreadyInUseError) {
       return {
         success: false,
-        message: "This username is already in use",
+        message: dict.auth.errors.username_in_use,
         fieldErrors: {
-          username: ["This username is already in use"],
+          username: [dict.auth.errors.username_in_use],
         },
       };
     }
@@ -65,7 +69,7 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
     console.error("Register error:", error);
     return {
       success: false,
-      message: "Unable to create account. Please try again.",
+      message: dict.auth.errors.create_account_generic,
     };
   }
 }

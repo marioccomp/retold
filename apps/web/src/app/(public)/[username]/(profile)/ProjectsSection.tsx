@@ -9,6 +9,7 @@ import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { useTranslation } from "@/src/i18n/client";
 
@@ -94,13 +95,13 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   // Se está criando, mostrar apenas o painel de criação
   if (isCreating) {
     return (
-      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out]">
+      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] relative">
         <Button
           variant="ghost"
-          className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-[#6b7c7a] hover:bg-[#05dc7f]/5 hover:text-[#05dc7f] w-fit group h-auto transition-all rounded-full md:rounded-none bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-gray-100 md:border-transparent shadow-sm md:shadow-none"
           onClick={handlePanelClose}
         >
-          <FiArrowLeft size={18} className=" transition-transform duration-200 group-hover:-translate-x-[3px]" />
+          <FiArrowLeft size={16} className=" transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>{dict.profile.back_to_projects}</span>
         </Button>
         <CreateProjectPanel
@@ -114,13 +115,13 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   // Se um projeto está selecionado, mostrar o painel do projeto
   if (selectedProject) {
     return (
-      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out]">
+      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] relative">
         <Button
           variant="ghost"
-          className="cursor-pointer inline-flex items-center gap-2 py-2 text-[0.95rem] font-medium text-[#6b7c7a] hover:bg-transparent hover:text-[#05dc7f] w-fit group p-0 h-auto"
+          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-[#6b7c7a] hover:bg-[#05dc7f]/5 hover:text-[#05dc7f] w-fit group h-auto transition-all rounded-full md:rounded-none bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-gray-100 md:border-transparent shadow-sm md:shadow-none"
           onClick={handleProjectClose}
         >
-          <FiArrowLeft size={18} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
+          <FiArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-[3px]" />
           <span>{dict.profile.back_to_projects}</span>
         </Button>
         <FeedProjectPanel
@@ -144,14 +145,36 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
         </Button>
       )}
 
-      {filteredProjects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          ownProfile={ownProfile}
-          onClick={() => handleProjectClick(project)}
-        />
-      ))}
+      {filteredProjects.length > 0 ? (
+        filteredProjects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            ownProfile={ownProfile}
+            onClick={() => handleProjectClick(project)}
+          />
+        ))
+      ) : (
+        // Se já não houver o botão de "Novo projeto" (que ocupa uma vaga no grid)
+        // e a lista estiver vazia, mostramos o aviso
+        !(ownProfile && searchQuery === "") && (
+          <div className="col-span-full py-8">
+            <Card className="border-dashed border-2 bg-[#fafafa] border-[#e7eae9]">
+              <CardContent className="py-16 flex flex-col items-center justify-center text-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-[#f3f6f5] flex items-center justify-center mb-2">
+                  <FiPlus className="w-8 h-8 text-[#a0aaa8] rotate-45" />
+                </div>
+                <h3 className="text-xl font-bold text-[#152e2b]">
+                  {dict.profile.no_projects_found.title}
+                </h3>
+                <p className="text-[#6b7c7a] max-w-[300px] leading-relaxed">
+                  {dict.profile.no_projects_found.description}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+      )}
     </>
   );
 }

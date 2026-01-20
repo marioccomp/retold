@@ -2,13 +2,13 @@ import { z } from "zod";
 
 const trim = (v: unknown) => (typeof v === "string" ? v.trim() : v);
 
-export const profileSchema = z.object({
-    title: z.preprocess(trim, z.string().max(50, "Title must have at most 50 characters")),
+export const getProfileSchema = (dict: any) => z.object({
+    title: z.preprocess(trim, z.string().max(50, dict.validation.title_max)),
 
     // Agora validando como Headline (mximo 100 caracteres)
     bio: z.preprocess(
         trim,
-        z.string().max(100, "Headline must have at most 100 characters")
+        z.string().max(100, dict.validation.headline_max)
     ),
 
     githubUrl: z.preprocess(
@@ -20,7 +20,7 @@ export const profileSchema = z.object({
                     const githubRegex = /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/;
                     return githubRegex.test(val);
                 },
-                { message: "Use o formato: github.com/seu-usuario" }
+                { message: dict.validation.github_invalid }
             )
             .transform((val) => {
                 if (!val || val === "") return "";
@@ -30,7 +30,6 @@ export const profileSchema = z.object({
                 return val.replace(/^(https?:\/\/)www\./, "$1");
             })
             .optional()
-            .or(z.literal(""))
     ),
 
     linkedinUrl: z.preprocess(
@@ -42,7 +41,7 @@ export const profileSchema = z.object({
                     const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
                     return linkedinRegex.test(val);
                 },
-                { message: "Use o formato: linkedin.com/in/seu-usuario" }
+                { message: dict.validation.linkedin_invalid }
             )
             .transform((val) => {
                 if (!val || val === "") return "";
@@ -52,17 +51,37 @@ export const profileSchema = z.object({
                 return val.replace(/^(https?:\/\/)www\./, "$1");
             })
             .optional()
-            .or(z.literal(""))
+    ),
+    websiteUrl: z.preprocess(
+        trim,
+        z.string()
+            .refine(
+                (val) => {
+                    if (!val || val === "") return true;
+                    // Regex básica para: qualquer_coisa.dominio (mínimo de uma URL)
+                    const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
+                    return urlRegex.test(val);
+                },
+                { message: dict.validation.url_invalid }
+            )
+            .transform((val) => {
+                if (!val || val === "") return "";
+                if (!val.startsWith("http")) {
+                    return `https://${val}`;
+                }
+                return val;
+            })
+            .optional()
     ),
 });
 
-export const profileDetailsSchema = z.object({
+export const getProfileDetailsSchema = (dict: any) => z.object({
     longBio: z.string().nullable(),
     skills: z.array(z.string()),
     educations: z.array(z.object({
-        degree: z.string().min(1, "Course is required"),
-        institution: z.string().min(1, "Institution is required"),
-        startDate: z.string().min(1, "Start date is required"),
+        degree: z.string().min(1, dict.validation.course_required),
+        institution: z.string().min(1, dict.validation.institution_required),
+        startDate: z.string().min(1, dict.validation.start_date_required),
         endDate: z.string().nullable(),
     })),
 });

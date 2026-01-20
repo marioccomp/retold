@@ -39,7 +39,7 @@ export default function ProfileAbout({ longBio, bio, ownProfile, onEditClick }: 
             </CardHeader>
             <CardContent className="pt-5 pb-6">
                 <p className="text-[#152e2b]/80 leading-relaxed text-[1rem] whitespace-pre-wrap">
-                    {longBio || bio || (
+                    {longBio || (
                         <span className="italic text-muted-foreground/60">{dict.profile.no_description}</span>
                     )}
                 </p>

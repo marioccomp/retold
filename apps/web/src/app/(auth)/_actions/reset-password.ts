@@ -1,17 +1,21 @@
 "use server";
 
-import { resetPasswordSchema } from "@/src/domains/auth/schemas/reset-password.schema";
+import { getResetPasswordSchema } from "@/src/domains/auth/schemas/reset-password.schema";
 import { resetPasswordService } from "@/src/domains/auth/services/reset-password.service";
 import type { ActionResponse } from "@/lib/action-response";
+import { getDictionary } from "@/src/i18n/server";
 
 export async function resetPassword(formData: FormData): Promise<ActionResponse> {
+  const dict = await getDictionary();
+  const resetPasswordSchema = getResetPasswordSchema(dict);
+
   const data = Object.fromEntries(formData.entries());
   const parsed = resetPasswordSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid Data",
+      message: dict.auth.errors.invalid_fields,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -25,7 +29,7 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
 
     return {
       success: false,
-      message: "Invalid or expired recovery link.",
+      message: dict.auth.errors.reset_password_error,
     };
   }
 }
