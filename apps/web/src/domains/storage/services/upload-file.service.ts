@@ -6,7 +6,7 @@ import { randomUUID } from "crypto";
 
 type UploadFilesParams = {
   file: File;
-  folder: "avatars" | "projects";
+  folder: "avatars" | "projects" | "covers";
   userId: number;
   projectId?: number;
 };
@@ -43,6 +43,12 @@ export async function uploadFileService({
       .resize(512, 512, { fit: "cover", position: "center" }) // avatar quadrado
       .webp({ quality: 80 })
       .toBuffer();
+  } else if (folder === "covers") {
+    outputBuffer = await sharp(inputBuffer)
+      .rotate()
+      .resize(1065, 250, { fit: "cover", position: "center" })
+      .webp({ quality: 85 })
+      .toBuffer();
   } else {
     outputBuffer = await sharp(inputBuffer)
       .rotate()
@@ -59,6 +65,8 @@ export async function uploadFileService({
 
   if (folder === "avatars") {
     objectName = `users/${userId}/avatar/${randomUUID()}.webp`;
+  } else if (folder === "covers") {
+    objectName = `users/${userId}/cover/${randomUUID()}.webp`;
   } else {
     if (!projectId) {
       throw new Error("projectId is required for project images");

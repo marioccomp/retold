@@ -24,6 +24,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
     longBio: user.longBio ?? null,
     skills: user.skills || [],
     image: user.image,
+    cover: user.cover,
     githubUrl: user.githubUrl,
     linkedinUrl: user.linkedinUrl,
     websiteUrl: user.websiteUrl,
