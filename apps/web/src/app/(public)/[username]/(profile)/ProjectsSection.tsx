@@ -51,14 +51,15 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
     userId: profile.id,
     title: projectData.title,
     description: projectData.description,
-    status: "PENDING",
+    status: projectData.status,
     images: projectData.images, // Pass images directly
     repository: projectData.repositoryUrl ? {
       id: 0,
       url: projectData.repositoryUrl,
       fullName: projectData.repositoryFullName || "",
       name: projectData.repositoryFullName?.split("/")[1] || "",
-      isActive: true
+      isActive: true,
+      private: projectData.repositoryIsPrivate ?? false,
     } : null,
   } : null;
 

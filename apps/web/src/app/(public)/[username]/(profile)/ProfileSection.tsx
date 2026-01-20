@@ -51,7 +51,7 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
     };
 
     return (
-        <div className="flex flex-col gap-10 animate-[fadeIn_0.6s_ease-out_forwards] pb-24 relative">
+        <div className="flex flex-col gap-10 animate-[fadeIn_0.3s_ease-out_forwards] pb-24 relative">
             {/* 1. About Section */}
             <ProfileAbout
                 longBio={profile.longBio}

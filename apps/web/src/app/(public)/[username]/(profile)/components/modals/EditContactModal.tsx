@@ -51,12 +51,12 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
 
     const onSave = () => {
         realMutation.mutate({
-            name: profile.name,
-            title: profile.title,
-            bio: profile.bio,
-            githubUrl: profile.githubUrl,
-            linkedinUrl: profile.linkedinUrl,
-            websiteUrl: profile.websiteUrl,
+            name: profile.name || "",
+            title: profile.title || "",
+            bio: profile.bio || "",
+            githubUrl: profile.githubUrl || "",
+            linkedinUrl: profile.linkedinUrl || "",
+            websiteUrl: profile.websiteUrl || "",
             email: email,
             phone: phone
         });

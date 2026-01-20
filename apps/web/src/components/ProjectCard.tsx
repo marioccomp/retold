@@ -4,6 +4,7 @@
 import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
 import { MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
+import { ExternalLink } from "lucide-react";
 import placeholderImage from "@/assets/mockup-escalonador.jpg";
 import { useState, useEffect, useTransition } from "react";
 import ownerPic from "@/assets/foto.jpeg";
@@ -167,7 +168,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
         <div className="flex p-[10px_24px_20px_24px] gap-4 justify-end text-[#4a5568]
           max-[650px]:p-0 max-[650px]:gap-3 max-[650px]:shrink-0 max-[380px]:gap-2"
         >
-          {project.repositoryUrl && (
+          {project.repositoryUrl && !project.repositoryIsPrivate && (
             <a
               href={project.repositoryUrl}
               target="_blank"
@@ -176,7 +177,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
               onClick={(e) => e.stopPropagation()}
               title={project.repositoryFullName || "View Code"}
             >
-              <FaGithub size={20} />
+              <ExternalLink size={20} />
             </a>
           )}
 

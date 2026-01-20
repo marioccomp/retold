@@ -76,6 +76,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData, currentUserId?
 
       repositoryUrl: project.repository?.url,
       repositoryFullName: project.repository?.fullName,
+      repositoryIsPrivate: project.repository?.private ?? false,
 
       isPinned: project.isPinned,
     })),

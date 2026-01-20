@@ -23,6 +23,7 @@ export interface ProjectCardDTO {
 
   repositoryUrl?: string;
   repositoryFullName?: string;
+  repositoryIsPrivate?: boolean;
 
   isPinned?: boolean;
   hasLiked?: boolean;

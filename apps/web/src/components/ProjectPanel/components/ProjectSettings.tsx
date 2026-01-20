@@ -159,6 +159,7 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
 
             queryClient.invalidateQueries({ queryKey: ["project-analysis", project.id] });
             queryClient.invalidateQueries({ queryKey: ["profile"] });
+            queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
             setIsEditOpen(false);
             if (onUpdate) onUpdate();
 
@@ -178,6 +179,7 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
             setIsDeleteOpen(false);
             if (onDelete) onDelete();
             queryClient.invalidateQueries({ queryKey: ["profile"] });
+            queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
         } catch (error) {
             console.error(error);
             toast.error(t.toast.delete_error);
