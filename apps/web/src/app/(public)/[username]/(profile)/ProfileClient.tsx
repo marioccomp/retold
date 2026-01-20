@@ -43,7 +43,11 @@ export default function ProfileClient({ username, ownProfile }: Props) {
   return (
     <div className="min-h-screen bg-[#fafafa]">
       {/* 1. Header Banner */}
-      <ProfileBanner cover={profile.cover} />
+      <ProfileBanner
+        cover={profile.cover}
+        ownProfile={ownProfile}
+        username={username}
+      />
 
       {/* 2. Main Layout Container */}
       <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] lg:grid-cols-[320px_1fr] xl:grid-cols-[350px_1fr] gap-6 md:gap-8 lg:gap-12 px-5 sm:px-8 md:px-8 lg:px-8 xl:px-16">
