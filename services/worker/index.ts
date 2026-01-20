@@ -15,14 +15,6 @@ function printOverview(overview: string, projectId: string) {
   console.log(`Project: ${projectId}\n`);
   console.log(overview);
   console.log(`${separator}\n`);
-
-  // Cria pasta temp/overview dentro do projeto se não existir
-  const tempDir = path.resolve("./temp/overview");
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-  const mdPath = path.join(tempDir, `${projectId}-overview.md`);
-  fs.writeFileSync(mdPath, `# Project Overview: ${projectId}\n\n${overview}`);
-  console.log(`Saved overview to ${mdPath}`);
 }
 
 function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
