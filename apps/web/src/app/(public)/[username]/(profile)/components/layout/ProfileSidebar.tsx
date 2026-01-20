@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useMemo } from "react";
-import { FiGithub, FiLinkedin, FiCamera, FiGlobe, FiMail, FiCopy, FiSend } from "react-icons/fi";
+import { FiGithub, FiLinkedin, FiCamera, FiGlobe, FiMail, FiCopy, FiSend, FiCheck } from "react-icons/fi";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { useTranslation } from "@/src/i18n/client";
+import { FollowButton } from "@/src/components/FollowButton";
+import { NetworkModal } from "@/src/components/NetworkModal";
+import { useState } from "react";
+import { followsMeAction } from "../../../_actions/follows-me.action";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
 
 const SocialLinkItem = memo(function SocialLinkItem({
     type,
@@ -54,6 +60,10 @@ type Props = {
 
 export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Props) {
     const { dict } = useTranslation();
+    const [networkModal, setNetworkModal] = useState<{ isOpen: boolean; type: "followers" | "following" | null }>({
+        isOpen: false,
+        type: null
+    });
 
     const stats = useMemo(() => {
         const totalViews = profile.projects.reduce((acc, p) => acc + (p.views || 0), 0);
@@ -64,6 +74,17 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
             likes: totalLikes >= 1000 ? `${(totalLikes / 1000).toFixed(1)}k` : totalLikes
         };
     }, [profile.projects]);
+
+    const { data: followsMe } = useQuery<boolean>({
+        queryKey: ["followsMe", profile.id],
+        queryFn: async () => {
+            const res = await followsMeAction(profile.id);
+            return res.success ? (res.data ?? false) : false;
+        },
+        staleTime: 1000 * 60 * 5, // 5 minutos de cache
+        refetchOnWindowFocus: false, // Não atualiza ao focar na janela
+        enabled: !ownProfile,
+    });
 
     return (
         <aside className="flex flex-col items-center w-full md:pl-0 lg:pl-12">
@@ -89,9 +110,22 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                             <span className="text-white text-xs font-semibold uppercase tracking-wider">{dict.profile.change_photo}</span>
                         </div>
                     )}
+
+                    {!ownProfile && followsMe && (
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e7eae9] shadow-[0_4px_12px_rgba(0,0,0,0.08)] rounded-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                <div className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f]">
+                                    <FiCheck size={10} strokeWidth={4} />
+                                </div>
+                                <span className="text-[10px] font-bold text-[#152e2b] tracking-[0.05em] uppercase whitespace-nowrap">
+                                    {dict.profile.follows_you}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                <div className="mt-3 text-xl font-bold text-[#152e2b]">
+                <div className="mt-3 text-xl font-bold text-[#152e2b] flex items-center gap-2">
                     <span>{profile.name}</span>
                 </div>
             </div>
@@ -144,55 +178,88 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                     </p>
                 </div>
 
-                {/* Action Button */}
-                {ownProfile ? (
-                    <Button
-                        onClick={onEditClick}
-                        className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20 flex items-center justify-center gap-2"
+                {/* Followers/Following Stats */}
+                <div className="w-full flex border border-[#e7eae9] rounded-xl overflow-hidden bg-white shadow-sm">
+                    <button
+                        onClick={() => setNetworkModal({ isOpen: true, type: "followers" })}
+                        className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] font-medium hover:bg-gray-50 transition-colors border-none bg-transparent cursor-pointer"
                     >
-                        {dict.profile.edit_profile}
-                    </Button>
-                ) : (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20"
-                            >
-                                {dict.profile.contact}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="center" className="w-[200px] rounded-xl border-[#e7eae9] bg-white shadow-xl p-2">
-                            <DropdownMenuItem
-                                className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
-                                onClick={() => {
-                                    if (profile.email) {
-                                        navigator.clipboard.writeText(profile.email);
-                                        toast.success(dict.profile.email_copied);
-                                    } else {
-                                        toast.error(dict.profile.no_email_error);
-                                    }
-                                }}
-                            >
-                                <FiCopy className="text-[#6b7c7a]" />
-                                <span className="font-medium">{dict.profile.copy_email}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
-                                onClick={() => {
-                                    if (profile.email) {
-                                        window.location.href = `mailto:${profile.email}`;
-                                    } else {
-                                        toast.error(dict.profile.no_email_error);
-                                    }
-                                }}
-                            >
-                                <FiSend className="text-[#6b7c7a]" />
-                                <span className="font-medium">{dict.profile.send_email}</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                )}
+                        <span className="block text-[1.1rem] font-bold text-[#152e2b]">{profile.followersCount}</span> {dict.profile.followers}
+                    </button>
+                    <button
+                        onClick={() => setNetworkModal({ isOpen: true, type: "following" })}
+                        className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] border-l border-[#e7eae9] font-medium hover:bg-gray-50 transition-colors border-none bg-transparent cursor-pointer"
+                    >
+                        <span className="block text-[1.1rem] font-bold text-[#152e2b]">{profile.followingCount}</span> {dict.profile.following}
+                    </button>
+                </div>
+
+                {/* Action Button */}
+                <div className="w-full flex flex-col gap-3">
+                    {!ownProfile && (
+                        <FollowButton
+                            targetUserId={profile.id}
+                            initialIsFollowing={profile.isFollowing}
+                            className="w-full h-11 text-base font-bold rounded-xl"
+                        />
+                    )}
+
+                    {ownProfile ? (
+                        <Button
+                            onClick={onEditClick}
+                            className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20 flex items-center justify-center gap-2"
+                        >
+                            {dict.profile.edit_profile}
+                        </Button>
+                    ) : (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20"
+                                >
+                                    {dict.profile.contact}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="w-[200px] rounded-xl border-[#e7eae9] bg-white shadow-xl p-2">
+                                <DropdownMenuItem
+                                    className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
+                                    onClick={() => {
+                                        if (profile.email) {
+                                            navigator.clipboard.writeText(profile.email);
+                                            toast.success(dict.profile.email_copied);
+                                        } else {
+                                            toast.error(dict.profile.no_email_error);
+                                        }
+                                    }}
+                                >
+                                    <FiCopy className="text-[#6b7c7a]" />
+                                    <span className="font-medium">{dict.profile.copy_email}</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
+                                    onClick={() => {
+                                        if (profile.email) {
+                                            window.location.href = `mailto:${profile.email}`;
+                                        } else {
+                                            toast.error(dict.profile.no_email_error);
+                                        }
+                                    }}
+                                >
+                                    <FiSend className="text-[#6b7c7a]" />
+                                    <span className="font-medium">{dict.profile.send_email}</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
+                </div>
             </section>
+
+            <NetworkModal
+                isOpen={networkModal.isOpen}
+                onClose={() => setNetworkModal({ ...networkModal, isOpen: false })}
+                userId={profile.id}
+                type={networkModal.type}
+            />
         </aside>
     );
 }

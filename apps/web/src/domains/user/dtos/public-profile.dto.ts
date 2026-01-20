@@ -22,6 +22,9 @@ export type PublicProfileDTO = {
   image: string | null;
   githubUrl: string | null;
   linkedinUrl: string | null;
+  followersCount: number;
+  followingCount: number;
+  isFollowing: boolean;
   websiteUrl: string | null;
   createdAt: string;
   projects: ProjectCardDTO[];

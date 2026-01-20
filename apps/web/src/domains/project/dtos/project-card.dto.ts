@@ -18,6 +18,9 @@ export interface ProjectCardDTO {
   ownerImage: string | null;
   ownerUsername: string;
 
+  ownerId: number;
+  isFollowingOwner: boolean;
+
   repositoryUrl?: string;
   repositoryFullName?: string;
 

@@ -28,7 +28,8 @@ export default function ProfileClient({ username, ownProfile }: Props) {
   const { data: profile } = useQuery({
     queryKey: ["profile", username],
     queryFn: () => getProfile(username),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache
+    refetchOnWindowFocus: false, // Não atualiza ao focar na janela
     refetchInterval: (query) => {
       const projects = query.state.data?.projects;
       const isAnalyzing = projects?.some(

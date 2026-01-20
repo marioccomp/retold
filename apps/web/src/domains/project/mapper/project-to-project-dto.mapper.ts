@@ -6,6 +6,7 @@ import { ProjectCardDTO, ProjectCardTagDTO } from "../dtos/project-card.dto";
 interface ProjectRequestDTO {
     project: Project;
     user: {
+        id: number;
         name: string;
         image: string;
         username: string;
@@ -18,10 +19,11 @@ interface ProjectRequestDTO {
     likes: number;
     views: number;
     hasLiked?: boolean;
+    isFollowingOwner?: boolean;
 }
 
 export function mapProjectToProjectDTO(request: ProjectRequestDTO): ProjectCardDTO {
-    const { project, user, repository, tags, likes, views, hasLiked } = request;
+    const { project, user, repository, tags, likes, views, hasLiked, isFollowingOwner } = request;
     return {
         id: project.id,
         title: project.title,
@@ -36,7 +38,9 @@ export function mapProjectToProjectDTO(request: ProjectRequestDTO): ProjectCardD
         ownerName: user.name,
         ownerImage: user.image,
         ownerUsername: user.username,
+        ownerId: user.id,
         repositoryUrl: repository?.url,
         repositoryFullName: repository?.fullName,
+        isFollowingOwner: isFollowingOwner ?? false,
     };
 }

@@ -17,6 +17,7 @@ import emptyImage from "@/assets/empty_file.png";
 import { toggleLike } from "../domains/project/actions/toggle-like.action";
 import { useTranslation } from "@/src/i18n/client";
 import { FiLoader } from "react-icons/fi";
+import { FollowButton } from "./FollowButton";
 
 interface Props {
   project: ProjectCardDTO;
@@ -99,6 +100,15 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
               </AvatarFallback>
             </Avatar>
             <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold">{ownerName}</p>
+            {!isOwner && project.ownerId && (
+              <FollowButton
+                targetUserId={project.ownerId}
+                initialIsFollowing={project.isFollowingOwner ?? false}
+                variant="ghost"
+                size="sm"
+                className="text-[12px] h-7 px-2 border-white/20 text-white hover:bg-white/10 hover:text-white"
+              />
+            )}
           </div>
           <div className="text-[15px] leading-relaxed text-[#f0fdf4] mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
             max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:text-[#e2e8f0] max-[650px]:line-clamp-3"

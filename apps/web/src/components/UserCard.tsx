@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslation } from "@/src/i18n/client";
+import { FollowButton } from "./FollowButton";
+import { useSession } from "next-auth/react";
 
 interface UserCardProps {
     user: {
@@ -16,10 +18,13 @@ interface UserCardProps {
         title: string | null;
         bio: string | null;
         skills: string[];
+        isFollowing?: boolean;
     };
 }
 
 export function UserCard({ user }: UserCardProps) {
+    const { data: session } = useSession();
+    const userId = Number(session?.user.id);
     const { dict } = useTranslation();
     const displayName = user.name || user.username || "User";
     const displayHandle = user.username ? `@${user.username}` : "";
@@ -68,13 +73,13 @@ export function UserCard({ user }: UserCardProps) {
                     )}
                 </div>
 
-                <div className="w-full mt-auto">
-                    <Button
-                        className="w-full bg-white text-[#152e2b] border-2 border-[#d4e5d7] group-hover:bg-[#f8fdf5] group-hover:border-[#33bd19] group-hover:text-[#004d40] transition-colors font-semibold shadow-none pointer-events-none"
-                    >
-                        {dict.feed.usercard?.view_profile || "View Profile"}
-                    </Button>
-                </div>
+                {userId !== user.id && <div className="w-full mt-auto" onClick={(e) => e.stopPropagation()}>
+                    <FollowButton
+                        targetUserId={user.id}
+                        initialIsFollowing={user.isFollowing ?? false}
+                        className="w-full"
+                    />
+                </div>}
             </Card>
         </Link>
     );

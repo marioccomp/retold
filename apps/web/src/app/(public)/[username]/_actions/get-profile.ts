@@ -10,5 +10,5 @@ export async function getProfile(username: string) {
 
   const user = await userRepository.findPublicProfileByUsername(username, currentUserId);
   if (!user) return null;
-  return mapUserToPublicProfile(user!);
+  return mapUserToPublicProfile(user!, currentUserId);
 }

@@ -18,6 +18,16 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
                     name: true,
                     username: true,
                     image: true,
+                    ...(currentUserId ? {
+                        followers: {
+                            where: {
+                                followerId: currentUserId
+                            },
+                            select: {
+                                followerId: true
+                            }
+                        }
+                    } : {})
                 }
             },
             tags: {
@@ -37,14 +47,16 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
                     likes: true
                 }
             },
-            likes: currentUserId ? {
-                where: {
-                    userId: currentUserId
-                },
-                select: {
-                    userId: true
+            ...(currentUserId ? {
+                likes: {
+                    where: {
+                        userId: currentUserId
+                    },
+                    select: {
+                        userId: true
+                    }
                 }
-            } : false
+            } : {})
         }
     })
 
@@ -65,6 +77,8 @@ export async function getFeedProjects(): Promise<ProjectCardDTO[]> {
         ownerName: project.user.name || "",
         ownerImage: project.user.image || "",
         ownerUsername: project.user.username || "",
+        ownerId: project.user.id,
+        isFollowingOwner: (project.user as any).followers?.length > 0,
         repositoryUrl: project.repository?.url || undefined,
         repositoryFullName: project.repository?.fullName || undefined,
     }))
