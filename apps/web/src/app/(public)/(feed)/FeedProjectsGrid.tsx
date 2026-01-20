@@ -77,6 +77,8 @@ export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
 
     const handleProjectClose = () => {
         router.back();
+        // Pequeno delay para garantir que a navegação do back() processe antes do refresh
+        setTimeout(() => router.refresh(), 100);
     };
 
     // Se um projeto está selecionado, mostrar o painel do projeto

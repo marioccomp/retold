@@ -39,6 +39,17 @@ export default function FeedContent({ projects }: Props) {
         }
     }, []);
 
+    const handleTabClick = () => {
+        setSearchQuery("");
+        // Pequeno delay para garantir que a aba mude antes do scroll se necessário
+        setTimeout(() => {
+            const element = document.getElementById('feed-content');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 10);
+    };
+
     return (
         <div id="feed-content" className="w-full max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col items-center relative scroll-mt-4">
             {/* Gradient transition from hero */}
@@ -54,8 +65,7 @@ export default function FeedContent({ projects }: Props) {
                                 <TabsTrigger
                                     key={tab.key}
                                     value={tab.key}
-
-                                    onClick={() => setSearchQuery("")}
+                                    onClick={handleTabClick}
                                     className="bg-transparent border-0 border-b-[3px] border-solid border-b-transparent py-1 px-0 text-base font-medium text-[#6b7c7a] cursor-pointer transition-colors duration-300 hover:text-[#152e2b] data-[state=active]:!text-[#152e2b] data-[state=active]:!border-b-[#33bd19] data-[state=active]:[text-shadow:0.6px_0_0_currentColor] data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap"
                                 >
                                     {tab.label}

@@ -22,4 +22,5 @@ export interface ProjectCardDTO {
   repositoryFullName?: string;
 
   isPinned?: boolean;
+  hasLiked?: boolean;
 }

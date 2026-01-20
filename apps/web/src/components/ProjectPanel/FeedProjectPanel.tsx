@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { Code2, Github, Clock, XCircle, Sparkles, Loader2, Package, FileCode, Shield, FolderTree, Code, PackageSearch, Settings, FileText, GitBranch, Container, CheckCircle2, ExternalLink } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -11,6 +11,7 @@ import { ProjectForOverlay } from "./types";
 import { useProjectAnalysis } from "./hooks/useProjectAnalysis";
 import { ProjectSettings } from "./components/ProjectSettings";
 import { useTranslation } from "@/src/i18n/client";
+import { incrementView } from "@/src/domains/project/actions/increment-view.action";
 
 type FeedProjectPanelProps = {
     project: ProjectForOverlay;
@@ -22,6 +23,15 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
     const t = dict.project;
     const { data: session } = useSession();
     const repo = project.repository;
+
+    const hasIncremented = useRef(false);
+
+    useEffect(() => {
+        if (!hasIncremented.current) {
+            incrementView(project.id);
+            hasIncremented.current = true;
+        }
+    }, [project.id]);
 
     const isOwner = session?.user?.id && project.userId && Number(session.user.id) === project.userId;
 

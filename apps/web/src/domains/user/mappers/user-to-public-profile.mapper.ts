@@ -37,7 +37,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
       endDate: edu.endDate?.toISOString() ?? null,
     })),
 
-    projects: user.projects.map((project) => ({
+    projects: user.projects.map((project: any) => ({
       id: project.id,
       title: project.title,
       description: project.description,
@@ -46,11 +46,11 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
 
       createdAt: project.createdAt.toISOString(),
 
-      // tem q implementar
-      likes: 0,
-      views: 0,
+      likes: project._count?.likes ?? 0,
+      views: project.views ?? 0,
+      hasLiked: project.likes && project.likes.length > 0,
 
-      tags: project.tags.map((tag) => ({
+      tags: project.tags.map((tag: any) => ({
         id: tag.id,
         name: tag.name,
       })),

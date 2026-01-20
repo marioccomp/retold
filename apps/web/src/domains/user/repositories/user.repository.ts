@@ -39,7 +39,7 @@ export const userRepository = {
       data: { password: passwordHash },
     });
   },
-  findPublicProfileByUsername(username: string) {
+  findPublicProfileByUsername(username: string, currentUserId?: number) {
     const user = prisma.user.findUnique({
       where: { username },
       include: {
@@ -48,6 +48,19 @@ export const userRepository = {
           include: {
             tags: true,
             repository: true,
+            _count: {
+              select: {
+                likes: true,
+              },
+            },
+            likes: currentUserId ? {
+              where: {
+                userId: currentUserId,
+              },
+              select: {
+                userId: true,
+              },
+            } : false,
           },
         },
         certifications: {
