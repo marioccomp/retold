@@ -36,6 +36,7 @@ model User {
   skills String[] @default([])
   githubUrl String?
   linkedinUrl String?
+  websiteUrl String?
   password String? // null when OAuth
   role Role @default(USER)
   plan Plan @default(FREE)

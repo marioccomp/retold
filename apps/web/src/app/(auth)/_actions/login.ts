@@ -5,20 +5,23 @@ import { signIn } from "@/src/domains/auth/auth";
 import type { ActionResponse } from "@/lib/action-response";
 import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
 import { loginUser } from "@/src/domains/auth/services/login.service";
-
-const loginSchema = z.object({
-  identifier: z.string().min(3, "Email or username is required"),
-  password: z.string().min(6, "password is required"),
-});
+import { getDictionary } from "@/src/i18n/server";
 
 export async function login(formData: FormData): Promise<ActionResponse> {
+  const dict = await getDictionary();
+
+  const loginSchema = z.object({
+    identifier: z.string().min(3, dict.validation.identifier_required),
+    password: z.string().min(6, dict.validation.password_required),
+  });
+
   const data = Object.fromEntries(formData.entries());
   const parsed = loginSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Incorrect email/username or password", // Se não tá no formato que a gente definiu, nem busca no banco
+      message: dict.auth.errors.incorrect_credentials, // Se não tá no formato que a gente definiu, nem busca no banco
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -37,14 +40,14 @@ export async function login(formData: FormData): Promise<ActionResponse> {
     if (error instanceof TooManyLoginAttemptsError) {
       return {
         success: false,
-        message: "Too many login attempts. Please try again later.",
+        message: dict.auth.errors.too_many_attempts,
       };
     }
 
     if (error instanceof InvalidCredentialsError) {
       return {
         success: false,
-        message: "Incorrect email/username or password",
+        message: dict.auth.errors.incorrect_credentials,
       };
     }
 
@@ -52,7 +55,7 @@ export async function login(formData: FormData): Promise<ActionResponse> {
 
     return {
       success: false,
-      message: "Unable to sign in. Please try again.",
+      message: dict.auth.errors.login_generic,
     };
   }
 }

@@ -135,20 +135,33 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(5,220,127,0.14),transparent_60%)]" />
             </div>
 
-            {/* Conteúdo (reduzi altura para “encaixar” com o feed) */}
-            <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 pt-12 md:pt-14 pb-10 md:pb-12">
+            {/* Conteúdo (aumentei o padding inferior para dar espaço à transição suave) */}
+            <div className="relative mx-auto max-w-[1400px] px-6 md:px-12 pt-12 md:pt-14 pb-24 md:pb-32">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
                     {/* LEFT */}
                     <div className="lg:col-span-6 flex flex-col gap-6 text-center lg:text-left">
 
 
-                        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-[#052e16] leading-[1.02]">
+                        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-[#052e16] leading-[1.02] animate-[slideUpEntrance_0.6s_ease-out_forwards]">
                             {dict.feed.feedhero.title_prefix}{" "}
                             <span className="relative inline-block">
+                                {/* Base gradient text */}
                                 <span className="bg-gradient-to-r from-[#05dc7f] to-[#00b894] bg-clip-text text-transparent font-bold">
                                     {dict.feed.feedhero.title_highlight}
                                 </span>
-                                <span className="absolute left-0 -bottom-1 h-[8px] w-full rounded-full bg-[#05dc7f]/10 blur-[0.5px]" />
+                                {/* Shine overlay - inline styles prevent FOUC */}
+                                <span
+                                    className="shiny-overlay"
+                                    aria-hidden="true"
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        WebkitTextFillColor: 'transparent',
+                                        color: 'transparent'
+                                    }}
+                                >
+                                    {dict.feed.feedhero.title_highlight}
+                                </span>
                             </span>
                         </h1>
 
@@ -247,8 +260,8 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 </div>
             </div>
 
-            {/* Transição pro FeedContent - Gradiente longo e suave para um blend perfeito */}
-            <div className="absolute bottom-0 left-0 w-full h-[320px] pointer-events-none bg-gradient-to-t from-white via-white/40 to-transparent z-10" />
+            {/* Transição pro FeedContent - Gradiente equilibrado para um blend suave sem cobrir o conteúdo */}
+            <div className="absolute bottom-0 left-0 w-full h-64 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
 
             {/* keyframes */}
             <style jsx global>{`
@@ -270,6 +283,38 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+
+        /* ShinyText Effect - only white shine passing */
+        .shiny-overlay {
+          position: absolute;
+          inset: 0;
+          display: inline-block;
+          font-weight: 700;
+          background: linear-gradient(
+            120deg,
+            transparent 0%,
+            transparent 40%,
+            rgba(255, 255, 255, 1) 50%,
+            transparent 60%,
+            transparent 100%
+          );
+          background-size: 200% 100%;
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          color: transparent;
+          animation: shiny-slide 2s linear infinite;
+          pointer-events: none;
+        }
+
+        @keyframes shiny-slide {
+          0% {
+            background-position: 100% center;
+          }
+          100% {
+            background-position: -100% center;
           }
         }
       `}</style>

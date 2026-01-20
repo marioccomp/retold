@@ -9,6 +9,7 @@ import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { useTranslation } from "@/src/i18n/client";
 
@@ -144,14 +145,36 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
         </Button>
       )}
 
-      {filteredProjects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          ownProfile={ownProfile}
-          onClick={() => handleProjectClick(project)}
-        />
-      ))}
+      {filteredProjects.length > 0 ? (
+        filteredProjects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            ownProfile={ownProfile}
+            onClick={() => handleProjectClick(project)}
+          />
+        ))
+      ) : (
+        // Se já não houver o botão de "Novo projeto" (que ocupa uma vaga no grid)
+        // e a lista estiver vazia, mostramos o aviso
+        !(ownProfile && searchQuery === "") && (
+          <div className="col-span-full py-8">
+            <Card className="border-dashed border-2 bg-[#fafafa] border-[#e7eae9]">
+              <CardContent className="py-16 flex flex-col items-center justify-center text-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-[#f3f6f5] flex items-center justify-center mb-2">
+                  <FiPlus className="w-8 h-8 text-[#a0aaa8] rotate-45" />
+                </div>
+                <h3 className="text-xl font-bold text-[#152e2b]">
+                  {dict.profile.no_projects_found.title}
+                </h3>
+                <p className="text-[#6b7c7a] max-w-[300px] leading-relaxed">
+                  {dict.profile.no_projects_found.description}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+      )}
     </>
   );
 }

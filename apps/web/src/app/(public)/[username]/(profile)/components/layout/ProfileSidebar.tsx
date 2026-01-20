@@ -1,8 +1,15 @@
 "use client";
 
 import { memo } from "react";
-import { FiGithub, FiLinkedin, FiCamera } from "react-icons/fi";
+import { FiGithub, FiLinkedin, FiCamera, FiGlobe, FiMail, FiCopy, FiSend } from "react-icons/fi";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { useTranslation } from "@/src/i18n/client";
@@ -12,11 +19,11 @@ const SocialLinkItem = memo(function SocialLinkItem({
     url,
     Icon,
 }: {
-    type: "github" | "linkedin";
+    type: "github" | "linkedin" | "website";
     url: string | null;
     Icon: typeof FiGithub;
 }) {
-    if (!url) return null;
+    if (!url || url.trim() === "") return null;
 
     return (
         <li>
@@ -29,8 +36,8 @@ const SocialLinkItem = memo(function SocialLinkItem({
                 <a
                     href={url}
                     target="_blank"
-                    rel="noopener noreferrer"
-                    title={type === "github" ? "GitHub" : "LinkedIn"}
+                    rel="noopener noreferrer ugc"
+                    title={type === "github" ? "GitHub" : type === "linkedin" ? "LinkedIn" : "Website"}
                 >
                     <Icon size={18} />
                 </a>
@@ -51,8 +58,11 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
     return (
         <aside className="flex flex-col items-center w-full md:pl-0 lg:pl-12">
             <div className="-mt-20 sm:-mt-[100px] md:-mt-[110px] lg:-mt-[135px] flex flex-col items-center">
-                <div className="relative">
-                    <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-white shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.08)] bg-white">
+                <div
+                    className={`relative group ${ownProfile ? "cursor-pointer" : ""}`}
+                    onClick={ownProfile ? onEditClick : undefined}
+                >
+                    <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-white shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.08)] bg-white transition-transform duration-300 group-hover:scale-[1.02]">
                         <AvatarImage
                             src={profile.image ?? undefined}
                             alt={dict.profile.alt_avatar}
@@ -64,14 +74,10 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                     </Avatar>
 
                     {ownProfile && (
-                        <Button
-                            size="icon"
-                            className="absolute bottom-3 right-3 w-9 h-9 rounded-full border-none bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] hover:scale-105 hover:shadow-[0_6px_16px_rgba(5,220,127,0.4)] transition-all duration-200 cursor-pointer"
-                            title={dict.profile.change_photo}
-                            onClick={onEditClick}
-                        >
-                            <FiCamera />
-                        </Button>
+                        <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-4 border-white/20">
+                            <FiCamera className="text-white mb-2" size={32} />
+                            <span className="text-white text-xs font-semibold uppercase tracking-wider">{dict.profile.change_photo}</span>
+                        </div>
                     )}
                 </div>
 
@@ -111,6 +117,11 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                         url={profile.linkedinUrl}
                         Icon={FiLinkedin}
                     />
+                    <SocialLinkItem
+                        type="website"
+                        url={profile.websiteUrl}
+                        Icon={FiGlobe}
+                    />
                 </ul>
 
                 {/* Stats */}
@@ -132,9 +143,44 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                         {dict.profile.edit_profile}
                     </Button>
                 ) : (
-                    <Button className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20">
-                        {dict.profile.contact}
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20"
+                            >
+                                {dict.profile.contact}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="center" className="w-[200px] rounded-xl border-[#e7eae9] bg-white shadow-xl p-2">
+                            <DropdownMenuItem
+                                className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
+                                onClick={() => {
+                                    if (profile.email) {
+                                        navigator.clipboard.writeText(profile.email);
+                                        toast.success(dict.profile.email_copied);
+                                    } else {
+                                        toast.error(dict.profile.no_email_error);
+                                    }
+                                }}
+                            >
+                                <FiCopy className="text-[#6b7c7a]" />
+                                <span className="font-medium">{dict.profile.copy_email}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="flex items-center gap-3 py-3 px-4 cursor-pointer hover:bg-[#f3f6f5] rounded-lg text-[#152e2b] transition-colors"
+                                onClick={() => {
+                                    if (profile.email) {
+                                        window.location.href = `mailto:${profile.email}`;
+                                    } else {
+                                        toast.error(dict.profile.no_email_error);
+                                    }
+                                }}
+                            >
+                                <FiSend className="text-[#6b7c7a]" />
+                                <span className="font-medium">{dict.profile.send_email}</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 )}
             </section>
         </aside>

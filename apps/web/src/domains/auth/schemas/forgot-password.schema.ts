@@ -1,5 +1,5 @@
 import { z } from "zod";
 
-export const forgotPasswordSchema = z.object({
-  email: z.string().email("E-mail inválido"),
+export const getForgotPasswordSchema = (dict: any) => z.object({
+  email: z.string().email(dict.validation.email_invalid),
 });

@@ -1,20 +1,24 @@
 "use server";
 
 import { auth, signOut } from "@/src/domains/auth/auth";
-import { updatePasswordSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getUpdatePasswordSchema } from "@/src/domains/auth/schemas/register.schema";
 import { prisma, userRepository } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
+import { getDictionary } from "@/src/i18n/server";
 
 export async function updatePasswordAction(
     prevState: any,
     formData: FormData
 ) {
     const session = await auth();
+    const dict = await getDictionary();
 
     if (!session?.user?.id) {
-        return { error: "Unauthorized" };
+        return { error: dict.settings.password.errors.unauthorized };
     }
+
+    const updatePasswordSchema = getUpdatePasswordSchema(dict);
 
     const rawData = Object.fromEntries(formData.entries());
     const validatedFields = updatePasswordSchema.safeParse(rawData);
@@ -31,21 +35,21 @@ export async function updatePasswordAction(
     });
 
     if (!user || !user.password) {
-        return { error: "User not found or password not set" };
+        return { error: dict.settings.password.errors.user_not_found };
     }
 
     const isValid = await bcrypt.compare(currentPassword, user.password);
 
     if (!isValid) {
         // Return a generic error or specific one if preferred
-        return { error: { currentPassword: ["Incorrect password"] } };
+        return { error: { currentPassword: [dict.settings.password.errors.incorrect_password] } };
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await userRepository.updatePassword(userId, hashedPassword);
 
-    return { success: "Password updated successfully" };
+    return { success: dict.settings.password.success_message };
 }
 
 export async function deleteAccountAction() {

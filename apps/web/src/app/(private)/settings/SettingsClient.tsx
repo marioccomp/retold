@@ -49,7 +49,7 @@ export function SettingsClient() {
                     toast.error(result.error);
                 } else {
                     const firstError = Object.values(result.error)[0]?.[0];
-                    toast.error(firstError || "Failed to update password");
+                    toast.error(firstError || dict.settings.dangerZone.toast.update_error);
                 }
             } else if (result?.success) {
                 toast.success(result.success);
@@ -64,12 +64,12 @@ export function SettingsClient() {
     }
 
     async function handleDeleteAccount() {
-        if (window.confirm("Are you sure you want to delete your account? This action cannot be undone and will delete all your projects and data.")) {
+        if (window.confirm(dict.settings.dangerZone.toast.delete_confirm)) {
             startDeleteTransition(async () => {
                 try {
                     await deleteAccountAction();
                 } catch (error) {
-                    toast.error("Failed to delete account");
+                    toast.error(dict.settings.dangerZone.toast.delete_error);
                 }
             });
         }

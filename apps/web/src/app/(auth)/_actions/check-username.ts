@@ -3,15 +3,19 @@
 import { z } from "zod";
 import { userRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
-import { registerSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
+import { getDictionary } from "@/src/i18n/server";
 
 export async function checkUsername(username: string): Promise<ActionResponse> {
+  const dict = await getDictionary();
+  const registerSchema = getRegisterSchema(dict);
+
   const parsed = registerSchema.pick({ username: true }).safeParse({ username });
 
   if (!parsed.success) {
     return {
       success: false,
-      message: "Invalid username",
+      message: dict.auth.errors.invalid_username,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -21,9 +25,9 @@ export async function checkUsername(username: string): Promise<ActionResponse> {
   if (exists) {
     return {
       success: false,
-      message: "Username already in use",
+      message: dict.auth.errors.username_in_use,
       fieldErrors: {
-        username: ["Username already in use"],
+        username: [dict.auth.errors.username_in_use],
       },
     };
   }

@@ -17,6 +17,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
   return {
     id: user.id,
     username: user.username ?? "",
+    email: user.email,
     name: user.name,
     title: user.title,
     bio: user.bio,
@@ -25,6 +26,7 @@ export function mapUserToPublicProfile(user: UserWithProfileData): PublicProfile
     image: user.image,
     githubUrl: user.githubUrl,
     linkedinUrl: user.linkedinUrl,
+    websiteUrl: user.websiteUrl,
     createdAt: user.createdAt.toISOString(),
 
     educations: (user.educations || []).map((edu) => ({

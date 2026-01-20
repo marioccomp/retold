@@ -61,7 +61,7 @@ export default function ProfileEducation({ educations, ownProfile, onEditClick }
                         </div>
                     ))
                 ) : (
-                    <div className="flex gap-4">
+                    <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                             <FiBriefcase className="text-muted-foreground w-5 h-5" />
                         </div>

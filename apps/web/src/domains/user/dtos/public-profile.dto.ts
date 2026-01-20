@@ -13,6 +13,7 @@ export type EducationDTO = {
 export type PublicProfileDTO = {
   id: number;
   username: string;
+  email: string | null;
   name: string | null;
   title: string | null;
   bio: string | null;
@@ -21,6 +22,7 @@ export type PublicProfileDTO = {
   image: string | null;
   githubUrl: string | null;
   linkedinUrl: string | null;
+  websiteUrl: string | null;
   createdAt: string;
   projects: ProjectCardDTO[];
   certifications: CertificationCardDTO[];
