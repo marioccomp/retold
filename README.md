@@ -28,6 +28,31 @@ DATABASE_URL="postgresql://local_db:123@localhost:5432/local_db"
 
 UPSTASH_REDIS_REST_URL="https://seu-banco.upstash.io"
 UPSTASH_REDIS_REST_TOKEN="seu_token_aqui"
+
+APP_URL="http://localhost:3000"
+
+RESEND_API_KEY = "Sua_Chave_Resend_Aqui"
+
+AUTH_GITHUB_ID="seuID"
+AUTH_GITHUB_SECRET="seuSecretHere"
+
+GITHUB_APP_ID="seuID"
+GITHUB_PRIVATE_KEY="suaKEY"
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+GROQ_API_KEY=suaKeyHere
+
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin123
+
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin123
+MINIO_BUCKET=retold
+MINIO_PUBLIC_URL=http://localhost:9000
 ```
 
 ---
