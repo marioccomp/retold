@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
@@ -9,16 +9,17 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/src/i18n/client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { useSearch } from "@/src/providers/SearchContext";
 
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 
 
 type Props = {
     projects: ProjectCardDTO[];
-    searchQuery: string;
 };
 
-export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
+export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDTO[] }) {
+    const { debouncedSearchQuery } = useSearch();
     const { dict } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
@@ -64,10 +65,9 @@ export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
     }, [selectedProject?.id]);
 
     const filteredProjects = projects.filter(
-
         (project) =>
-            project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            project.tags.some((tag) => tag.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            project.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+            project.tags.some((tag) => tag.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
     );
 
     const handleProjectClick = (project: ProjectCardDTO) => {
@@ -106,12 +106,11 @@ export default function FeedProjectsGrid({ projects, searchQuery }: Props) {
 
     if (filteredProjects.length === 0) {
         return (
-            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-[#6b7c7a] text-lg">{dict.feed.feedprojectsgrid.no_projects.title}</p>
+            <div className="col-span-full flex flex-col items-center justify-center min-h-[500px] py-16 text-center">
+                <p className="text-[#6b7c7a] text-lg font-medium">{dict.feed.feedprojectsgrid.no_projects.title}</p>
                 <p className="text-[#a0aaa8] text-sm mt-1">{dict.feed.feedprojectsgrid.no_projects.description}</p>
             </div>
         );
-
     }
 
     return (

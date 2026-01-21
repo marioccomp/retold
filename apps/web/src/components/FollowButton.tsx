@@ -9,6 +9,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { useTranslation } from "@/src/i18n/client";
+import { useSession } from "next-auth/react";
+import { useAuthModal } from "@/src/providers/AuthModalContext";
 
 interface FollowButtonProps {
     targetUserId: number;
@@ -28,6 +30,8 @@ export function FollowButton({
     const { dict } = useTranslation();
     const queryClient = useQueryClient();
     const router = useRouter();
+    const { status: sessionStatus } = useSession();
+    const { openLoginModal } = useAuthModal();
     const [isPending, startTransition] = useTransition();
     const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
 
@@ -39,6 +43,11 @@ export function FollowButton({
     const handleToggleFollow = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (sessionStatus !== "authenticated") {
+            openLoginModal();
+            return;
+        }
 
         const previousState = isFollowing;
         const newState = !previousState;
@@ -92,12 +101,23 @@ export function FollowButton({
             onClick={handleToggleFollow}
             disabled={isPending}
             size={size}
+            variant={variant}
             className={cn(
                 "transition-all duration-300 font-bold rounded-full cursor-pointer active:scale-95 px-6 shrink-0",
-                !isFollowing ? (
-                    "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-[0_4px_12px_rgba(5,220,127,0.2)] hover:shadow-[0_6px_16px_rgba(5,220,127,0.3)]"
+                // Overlay variant (for ProjectCard images, etc)
+                variant === "ghost" ? (
+                    !isFollowing ? (
+                        "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-lg"
+                    ) : (
+                        "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 shadow-none font-medium"
+                    )
                 ) : (
-                    "bg-transparent border-2 border-[#05dc7f] text-[#05dc7f] hover:bg-[#05dc7f]/10 shadow-none"
+                    // Default brand styles
+                    !className?.includes("bg-") && (!isFollowing ? (
+                        "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-[0_4px_12px_rgba(5,220,127,0.2)] hover:shadow-[0_6px_16px_rgba(5,220,127,0.3)]"
+                    ) : (
+                        "bg-transparent border border-[#05dc7f] text-[#05dc7f] hover:bg-[#05dc7f]/10 shadow-none"
+                    ))
                 ),
                 className
             )}

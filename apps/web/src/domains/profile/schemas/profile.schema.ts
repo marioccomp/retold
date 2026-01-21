@@ -84,7 +84,7 @@ export const getProfileSchema = (dict: any) => z.object({
                     const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
                     return val.length > 5;
                 },
-                { message: dict.contact_section.validation.phone_invalid }
+                { message: dict.profile.contact_section.validation.phone_invalid }
             )
             .optional()
     ),
