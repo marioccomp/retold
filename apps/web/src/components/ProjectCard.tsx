@@ -4,6 +4,7 @@
 import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
 import { MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
+import { toast } from "sonner";
 import { ExternalLink } from "lucide-react";
 import placeholderImage from "@/assets/mockup-escalonador.jpg";
 import { useState, useEffect, useTransition } from "react";
@@ -19,6 +20,8 @@ import { toggleLike } from "../domains/project/actions/toggle-like.action";
 import { useTranslation } from "@/src/i18n/client";
 import { FiLoader } from "react-icons/fi";
 import { FollowButton } from "./FollowButton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuthModal } from "@/src/providers/AuthModalContext";
 
 interface Props {
   project: ProjectCardDTO;
@@ -33,6 +36,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
   const { dict } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
+  const queryClient = useQueryClient(); // Access React Query Client
   const [isLiked, setIsLiked] = useState(project.hasLiked ?? false);
   const [likesCount, setLikesCount] = useState(project.likes);
   const [viewsCount, setViewsCount] = useState(project.views);
@@ -50,9 +54,14 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
   // Check if owner is current user
   const isOwner = ownProfile || (session?.user?.username === project.ownerUsername);
 
+  const { openLoginModal } = useAuthModal();
+
   const handleToggleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!session?.user) return; // Talvez mostrar um modal de login depois
+    if (!session?.user) {
+      openLoginModal();
+      return;
+    }
 
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
@@ -61,7 +70,11 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
 
     startTransition(async () => {
       const response = await toggleLike(project.id);
-      if (!response.success) {
+      if (response.success) {
+        // Sync other components (like FeedProjectsGrid) by validating specific query keys
+        queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+        queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
+      } else {
         // Rollback se falhar
         setIsLiked(!newIsLiked);
         setLikesCount(prev => !newIsLiked ? prev + 1 : prev - 1);
@@ -106,8 +119,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
                 targetUserId={project.ownerId}
                 initialIsFollowing={project.isFollowingOwner ?? false}
                 variant="ghost"
-                size="sm"
-                className="text-[12px] h-7 px-2 border-white/20 text-white hover:bg-white/10 hover:text-white"
+                className="h-8 px-4 text-[11px] uppercase tracking-wider"
               />
             )}
           </div>
@@ -173,11 +185,11 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
               href={project.repositoryUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer text-inherit no-underline"
+              className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer text-[#4a5568] hover:text-[#05dc7f] transition-colors no-underline"
               onClick={(e) => e.stopPropagation()}
               title={project.repositoryFullName || "View Code"}
             >
-              <ExternalLink size={20} />
+              <FaGithub size={20} />
             </a>
           )}
 

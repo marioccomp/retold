@@ -4,6 +4,9 @@ import Header from "../components/Header";
 import AuthProvider from "../providers/auth";
 import { QueryProvider } from "../providers/QueryProvider";
 import { Toaster } from "sonner";
+import { AuthModalProvider } from "../providers/AuthModalContext";
+import { SearchProvider } from "../providers/SearchContext";
+import AuthModal from "../components/auth/AuthModal";
 
 import "./globals.css";
 import { auth } from "../domains/auth/auth";
@@ -34,11 +37,16 @@ export default async function RootLayout({
       <body className={`${questrial.className} antialiased min-h-screen flex flex-col`}>
         <LanguageProvider lang={lang}>
           <AuthProvider session={session}>
-            <QueryProvider>
-              <Header session={session} />
-              <main className="flex-grow w-full">{children}</main>
-              <Toaster richColors position="top-right" />
-            </QueryProvider>
+            <AuthModalProvider>
+              <QueryProvider>
+                <SearchProvider>
+                  <Header session={session} />
+                  <main className="flex-grow w-full">{children}</main>
+                  <AuthModal />
+                  <Toaster richColors position="top-right" />
+                </SearchProvider>
+              </QueryProvider>
+            </AuthModalProvider>
           </AuthProvider>
         </LanguageProvider>
       </body>

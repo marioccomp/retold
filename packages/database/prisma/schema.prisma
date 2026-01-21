@@ -24,34 +24,34 @@ enum Plan {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  username String? @unique
-  email String @unique
+  id            Int       @id @default(autoincrement())
+  username      String?   @unique
+  email         String    @unique
   emailVerified DateTime?
-  phone String?
-  name  String?
-  title String?
-  image String?
-  cover String?
-  bio String?
-  longBio String?
-  skills String[] @default([])
-  githubUrl String?
-  linkedinUrl String?
-  websiteUrl String?
-  password String? // null when OAuth
-  role Role @default(USER)
-  plan Plan @default(FREE)
+  phone         String?
+  name          String?
+  title         String?
+  image         String?
+  cover         String?
+  bio           String?
+  longBio       String?
+  skills        String[]  @default([])
+  githubUrl     String?
+  linkedinUrl   String?
+  websiteUrl    String?
+  password      String? // null when OAuth
+  role          Role      @default(USER)
+  plan          Plan      @default(FREE)
 
   passwordResetTokens PasswordResetToken[]
-  accounts      Account[]
-  sessions      Session[]
-  projects Project[]
-  certifications Certification[]
-  participations Participation[]
-  educations Education[]
-  likes Like[]
-  projectViews ProjectView[]
+  accounts            Account[]
+  sessions            Session[]
+  projects            Project[]
+  certifications      Certification[]
+  participations      Participation[]
+  educations          Education[]
+  likes               Like[]
+  projectViews        ProjectView[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -61,57 +61,58 @@ model User {
   repositories Repository[]
 
   followers Follows[] @relation("following")
-  following  Follows[] @relation("follower")
+  following Follows[] @relation("follower")
 
   @@index([email])
   @@index([username])
 }
 
 model Follows {
-  follower    User @relation("follower", fields: [followerId], references: [id])
+  follower    User     @relation("follower", fields: [followerId], references: [id])
   followerId  Int
-  following   User @relation("following", fields: [followingId], references: [id])
+  following   User     @relation("following", fields: [followingId], references: [id])
   followingId Int
   createdAt   DateTime @default(now())
+
   @@id([followerId, followingId])
 }
 
 model GithubAppInstallation {
-  id              Int      @id @default(autoincrement())
-  installationId  String   @unique 
-  accountLogin    String   
-  accountType     String   
-  
-  userId          Int
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             Int    @id @default(autoincrement())
+  installationId String @unique
+  accountLogin   String
+  accountType    String
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
 
 model Account {
-  id                 Int @id @default(autoincrement())
-  userId             Int
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                Int     @id @default(autoincrement())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-model Session {  // por enquanto nao é usado por usar strategy = "jwt", mas pode precisar num futuro
-  id           Int      @id @default(autoincrement()) 
+model Session {
+  id           Int      @id @default(autoincrement())
   sessionToken String   @unique
   userId       Int
   expires      DateTime
@@ -127,11 +128,11 @@ model VerificationToken {
 }
 
 model PasswordResetToken {
-  id         Int       @id @default(autoincrement()) 
-  userId     Int     
-  tokenHash  String    @unique
-  expiresAt  DateTime
-  usedAt     DateTime? // Null = Ativo, DateTime = Usado
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime? // Null = Ativo, DateTime = Usado
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -146,41 +147,41 @@ enum ProjectStatus {
 }
 
 model Project {
-  id Int @id @default(autoincrement())
-  title String
-  description String
+  id                Int    @id @default(autoincrement())
+  title             String
+  description       String
   longerDescription String
 
-  images            String[]
+  images String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  repositoryId   Int?
-  repository Repository? @relation(fields: [repositoryId], references: [id])
+  repositoryId Int?
+  repository   Repository? @relation(fields: [repositoryId], references: [id])
 
   isPinned Boolean @default(false)
-  
-  status ProjectStatus @default(PENDING)
+
+  status   ProjectStatus       @default(PENDING)
   analysis RepositoryAnalysis?
 
-
   userId Int
-  user User @relation(fields:[userId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   tags Tag[]
 
-  likes Like[]
-  views Int @default(0)
+  likes        Like[]
+  views        Int           @default(0)
   projectViews ProjectView[]
 }
 
 model Like {
   createdAt DateTime @default(now())
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   projectId Int
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   // Chave composta para garantir que um usuário só pode curtir um projeto uma vez
   @@id([userId, projectId])
   // Index para contar likes de um projeto rapidamente
@@ -190,17 +191,17 @@ model Like {
 model Repository {
   id Int @id @default(autoincrement())
 
-  githubId Int @unique
-  name String
+  githubId Int    @unique
+  name     String
   fullName String
-  url String
+  url      String
 
   private Boolean
 
   isActive Boolean @default(true)
 
   userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   projects Project[]
 
@@ -213,77 +214,76 @@ model Repository {
 model RepositoryAnalysis {
   id Int @id @default(autoincrement())
 
-  projectId Int @unique
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int     @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  appType String
-  stack Json
-  structure Json?
-  signals Json?
+  appType     String
+  stack       Json
+  structure   Json?
+  signals     Json?
   rawAnalysis Json?
   llmOverview String? @db.Text
 
   createdAt DateTime @default(now())
 }
 
-
 model Certification {
-  id Int @id @default(autoincrement())
-  title String
+  id          Int    @id @default(autoincrement())
+  title       String
   description String
 
-  issuer        String   
-  credentialUrl String?  
-  issuedAt      DateTime 
+  issuer        String
+  credentialUrl String?
+  issuedAt      DateTime
 
-  image    String?
+  image String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId Int
-  user User @relation(fields:[userId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   tags Tag[]
 }
 
 model Participation {
-  id Int @id @default(autoincrement())
-  title String
+  id          Int    @id @default(autoincrement())
+  title       String
   description String
 
-  images      String[]
+  images String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId Int
-  user User @relation(fields:[userId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   tags Tag[]
 }
 
 model Tag {
-  id Int @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   name String @unique
 
-  projects Project[]
+  projects       Project[]
   certifications Certification[]
   participations Participation[]
 }
 
 model Education {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   degree      String
   institution String
   startDate   DateTime
   endDate     DateTime? // Null means "In Progress"
-  
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
@@ -294,7 +294,7 @@ model ProjectView {
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId    Int?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ipAddress String?  // Para usuários não logados
+  ipAddress String? // Para usuários não logados
   createdAt DateTime @default(now())
 
   @@index([projectId, userId])

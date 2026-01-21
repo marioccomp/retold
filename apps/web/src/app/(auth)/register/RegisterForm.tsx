@@ -430,8 +430,13 @@ export default function RegisterForm() {
 
           {/* Social accounts */}
           <div className="flex justify-center gap-4">
-            <button className="flex items-center justify-center w-12 h-12 rounded-lg border border-gray-200 text-gray-600 transition-all hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer">
+            <button
+              className="flex items-center justify-center w-full h-12 rounded-lg border border-gray-200 text-gray-600 transition-all hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
+              onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
+              type="button"
+            >
               <FiGithub className="text-xl" />
+              <span>GitHub</span>
             </button>
           </div>
 

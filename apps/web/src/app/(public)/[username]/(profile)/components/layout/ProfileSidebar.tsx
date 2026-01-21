@@ -149,25 +149,6 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                     </p>
                 </div>
 
-                {/* Social Links */}
-                <ul className="flex flex-wrap items-center justify-center gap-3 p-0 m-0 list-none w-full">
-                    <SocialLinkItem
-                        type="github"
-                        url={profile.githubUrl}
-                        Icon={FiGithub}
-                    />
-                    <SocialLinkItem
-                        type="linkedin"
-                        url={profile.linkedinUrl}
-                        Icon={FiLinkedin}
-                    />
-                    <SocialLinkItem
-                        type="website"
-                        url={profile.websiteUrl}
-                        Icon={FiGlobe}
-                    />
-                </ul>
-
                 {/* Stats */}
                 <div className="w-full flex border border-[#e7eae9] rounded-xl overflow-hidden bg-white shadow-sm">
                     <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] font-medium">
@@ -193,6 +174,25 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
                         <span className="block text-[1.1rem] font-bold text-[#152e2b]">{profile.followingCount}</span> {dict.profile.following}
                     </button>
                 </div>
+
+                {/* Social Links */}
+                <ul className="flex flex-wrap items-center justify-center gap-3 p-0 m-0 list-none w-full">
+                    <SocialLinkItem
+                        type="github"
+                        url={profile.githubUrl}
+                        Icon={FiGithub}
+                    />
+                    <SocialLinkItem
+                        type="linkedin"
+                        url={profile.linkedinUrl}
+                        Icon={FiLinkedin}
+                    />
+                    <SocialLinkItem
+                        type="website"
+                        url={profile.websiteUrl}
+                        Icon={FiGlobe}
+                    />
+                </ul>
 
                 {/* Action Button */}
                 <div className="w-full flex flex-col gap-3">
