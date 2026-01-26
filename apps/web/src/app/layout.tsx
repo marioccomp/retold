@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Questrial } from "next/font/google";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import AuthProvider from "../providers/auth";
 import { QueryProvider } from "../providers/QueryProvider";
 import { Toaster } from "sonner";
@@ -42,6 +43,7 @@ export default async function RootLayout({
                 <SearchProvider>
                   <Header session={session} />
                   <main className="flex-grow w-full">{children}</main>
+                  <Footer />
                   <AuthModal />
                   <Toaster richColors position="top-right" />
                 </SearchProvider>

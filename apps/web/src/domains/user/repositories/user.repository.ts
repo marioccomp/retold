@@ -206,6 +206,7 @@ export const userRepository = {
         image: true,
         title: true,
         bio: true,
+        cover: true,
         skills: true,
         ...(currentUserId ? {
           followers: {
