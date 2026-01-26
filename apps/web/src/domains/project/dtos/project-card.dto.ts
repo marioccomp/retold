@@ -1,30 +1,33 @@
 export interface ProjectCardTagDTO {
-  name: string;
-  id: number;
+    id: number;
+    name: string;
 }
 
 export interface ProjectCardDTO {
-  id: number;
-  title: string;
-  description: string | null;
-  status: string;
-  images: string[];
-  likes: number;
-  views: number;
-  tags: ProjectCardTagDTO[];
-  createdAt: string;
+    id: number;
+    title: string;
+    description: string | null;
+    status: string;
+    images: string[];
 
-  ownerName: string;
-  ownerImage: string | null;
-  ownerUsername: string;
+    likes: number;
+    views: number;
+    hasLiked?: boolean;
 
-  ownerId: number;
-  isFollowingOwner: boolean;
+    tags: ProjectCardTagDTO[];
 
-  repositoryUrl?: string;
-  repositoryFullName?: string;
-  repositoryIsPrivate?: boolean;
+    createdAt: string;
 
-  isPinned?: boolean;
-  hasLiked?: boolean;
+    ownerName: string;
+    ownerImage: string | null;
+    ownerUsername: string;
+    ownerId: number;
+    isFollowingOwner?: boolean;
+
+    repositoryUrl?: string;
+    repositoryFullName?: string;
+    repositoryIsPrivate?: boolean;
+
+    isPinned?: boolean;
+    userOwnership?: number; // % contribution
 }

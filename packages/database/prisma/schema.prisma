@@ -63,8 +63,54 @@ model User {
   followers Follows[] @relation("following")
   following Follows[] @relation("follower")
 
+  githubStats GithubStats?
+  userStats   UserProjectStats[]
+
   @@index([email])
   @@index([username])
+}
+
+model GithubStats {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lastCommit        Json? // Para guardar message, date e repo
+  totalStars        Int
+  totalRepositories Int
+  totalPRs          Int
+  topLanguages      Json? // Para guardar array de {name, count}
+}
+
+// Estatísticas detalhadas do usuário em relação a um projeto específico
+model UserProjectStats {
+  id Int @id @default(autoincrement())
+
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Métricas de Código
+  commitsCount Int   @default(0) // Quantidade de commits do usuário
+  linesAdded   Int   @default(0) // Linhas adicionadas (via git log)
+  linesDeleted Int   @default(0) // Linhas deletadas (via git log)
+  ownership    Float @default(0) // % do código atual que pertence ao usuário (via git blame)
+
+  // Métricas de Tempo/Frequência
+  firstCommitDate DateTime? // Data do primeiro commit nesse projeto
+  lastCommitDate  DateTime? // Data do último commit nesse projeto
+  activeDays      Int       @default(0) // Quantos dias diferentes o usuário commitou
+
+  // Métricas de Impacto
+  impactScore Float @default(0) // Um score calculado (ex: complexidade * volume) - futuro
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, projectId])
+  @@index([userId])
+  @@index([projectId])
 }
 
 model Follows {
@@ -173,6 +219,8 @@ model Project {
   likes        Like[]
   views        Int           @default(0)
   projectViews ProjectView[]
+
+  userStats UserProjectStats[]
 }
 
 model Like {

@@ -20,7 +20,8 @@ export async function getHighlightedProject() {
         },
         repository: {
             url: project.repository?.url || "",
-            fullName: project.repository?.fullName || ""
+            fullName: project.repository?.fullName || "",
+            private: project.repository?.private
         },
         tags: project.tags.map((tag) => ({
             name: tag.name,

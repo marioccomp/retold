@@ -1,28 +1,16 @@
-import { userRepository } from "@repo/database";
+import { githubRepository } from "@repo/database";
 import { Octokit } from "octokit";
-import { createAppAuth } from "@octokit/auth-app";
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
 
 export async function getUserRepositories() {
   const session = await auth();
   const userId = Number(session?.user.id);
-  const installation = await userRepository.getUserInstallationId(userId);
-
-  if (!installation) {
-    return [];
-  }
-
-  const octokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: process.env.GITHUB_APP_ID,
-      privateKey: process.env.GITHUB_PRIVATE_KEY,
-      installationId: installation.installationId,
-    },
-  });
 
   try {
+    const token = await githubRepository.getTokenByUserId(userId);
+    const octokit = new Octokit({ auth: token });
+
     const { data } = await octokit.rest.apps.listReposAccessibleToInstallation({
       per_page: 100,
     });

@@ -6,8 +6,10 @@ import { classifyFile } from "./classify-file.js";
 import { buildInfraAndStats } from "./build-infra.js";
 import { buildStructure } from "./build-struct.js";
 
+
 export async function analyzeRepository(repoPath: string) {
   const { files } = scanRepository(repoPath);
+
 
   const { infra, stats } = buildInfraAndStats(files);
   const structure = buildStructure(files);
@@ -28,6 +30,10 @@ export async function analyzeRepository(repoPath: string) {
     },
   });
 
+
+
+
+
   const testFiles = files.filter((f) => classifyFile(f) === "test");
 
   return {
@@ -41,4 +47,5 @@ export async function analyzeRepository(repoPath: string) {
     stats,
     structure,
   };
+
 }

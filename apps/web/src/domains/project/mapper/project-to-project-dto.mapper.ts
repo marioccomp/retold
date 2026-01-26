@@ -14,6 +14,7 @@ interface ProjectRequestDTO {
     repository: {
         url: string;
         fullName: string;
+        private?: boolean;
     };
     tags: ProjectCardTagDTO[];
     likes: number;
@@ -41,6 +42,7 @@ export function mapProjectToProjectDTO(request: ProjectRequestDTO): ProjectCardD
         ownerId: user.id,
         repositoryUrl: repository?.url,
         repositoryFullName: repository?.fullName,
+        repositoryIsPrivate: repository?.private,
         isFollowingOwner: isFollowingOwner ?? false,
     };
 }

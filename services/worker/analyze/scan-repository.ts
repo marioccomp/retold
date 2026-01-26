@@ -16,7 +16,7 @@ export function scanRepository(
   // Default depth tuned to catch common layouts like:
   // - src/main/java/... (Spring Boot)
   // - apps/**/src/... (monorepos)
-  maxDepth = 7,
+  maxDepth = 15,
   currentDepth = 0,
   acc: FileEntry[] = []
 ): RepositoryScanResult {

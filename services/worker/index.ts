@@ -2,20 +2,13 @@ import "dotenv/config";
 import path from "path";
 import fs from "fs";
 import { Worker } from "bullmq";
-import { redisConnection } from "@repo/queue/redis.js";
-import { cloneRepository } from "./clone.js";
-import { prisma } from "@repo/database";
-import { analyzeProjectWithLLM } from "./llm/analyze-project.js";
-import { analyzeRepository } from "./analyze/index.js";
-import { getToken } from "./workerRepository/worker.repository.js";
+import { redisConnection, userAnalyzeQueue } from "@repo/queue";
+import "./user-worker";
+import { cloneRepository } from "./clone";
+import { prisma, githubRepository } from "@repo/database";
+import { analyzeProjectWithLLM } from "./llm/analyze-project";
+import { analyzeRepository } from "./analyze/index";
 
-function printOverview(overview: string, projectId: string) {
-  const separator = "=".repeat(80);
-  console.log(`\n${separator}`);
-  console.log(`Project: ${projectId}\n`);
-  console.log(overview);
-  console.log(`${separator}\n`);
-}
 
 function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
   const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
@@ -47,21 +40,41 @@ const worker = new Worker(
         data: { status: "ANALYZING" },
       });
 
-      const token = await getToken(projectId);
+      const token = await githubRepository.getToken(projectId);
+
+      const projectWithUser = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: { user: true }
+      });
+
+      if (!projectWithUser || !projectWithUser.user) {
+        throw new Error("Project or User not found");
+      }
 
       await cloneRepository(repoUrl, tmpPath, token);
       const readmeContent = readRepositoryReadme(tmpPath);
+
+      // Extract username from repo URL (e.g., https://github.com/username/repo -> username)
+      const githubUsernameFromUrl = repoUrl.split("github.com/")[1]?.split("/")[0] ||
+        repoUrl.split("github.com:")[1]?.split("/")[0] ||
+        projectWithUser.user.username;
+
       const analysis = await analyzeRepository(tmpPath);
+
+      // Trigger user analysis in parallel with LLM processing
+      // Fire and forget - lets the user worker handle it async
+      userAnalyzeQueue.add("analyze-user", {
+        projectId,
+        userEmail: projectWithUser.user.email,
+        githubUsername: githubUsernameFromUrl
+      }).catch(e => console.error("[worker] failed to queue user analysis", e));
+
 
       const llmInsights = await analyzeProjectWithLLM({
         ...analysis,
         readme: readmeContent,
         locale: locale || "en",
       });
-
-      printOverview(llmInsights ?? "", projectId);
-
-      console.log("[worker] analysis result:", JSON.stringify(analysis, null, 2));
 
       await prisma.repositoryAnalysis.upsert({
         where: { projectId },
@@ -119,6 +132,8 @@ const worker = new Worker(
         where: { id: projectId },
         data: { status: "DONE" },
       });
+
+
     } catch (err) {
       console.error(err);
 

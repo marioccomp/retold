@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "../_actions/get-profile";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 
+
+
 // Specialized Components
 import ProfileBanner from "./components/layout/ProfileBanner";
 import ProfileSidebar from "./components/layout/ProfileSidebar";
@@ -56,6 +58,8 @@ export default function ProfileClient({ username, ownProfile }: Props) {
     setSearchQuery("");
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", value);
+    // Remove project param when changing tabs to avoid the project panel persisting
+    params.delete("project");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 

@@ -38,10 +38,11 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
         return {
             id: projectDTO.id,
-            userId: undefined,
+            userId: projectDTO.ownerId,
             title: projectDTO.title,
             description: projectDTO.description,
-            status: "PENDING",
+            status: projectDTO.status,
+            images: projectDTO.images,
             owner: {
                 name: projectDTO.ownerName,
                 image: projectDTO.ownerImage,
@@ -54,6 +55,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                     fullName: projectDTO.repositoryFullName || "",
                     name: projectDTO.repositoryFullName?.split("/")[1] || "",
                     isActive: true,
+                    private: projectDTO.repositoryIsPrivate ?? false,
                 }
                 : null,
         };
@@ -321,6 +323,15 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
           }
           100% {
             background-position: -100% center;
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
           }
         }
       `}</style>

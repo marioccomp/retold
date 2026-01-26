@@ -7,6 +7,7 @@ import { startProjectAnalysisAction } from "./start-project-analysis.action";
 import { ActionResponse } from "@/lib/action-response";
 import { Project } from "@prisma/client";
 import { getDictionary } from "@/src/i18n/server";
+import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 // import { analyzeRepoQueue } from "@repo/queue";
 
 type CreateProjectInput = {
@@ -61,25 +62,9 @@ export async function createProjectAction(input: CreateProjectInput): Promise<Ac
 
     const projectId = project.id;
 
-    await startProjectAnalysisAction(projectId);
+    await postGithubStats(session.user.username || "");
 
-    // TODO: Uncomment when queue is ready
-    // await analyzeRepoQueue.add(
-    //   "analyze",
-    //   {
-    //     projectId: project.id,
-    //     repositoryId: repository.id,
-    //     repoUrl: repository.url,
-    //   },
-    //   {
-    //     attempts: 3,
-    //     backoff: {
-    //       type: "exponential",
-    //       delay: 5000,
-    //     },
-    //     removeOnComplete: true,
-    //   }
-    // );
+    await startProjectAnalysisAction(projectId);
 
     return { success: true, data: project };
 }
