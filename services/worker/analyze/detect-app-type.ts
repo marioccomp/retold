@@ -37,7 +37,7 @@ export function detectAppType(input: {
   if (languages.includes("Java")) backendScore += 2;
   if (languages.includes("Go")) backendScore += 2;
 
-  /* ================= Infra signals ================= */
+  /* ===================== Infra signals ===================== */
 
   if (signals.hasDockerfile) backendScore += 1;
   if (signals.hasCI) backendScore += 1;
@@ -47,6 +47,11 @@ export function detectAppType(input: {
   if (frontendScore > 0 && backendScore > 0) return "Fullstack";
   if (frontendScore > backendScore) return "Frontend";
   if (backendScore > frontendScore) return "Backend";
+
+  // Fallback for Systems/CLI
+  if (languages.some(l => ["C", "C++", "Rust", "Go"].includes(l)) && frontendScore === 0) {
+    return "CLI / Console App";
+  }
 
   return "Unknown";
 }

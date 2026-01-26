@@ -27,7 +27,14 @@ export async function analyzeProjectWithLLM(analysis: {
     docsFiles: number;
   };
   structure: any;
+  structure: any;
   readme?: string;
+  codeSamples?: {
+    relativePath: string;
+    language: string;
+    excerpt: string;
+    reason: string;
+  }[];
   locale?: string;
 }) {
   const prompt = projectOverviewPrompt(analysis, analysis.locale);
