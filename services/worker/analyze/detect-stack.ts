@@ -259,6 +259,24 @@ export function detectStack(files: FileEntry[], languages: string[]) {
     if (cargo.includes("diesel")) stack.tools.push("Diesel");
   }
 
+  /* ===================== C / C++ / SYSTEMS ===================== */
+
+  if (stack.languages.includes("C") || stack.languages.includes("C++")) {
+    if (hasFile("Makefile")) stack.tools.push("Make");
+    if (hasFile("CMakeLists.txt")) stack.tools.push("CMake");
+    if (hasFile("configure.ac") || hasFile("configure")) stack.tools.push("Autotools");
+
+    // Simple heuristic for common C libs (scan first few C files)
+    const cFiles = files.filter(f => f.ext === ".c" || f.ext === ".cpp" || f.ext === ".h").slice(0, 3);
+    for (const cf of cFiles) {
+      const content = fs.readFileSync(cf.path, "utf-8");
+      if (content.includes("ncurses.h")) stack.tools.push("ncurses");
+      if (content.includes("SDL.h") || content.includes("SDL2/SDL.h")) stack.tools.push("SDL");
+      if (content.includes("raylib.h")) stack.tools.push("Raylib");
+      if (content.includes("GL/gl.h")) stack.tools.push("OpenGL");
+    }
+  }
+
   /* ===================== FINAL ===================== */
 
   stack.languages = [...new Set(stack.languages)];

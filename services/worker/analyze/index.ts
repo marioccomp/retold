@@ -7,7 +7,11 @@ import { buildInfraAndStats } from "./build-infra.js";
 import { buildStructure } from "./build-struct.js";
 
 
-export async function analyzeRepository(repoPath: string) {
+import path from "path";
+import { classifyProject } from "./classify-project.js";
+import { selectCodeSamples } from "./select-code-samples.js";
+
+export async function analyzeRepository(repoPath: string, opts?: { readme?: string; repoUrl?: string }) {
   const { files } = scanRepository(repoPath);
 
 
@@ -30,22 +34,46 @@ export async function analyzeRepository(repoPath: string) {
     },
   });
 
+  const primaryLanguage = detectedLanguages[0] ?? stack.languages[0] ?? "Unknown";
 
-
-
+  const classification = classifyProject({
+    files: files.map(f => ({ path: path.relative(repoPath, f.path), name: f.name })),
+    readme: opts?.readme ?? "",
+    repoUrl: opts?.repoUrl,
+    stack,
+    infra: {
+      hasCI: infra.hasCI,
+      hasDocker: infra.hasDocker,
+      hasTests: infra.hasTests,
+    },
+    primaryLanguage
+  });
 
   const testFiles = files.filter((f) => classifyFile(f) === "test");
+
+  // Select code samples if necessary (no readme or low confidence/unknowns)
+  let codeSamples: any[] = [];
+  const needsMoreContext = !opts?.readme || classification.confidence < 0.6 || classification.purpose === "unknown";
+
+  if (needsMoreContext) {
+    codeSamples = selectCodeSamples(files, 2).map(s => ({
+      ...s,
+      relativePath: path.relative(repoPath, s.relativePath)
+    }));
+  }
 
   return {
     summary: {
       // Prefer extension-based detection; fallback to inferred stack languages.
-      primaryLanguage: detectedLanguages[0] ?? stack.languages[0] ?? "Unknown",
+      primaryLanguage,
       appType,
     },
     stack,
     infra,
     stats,
     structure,
+    classification,
+    codeSamples
   };
 
 }

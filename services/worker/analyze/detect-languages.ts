@@ -10,6 +10,19 @@ const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
   ".rb": "Ruby",
   ".php": "PHP",
   ".rs": "Rust",
+  ".c": "C",
+  ".h": "C",
+  ".cpp": "C++",
+  ".hpp": "C++",
+  ".cc": "C++",
+  ".cxx": "C++",
+  ".hh": "C++",
+  ".lua": "Lua",
+  ".r": "R",
+  ".jl": "Julia",
+  ".sh": "Shell",
+  ".kt": "Kotlin",
+  ".swift": "Swift",
 };
 
 export function detectLanguages(files: FileEntry[]) {
