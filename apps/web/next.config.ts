@@ -10,6 +10,11 @@ dotenv.config({
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@prisma/client", "pg"],
   transpilePackages: ["@repo/database"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
 };
 
 export default nextConfig;
