@@ -15,5 +15,7 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export { Prisma } from "@prisma/client";
 export type { User, Project, Tag, Certification, Participation, Repository, RepositoryAnalysis } from "@prisma/client";
-export * from "./repositories";
+export * from "./repositories/index";
+export { githubRepository } from "./repositories/github.repository";
+
 

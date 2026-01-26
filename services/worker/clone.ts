@@ -12,5 +12,5 @@ export async function cloneRepository(repoUrl: string, targetPath: string, token
   if (token) {
     authenticatedUrl = repoUrl.replace("https://", `https://x-access-token:${token}@`);
   }
-  await execAsync(`git clone --depth=1 ${authenticatedUrl} ${targetPath}`);
+  await execAsync(`git clone --depth=50 ${authenticatedUrl} ${targetPath}`);
 }

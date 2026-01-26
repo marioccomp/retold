@@ -12,6 +12,8 @@ import { useProjectAnalysis } from "./hooks/useProjectAnalysis";
 import { ProjectSettings } from "./components/ProjectSettings";
 import { useTranslation } from "@/src/i18n/client";
 import { incrementView } from "@/src/domains/project/actions/increment-view.action";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { getProjectOwnerStats } from "@/src/domains/project/actions/get-project-owner-stats.action";
 
 type FeedProjectPanelProps = {
     project: ProjectForOverlay;
@@ -42,6 +44,26 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
         handleAnalyzeRepo
     } = useProjectAnalysis(project);
 
+    const queryClient = useQueryClient();
+
+    // Fetch ownership stats with polling if analyzing
+    const { data: userStats } = useQuery({
+        queryKey: ['project-owner-stats', project.id, project.userId],
+        queryFn: () => getProjectOwnerStats(project.id, project.userId!),
+        enabled: !!project.id && !!project.userId,
+        refetchInterval: (status === 'ANALYZING' || status === 'PENDING') ? 5000 : false
+    });
+
+    // Invalidate queries when analysis finishes (stats become available)
+    useEffect(() => {
+        if (userStats && (status === 'ANALYZING' || status === 'PENDING')) {
+            queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+            queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
+        }
+    }, [userStats, status, queryClient]);
+
+    const displayOwnership = userStats?.ownership ?? project.userOwnership;
+
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex flex-col w-full">
             <style jsx global>{`
@@ -62,12 +84,25 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
 
             {/* Header - Centered & Modern */}
             <div className="p-8 md:p-12 border-b border-gray-100 bg-white relative">
+                {/* Ownership Seal - Top Left */}
+                {displayOwnership !== undefined && displayOwnership > 0 && (
+                    <div className="absolute top-6 left-6 z-10 hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-100 text-emerald-900 rounded-full shadow-sm animate-in fade-in zoom-in duration-300">
+                        <Sparkles className="w-3.5 h-3.5 text-[#05dc7f]" />
+                        <span className="text-xs font-medium">
+                            {t.overlay.ownership?.authored_prefix || "Authored"} <strong className="text-[#05dc7f]">{Math.round(displayOwnership)}%</strong> {t.overlay.ownership?.authored_suffix || "of the codebase"}
+                        </span>
+                    </div>
+                )}
+
                 {/* Absolute Layout for Status and Settings */}
                 <div className="absolute top-6 right-6 flex items-center gap-3">
                     <StatusBadge status={status || "PENDING"} isOwner={!!isOwner} t={t} />
                     {isOwner && (
                         <ProjectSettings
-                            project={project}
+                            project={{
+                                ...project,
+                                ownerUsername: project.owner?.username
+                            }}
                             onDelete={onClose}
                             triggerClassName="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-100"
                         />
@@ -113,9 +148,10 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                                 <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
                                     {project.owner.name}
                                 </span>
-                                <ExternalLink className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#05dc7f] transition-colors" />
                             </Link>
                         )}
+
+
 
                         {project.description && (
                             <p className="text-base sm:text-xl text-gray-600 leading-relaxed max-w-2xl w-full font-normal break-all whitespace-pre-wrap mx-auto text-left py-4 border-l-2 border-[#05dc7f]/10 pl-6 max-[650px]:text-[15px] max-[650px]:pl-4">
@@ -252,7 +288,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

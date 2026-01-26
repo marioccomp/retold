@@ -122,6 +122,10 @@
                 "alt_preview": "Project preview",
                 "alt_active": "Active project preview",
                 "alt_index": "Preview {index}"
+            },
+            "ownership": {
+                "authored_prefix": "Authored",
+                "authored_suffix": "of the codebase"
             }
         },
         "create_panel": {
@@ -288,6 +292,8 @@
         "stat_prs": "Pull Requests",
         "stat_issues": "Issues",
         "stat_projects": "Projects analyzed",
+        "stat_lines_changed": "Lines Changed",
+        "stat_active_days": "Active Days",
         "pinned_projects_empty": "This user hasn't pinned any projects yet.",
         "add_pinned_project": "Add Pinned Project",
         "select_project_to_pin": "Select a project to pin",

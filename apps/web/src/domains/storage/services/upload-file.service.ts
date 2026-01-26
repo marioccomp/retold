@@ -67,7 +67,7 @@ export async function uploadFileService({
     objectName = `users/${userId}/avatar/${randomUUID()}.webp`;
   } else if (folder === "covers") {
     objectName = `users/${userId}/cover/${randomUUID()}.webp`;
-  } else {
+  } else { 
     if (!projectId) {
       throw new Error("projectId is required for project images");
     }

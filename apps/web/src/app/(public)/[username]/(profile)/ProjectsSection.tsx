@@ -40,7 +40,9 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   const queryClient = useQueryClient();
 
   const projects = profile.projects;
-  const selectedProjectId = searchParams.get("project");
+  const currentTab = searchParams.get("tab") || "profile";
+  // Only consider project selection when on the projects tab
+  const selectedProjectId = currentTab === "projects" ? searchParams.get("project") : null;
 
   // Find project data based on URL param
   const projectData = selectedProjectId ? projects.find(p => String(p.id) === selectedProjectId) : null;
@@ -79,6 +81,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
 
   const handleProjectCreated = () => {
     queryClient.invalidateQueries({ queryKey: ["profile", profile.username] });
+    queryClient.invalidateQueries({ queryKey: ["github-stats", profile.username] });
     setIsCreating(false);
   };
 
@@ -90,7 +93,9 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   };
 
   const handleProjectClose = () => {
-    router.back();
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("project");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   // Se está criando, mostrar apenas o painel de criação

@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import ProfileClient from "./ProfileClient";
-import { userRepository } from "@repo/database";
-import { mapUserToPublicProfile } from "@/src/domains/user/mappers/user-to-public-profile.mapper";
 import { auth } from "@/src/domains/auth/auth";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
 import { getProfile } from "../_actions/get-profile";
+import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
+import { getGithubDatabaseStats } from "../_actions/get-github-database-stats.action";
+
 
 type PageProps = {
   params: Promise<{
@@ -18,14 +19,23 @@ export default async function Page({ params }: PageProps) {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["profile", username],
-    queryFn: () => getProfile(username),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["profile", username],
+      queryFn: () => getProfile(username),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["github-stats", username],
+      queryFn: () => getGithubDatabaseStats(username),
+    }),
+  ]);
 
-  const profile = queryClient.getQueryData(["profile", username]);
+  const profile: PublicProfileDTO | null | undefined = await queryClient.getQueryData(["profile", username]);
+
 
   if (!profile) notFound();
+
+
 
   // const user = await userRepository.findPublicProfileByUsername(username);
 

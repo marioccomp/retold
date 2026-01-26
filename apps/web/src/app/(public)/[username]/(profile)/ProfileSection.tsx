@@ -42,13 +42,7 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
         "PostgreSQL",
     ];
 
-    // Mock stats
-    const stats = {
-        commits: 1250,
-        prs: 45,
-        issues: 12,
-        projectsCount: profile.projects.length
-    };
+
 
     return (
         <div className="flex flex-col gap-10 animate-[fadeIn_0.3s_ease-out_forwards] pb-24 relative">
@@ -67,7 +61,7 @@ export default function ProfileSection({ profile, ownProfile }: Props) {
             />
 
             {/* 3. Stats Section */}
-            <ProfileStats stats={stats} />
+            <ProfileStats stats={profile.stats} />
 
             {/* 4. Secondary info (Education & Skills) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">

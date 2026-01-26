@@ -3,6 +3,7 @@
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { revalidatePath } from "next/cache";
+import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 
 export async function deleteProjectAction(projectId: number) {
     const session = await auth();
@@ -27,6 +28,10 @@ export async function deleteProjectAction(projectId: number) {
             id: projectId,
         },
     });
+
+    if (session.user.username) {
+        await postGithubStats(session.user.username);
+    }
 
     revalidatePath(`/${session.user.username}`);
     return { success: true };

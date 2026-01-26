@@ -26,6 +26,7 @@ type ProjectSettingsProps = {
         title: string;
         description: string | null;
         images?: string[];
+        ownerUsername?: string;
     };
     onUpdate?: () => void;
     onDelete?: () => void;
@@ -160,6 +161,10 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
             queryClient.invalidateQueries({ queryKey: ["project-analysis", project.id] });
             queryClient.invalidateQueries({ queryKey: ["profile"] });
             queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+
+            if (project.ownerUsername) {
+                queryClient.invalidateQueries({ queryKey: ["github-stats", project.ownerUsername] });
+            }
             setIsEditOpen(false);
             if (onUpdate) onUpdate();
 
@@ -180,6 +185,10 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
             if (onDelete) onDelete();
             queryClient.invalidateQueries({ queryKey: ["profile"] });
             queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+
+            if (project.ownerUsername) {
+                queryClient.invalidateQueries({ queryKey: ["github-stats", project.ownerUsername] });
+            }
         } catch (error) {
             console.error(error);
             toast.error(t.toast.delete_error);

@@ -1,10 +1,11 @@
+export { userRepository } from "@repo/database";
 import { prisma } from "@repo/database";
 import { User } from "@repo/database";
 
 type UpdatableProfileFields = Pick<User, "name" | "username" | "bio" | "title" | "githubUrl" | "linkedinUrl" | "websiteUrl" | "longBio" | "skills" | "phone" | "email">;
 type UpdateProfileInput = Partial<UpdatableProfileFields>;
 
-export const userRepository = {
+const userRepository = {
   findByEmailOrUsername(email: string, username: string) {
     return prisma.user.findFirst({
       where: {

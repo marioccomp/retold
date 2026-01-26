@@ -10,6 +10,15 @@ export type EducationDTO = {
   endDate: string | null;
 }
 
+export type UserStatsDTO = {
+  commits: number;
+  linesAdded: number;
+  linesDeleted: number;
+  activeDays: number;
+  projectsCount: number;
+  averageOwnership: number;
+};
+
 export type PublicProfileDTO = {
   id: number;
   username: string;
@@ -33,4 +42,6 @@ export type PublicProfileDTO = {
   certifications: CertificationCardDTO[];
   participations: ParticipationCardDTO[];
   educations: EducationDTO[];
+
+  stats: UserStatsDTO;
 };

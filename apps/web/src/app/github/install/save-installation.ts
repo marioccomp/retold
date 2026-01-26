@@ -1,8 +1,6 @@
 "use server";
 
-import { prisma } from "@repo/database";
-import { Octokit } from "octokit";
-import { createAppAuth } from "@octokit/auth-app";
+import { prisma, githubRepository } from "@repo/database";
 
 interface SaveInstallationInput {
   installationId: string;
@@ -16,14 +14,7 @@ export async function saveGithubInstallation({ installationId, userId }: SaveIns
 
   if (exists) return;
 
-  const octokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: process.env.GITHUB_APP_ID!,
-      privateKey: process.env.GITHUB_PRIVATE_KEY!,
-      installationId,
-    },
-  });
+  const octokit = githubRepository.getOctokitFromInstallationId(installationId);
 
   const { data } = await octokit.rest.apps.getInstallation({
     installation_id: Number(installationId),

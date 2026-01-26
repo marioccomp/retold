@@ -36,6 +36,7 @@ export const projectRepository = {
                     select: {
                         url: true,
                         fullName: true,
+                        private: true,
                     }
                 },
                 _count: {

@@ -122,6 +122,10 @@
                 "alt_preview": "Prévia do projeto",
                 "alt_active": "Prévia ativa do projeto",
                 "alt_index": "Prévia {index}"
+            },
+            "ownership": {
+                "authored_prefix": "Desenvolveu",
+                "authored_suffix": "do código base"
             }
         },
         "create_panel": {
@@ -288,6 +292,8 @@
         "stat_prs": "Pull Requests",
         "stat_issues": "Issues",
         "stat_projects": "Projetos analisados",
+        "stat_lines_changed": "Linhas Alteradas",
+        "stat_active_days": "Dias Ativos",
         "pinned_projects_empty": "Este usuário ainda não fixou nenhum projeto.",
         "add_pinned_project": "Adicionar Projeto Fixado",
         "select_project_to_pin": "Selecione um projeto para fixar",

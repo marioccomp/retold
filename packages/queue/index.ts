@@ -7,4 +7,8 @@ export const analyzeRepoQueue = new Queue("analyze-repo", {
   connection: redisConnection,
 });
 
+export const userAnalyzeQueue = new Queue("user-analyze", {
+  connection: redisConnection,
+});
+
 export * from "./redis";

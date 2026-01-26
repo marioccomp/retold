@@ -230,6 +230,7 @@ export default function Header({ session: initialSession }: { session: Session |
             </Button>
           </div>
 
+
           {status === "authenticated" ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
