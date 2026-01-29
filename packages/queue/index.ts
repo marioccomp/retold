@@ -11,4 +11,8 @@ export const userAnalyzeQueue = new Queue("user-analyze", {
   connection: redisConnection,
 });
 
+export const lastCommitQueue = new Queue("github-last-commit", {
+  connection: redisConnection,
+});
+
 export * from "./redis";

@@ -4,11 +4,11 @@ import fs from "fs";
 import { Worker } from "bullmq";
 import { redisConnection, userAnalyzeQueue } from "@repo/queue";
 import "./user-worker";
+import "./last-commit-worker";
 import { cloneRepository } from "./clone";
 import { prisma, githubRepository } from "@repo/database";
 import { analyzeProjectWithLLM } from "./llm/analyze-project";
 import { analyzeRepository } from "./analyze/index";
-
 
 function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
   const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
@@ -44,7 +44,7 @@ const worker = new Worker(
 
       const projectWithUser = await prisma.project.findUnique({
         where: { id: projectId },
-        include: { user: true }
+        include: { user: true },
       });
 
       if (!projectWithUser || !projectWithUser.user) {
@@ -55,7 +55,8 @@ const worker = new Worker(
       const readmeContent = readRepositoryReadme(tmpPath);
 
       // Extract username from repo URL (e.g., https://github.com/username/repo -> username)
-      const githubUsernameFromUrl = repoUrl.split("github.com/")[1]?.split("/")[0] ||
+      const githubUsernameFromUrl =
+        repoUrl.split("github.com/")[1]?.split("/")[0] ||
         repoUrl.split("github.com:")[1]?.split("/")[0] ||
         projectWithUser.user.username;
 
@@ -63,12 +64,13 @@ const worker = new Worker(
 
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
-      userAnalyzeQueue.add("analyze-user", {
-        projectId,
-        userEmail: projectWithUser.user.email,
-        githubUsername: githubUsernameFromUrl
-      }).catch(e => console.error("[worker] failed to queue user analysis", e));
-
+      userAnalyzeQueue
+        .add("analyze-user", {
+          projectId,
+          userEmail: projectWithUser.user.email,
+          githubUsername: githubUsernameFromUrl,
+        })
+        .catch((e) => console.error("[worker] failed to queue user analysis", e));
 
       const llmInsights = await analyzeProjectWithLLM({
         ...analysis,
@@ -133,8 +135,6 @@ const worker = new Worker(
         where: { id: projectId },
         data: { status: "DONE" },
       });
-
-
     } catch (err) {
       console.error(err);
 

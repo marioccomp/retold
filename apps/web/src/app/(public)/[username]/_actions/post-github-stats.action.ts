@@ -6,102 +6,81 @@ import { projectRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 
 export async function postGithubStats(username: string): Promise<ActionResponse> {
-    const user = await prisma.user.findUnique({
-        where: { username },
-        include: { githubInstallations: true }
-    });
+  const user = await prisma.user.findUnique({
+    where: { username },
+    include: { githubInstallations: true },
+  });
 
-    if (!user || user.githubInstallations.length === 0) return {
-        success: false,
-        message: "No github installations found",
+  if (!user || user.githubInstallations.length === 0)
+    return {
+      success: false,
+      message: "No github installations found",
     };
 
-    const githubLogin = user.githubInstallations[0].accountLogin;
+  const githubLogin = user.githubInstallations[0].accountLogin;
 
-    try {
-        const token = await githubRepository.getTokenByUserId(user.id);
-        const octokit = new Octokit({ auth: token });
+  try {
+    const token = await githubRepository.getTokenByUserId(user.id);
+    const octokit = new Octokit({ auth: token });
 
-        const userProjects = await projectRepository.getAllProjects(user.id);
+    const userProjects = await projectRepository.getAllProjects(user.id);
 
-        const projectRepoNames = userProjects.map(p => p.repository?.fullName).filter(Boolean);
+    const projectRepoNames = userProjects.map((p) => p.repository?.fullName).filter(Boolean);
 
-        let lastCommitData = null;
-        let repoFilter = "";
+    let repoFilter = "";
 
-        if (projectRepoNames.length > 0) {
-            repoFilter = projectRepoNames.map(name => `repo:${name}`).join(" ");
-            const commits = await octokit.rest.search.commits({
-                q: `${repoFilter} author:${githubLogin}`,
-                sort: "author-date",
-                order: "desc",
-                per_page: 1,
-            });
+    const [repoData, prData] = await Promise.all([
+      octokit.rest.apps.listReposAccessibleToInstallation({
+        per_page: 100,
+      }),
+      octokit.rest.search.issuesAndPullRequests({
+        q: `${repoFilter} author:${githubLogin} type:pr`,
+        per_page: 1,
+      }),
+    ]);
 
-            if (commits.data.items.length > 0) {
-                const item = commits.data.items[0];
-                lastCommitData = {
-                    message: item.commit.message,
-                    date: item.commit.author.date,
-                    repo: item.repository.full_name,
-                };
-            }
-        }
+    const { data } = repoData;
 
-        const [repoData, prData] = await Promise.all([
-            octokit.rest.apps.listReposAccessibleToInstallation({
-                per_page: 100,
-            }),
-            octokit.rest.search.issuesAndPullRequests({
-                q: `${repoFilter} author:${githubLogin} type:pr`,
-                per_page: 1,
-            })
-        ]);
+    const userProjectRepositories = data.repositories.filter((repo) =>
+      userProjects.some((p) => p.repository?.fullName === repo.full_name)
+    );
 
-        const { data } = repoData;
+    let totalStars = 0;
+    const languages: Record<string, number> = {};
 
-        const userProjectRepositories = data.repositories.filter(repo => userProjects.some(p => p.repository?.fullName === repo.full_name));
+    userProjectRepositories.forEach((repo) => {
+      totalStars += repo.stargazers_count || 0;
+      if (repo.language) {
+        languages[repo.language] = (languages[repo.language] || 0) + 1;
+      }
+    });
 
-        let totalStars = 0;
-        const languages: Record<string, number> = {};
+    const topLanguages = Object.entries(languages)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([name, count]) => ({ name, count }));
 
-        userProjectRepositories.forEach((repo) => {
-            totalStars += repo.stargazers_count || 0;
-            if (repo.language) {
-                languages[repo.language] = (languages[repo.language] || 0) + 1;
-            }
+    await userRepository.createOrUpdateGithubStats(user.id, {
+      totalStars,
+      totalRepositories: data.total_count,
+      totalPRs: prData.data.total_count,
+      topLanguages,
+    });
 
-        });
-
-        const topLanguages = Object.entries(languages)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 5)
-            .map(([name, count]) => ({ name, count }))
-
-
-        await userRepository.createOrUpdateGithubStats(user.id, {
-            lastCommit: lastCommitData,
-            totalStars,
-            totalRepositories: data.total_count,
-            totalPRs: prData.data.total_count,
-            topLanguages,
-        });
-
-        return {
-            success: true,
-        };
-
-    } catch (error) {
-        if (error instanceof Error && error.message === "No github installations found") {
-            return {
-                success: false,
-                message: "No github installations found",
-            }
-        }
-        console.error("Error fetching github stats:", error);
-        return {
-            success: false,
-            message: "Error fetching github stats",
-        }
+    return {
+      success: true,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message === "No github installations found") {
+      return {
+        success: false,
+        message: "No github installations found",
+      };
     }
+    console.error("Error fetching github stats:", error);
+    return {
+      success: false,
+      message: "Error fetching github stats",
+    };
+  }
 }
