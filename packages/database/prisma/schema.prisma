@@ -76,11 +76,13 @@ model GithubStats {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  lastCommit        Json? // Para guardar message, date e repo
+  lastCommit        Json? 
+  lastCommitFetchedAt DateTime?
   totalStars        Int
   totalRepositories Int
   totalPRs          Int
-  topLanguages      Json? // Para guardar array de {name, count}
+  topLanguages      Json? 
+  updatedAt DateTime? @updatedAt
 }
 
 // Estatísticas detalhadas do usuário em relação a um projeto específico
@@ -96,7 +98,6 @@ model UserProjectStats {
   commitsCount Int   @default(0) // Quantidade de commits do usuário
   linesAdded   Int   @default(0) // Linhas adicionadas (via git log)
   linesDeleted Int   @default(0) // Linhas deletadas (via git log)
-  ownership    Float @default(0) // % do código atual que pertence ao usuário (via git blame)
 
   // Métricas de Tempo/Frequência
   firstCommitDate DateTime? // Data do primeiro commit nesse projeto

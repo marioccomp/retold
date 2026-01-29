@@ -27,7 +27,6 @@ export async function analyzeProjectWithLLM(analysis: {
     docsFiles: number;
   };
   structure: any;
-  structure: any;
   readme?: string;
   codeSamples?: {
     relativePath: string;

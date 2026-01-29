@@ -16,12 +16,28 @@ const userWithProfileData = Prisma.validator<Prisma.UserDefaultArgs>()({
     },
     followers: true,
     userStats: true,
+    githubStats: true,
   },
 });
 
 type UserWithProfileData = Prisma.UserGetPayload<typeof userWithProfileData>;
 
-export function mapUserToPublicProfile(user: UserWithProfileData, currentUserId?: number): PublicProfileDTO {
+type LastCommitDTO = { message: string; date: string; repo: string } | null;
+
+function normalizeLastCommit(value: unknown): LastCommitDTO {
+  if (!value || typeof value !== "object") return null;
+  const v = value as any;
+
+  if (typeof v.message === "string" && typeof v.date === "string" && typeof v.repo === "string") {
+    return { message: v.message, date: v.date, repo: v.repo };
+  }
+  return null;
+}
+
+export function mapUserToPublicProfile(
+  user: UserWithProfileData,
+  currentUserId?: number
+): PublicProfileDTO {
   const isFollowing = user.followers && user.followers.length > 0;
 
   return {
@@ -58,8 +74,6 @@ export function mapUserToPublicProfile(user: UserWithProfileData, currentUserId?
       description: project.description,
       status: project.status,
       images: project.images,
-      userOwnership: user.userStats?.find((s: Readonly<{ projectId: number; ownership: number }>) => s.projectId === project.id)?.ownership ?? 0,
-
       createdAt: project.createdAt.toISOString(),
 
       likes: project._count?.likes ?? 0,
@@ -125,9 +139,8 @@ export function mapUserToPublicProfile(user: UserWithProfileData, currentUserId?
       linesDeleted: user.userStats.reduce((acc, curr) => acc + curr.linesDeleted, 0),
       activeDays: user.userStats.reduce((acc, curr) => acc + curr.activeDays, 0),
       projectsCount: user.projects.length,
-      averageOwnership: user.userStats.length > 0
-        ? user.userStats.reduce((acc, curr) => acc + curr.ownership, 0) / user.userStats.length
-        : 0
-    }
+      lastCommitFetchedAt: user.githubStats?.lastCommitFetchedAt || null,
+      lastCommit: normalizeLastCommit(user.githubStats?.lastCommit),
+    },
   };
 }

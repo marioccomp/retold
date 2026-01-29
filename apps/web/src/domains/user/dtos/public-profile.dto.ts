@@ -8,7 +8,7 @@ export type EducationDTO = {
   institution: string;
   startDate: string;
   endDate: string | null;
-}
+};
 
 export type UserStatsDTO = {
   commits: number;
@@ -16,7 +16,12 @@ export type UserStatsDTO = {
   linesDeleted: number;
   activeDays: number;
   projectsCount: number;
-  averageOwnership: number;
+  lastCommit?: {
+    message: string;
+    date: string;
+    repo: string;
+  } | null;
+  lastCommitFetchedAt: Date | null;
 };
 
 export type PublicProfileDTO = {
