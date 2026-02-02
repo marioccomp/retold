@@ -49,6 +49,8 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState<"public" | "private">("public");
     const [selectedRepoId, setSelectedRepoId] = useState<number | null>(null);
+    const [manualUrl, setManualUrl] = useState("");
+    const [repoMode, setRepoMode] = useState<"select" | "url">("select");
     const [images, setImages] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
@@ -158,14 +160,18 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     // Create Project Mutation
     const { mutate: createProject, isPending: mutationIsCreating } = useMutation({
         mutationFn: async () => {
-            if (!title || !description || !selectedRepoId) return;
+            if (!title || !description) return;
+            // Validation depending on mode
+            if (repoMode === "select" && !selectedRepoId) return;
+            if (repoMode === "url" && !manualUrl) return;
 
             const result = await createProjectAction({
                 title,
                 description,
                 visibility,
-                repositoryId: selectedRepoId,
-            });
+                repositoryId: repoMode === "select" ? selectedRepoId! : undefined,
+                githubUrl: repoMode === "url" ? manualUrl : undefined,
+            } as any);
 
             if (!result.success) {
                 throw new Error(result.message || t.toast.error);
@@ -203,7 +209,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         createProject();
     };
 
-    const canCreate = title.trim() && description.trim() && selectedRepoId && !mutationIsCreating && !isUploadingImages;
+    // Validation
+    const isRepoValid = repoMode === "select" ? selectedRepoId !== null : !!manualUrl;
+    const canCreate = title.trim() && description.trim() && isRepoValid && !mutationIsCreating && !isUploadingImages;
 
     return (
         <div className="bg-white rounded-[16px] border border-[#e7eae9] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-[fadeIn_0.3s_ease-out]">
@@ -316,56 +324,100 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
 
                     {/* Repositories Section */}
                     <div className="flex flex-col gap-3">
-                        <div>
-                            <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">{t.labels.repository}</h3>
-                            <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.repo_hint}</p>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">{t.labels.repository}</h3>
+                                <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.repo_hint}</p>
+                            </div>
                         </div>
 
-                        {isLoadingRepos ? (
-                            <div className="p-[30px] text-center text-[#6b7c7a] text-[0.9rem]">{t.repo_loading}</div>
-                        ) : repositories.length > 0 ? (
-                            <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1">
-                                {repositories.map((repo) => {
-                                    const isSelected = selectedRepoId === repo.id;
-                                    return (
-                                        <div
-                                            key={repo.id}
-                                            className={cn(
-                                                "flex items-center justify-between p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200",
-                                                isSelected
-                                                    ? "border-[#05dc7f] bg-[#05dc7f]/6"
-                                                    : "border-[#e7eae9] hover:border-[#b8bfbd] hover:bg-[#fafafa]"
-                                            )}
-                                            onClick={() => setSelectedRepoId(repo.id)}
-                                            role="button"
-                                            tabIndex={0}
-                                            onKeyDown={(e) => e.key === "Enter" && setSelectedRepoId(repo.id)}
-                                        >
-                                            <span className="text-[0.9rem] text-[#152e2b] font-medium flex items-center gap-2">
-                                                <FiGithub />
-                                                {repo.name}
-                                            </span>
-                                            <span className="text-[0.8rem] font-medium text-[#05dc7f]">
-                                                {isSelected ? <span className="flex items-center gap-1"><FiCheck /> {t.repo_selected}</span> : ""}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                        {/* Tabs for Repo Source */}
+                        <div className="flex p-1 bg-gray-100/80 rounded-lg">
+                            <button
+                                onClick={() => { setSelectedRepoId(null); setManualUrl(""); setRepoMode("select"); }}
+                                className={cn(
+                                    "flex-1 py-1.5 text-xs font-semibold rounded-md transition-all",
+                                    repoMode === "select" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                                )}
+                            >
+                                Your Repositories
+                            </button>
+                            <button
+                                onClick={() => { setSelectedRepoId(null); setManualUrl(""); setRepoMode("url"); }}
+                                className={cn(
+                                    "flex-1 py-1.5 text-xs font-semibold rounded-md transition-all",
+                                    repoMode === "url" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                                )}
+                            >
+                                Paste URL
+                            </button>
+                        </div>
+
+                        {/* Tab Content */}
+                        {repoMode === "select" ? (
+                            <>
+                                {isLoadingRepos ? (
+                                    <div className="p-[30px] text-center text-[#6b7c7a] text-[0.9rem]">{t.repo_loading}</div>
+                                ) : repositories.length > 0 ? (
+                                    <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1">
+                                        {repositories.map((repo) => {
+                                            const isSelected = selectedRepoId === repo.id;
+                                            return (
+                                                <div
+                                                    key={repo.id}
+                                                    className={cn(
+                                                        "flex items-center justify-between p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200",
+                                                        isSelected
+                                                            ? "border-[#05dc7f] bg-[#05dc7f]/6"
+                                                            : "border-[#e7eae9] hover:border-[#b8bfbd] hover:bg-[#fafafa]"
+                                                    )}
+                                                    onClick={() => setSelectedRepoId(repo.id)}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onKeyDown={(e) => e.key === "Enter" && setSelectedRepoId(repo.id)}
+                                                >
+                                                    <span className="text-[0.9rem] text-[#152e2b] font-medium flex items-center gap-2">
+                                                        <FiGithub />
+                                                        {repo.name}
+                                                    </span>
+                                                    <span className="text-[0.8rem] font-medium text-[#05dc7f]">
+                                                        {isSelected ? <span className="flex items-center gap-1"><FiCheck /> {t.repo_selected}</span> : ""}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="p-6 text-center text-[#6b7c7a] text-[0.9rem] border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa]">
+                                        {t.repo_none}
+                                    </div>
+                                )}
+
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleAddRepository}
+                                    className="cursor-pointer w-full mt-1 border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa] text-[#6b7c7a] text-[0.9rem] font-medium hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[#05dc7f]/4 h-auto py-3 gap-2"
+                                >
+                                    <FiPlus size={18} />
+                                    {repositories.length > 0 ? t.repo_manage : t.repo_connect}
+                                </Button>
+                            </>
                         ) : (
-                            <div className="p-6 text-center text-[#6b7c7a] text-[0.9rem] border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa]">
-                                {t.repo_none}
+                            <div className="flex flex-col gap-2 animate-in fade-in duration-300">
+                                <Label htmlFor="repo-url" className="text-[0.875rem] font-medium text-[#152e2b]">GitHub URL</Label>
+                                <Input
+                                    id="repo-url"
+                                    type="url"
+                                    placeholder="https://github.com/username/repo"
+                                    value={manualUrl}
+                                    onChange={(e) => setManualUrl(e.target.value)}
+                                    className="h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-[0.95rem] focus-visible:ring-[#05dc7f]/30 focus-visible:border-[#05dc7f]"
+                                />
+                                <p className="text-xs text-gray-500">
+                                    Use for public repositories or testing. Does not require GitHub App installation.
+                                </p>
                             </div>
                         )}
-
-                        <Button
-                            variant="ghost"
-                            onClick={handleAddRepository}
-                            className="cursor-pointer w-full mt-1 border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa] text-[#6b7c7a] text-[0.9rem] font-medium hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[#05dc7f]/4 h-auto py-3 gap-2"
-                        >
-                            <FiPlus size={18} />
-                            {repositories.length > 0 ? t.repo_manage : t.repo_connect}
-                        </Button>
                     </div>
                 </div>
             </div>

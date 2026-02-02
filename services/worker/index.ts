@@ -40,7 +40,18 @@ const worker = new Worker(
         data: { status: "ANALYZING" },
       });
 
-      const token = await githubRepository.getToken(projectId);
+      let token = "";
+      try {
+        token = await githubRepository.getToken(projectId);
+      } catch (e: any) {
+        if (e.message.includes("No github installations found")) {
+          console.log("[worker] No GitHub installation found. Attempting public clone without token.");
+        } else {
+          // Log other errors but maybe still try? No, let's rethrow if it's not the specific installation error.
+          // actually, if 'Project not found' or 'User not found' we should fail.
+          throw e; // Rethrow other errors
+        }
+      }
 
       const projectWithUser = await prisma.project.findUnique({
         where: { id: projectId },
