@@ -47,7 +47,8 @@
             "github": "Connect your GitHub account",
             "connected": "Connected",
             "connect": "Connect",
-            "loading": "Loading..."
+            "loading": "Loading...",
+            "already_linked_error": "This GitHub account is already linked to another user."
         }
     },
     "project": {

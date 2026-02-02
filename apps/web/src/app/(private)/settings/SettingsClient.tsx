@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { FiGithub, FiShield, FiAlertTriangle, FiCheckCircle, FiSettings, FiGlobe } from "react-icons/fi";
+import { FiGithub, FiShield, FiAlertTriangle, FiCheckCircle, FiSettings, FiGlobe, FiAlertCircle } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { updatePasswordAction, deleteAccountAction, getConnectedProvidersAction } from "@/src/actions/settings";
 import { setLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
@@ -22,6 +23,8 @@ export function SettingsClient() {
     const [providers, setProviders] = useState<string[]>([]);
     const [loadingProviders, setLoadingProviders] = useState(true);
     const [isGithubLinked, setIsGithubLinked] = useState(false);
+    const [linkError, setLinkError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState("general");
 
     const [pendingPassword, startPasswordTransition] = useTransition();
     const [pendingDelete, startDeleteTransition] = useTransition();
@@ -47,7 +50,10 @@ export function SettingsClient() {
         if (!github) return;
 
         if (github === "linked") toast.success("GitHub conectado com sucesso.");
-        if (github === "already_linked") toast.error("Esse GitHub já está conectado a outra conta.");
+
+        setActiveTab("integrations");
+
+        if (github === "already_linked") setLinkError("already_linked");
         if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
 
         window.history.replaceState(null, "", "/settings");
@@ -110,7 +116,7 @@ export function SettingsClient() {
 
             <Separator className="mb-8" />
 
-            <Tabs defaultValue="general" className="flex flex-col md:flex-row md:items-start gap-8">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col md:flex-row md:items-start gap-8">
                 {/* Sidebar Navigation */}
                 <TabsList className="flex flex-row md:flex-col h-auto w-full md:w-56 bg-transparent p-0 gap-1 shrink-0 self-start sticky top-24">
                     {navItems.map((item) => (
@@ -216,6 +222,16 @@ export function SettingsClient() {
                                 <CardDescription>{dict.settings.connectedAccounts.description}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
+                                {linkError === "already_linked" && (
+                                    <Alert variant="destructive">
+                                        <FiAlertCircle className="h-4 w-4" />
+                                        <AlertTitle>Error</AlertTitle>
+                                        <AlertDescription>
+                                            {/* @ts-ignore - Key added dynamically */}
+                                            {dict.settings.connectedAccounts.already_linked_error}
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
                                 <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50/50">
                                     <div className="flex items-center gap-4">
                                         <div className="bg-white p-2 rounded-full border shadow-sm">

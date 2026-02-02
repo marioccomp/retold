@@ -47,7 +47,8 @@
             "github": "Conecte sua conta do GitHub",
             "connected": "Conectado",
             "connect": "Conectar",
-            "loading": "Carregando..."
+            "loading": "Carregando...",
+            "already_linked_error": "Esta conta do GitHub já está vinculada a outro usuário."
         }
     },
     "project": {
