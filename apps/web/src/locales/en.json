@@ -95,13 +95,23 @@
                 "tech_stack": "Tech Stack",
                 "files": "Files",
                 "infra": "Infra & Quality",
-                "structure": "Structure"
+                "structure": "Structure",
+                "strengths": "Key Strengths",
+                "architecture": "Architecture",
+                "suggestions": "Suggestions",
+                "loading_report": "Loading report data..."
             },
             "stats": {
                 "source": "Source",
                 "tests": "Tests",
                 "config": "Config",
-                "docs": "Docs"
+                "docs": "Docs",
+                "total_files": "Total Files",
+                "sources": "Sources",
+                "code_files": "Code Files",
+                "infra_setup": "Infra & Setup",
+                "tests_found": "Tests found",
+                "no_tests": "No tests"
             },
             "infra": {
                 "ci_cd": "CI/CD Pipeline",
