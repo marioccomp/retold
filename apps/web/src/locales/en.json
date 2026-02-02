@@ -90,6 +90,11 @@
                 "description": "Could not process the repository data.",
                 "button": "Try Again"
             },
+            "rate_limited_view": {
+                "title": "Service Temporarily Unavailable",
+                "description": "We've reached our analysis limit for today. Please try again in about 1 hour.",
+                "button": "Retry Later"
+            },
             "sections": {
                 "summary": "Executive Summary",
                 "tech_stack": "Tech Stack",
@@ -127,6 +132,17 @@
                 "depth": "Max Depth",
                 "present": "Present",
                 "missing": "Missing"
+            },
+            "architecture_types": {
+                "monorepo": "Monorepo",
+                "monolith": "Monolith",
+                "modular_monolith": "Modular Monolith",
+                "microservices": "Microservices",
+                "library": "Library",
+                "cli_tool": "CLI Tool",
+                "mobile_app": "Mobile App",
+                "static_site": "Static Site",
+                "unknown": "Unknown"
             },
             "gallery": {
                 "alt_preview": "Project preview",

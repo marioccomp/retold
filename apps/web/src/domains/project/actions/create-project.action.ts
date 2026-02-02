@@ -31,6 +31,22 @@ export async function createProjectAction(
     return { success: false, message: dict.auth.errors.unauthorized };
   }
 
+  // Check rate limit
+  const user = await prisma.user.findUnique({
+    where: { id: Number(session.user.id) },
+    select: { rateLimitResetAt: true }
+  });
+
+  if (user?.rateLimitResetAt && user.rateLimitResetAt > new Date()) {
+    const diff = user.rateLimitResetAt.getTime() - Date.now();
+    const minutes = Math.floor(diff / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    return {
+      success: false,
+      message: `Limite de análises atingido. Tente novamente em ${minutes}m ${seconds}s.`
+    };
+  }
+
   const existingProject = await prisma.project.findFirst({
     where: { repositoryId: input.repositoryId },
   });

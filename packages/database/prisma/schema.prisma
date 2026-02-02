@@ -58,6 +58,8 @@ model User {
 
   githubInstallations GithubAppInstallation[]
 
+  rateLimitResetAt DateTime?
+
   repositories Repository[]
 
   followers Follows[] @relation("following")
@@ -76,13 +78,13 @@ model GithubStats {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  lastCommit        Json? 
+  lastCommit          Json?
   lastCommitFetchedAt DateTime?
-  totalStars        Int
-  totalRepositories Int
-  totalPRs          Int
-  topLanguages      Json? 
-  updatedAt DateTime? @updatedAt
+  totalStars          Int
+  totalRepositories   Int
+  totalPRs            Int
+  topLanguages        Json?
+  updatedAt           DateTime? @updatedAt
 }
 
 // Estatísticas detalhadas do usuário em relação a um projeto específico
@@ -95,9 +97,9 @@ model UserProjectStats {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   // Métricas de Código
-  commitsCount Int   @default(0) // Quantidade de commits do usuário
-  linesAdded   Int   @default(0) // Linhas adicionadas (via git log)
-  linesDeleted Int   @default(0) // Linhas deletadas (via git log)
+  commitsCount Int @default(0) // Quantidade de commits do usuário
+  linesAdded   Int @default(0) // Linhas adicionadas (via git log)
+  linesDeleted Int @default(0) // Linhas deletadas (via git log)
 
   // Métricas de Tempo/Frequência
   firstCommitDate DateTime? // Data do primeiro commit nesse projeto
@@ -191,6 +193,7 @@ enum ProjectStatus {
   ANALYZING
   DONE
   ERROR
+  RATE_LIMITED
 }
 
 model Project {

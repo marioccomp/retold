@@ -50,7 +50,7 @@ export function buildInfraAndStats(files: FileEntry[]) {
   if (paths.some((p) => p.includes("vitest"))) testTools.push("vitest");
   if (paths.some((p) => p.includes("pytest"))) testTools.push("pytest");
 
-  // K8s: tenta ser menos “chute”
+  // K8s: tenta ser menos "chute"
   const hasKubernetes = paths.some(
     (p) =>
       p.endsWith("kustomization.yaml") ||
@@ -66,6 +66,32 @@ export function buildInfraAndStats(files: FileEntry[]) {
 
   const hasTerraform = paths.some((p) => p.endsWith(".tf"));
 
+  // ===================== Monorepo detection =====================
+  // Count package.json files (excluding node_modules)
+  const packageJsonCount = files.filter(
+    (f) => f.name === "package.json" && !f.relativePath.includes("node_modules")
+  ).length;
+
+  // Detect monorepo tools
+  let monorepoTool: string | null = null;
+  if (names.includes("turbo.json")) monorepoTool = "Turborepo";
+  else if (names.includes("nx.json") || names.includes("workspace.json")) monorepoTool = "Nx";
+  else if (names.includes("lerna.json")) monorepoTool = "Lerna";
+  else if (names.includes("pnpm-workspace.yaml")) monorepoTool = "pnpm workspaces";
+  else if (names.includes("rush.json")) monorepoTool = "Rush";
+
+  // Detect workspace directories (common monorepo patterns)
+  const workspacePatterns = ["apps/", "packages/", "services/", "libs/", "modules/"];
+  const workspaceDirectories = workspacePatterns.filter((pattern) =>
+    paths.some((p) => p.startsWith(pattern) && p.includes("/package.json"))
+  ).map(p => p.replace("/", ""));
+
+  // Determine if it's a monorepo
+  const isMonorepo =
+    monorepoTool !== null ||
+    packageJsonCount >= 3 ||
+    workspaceDirectories.length >= 2;
+
   return {
     infra: {
       hasDockerfile,
@@ -76,6 +102,11 @@ export function buildInfraAndStats(files: FileEntry[]) {
       hasTests: testFiles > 0,
       hasKubernetes,
       hasTerraform,
+      // Monorepo signals
+      isMonorepo,
+      monorepoTool,
+      packageJsonCount,
+      workspaceDirectories,
     },
     stats: {
       totalFiles: files.length,

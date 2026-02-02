@@ -90,6 +90,11 @@
                 "description": "Não foi possível processar os dados do repositório.",
                 "button": "Tentar Novamente"
             },
+            "rate_limited_view": {
+                "title": "Serviço Temporariamente Indisponível",
+                "description": "Atingimos nosso limite de análises por hoje. Tente novamente em cerca de 1 hora.",
+                "button": "Tentar Depois"
+            },
             "sections": {
                 "summary": "Resumo Executivo",
                 "tech_stack": "Stack Tecnológica",
@@ -127,6 +132,17 @@
                 "depth": "Profundidade Máx",
                 "present": "Presente",
                 "missing": "Ausente"
+            },
+            "architecture_types": {
+                "monorepo": "Monorepo",
+                "monolith": "Monolito",
+                "modular_monolith": "Monolito Modular",
+                "microservices": "Microsserviços",
+                "library": "Biblioteca",
+                "cli_tool": "Ferramenta CLI",
+                "mobile_app": "App Mobile",
+                "static_site": "Site Estático",
+                "unknown": "Desconhecido"
             },
             "gallery": {
                 "alt_preview": "Prévia do projeto",

@@ -154,8 +154,65 @@ const worker = new Worker(
         where: { id: projectId },
         data: { status: "DONE" },
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+
+      // Check if it's a rate limit error from Groq
+      const isRateLimitError =
+        err?.error?.error?.code === "rate_limit_exceeded" ||
+        err?.message?.includes("Rate limit") ||
+        err?.message?.includes("rate_limit_exceeded");
+
+      if (isRateLimitError) {
+        console.log("[worker] Rate limit hit - marking project as RATE_LIMITED");
+
+        const message = err?.error?.error?.message || err?.message || "";
+        let addMs = 0;
+
+        // Extract strictly the "try again in ..." part
+        const tryAgainMatch = message.match(/try again in\s+([0-9hms\.]+)/i);
+
+        if (tryAgainMatch) {
+          const timePart = tryAgainMatch[1];
+
+          const hoursMatch = timePart.match(/(\d+)h/);
+          if (hoursMatch) addMs += parseFloat(hoursMatch[1]) * 3600 * 1000;
+
+          const minutesMatch = timePart.match(/(\d+)m/);
+          if (minutesMatch) addMs += parseFloat(minutesMatch[1]) * 60 * 1000;
+
+          const secondsMatch = timePart.match(/(\d+(\.\d+)?)s/);
+          if (secondsMatch) addMs += parseFloat(secondsMatch[1]) * 1000;
+        }
+
+        // Fallback default 1h if parsing failed but it is rate limit
+        if (addMs === 0) addMs = 3600 * 1000;
+
+        const resetAt = new Date(Date.now() + addMs);
+
+        console.log(`[worker] Rate limit duration parsed: ${addMs}ms. Reset at: ${resetAt.toISOString()}`);
+
+        // Find owner to lock
+        const project = await prisma.project.findUnique({
+          where: { id: projectId },
+          select: { userId: true }
+        });
+
+        if (project) {
+          await prisma.user.update({
+            where: { id: project.userId },
+            data: { rateLimitResetAt: resetAt }
+          });
+          console.log(`[worker] User ${project.userId} locked until ${resetAt.toISOString()}`);
+        }
+
+        await prisma.project.update({
+          where: { id: projectId },
+          data: { status: "RATE_LIMITED" },
+        });
+
+        return;
+      }
 
       await prisma.project.update({
         where: { id: projectId },
