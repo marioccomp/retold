@@ -41,6 +41,18 @@ export function SettingsClient() {
         loadProviders();
     }, []);
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const github = params.get("github");
+        if (!github) return;
+
+        if (github === "linked") toast.success("GitHub conectado com sucesso.");
+        if (github === "already_linked") toast.error("Esse GitHub já está conectado a outra conta.");
+        if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
+
+        window.history.replaceState(null, "", "/settings");
+    }, []);
+
     async function handleUpdatePassword(formData: FormData) {
         startPasswordTransition(async () => {
             const result = await updatePasswordAction(null, formData);
@@ -60,7 +72,7 @@ export function SettingsClient() {
     }
 
     async function handleLinkGithub() {
-        await signIn("github", { callbackUrl: "/settings" });
+        window.location.href = "/api/github/link";
     }
 
     async function handleDeleteAccount() {
