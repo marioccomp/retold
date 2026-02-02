@@ -4,6 +4,18 @@ import { groq } from "./groq-client.js";
 import { projectOverviewPrompt } from "./prompts/project-overview.js";
 
 export async function analyzeProjectWithLLM(analysis: Heuristic) {
+  // === DETAILED LOGGING: What data arrives at the LLM ===
+  console.log("\n========== [LLM INPUT DEBUG] ==========");
+  console.log("[LLM INPUT] Stack:", JSON.stringify(analysis.stack, null, 2));
+  console.log("[LLM INPUT] Infra:", JSON.stringify(analysis.infra, null, 2));
+  console.log("[LLM INPUT] Stats:", JSON.stringify(analysis.stats, null, 2));
+  console.log("[LLM INPUT] Structure:", JSON.stringify(analysis.structure, null, 2));
+  console.log("[LLM INPUT] Classification:", JSON.stringify(analysis.classification, null, 2));
+  console.log("[LLM INPUT] README length:", analysis.readme?.length ?? 0, "chars");
+  console.log("[LLM INPUT] README preview:", analysis.readme?.slice(0, 300) ?? "<missing>");
+  console.log("[LLM INPUT] Code samples count:", analysis.codeSamples?.length ?? 0);
+  console.log("========================================\n");
+
   const prompt = projectOverviewPrompt(analysis, analysis.locale);
 
   const system =
@@ -22,8 +34,10 @@ export async function analyzeProjectWithLLM(analysis: Heuristic) {
 
   const raw1 = completion1.choices[0].message.content ?? "";
 
+  console.log("[LLM] Raw response (first attempt):", raw1.slice(0, 2000));
+
   const parsed1 = tryParseJson(raw1);
-  if (parsed1.ok) return sanitizeLLMResponse(parsed1.value);
+  if (parsed1.ok) return sanitizeLLMResponse(parsed1.value, analysis);
 
   // Retry (mais agressivo)
   const completion2 = await groq.chat.completions.create({
@@ -44,7 +58,7 @@ export async function analyzeProjectWithLLM(analysis: Heuristic) {
 
   const raw2 = completion2.choices[0].message.content ?? "";
   const parsed2 = tryParseJson(raw2);
-  if (parsed2.ok) return sanitizeLLMResponse(parsed2.value);
+  if (parsed2.ok) return sanitizeLLMResponse(parsed2.value, analysis);
 
   // fallback: devolve o bruto (ou lança erro)
   return {
@@ -105,11 +119,83 @@ const FORBIDDEN_WEAKNESS_PATTERNS = [
 ];
 
 /**
- * Sanitizes the LLM response by filtering out fabricated/generic weaknesses.
- * This ensures that criticisms about using standard frameworks/libraries are removed.
+ * Patterns for test-related weaknesses that should be filtered when tests exist
  */
-function sanitizeLLMResponse(response: any): any {
+const TEST_WEAKNESS_PATTERNS = [
+  // English
+  /lack\s*of\s*tests?/i,
+  /missing\s*(unit\s*)?tests?/i,
+  /no\s*(automated\s*)?tests?/i,
+  /without\s*tests?/i,
+  /tests?\s*are\s*missing/i,
+  /absence\s*of\s*tests?/i,
+
+  // Portuguese
+  /falta\s*de\s*testes?/i,
+  /sem\s*testes?/i,
+  /aus[êe]ncia\s*de\s*testes?/i,
+  /n[ãa]o\s*(possui|tem|h[áa])\s*testes?/i,
+  /testes?\s*(automatizados?\s*)?(ausentes?|faltando|inexistentes?)/i,
+];
+
+/**
+ * Patterns for test-related suggestions that should be filtered when test framework exists
+ */
+const TEST_SUGGESTION_PATTERNS = [
+  // English - catch variations
+  /implement\s*(automated\s*)?tests?/i,
+  /add\s*(automated\s*)?(unit\s*)?tests?/i,
+  /create\s*(unit\s*)?tests?/i,
+  /use\s*(jest|vitest|mocha|pytest)/i,
+  /introduce\s*(automated\s*)?testing/i,
+  /(testing\s*)?(library|framework)\s*(like|such as|como)\s*(jest|vitest|mocha)/i,
+  /unit\s*tests?\s*(for|para)/i,
+
+  // Portuguese - catch variations
+  /implementar\s*testes?/i,
+  /adicionar\s*testes?\s*(unit[áa]rios?|automatizados?)?/i,
+  /criar\s*testes?\s*(unit[áa]rios?)?/i,
+  /utilizar\s*.*(jest|vitest|mocha|pytest)/i,  // catch "utilizar uma biblioteca ... Jest"
+  /biblioteca\s*de\s*testes?\s*(como|like)\s*(jest|vitest)/i,
+  /introduzir\s*testes?/i,
+  /testes?\s*unit[áa]rios?\s*(para|for)/i,
+];
+
+/**
+ * Patterns for documentation-related suggestions that should be filtered when README is substantial
+ */
+const DOC_SUGGESTION_PATTERNS = [
+  // English - only generic ones
+  /^improve\s*documentation$/i,
+  /^add\s*documentation$/i,
+  /^better\s*documentation$/i,
+  /^enhance\s*documentation$/i,
+
+  // Portuguese - only generic ones
+  /^melhorar\s*(a\s*)?documenta[çc][ãa]o$/i,
+  /^adicionar\s*documenta[çc][ãa]o$/i,
+  /^aprimorar\s*(a\s*)?documenta[çc][ãa]o$/i,
+];
+
+/**
+ * Sanitizes the LLM response by filtering out fabricated/generic weaknesses and suggestions.
+ * Uses the analysis context to make informed decisions about what to filter.
+ */
+function sanitizeLLMResponse(response: any, analysis: Heuristic): any {
   if (!response || typeof response !== "object") return response;
+
+  // Check if test framework exists in stack
+  const testToolsInStack = analysis.stack?.tools?.filter((t) =>
+    /jest|vitest|mocha|pytest|rspec|junit|phpunit|testify/i.test(t)
+  ) ?? [];
+  const hasTestFramework = testToolsInStack.length > 0 || (analysis.infra?.testTools?.length ?? 0) > 0;
+  const hasTestFiles = (analysis.stats?.testFiles ?? 0) > 0;
+  const hasTests = hasTestFramework || hasTestFiles;
+
+  // Check if README is substantial
+  const hasSubstantialReadme = (analysis.readme?.length ?? 0) > 200;
+
+  console.log(`[sanitize] Context: hasTests=${hasTests}, hasTestFramework=${hasTestFramework}, hasTestFiles=${hasTestFiles}, testToolsInStack=${testToolsInStack.join(",")}, hasSubstantialReadme=${hasSubstantialReadme}`);
 
   // Filter weaknesses
   if (response.weaknesses && Array.isArray(response.weaknesses)) {
@@ -125,13 +211,63 @@ function sanitizeLLMResponse(response: any): any {
         .toLowerCase();
 
       // Check if any forbidden pattern matches
-      const isForbidden = FORBIDDEN_WEAKNESS_PATTERNS.some((pattern) =>
+      const isForbiddenDependency = FORBIDDEN_WEAKNESS_PATTERNS.some((pattern) =>
         pattern.test(textToCheck)
       );
 
-      if (isForbidden) {
-        console.log(`[sanitize] Filtered out fabricated weakness: "${weakness.title}"`);
+      if (isForbiddenDependency) {
+        console.log(`[sanitize] Filtered out fabricated dependency weakness: "${weakness.title}"`);
         return false;
+      }
+
+      // Filter test-related weaknesses if tests exist
+      if (hasTests) {
+        const isTestWeakness = TEST_WEAKNESS_PATTERNS.some((pattern) =>
+          pattern.test(textToCheck)
+        );
+        if (isTestWeakness) {
+          console.log(`[sanitize] Filtered out invalid test weakness (tests exist): "${weakness.title}"`);
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  // Filter suggestions
+  if (response.suggestions && Array.isArray(response.suggestions)) {
+    response.suggestions = response.suggestions.filter((suggestion: any) => {
+      if (!suggestion || typeof suggestion !== "object") return true;
+
+      const textToCheck = [
+        suggestion.title || "",
+        suggestion.recommended_action || "",
+        suggestion.rationale || "",
+      ]
+        .join(" ");
+
+      // Filter test implementation suggestions if test framework already exists
+      if (hasTestFramework) {
+        const isTestSuggestion = TEST_SUGGESTION_PATTERNS.some((pattern) =>
+          pattern.test(textToCheck)
+        );
+        if (isTestSuggestion) {
+          console.log(`[sanitize] Filtered out invalid test suggestion (framework exists): "${suggestion.title}"`);
+          return false;
+        }
+      }
+
+      // Filter generic documentation suggestions if README is substantial
+      if (hasSubstantialReadme) {
+        const title = (suggestion.title || "").trim();
+        const isGenericDocSuggestion = DOC_SUGGESTION_PATTERNS.some((pattern) =>
+          pattern.test(title)
+        );
+        if (isGenericDocSuggestion) {
+          console.log(`[sanitize] Filtered out generic doc suggestion (README exists): "${suggestion.title}"`);
+          return false;
+        }
       }
 
       return true;

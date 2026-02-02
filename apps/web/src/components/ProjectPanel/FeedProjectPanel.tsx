@@ -208,7 +208,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                     {data.summary.primaryLanguage}
                   </Badge>
                 )}
-                {data.summary.appType && (
+                {data.summary.appType && data.summary.appType !== "Unknown" && (
                   <Badge
                     variant="secondary"
                     className="bg-purple-50 text-purple-700 border-purple-100"
@@ -381,7 +381,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                   )}
 
                   {/* Suggestions Section */}
-                  {llm.suggestions?.length && (
+                  {llm.suggestions && llm.suggestions.length > 0 && (
                     <>
                       <Separator />
                       <div>

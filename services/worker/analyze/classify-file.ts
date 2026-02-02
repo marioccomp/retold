@@ -93,6 +93,8 @@ export function classifyFile(file: FileEntry): FileRole {
       ".go",
       ".java",
       ".cs",
+      ".jl",
+      ".kt",
       ".rb",
       ".php",
       ".rs",
