@@ -1,64 +1,70 @@
+// worker/analyze/scan-repository.ts
 import fs from "fs";
 import path from "path";
 
 export type FileEntry = {
-  path: string;
+  path: string; // absoluto
+  relativePath: string; // relativo ao repo
   name: string;
   ext: string;
+  size: number; // bytes
 };
 
 export type RepositoryScanResult = {
   files: FileEntry[];
 };
 
+const IGNORED_DIRS = new Set([
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  "target",
+  "coverage",
+  ".next",
+  ".turbo",
+  ".cache",
+  "out",
+  "bin",
+  "obj",
+  "vendor",
+  ".idea",
+  ".vscode",
+]);
+
 export function scanRepository(
   basePath: string,
-  // Default depth tuned to catch common layouts like:
-  // - src/main/java/... (Spring Boot)
-  // - apps/**/src/... (monorepos)
   maxDepth = 15,
   currentDepth = 0,
-  acc: FileEntry[] = []
+  acc: FileEntry[] = [],
+  rootPath: string = basePath
 ): RepositoryScanResult {
-  if (currentDepth > maxDepth) {
-    return {
-      files: acc,
-    };
-  }
+  if (currentDepth > maxDepth) return { files: acc };
 
   const entries = fs.readdirSync(basePath, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (["node_modules", ".git"].includes(entry.name)) continue;
+    if (IGNORED_DIRS.has(entry.name)) continue;
 
     const fullPath = path.join(basePath, entry.name);
 
     if (entry.isDirectory()) {
-      scanRepository(fullPath, maxDepth, currentDepth + 1, acc);
+      scanRepository(fullPath, maxDepth, currentDepth + 1, acc, rootPath);
     } else {
+      let size = 0;
+      try {
+        size = fs.statSync(fullPath).size;
+      } catch {}
+
       acc.push({
         path: fullPath,
+        relativePath: path.relative(rootPath, fullPath),
         name: entry.name,
         ext: path.extname(entry.name),
+        size,
       });
     }
   }
 
-  return {
-    files: acc,
-  };
-}
-
-function computeSignals(files: FileEntry[]) {
-  const paths = files.map((f) => f.path);
-
-  return {
-    hasDockerfile: paths.some((p) => p.endsWith("Dockerfile")),
-    hasCI: paths.some(
-      (p) =>
-        p.includes(".github/workflows") ||
-        p.endsWith(".gitlab-ci.yml") ||
-        p.endsWith(".circleci/config.yml")
-    ),
-  };
+  return { files: acc };
 }

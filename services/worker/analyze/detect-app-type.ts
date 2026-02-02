@@ -5,6 +5,7 @@ export function detectAppType(input: {
   signals: {
     hasDockerfile: boolean;
     hasCI: boolean;
+    hasCompose: boolean;
   };
 }) {
   let frontendScore = 0;
@@ -49,7 +50,7 @@ export function detectAppType(input: {
   if (backendScore > frontendScore) return "Backend";
 
   // Fallback for Systems/CLI
-  if (languages.some(l => ["C", "C++", "Rust", "Go"].includes(l)) && frontendScore === 0) {
+  if (languages.some((l) => ["C", "C++", "Rust", "Go"].includes(l)) && frontendScore === 0) {
     return "CLI / Console App";
   }
 

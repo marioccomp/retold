@@ -79,6 +79,10 @@ const worker = new Worker(
         locale: locale || "en",
       });
 
+      const llmInsightsJson = JSON.stringify(llmInsights);
+
+      console.log(llmInsightsJson);
+
       await prisma.repositoryAnalysis.upsert({
         where: { projectId },
         create: {
@@ -88,7 +92,7 @@ const worker = new Worker(
           structure: analysis.structure,
           signals: analysis.infra,
           rawAnalysis: analysis,
-          llmOverview: llmInsights,
+          llmOverview: llmInsightsJson,
         },
         update: {
           appType: analysis.summary.appType,
@@ -96,7 +100,7 @@ const worker = new Worker(
           structure: analysis.structure,
           signals: analysis.infra,
           rawAnalysis: analysis,
-          llmOverview: llmInsights,
+          llmOverview: llmInsightsJson,
         },
       });
 
@@ -108,9 +112,24 @@ const worker = new Worker(
         tagsToAssign.push(analysis.summary.primaryLanguage);
       }
 
-      // Frameworks (max 3 to keep total at 4)
+      // Prioritized framework selection
       if (analysis.stack.frameworks && Array.isArray(analysis.stack.frameworks)) {
-        for (const fw of analysis.stack.frameworks.slice(0, 3)) {
+        // Priority tiers: backend/main frameworks > frontend frameworks > SDKs/tools
+        const highPriority = ["NestJS", "Express", "FastAPI", "Django", "Flask", "AdonisJS", "Next.js", "Nuxt.js", "Rails"];
+        const mediumPriority = ["React Native", "React", "Vue", "Angular", "Svelte", "Flutter", "Spring Boot", "Laravel"];
+        const lowPriority = ["Expo", "Electron"]; // SDKs/runners that are less important as tags
+
+        const sortedFrameworks = [...analysis.stack.frameworks].sort((a, b) => {
+          const getPriority = (fw: string) => {
+            if (highPriority.includes(fw)) return 0;
+            if (mediumPriority.includes(fw)) return 1;
+            if (lowPriority.includes(fw)) return 2;
+            return 1; // default to medium
+          };
+          return getPriority(a) - getPriority(b);
+        });
+
+        for (const fw of sortedFrameworks) {
           if (tagsToAssign.length < 4) tagsToAssign.push(fw);
         }
       }

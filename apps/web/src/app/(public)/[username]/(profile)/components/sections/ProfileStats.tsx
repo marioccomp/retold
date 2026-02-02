@@ -4,6 +4,8 @@ import { FiActivity, FiGitCommit, FiCalendar, FiTrendingUp, FiCode } from "react
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/src/i18n/client";
 import { UserStatsDTO } from "@/src/domains/user/dtos/public-profile.dto";
+import { useQuery } from "@tanstack/react-query";
+import { getGithubDatabaseStats } from "../../../_actions/get-github-database-stats.action";
 
 type Props = {
   stats: UserStatsDTO;
