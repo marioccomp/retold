@@ -28,6 +28,7 @@ model User {
   username      String?   @unique
   email         String    @unique
   emailVerified DateTime?
+  githubEmail   String?
   phone         String?
   name          String?
   title         String?
