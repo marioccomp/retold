@@ -74,6 +74,80 @@ README POLICY:
 - If README is missing or too thin, infer purpose/domain from code and structure, and say that the purpose is inferred.
 `.trim();
 
+  // Stack Synergy Analysis - teaches how tools interact
+  const stackSynergyPolicy = `
+STACK SYNERGY ANALYSIS (CRITICAL FOR SUMMARY):
+- Analyze how tools work TOGETHER, not just individually. The combination of tools changes the project type.
+- Universal patterns to identify:
+  - Backend framework + SSR bridge (e.g., Inertia.js, Livewire, HTMX) → Server-side rendering, likely NO separate REST API
+  - Backend framework ALONE (without frontend framework) → Probably a REST/GraphQL API
+  - Full-stack meta-framework (e.g., Next.js, Nuxt, SvelteKit) → Unified frontend+backend
+  - Frontend framework + separate backend framework → Traditional SPA + API architecture
+  - Mobile framework + Expo/similar → Cross-platform mobile app
+  - ORM/ODM present → Type-safe database access layer
+  - GraphQL/tRPC present → Non-REST API paradigm
+- In general_summary.description, you MUST explain:
+  - What ROLE each major framework plays
+  - How they INTERACT with each other
+  - What architectural PATTERN this combination creates
+- Do NOT just list technologies - explain their SYNERGY and what type of application they create together.
+`.trim();
+
+  // Heuristic Analysis instructions
+  const heuristicAnalysisPolicy = `
+HEURISTIC ANALYSIS (MANDATORY):
+- For each framework in stack.frameworks, explain its architectural ROLE
+- For each significant tool in stack.tools, explain its PURPOSE in the project
+- Correlate structure.topLevelDirs with project organization:
+  - apps/ + packages/ directories → Monorepo with shared code
+  - src/lib/ → Library-first architecture
+  - cmd/ or bin/ → CLI application
+  - services/ → Multiple backend services
+- Cross-reference infra signals with your analysis:
+  - If infra.hasTests = true AND stats.testFiles > 0, acknowledge test infrastructure exists
+  - If infra.ciProviders.length > 0, acknowledge CI/CD is configured
+  - If infra.lintTools.length > 0, acknowledge code quality tooling exists
+- Adapt tone based on classification.maturityExpectation:
+  - "low" → Be a mentor, focus on guidance and learning opportunities, be encouraging
+  - "medium" → Be a balanced evaluator
+  - "high" → Be a professional auditor, focus on production readiness
+`.trim();
+
+  // Documentation evaluation rules
+  const documentationPolicy = `
+DOCUMENTATION EVALUATION (BEFORE suggesting doc improvements):
+- Check if README contains these elements:
+  1. Project description/overview
+  2. Installation instructions
+  3. Configuration/setup guide
+  4. Usage examples or commands
+  5. API documentation (if applicable)
+- Scoring:
+  - 4+ items present → WELL documented, do NOT suggest generic "improve documentation"
+  - README has > 50 lines with clear sections → Consider it adequate
+- Valid documentation weakness: "API endpoint documentation missing for /api/v1/* routes"
+- INVALID weakness: "Improve documentation" (when README already covers install/usage/config)
+- If README contains detailed setup instructions, this is a STRENGTH, not something to improve.
+`.trim();
+
+  // Weakness validation rules
+  const weaknessValidationPolicy = `
+WEAKNESS VALIDATION (CHECK BEFORE CRITICIZING):
+- MANDATORY pre-checks:
+  - If infra.hasTests = true OR stats.testFiles > 0 → Do NOT criticize "lack of tests"
+  - If readme exists AND has substantial content → Do NOT criticize "lack of documentation"
+  - If infra.ciProviders.length > 0 → Do NOT criticize "missing CI/CD"
+  - If infra.lintTools.length > 0 → Do NOT criticize "no linting/code quality"
+  - If stack.tools includes any ORM → Do NOT criticize "raw SQL" or "no data layer"
+  - If stack.tools includes any auth library → Do NOT criticize "no authentication"
+- Each weakness MUST have:
+  - Specific file, pattern, or code sample as evidence
+  - Explanation of why it matters for THIS project's domain/purpose
+  - Actionable fix (what specifically to do)
+- Maximum 4 weaknesses - quality over quantity
+- If project is well-structured: return 1-2 genuine issues, or acknowledge it's solid.
+`.trim();
+
   // Encourage adaptive focus based on domain/purpose, without changing keys
   const adaptationPolicy = `
 ADAPTATION POLICY:
@@ -82,7 +156,40 @@ ADAPTATION POLICY:
   - If purpose is "production": prioritize reliability, security, scalability, observability, data integrity, and operational concerns.
   - If domain is "web": discuss routing, auth/session, API boundaries, caching, SEO (if relevant), performance, and deployment ergonomics.
   - If domain is "cli" or "systems": discuss UX in terminal, input validation, error handling, portability, performance, and packaging.
-- Avoid repeating the same generic suggestions across projects. Suggestions must be specific to this repo context.
+
+SUGGESTION DIVERSITY (CRITICAL - AVOID GENERIC SUGGESTIONS):
+- NEVER default to "add tests" or "improve documentation" - these are the MOST COMMON and LEAST USEFUL suggestions.
+- Instead, think about UNIQUE aspects of THIS project and suggest improvements in these categories:
+  ARCHITECTURE:
+    - "Consider extracting X into a separate service/package"
+    - "The coupling between A and B could be reduced using dependency injection"
+    - "Consider implementing a repository pattern for data access"
+  PERFORMANCE:
+    - "Add caching for API route X that fetches frequently accessed data"
+    - "Consider lazy loading for the heavy component Y"
+    - "Implement pagination for the list endpoint Z"
+  DEVELOPER EXPERIENCE:
+    - "Add TypeScript strict mode for better type safety"
+    - "Create a shared types package for the monorepo"
+    - "Add path aliases to simplify imports"
+  SECURITY:
+    - "Consider rate limiting on the auth endpoints"
+    - "Add input validation with Zod for API routes"
+    - "Implement CORS configuration for production"
+  OBSERVABILITY:
+    - "Add structured logging for debugging"
+    - "Consider adding error tracking (Sentry, etc.)"
+    - "Add health check endpoints"
+  USER EXPERIENCE:
+    - "Add loading states for async operations"
+    - "Implement optimistic updates for better perceived performance"
+    - "Add error boundaries for graceful error handling"
+  MONOREPO-SPECIFIC:
+    - "Extract shared utilities into a common package"
+    - "Consider workspace-level dependency management"
+    - "Add changeset for version management"
+- If the project is WELL-STRUCTURED and has good practices: acknowledge it and suggest ADVANCED improvements, not basics.
+- If you cannot think of a non-generic suggestion, return an EMPTY suggestions array.
 `.trim();
 
   const architecturePolicy = `ARCHITECTURE POLICY:
@@ -103,6 +210,66 @@ OTHER RULES:
 - Treat "infra" signals as higher confidence than README claims.
 - Provide at least 3 evidence items when style != "unknown".
 `.trim();
+
+  // ============================================================
+  // DYNAMIC BLOCKLIST - Tells LLM what the project ALREADY HAS
+  // This makes it EXPLICIT and impossible to ignore
+  // ============================================================
+  const blocklist: string[] = [];
+
+  // Test framework detection
+  const testTools = [
+    ...(input.infra?.testTools ?? []),
+    ...(input.stack?.tools?.filter((t: string) =>
+      /jest|vitest|mocha|pytest|rspec|junit|phpunit|cypress|playwright/i.test(t)
+    ) ?? [])
+  ];
+  const hasTestFramework = testTools.length > 0;
+  const hasTestFiles = (input.stats?.testFiles ?? 0) > 0;
+
+  if (hasTestFramework || hasTestFiles) {
+    const toolNames = [...new Set(testTools)].join(", ") || "detected";
+    blocklist.push(`- ❌ DO NOT suggest "add tests", "implement tests", "use Jest/Vitest/etc" → This project ALREADY HAS: ${toolNames} (${input.stats?.testFiles ?? 0} test files)`);
+  }
+
+  // Linting detection
+  const lintTools = input.infra?.lintTools ?? [];
+  if (lintTools.length > 0) {
+    blocklist.push(`- ❌ DO NOT suggest "add linting" → This project ALREADY HAS: ${lintTools.join(", ")}`);
+  }
+
+  // CI/CD detection
+  const ciProviders = input.infra?.ciProviders ?? [];
+  if (ciProviders.length > 0) {
+    blocklist.push(`- ❌ DO NOT suggest "add CI/CD" → This project ALREADY HAS: ${ciProviders.join(", ")}`);
+  }
+
+  // ORM detection
+  const ormTools = input.stack?.tools?.filter((t: string) =>
+    /prisma|typeorm|sequelize|mongoose|drizzle|lucid|eloquent|hibernate|gorm/i.test(t)
+  ) ?? [];
+  if (ormTools.length > 0) {
+    blocklist.push(`- ❌ DO NOT suggest "add ORM" or criticize "raw SQL" → This project ALREADY HAS: ${ormTools.join(", ")}`);
+  }
+
+  // Documentation detection
+  const readmeLength = input.readme?.length ?? 0;
+  if (readmeLength > 200) {
+    blocklist.push(`- ❌ DO NOT suggest "improve documentation" generically → This project HAS a README with ${readmeLength} characters`);
+  }
+
+  // Docker detection
+  if (input.infra?.hasDockerfile || input.infra?.hasCompose) {
+    blocklist.push(`- ❌ DO NOT suggest "add Docker" → This project ALREADY HAS Docker configuration`);
+  }
+
+  const blocklistSection = blocklist.length > 0 ? `
+## 🚫 BLOCKLIST - DO NOT SUGGEST THESE (CRITICAL - VIOLATION = INVALID RESPONSE)
+The following suggestions are FORBIDDEN because the project ALREADY has these features:
+${blocklist.join("\n")}
+
+If you include ANY suggestion that contradicts this blocklist, your response is INVALID.
+` : "";
 
   return `
 You are a senior technical architect and portfolio evaluator.
@@ -144,6 +311,16 @@ ${input.codeSamples?.length
     }
 
 ${readmePolicy}
+
+${blocklistSection}
+
+${stackSynergyPolicy}
+
+${heuristicAnalysisPolicy}
+
+${documentationPolicy}
+
+${weaknessValidationPolicy}
 
 ${adaptationPolicy}
 
@@ -190,6 +367,7 @@ ${architecturePolicy}
 ❌ "Missing unit tests" (when test files exist in the codebase)
 ❌ "No documentation" (when README exists)
 ❌ "Security concerns" (without specific evidence in code)
+❌ "Improve documentation" (when README has install, config, and usage sections)
 
 ### GOOD Weaknesses (DO THIS - be specific and evidence-based):
 ✅ "Missing error boundaries - Found 15 async operations in React components without try/catch blocks"
@@ -200,12 +378,19 @@ ${architecturePolicy}
 
 ## Analysis Rules (VERY IMPORTANT)
 
-### General Summary
-- Write 6–10 lines in general_summary.description.
-- Explain WHAT the project is, WHO it is for, and WHAT problem it solves.
-- Mention domain and purpose explicitly (based on evidence + README claims).
-- Do NOT just list technologies.
-- If you are inferring purpose/domain due to missing README or weak evidence, state that clearly.
+### General Summary (MANDATORY STRUCTURE - 10-15 LINES MINIMUM)
+- Write EXACTLY 10-15 lines in general_summary.description. This is MANDATORY.
+- Follow this structure:
+  1. WHAT is the project (1-2 lines) - name and core function
+  2. PROBLEM it solves (1-2 lines) - the pain point or need it addresses
+  3. TARGET AUDIENCE (1 line) - who would use this
+  4. TECHNOLOGY SYNERGY (3-4 lines) - how the stack works together, what pattern it creates
+     - Explain what each major framework DOES and how they INTERACT
+     - Describe the architectural pattern this combination creates
+  5. ARCHITECTURE OVERVIEW (2-3 lines) - structure and organization
+  6. MATURITY OBSERVATION (1 line) - based on infra signals and classification
+- Do NOT just list technologies - explain their PURPOSE and INTERACTION
+- If README is thin, infer from code samples and structure, stating that you are inferring
 
 ### Architecture
 - Fill architecture.style based on evidence:
@@ -236,6 +421,7 @@ ${architecturePolicy}
   - Explain why it matters for THIS domain/purpose/maturity
   - Be actionable (the developer can actually fix it)
 - Do NOT include generic advice (tests/CI/docs) unless specifically missing AND critical for this project type.
+- REMEMBER: Run the weakness validation checks before including any weakness.
 
 ### Suggestions
 - Return 2–5 suggestions.
