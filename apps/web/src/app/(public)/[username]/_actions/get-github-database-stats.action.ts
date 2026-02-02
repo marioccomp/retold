@@ -1,8 +1,8 @@
 import { prisma, userRepository } from "@repo/database";
 import { lastCommitQueue } from "@repo/queue";
 
-// const TTL_MS = 24 * 60 * 60 * 1000;
-const TTL_MS = 20000;
+const TTL_MS = 24 * 60 * 60 * 1000;
+// const TTL_MS = 20000;
 
 export async function getGithubDatabaseStats(username: string) {
   const stats = await userRepository.getGithubStatsByUsername(username);

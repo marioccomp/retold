@@ -1,42 +1,107 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import {
-  Code2,
   Github,
   Clock,
   XCircle,
   Sparkles,
   Loader2,
-  Package,
-  FileCode,
-  Shield,
-  FolderTree,
-  Code,
   PackageSearch,
-  Settings,
-  FileText,
-  GitBranch,
-  Container,
   CheckCircle2,
-  ExternalLink,
+  Lightbulb,
+  FileCode,
+  Settings,
+  Layout,
+  Code2,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 import { ProjectForOverlay } from "./types";
 import { useProjectAnalysis } from "./hooks/useProjectAnalysis";
 import { ProjectSettings } from "./components/ProjectSettings";
 import { useTranslation } from "@/src/i18n/client";
 import { incrementView } from "@/src/domains/project/actions/increment-view.action";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 type FeedProjectPanelProps = {
   project: ProjectForOverlay;
   onClose: () => void;
 };
+
+type LlmReportV21 = {
+  schema_version: "2.1" | "2.0" | string;
+  language: "pt-BR" | "en" | string;
+
+  meta?: {
+    primaryLanguage?: string;
+    appType?: string;
+    domain?: string;
+    purpose?: string;
+    maturityExpectation?: string;
+  };
+
+  general_summary?: {
+    title?: string;
+    description?: string;
+  };
+
+  architecture?: {
+    style?: string;
+    explanation?: string;
+    evidence?: Array<{
+      signal?: string;
+      source?: string;
+    }>;
+  };
+
+  strengths?: Array<{
+    title: string;
+    explanation: string;
+    related_to?: string;
+  }>;
+
+  weaknesses?: Array<{
+    title: string;
+    explanation: string;
+    impact: "low" | "medium" | "high";
+    context?: string;
+  }>;
+
+  suggestions?: Array<{
+    title: string;
+    recommended_action: string;
+    rationale?: string;
+    priority: "low" | "medium" | "high";
+  }>;
+
+  error?: string;
+  raw?: string;
+};
+
+function safeParseLlm(input: unknown): LlmReportV21 | null {
+  if (!input) return null;
+  if (typeof input === "object") return input as LlmReportV21;
+  if (typeof input !== "string") return null;
+
+  try {
+    return JSON.parse(input) as LlmReportV21;
+  } catch {
+    const trimmed = input.trim();
+    const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenced?.[1]) {
+      try {
+        return JSON.parse(fenced[1]) as LlmReportV21;
+      } catch {
+        return { schema_version: "2.1", language: "en", error: "Invalid JSON", raw: input };
+      }
+    }
+    return { schema_version: "2.1", language: "en", error: "Invalid JSON", raw: input };
+  }
+}
 
 export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
   const { dict } = useTranslation();
@@ -53,34 +118,28 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
     }
   }, [project.id]);
 
-  const isOwner = session?.user?.id && project.userId && Number(session.user.id) === project.userId;
+  const isOwner =
+    session?.user?.id && project.userId && Number(session.user.id) === project.userId;
 
   const { status, analysis, data, handleAnalyzeRepo } = useProjectAnalysis(project);
 
-  const queryClient = useQueryClient();
+  const llm = safeParseLlm(data?.llmOverview);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex flex-col w-full">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex flex-col w-full h-auto">
       <style jsx global>{`
-        .scrollbar-fintech::-webkit-scrollbar {
-          width: 6px;
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
-        .scrollbar-fintech::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .scrollbar-fintech::-webkit-scrollbar-thumb {
-          background: #e5e7eb;
-          border-radius: 10px;
-        }
-        .scrollbar-fintech::-webkit-scrollbar-thumb:hover {
-          background: #d1d5db;
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
 
-      {/* Header - Centered & Modern */}
-      <div className="p-8 md:p-12 border-b border-gray-100 bg-white relative">
-        {/* Absolute Layout for Status and Settings */}
-        <div className="absolute top-6 right-6 flex items-center gap-3">
+      {/* Modern Glassy Header */}
+      <div className="relative px-6 py-6 border-b border-gray-100 bg-white/80 backdrop-blur-md z-10">
+        <div className="absolute top-4 right-4 flex items-center gap-2">
           <StatusBadge status={status || "PENDING"} isOwner={!!isOwner} t={t} />
           {isOwner && (
             <ProjectSettings
@@ -94,121 +153,114 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
           )}
         </div>
 
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <div className="flex-1 w-full flex flex-col items-center">
-            {/* New Premium Icon Style */}
-            <div className="mb-8">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-white to-gray-50 flex items-center justify-center border-2 border-[#05dc7f]/30 shadow-2xl shadow-[#05dc7f]/10 shrink-0 transform rotate-6 hover:rotate-0 transition-all duration-500 group/icon">
-                <PackageSearch className="w-10 h-10 text-[#05dc7f] group-hover/icon:scale-110 transition-transform duration-300" />
-              </div>
+        <div className="flex flex-col md:flex-row gap-6 md:items-start max-w-5xl mx-auto w-full">
+          {/* Icon */}
+          <div className="shrink-0 mx-auto md:mx-0">
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100/50 flex items-center justify-center shadow-sm group">
+              <PackageSearch className="w-8 h-8 md:w-10 md:h-10 text-[#05dc7f] group-hover:scale-110 transition-transform duration-300" />
             </div>
+          </div>
 
-            <div className="flex flex-col items-center w-full max-w-full overflow-hidden">
-              <h2 className="m-0 text-2xl sm:text-5xl font-black text-gray-900 tracking-tight leading-tight break-all whitespace-pre-wrap line-clamp-3 overflow-hidden w-full">
-                {project.title}
-              </h2>
+          {/* Title & Meta */}
+          <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left min-w-0">
+            <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-tight break-all line-clamp-2">
+              {project.title}
+            </h2>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3">
+              {/* Owner */}
+              {project.owner && (
+                <Link
+                  href={`/${project.owner.username}`}
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-50 border border-gray-200/60 hover:border-[#05dc7f]/30 hover:bg-white transition-all text-sm group"
+                >
+                  <Avatar className="w-5 h-5 border border-white shadow-sm">
+                    <AvatarImage src={project.owner.image || undefined} />
+                    <AvatarFallback className="text-[9px] bg-[#05dc7f]/10 text-[#0f2f28] font-bold">
+                      {project.owner.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-gray-600 font-medium group-hover:text-gray-900 truncate max-w-[120px]">
+                    {project.owner.name}
+                  </span>
+                </Link>
+              )}
+
+              {/* Repo Link */}
               {repo && !repo.private && (
                 <a
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#05dc7f] font-medium transition-colors duration-200 mt-3"
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50"
                 >
-                  <Github className="w-4 h-4" />
-                  <span>{repo.fullName}</span>
+                  <Github className="w-3.5 h-3.5" />
+                  <span className="truncate max-w-[200px]">{repo.fullName}</span>
                 </a>
               )}
             </div>
 
-            {/* Owner Info shadow-sm */}
-            {project.owner && (
-              <Link
-                href={`/${project.owner.username}`}
-                className="inline-flex items-center gap-2 group mt-8 mb-8 p-1 pr-4 rounded-full bg-gray-50 border border-gray-100 hover:border-[#05dc7f]/30 hover:bg-white transition-all duration-300"
-              >
-                <Avatar className="w-8 h-8 border-2 border-white shadow-sm">
-                  <AvatarImage src={project.owner.image || undefined} />
-                  <AvatarFallback className="text-[12px] bg-[#05dc7f]/10 text-[#0f2f28] font-bold">
-                    {project.owner.name.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
-                  {project.owner.name}
-                </span>
-              </Link>
+            {/* Classification Tags */}
+            {data?.summary && (
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4">
+                {data.summary.primaryLanguage && (
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">
+                    {data.summary.primaryLanguage}
+                  </Badge>
+                )}
+                {data.summary.appType && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-purple-50 text-purple-700 border-purple-100"
+                  >
+                    {humanizeEnum(data.summary.appType)}
+                  </Badge>
+                )}
+              </div>
             )}
-
-            {project.description && (
-              <p className="text-base sm:text-xl text-gray-600 leading-relaxed max-w-2xl w-full font-normal break-all whitespace-pre-wrap mx-auto text-left py-4 border-l-2 border-[#05dc7f]/10 pl-6 max-[650px]:text-[15px] max-[650px]:pl-4">
-                {project.description}
-              </p>
-            )}
-
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-16 mt-8 sm:mt-12 pt-8 sm:pt-10 border-t border-gray-100 w-full">
-              {data.summary?.primaryLanguage && (
-                <div className="flex flex-col gap-1 sm:gap-1.5">
-                  <span className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                    {t.metrics.language}
-                  </span>
-                  <div className="flex items-center gap-2 sm:gap-2.5">
-                    <div className="p-1 sm:p-1.5 rounded-lg bg-green-50/50">
-                      <Code className="w-3.5 h-3.5 sm:w-4 h-4 text-[#05dc7f]" />
-                    </div>
-                    <span className="text-sm sm:text-base font-bold text-gray-900">
-                      {data.summary.primaryLanguage}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {data.summary?.appType && (
-                <div className="flex flex-col gap-1 sm:gap-1.5">
-                  <span className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                    {t.metrics.architecture}
-                  </span>
-                  <div className="flex items-center gap-2 sm:gap-2.5">
-                    <div className="p-1 sm:p-1.5 rounded-lg bg-gray-50">
-                      <Package className="w-3.5 h-3.5 sm:w-4 h-4 text-gray-500" />
-                    </div>
-                    <span className="text-sm sm:text-base font-bold text-gray-900">
-                      {data.summary.appType}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {data.stats?.totalFiles && (
-                <div className="flex flex-col gap-1 sm:gap-1.5">
-                  <span className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                    {t.metrics.complexity}
-                  </span>
-                  <div className="flex items-center gap-2 sm:gap-2.5">
-                    <div className="p-1 sm:p-1.5 rounded-lg bg-gray-50">
-                      <FileText className="w-3.5 h-3.5 sm:w-4 h-4 text-gray-500" />
-                    </div>
-                    <span className="text-sm sm:text-base font-bold text-gray-900">
-                      {t.metrics.files.replace("{count}", String(data.stats.totalFiles))}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
-
-        {/* Project Images Gallery - Full Width & Centered */}
-        {project.images && project.images.length > 0 && (
-          <div className="mt-16 flex justify-center">
-            <div className="w-full max-w-5xl">
-              <ProjectImageGallery images={project.images} t={t} />
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Content Area */}
-      <div className="px-8 py-12 bg-gray-50/50">
-        <div className="max-w-5xl mx-auto space-y-12">
+      {/* Content */}
+      <div className="bg-gray-50/50 p-4 md:p-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Stats Cards Row */}
+          {status === "DONE" && data?.stats && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              <StatCard
+                icon={FileCode}
+                label={t.metrics.files.replace("{count}", "")}
+                value={data.stats.totalFiles}
+                sublabel={(t.overlay?.stats as any)?.total_files ?? "Total Files"}
+              />
+              <StatCard
+                icon={Code2}
+                label={(t.overlay?.stats as any)?.sources ?? "Sources"}
+                value={data.stats.sourceFiles}
+                sublabel={(t.overlay?.stats as any)?.code_files ?? "Code Files"}
+                color="blue"
+              />
+              <StatCard
+                icon={Settings}
+                label={(t.overlay?.stats as any)?.config ?? "Config"}
+                value={data.stats.configFiles}
+                sublabel={(t.overlay?.stats as any)?.infra_setup ?? "Infra & Setup"}
+                color="orange"
+              />
+              <StatCard
+                icon={CheckCircle2}
+                label={(t.overlay?.stats as any)?.tests ?? "Tests"}
+                value={data.stats.testFiles}
+                sublabel={data.infra?.hasTests
+                  ? ((t.overlay?.stats as any)?.tests_found ?? "Tests found")
+                  : ((t.overlay?.stats as any)?.no_tests ?? "No tests")}
+                color={data.stats.testFiles > 0 ? "green" : "gray"}
+              />
+            </div>
+          )}
+
+          {/* Main State Views */}
           {status === "PENDING" &&
             (isOwner ? (
               <PendingView onAnalyze={handleAnalyzeRepo} t={t} />
@@ -234,52 +286,145 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
               />
             ))}
 
-          {status === "DONE" && analysis && (
-            <>
-              {/* AI Overview */}
-              {data.llmOverview && <AIOverviewCard overview={data.llmOverview as string} t={t} />}
+          {/* Report Content - Unified View */}
+          {status === "DONE" && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              {llm ? (
+                <div className="p-6 md:p-10 space-y-10">
+                  {/* Summary Section */}
+                  <div className="space-y-4">
+                    {llm.general_summary?.title && (
+                      <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                        {llm.general_summary.title}
+                      </h3>
+                    )}
+                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+                      {llm.general_summary?.description || (t.overlay as any)?.llm_empty_overview || "No overview available."}
+                    </p>
+                  </div>
 
-              {/* Tech Stack */}
-              <TechStackCard
-                frameworks={data.stack.frameworks}
-                tools={data.stack.tools}
-                languages={data.stack.languages}
-                t={t}
-              />
+                  <Separator />
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {data.stats && (
-                  <FileStatsCard
-                    sourceFiles={data.stats.sourceFiles}
-                    testFiles={data.stats.testFiles}
-                    configFiles={data.stats.configFiles}
-                    docsFiles={data.stats.docsFiles}
-                    t={t}
-                  />
-                )}
+                  {/* Key Strengths */}
+                  <div>
+                    <SectionHeader
+                      title={(t.overlay?.sections as any)?.strengths ?? "Key Strengths"}
+                      icon={Sparkles}
+                      color="green"
+                    />
+                    <div className="grid md:grid-cols-2 gap-4 mt-4">
+                      {llm.strengths?.slice(0, 4).map((s, i) => (
+                        <div
+                          key={i}
+                          className="p-4 rounded-xl bg-green-50/30 border border-green-100 hover:border-green-200 transition-colors"
+                        >
+                          <div className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-[#05dc7f]" />
+                            {s.title}
+                          </div>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {s.explanation}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-                {data.infra && (
-                  <InfraCard
-                    hasCI={data.infra.hasCI}
-                    hasDocker={data.infra.hasDocker}
-                    hasLint={data.infra.hasLint}
-                    hasTests={data.infra.hasTests}
-                    t={t}
-                  />
-                )}
-              </div>
+                  <Separator />
 
-              {/* Project Structure */}
-              {data.structure && (
-                <StructureCard
-                  hasSrcFolder={data.structure.hasSrcFolder}
-                  hasTestsFolder={data.structure.hasTestsFolder}
-                  maxDepth={data.structure.maxDepth}
-                  t={t}
-                />
+                  {/* Architecture Section */}
+                  <div>
+                    <SectionHeader
+                      title={(t.overlay?.sections as any)?.architecture ?? "Architecture"}
+                      icon={Layout}
+                      color="purple"
+                    />
+                    <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-200/60">
+                      {llm.architecture?.style && (
+                        <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-sm font-bold border border-purple-100">
+                          <Layout className="w-4 h-4" />
+                          {humanizeEnum(llm.architecture.style)}
+                        </div>
+                      )}
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {llm.architecture?.explanation || (t.overlay as any)?.llm_empty_architecture || "No architecture details."}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tech Stack */}
+                  {data?.stack && (
+                    <>
+                      <Separator />
+                      <div>
+                        <SectionHeader title={(t.overlay?.sections as any)?.tech_stack ?? "Tech Stack"} icon={Code2} color="blue" />
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {[
+                            ...(data.stack.languages || []),
+                            ...(data.stack.frameworks || []),
+                            ...(data.stack.tools || []),
+                            ...(data.infra?.ciProviders || []),
+                          ].map((tech, i) => (
+                            <Badge
+                              key={i}
+                              variant="outline"
+                              className="px-3 py-1.5 text-sm bg-white text-gray-700 border-gray-200"
+                            >
+                              {tech}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Suggestions Section */}
+                  {llm.suggestions?.length && (
+                    <>
+                      <Separator />
+                      <div>
+                        <SectionHeader
+                          title={(t.overlay?.sections as any)?.suggestions ?? "Suggestions"}
+                          icon={Lightbulb}
+                          color="blue"
+                        />
+
+                        <div className="mt-6 space-y-4">
+                          {llm.suggestions?.map((s, i) => (
+                            <div
+                              key={`suggestion-${i}`}
+                              className="flex gap-4 p-4 rounded-xl bg-blue-50/30 border border-blue-100/50 hover:border-blue-200 transition-colors"
+                            >
+                              <div className="flex flex-col items-center gap-2 shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                                  <Lightbulb className="w-4 h-4" />
+                                </div>
+                              </div>
+                              <div>
+                                <div className="font-bold text-gray-900">{s.title}</div>
+                                <p className="text-sm text-gray-700 mt-1 font-medium">
+                                  {s.recommended_action}
+                                </p>
+                                {s.rationale && (
+                                  <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                                    {s.rationale}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="p-12 text-center text-gray-500">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-gray-400" />
+                  <p>{(t.overlay?.sections as any)?.loading_report ?? "Loading report data..."}</p>
+                </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -287,7 +432,78 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
   );
 }
 
-// === Sub-components ===
+/* ====================== UI Helpers ====================== */
+
+const StatCard = ({
+  icon: Icon,
+  label,
+  value,
+  sublabel,
+  color = "green",
+}: {
+  icon: any;
+  label: string;
+  value: string | number;
+  sublabel: string;
+  color?: "green" | "blue" | "orange" | "gray";
+}) => {
+  const colors = {
+    green: "text-[#05dc7f] bg-green-50",
+    blue: "text-blue-500 bg-blue-50",
+    orange: "text-orange-500 bg-orange-50",
+    gray: "text-gray-500 bg-gray-50",
+  };
+
+  const c = colors[color];
+
+  return (
+    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow">
+      <div className={`p-2.5 rounded-lg ${c} shrink-0`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <div>
+        <div className="text-2xl font-black text-gray-900 leading-none mb-1">{value}</div>
+        <div className="text-xs font-bold text-gray-500 uppercase tracking-wide">{label}</div>
+        <div className="text-[10px] text-gray-400 mt-1 font-medium">{sublabel}</div>
+      </div>
+    </div>
+  );
+};
+
+const SectionHeader = ({
+  title,
+  icon: Icon,
+  color = "green",
+}: {
+  title: string;
+  icon?: any;
+  color?: "green" | "blue" | "orange" | "purple";
+}) => {
+  const colorClass = {
+    green: "text-[#05dc7f]",
+    blue: "text-blue-500",
+    orange: "text-orange-500",
+    purple: "text-purple-500",
+  }[color];
+
+  return (
+    <div className="flex items-center gap-2.5">
+      {Icon && <Icon className={`w-5 h-5 ${colorClass}`} />}
+      <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">{title}</h3>
+    </div>
+  );
+};
+
+const Separator = () => <div className="h-px w-full bg-gray-100" />;
+
+function humanizeEnum(v: string) {
+  return String(v)
+    .replace(/_/g, " ")
+    .trim()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
 
 const StatusBadge = ({ status, isOwner, t }: { status: string; isOwner: boolean; t: any }) => {
   if (!isOwner && status === "DONE") return null;
@@ -327,7 +543,7 @@ const StatusBadge = ({ status, isOwner, t }: { status: string; isOwner: boolean;
 
   return (
     <div
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${c.bg} ${c.text}`}
+      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold border ${c.bg} ${c.text}`}
     >
       <span
         className={`w-1.5 h-1.5 rounded-full ${c.dotColor} ${c.animate ? "animate-pulse" : ""}`}
@@ -404,296 +620,3 @@ const ErrorView = ({ onRetry, t }: { onRetry: () => void; t: any }) => (
     </button>
   </div>
 );
-
-const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
-  <div className="flex items-center gap-3 mb-8">
-    <div className="p-2 rounded-xl bg-green-50">
-      <Icon className="w-5 h-5 text-[#05dc7f]" />
-    </div>
-    <h3 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em]">{title}</h3>
-  </div>
-);
-
-const AIOverviewCard = ({ overview, t }: { overview: string; t: any }) => (
-  <div className="bg-white rounded-2xl border border-green-100/50 p-10 shadow-sm relative overflow-hidden group">
-    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-      <Sparkles className="w-24 h-24 text-[#05dc7f]" />
-    </div>
-    <SectionHeader icon={Sparkles} title={t.overlay.sections.summary} />
-    <div className="text-gray-600 prose prose-sm max-w-none prose-headings:text-gray-900 prose-strong:text-gray-900 prose-p:leading-relaxed prose-li:text-gray-600">
-      <ReactMarkdown
-        components={{
-          h1: () => null,
-          h2: () => null,
-          h3: ({ children }) => (
-            <h4 className="text-gray-900 font-bold mt-8 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
-              {children}
-            </h4>
-          ),
-          p: ({ children }) => (
-            <p className="mb-6 text-[16px] font-normal text-gray-600 leading-relaxed">{children}</p>
-          ),
-          ul: ({ children }) => <ul className="space-y-3 mb-6 ml-0 list-none">{children}</ul>,
-          li: ({ children }) => (
-            <li className="flex items-start gap-4 text-[15px]">
-              <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-[#05dc7f] shrink-0" />
-              <span className="flex-1 text-gray-600 leading-relaxed">{children}</span>
-            </li>
-          ),
-          strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
-          blockquote: ({ children }) => (
-            <div className="border-l-4 border-[#05dc7f] pl-6 my-6 italic text-gray-500 text-[15px] bg-gray-50/80 py-4 rounded-r-xl">
-              {children}
-            </div>
-          ),
-        }}
-      >
-        {overview}
-      </ReactMarkdown>
-    </div>
-  </div>
-);
-
-const TechStackCard = ({
-  frameworks,
-  tools,
-  languages,
-  t,
-}: {
-  frameworks: string[];
-  tools: string[];
-  languages: string[];
-  t: any;
-}) => {
-  if (!frameworks.length && !tools.length && !languages.length) return null;
-
-  return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-10 shadow-sm">
-      <SectionHeader icon={Package} title={t.overlay.sections.tech_stack} />
-      <div className="flex flex-wrap gap-3">
-        {frameworks.map((fw, i) => (
-          <span
-            key={`fw-${i}`}
-            className="px-4 py-2 bg-green-50 text-[#0f2f28] rounded-xl text-sm font-bold border border-green-100/50 hover:scale-105 transition-transform cursor-default"
-          >
-            {fw}
-          </span>
-        ))}
-        {languages.map((lang, i) => (
-          <span
-            key={`lang-${i}`}
-            className="px-4 py-2 bg-gray-50 text-gray-700 rounded-xl text-sm font-bold border border-gray-200/50 hover:scale-105 transition-transform cursor-default"
-          >
-            {lang}
-          </span>
-        ))}
-        {tools.map((tool, i) => (
-          <span
-            key={`tool-${i}`}
-            className="px-4 py-2 bg-white text-gray-500 rounded-xl text-sm font-bold border border-gray-200 hover:scale-105 transition-transform cursor-default"
-          >
-            {tool}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const FileStatsCard = ({
-  sourceFiles,
-  testFiles,
-  configFiles,
-  docsFiles,
-  t,
-}: {
-  sourceFiles: number;
-  testFiles: number;
-  configFiles: number;
-  docsFiles: number;
-  t: any;
-}) => (
-  <div className="bg-white rounded-2xl border border-gray-200 p-10 shadow-sm h-full">
-    <SectionHeader icon={FileCode} title={t.overlay.sections.files} />
-    <div className="grid grid-cols-2 gap-x-8 gap-y-10 mt-4">
-      <StatItem label={t.overlay.stats.source} value={sourceFiles} />
-      <StatItem label={t.overlay.stats.tests} value={testFiles} />
-      <StatItem label={t.overlay.stats.config} value={configFiles} />
-      <StatItem label={t.overlay.stats.docs} value={docsFiles} />
-    </div>
-  </div>
-);
-
-const StatItem = ({ label, value }: { label: string; value: number }) => (
-  <div className="group">
-    <dt className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 group-hover:text-[#05dc7f] transition-colors">
-      {label}
-    </dt>
-    <dd className="text-3xl font-black text-gray-900 tracking-tight">{value}</dd>
-  </div>
-);
-
-const InfraCard = ({
-  hasCI,
-  hasDocker,
-  hasLint,
-  hasTests,
-  t,
-}: {
-  hasCI: boolean;
-  hasDocker: boolean;
-  hasLint: boolean;
-  hasTests: boolean;
-  t: any;
-}) => (
-  <div className="bg-white rounded-2xl border border-gray-200 p-10 shadow-sm h-full">
-    <SectionHeader icon={Shield} title={t.overlay.sections.infra} />
-    <div className="grid grid-cols-1 gap-4">
-      <InfraRow label={t.overlay.infra.ci_cd} has={hasCI} t={t} />
-      <InfraRow label={t.overlay.infra.docker} has={hasDocker} t={t} />
-      <InfraRow label={t.overlay.infra.lint} has={hasLint} t={t} />
-      <InfraRow label={t.overlay.infra.tests} has={hasTests} t={t} />
-    </div>
-  </div>
-);
-
-const InfraRow = ({ label, has, t }: { label: string; has: boolean; t: any }) => (
-  <div className="flex items-center justify-between py-2 group">
-    <span className="text-[15px] font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
-      {label}
-    </span>
-    {has ? (
-      <div className="flex items-center gap-2 text-[#0f2f28] text-[11px] font-black uppercase tracking-wider bg-green-50 px-3 py-1.5 rounded-lg border border-green-100/50">
-        <CheckCircle2 className="w-4 h-4 text-[#05dc7f]" />
-        <span>{t.overlay.infra.active}</span>
-      </div>
-    ) : (
-      <span className="text-[11px] text-gray-400 font-bold px-3 py-1.5 uppercase tracking-wider">
-        {t.overlay.infra.missing}
-      </span>
-    )}
-  </div>
-);
-
-const StructureCard = ({
-  hasSrcFolder,
-  hasTestsFolder,
-  maxDepth,
-  t,
-}: {
-  hasSrcFolder: boolean;
-  hasTestsFolder: boolean;
-  maxDepth: number;
-  t: any;
-}) => (
-  <div className="bg-white rounded-2xl border border-gray-200 p-10 shadow-sm">
-    <SectionHeader icon={FolderTree} title={t.overlay.sections.structure} />
-    <div className="flex flex-wrap gap-12 mt-4">
-      <StructureItem
-        label={t.overlay.structure.src}
-        value={hasSrcFolder ? t.overlay.structure.present : t.overlay.structure.missing}
-        highlight={hasSrcFolder}
-      />
-      <StructureItem
-        label={t.overlay.structure.tests}
-        value={hasTestsFolder ? t.overlay.structure.present : t.overlay.structure.missing}
-        highlight={hasTestsFolder}
-      />
-      <StructureItem
-        label={t.overlay.structure.depth}
-        value={maxDepth.toString()}
-        highlight={false}
-      />
-    </div>
-  </div>
-);
-
-const StructureItem = ({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight: boolean;
-}) => (
-  <div>
-    <div className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">
-      {label}
-    </div>
-    <div className={`text-xl font-black ${highlight ? "text-gray-900" : "text-gray-400"}`}>
-      {value}
-    </div>
-  </div>
-);
-
-const ProjectImageGallery = ({ images, t }: { images: string[]; t: any }) => {
-  const [activeImage, setActiveImage] = useState(images[0]);
-
-  useEffect(() => {
-    if (images && images.length > 0) {
-      setActiveImage(images[0]);
-    }
-  }, [images]);
-
-  if (!images || images.length === 0) return null;
-
-  if (images.length === 1) {
-    return (
-      <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-2xl relative aspect-video bg-gray-50 group">
-        <img
-          src={images[0]}
-          alt={t.overlay.gallery.alt_preview}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-full">
-      <style jsx>{`
-        .hide-scroll::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scroll {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-      {/* Main Image Area */}
-      <div className="md:col-span-3">
-        <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-gray-100 bg-gray-50 shadow-2xl group">
-          <img
-            key={activeImage}
-            src={activeImage}
-            alt={t.overlay.gallery.alt_active}
-            className="w-full h-full object-cover animate-in fade-in zoom-in-95 duration-500 group-hover:scale-105 transition-transform duration-700"
-          />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
-      </div>
-
-      {/* Thumbnails Sidebar - Grid on mobile, Column on desktop */}
-      <div className="md:col-span-1 grid grid-cols-3 sm:grid-cols-4 md:flex md:flex-col gap-3 md:gap-4 overflow-y-auto md:max-h-[500px] hide-scroll">
-        {images.map((img, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveImage(img)}
-            className={`relative aspect-video w-full flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-300 ${
-              activeImage === img
-                ? "border-[#05dc7f] shadow-lg shadow-[#05dc7f]/20 scale-105"
-                : "border-transparent opacity-50 hover:opacity-100 hover:scale-[1.02]"
-            }`}
-          >
-            <img
-              src={img}
-              alt={t.overlay.gallery.alt_index.replace("{index}", String(index + 1))}
-              className="w-full h-full object-cover"
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};

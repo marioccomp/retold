@@ -6,14 +6,15 @@ import { classifyFile } from "./classify-file.js";
 import { buildInfraAndStats } from "./build-infra.js";
 import { buildStructure } from "./build-struct.js";
 
-
 import path from "path";
 import { classifyProject } from "./classify-project.js";
 import { selectCodeSamples } from "./select-code-samples.js";
 
-export async function analyzeRepository(repoPath: string, opts?: { readme?: string; repoUrl?: string }) {
+export async function analyzeRepository(
+  repoPath: string,
+  opts?: { readme?: string; repoUrl?: string }
+) {
   const { files } = scanRepository(repoPath);
-
 
   const { infra, stats } = buildInfraAndStats(files);
   const structure = buildStructure(files);
@@ -27,38 +28,40 @@ export async function analyzeRepository(repoPath: string, opts?: { readme?: stri
   const appType = detectAppType({
     frameworks: stack.frameworks,
     tools: stack.tools,
-    languages: languagesForAppType,
+    languages: [...new Set([...detectedLanguages, ...stack.languages])],
     signals: {
-      hasCI: infra.hasCI,
-      hasDockerfile: infra.hasDocker,
+      hasCI: infra.ciProviders.length > 0,
+      hasDockerfile: infra.hasDockerfile,
+      hasCompose: infra.hasCompose,
     },
   });
 
   const primaryLanguage = detectedLanguages[0] ?? stack.languages[0] ?? "Unknown";
 
   const classification = classifyProject({
-    files: files.map(f => ({ path: path.relative(repoPath, f.path), name: f.name })),
+    files: files.map((f) => ({ path: path.relative(repoPath, f.path), name: f.name })),
     readme: opts?.readme ?? "",
     repoUrl: opts?.repoUrl,
     stack,
     infra: {
-      hasCI: infra.hasCI,
-      hasDocker: infra.hasDocker,
+      hasCI: infra.ciProviders.length > 0,
+      hasDocker: infra.hasDockerfile || infra.hasCompose,
       hasTests: infra.hasTests,
     },
-    primaryLanguage
+    primaryLanguage,
   });
 
   const testFiles = files.filter((f) => classifyFile(f) === "test");
 
   // Select code samples if necessary (no readme or low confidence/unknowns)
   let codeSamples: any[] = [];
-  const needsMoreContext = !opts?.readme || classification.confidence < 0.6 || classification.purpose === "unknown";
+  const needsMoreContext =
+    !opts?.readme || classification.confidence < 0.6 || classification.purpose === "unknown";
 
   if (needsMoreContext) {
-    codeSamples = selectCodeSamples(files, 2).map(s => ({
+    codeSamples = selectCodeSamples(files, 2).map((s) => ({
       ...s,
-      relativePath: path.relative(repoPath, s.relativePath)
+      relativePath: path.relative(repoPath, s.relativePath),
     }));
   }
 
@@ -73,7 +76,6 @@ export async function analyzeRepository(repoPath: string, opts?: { readme?: stri
     stats,
     structure,
     classification,
-    codeSamples
+    codeSamples,
   };
-
 }

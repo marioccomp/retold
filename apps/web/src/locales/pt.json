@@ -95,13 +95,23 @@
                 "tech_stack": "Stack Tecnológica",
                 "files": "Arquivos",
                 "infra": "Infra & Qualidade",
-                "structure": "Estrutura"
+                "structure": "Estrutura",
+                "strengths": "Pontos Fortes",
+                "architecture": "Arquitetura",
+                "suggestions": "Sugestões",
+                "loading_report": "Carregando relatório..."
             },
             "stats": {
                 "source": "Fonte",
                 "tests": "Testes",
                 "config": "Config",
-                "docs": "Docs"
+                "docs": "Docs",
+                "total_files": "Arquivos Totais",
+                "sources": "Códigos",
+                "code_files": "Arquivos de Código",
+                "infra_setup": "Infra & Config",
+                "tests_found": "Testes encontrados",
+                "no_tests": "Sem testes"
             },
             "infra": {
                 "ci_cd": "Pipeline CI/CD",
