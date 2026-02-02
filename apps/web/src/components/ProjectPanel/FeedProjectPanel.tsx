@@ -286,6 +286,8 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
               />
             ))}
 
+          {status === "RATE_LIMITED" && <RateLimitedView t={t} />}
+
           {/* Report Content - Unified View */}
           {status === "DONE" && (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -343,7 +345,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                       {llm.architecture?.style && (
                         <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-sm font-bold border border-purple-100">
                           <Layout className="w-4 h-4" />
-                          {humanizeEnum(llm.architecture.style)}
+                          {(t.overlay as any)?.architecture_types?.[llm.architecture.style] ?? humanizeEnum(llm.architecture.style)}
                         </div>
                       )}
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
@@ -618,5 +620,17 @@ const ErrorView = ({ onRetry, t }: { onRetry: () => void; t: any }) => (
     >
       {t.overlay.error_view.button}
     </button>
+  </div>
+);
+
+const RateLimitedView = ({ t }: { t: any }) => (
+  <div className="flex flex-col items-center justify-center py-16 text-center bg-amber-50/30 rounded-2xl border border-amber-100">
+    <Clock className="w-12 h-12 text-amber-500 mb-5" />
+    <h3 className="text-xl font-bold text-amber-900 mb-2">
+      {t.overlay?.rate_limited_view?.title || "Service Temporarily Unavailable"}
+    </h3>
+    <p className="text-amber-600/80 text-base">
+      {t.overlay?.rate_limited_view?.description || "We've reached our analysis limit for today. Please try again in about 1 hour."}
+    </p>
   </div>
 );

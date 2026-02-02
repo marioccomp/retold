@@ -6,7 +6,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx --env-file=../../.env index.ts"
+    "dev": "tsx --watch --env-file=../../.env index.ts"
   },
   "dependencies": {
     "@octokit/auth-app": "^8.1.2",

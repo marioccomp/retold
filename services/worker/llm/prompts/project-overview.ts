@@ -31,7 +31,7 @@ IMPORTANT:
     },
     architecture: {
       style:
-        "monolith|modular_monolith|microservices|library|cli_tool|mobile_app|static_site|unknown",
+        "monorepo|monolith|modular_monolith|microservices|library|cli_tool|mobile_app|static_site|unknown",
       explanation: "",
       evidence: [
         {
@@ -88,13 +88,20 @@ ADAPTATION POLICY:
   const architecturePolicy = `ARCHITECTURE POLICY:
 - You MUST infer architecture ONLY from evidence in Repository Context and Code Samples.
 - If evidence is insufficient, set architecture.style = "unknown" and explain uncertainty in evidence + key_runtime_concerns.
-- Never claim "microservices" just because it's a monorepo. A monorepo can still be a monolith/modular monolith.
+
+MONOREPO DETECTION (CRITICAL):
+- If infra.isMonorepo is true, OR infra.monorepoTool is present, OR infra.packageJsonCount >= 3:
+  - NEVER set architecture.style = "monolith"
+  - Use "monorepo" if the repo contains multiple deployable apps/services (e.g., apps/, services/ directories)
+  - Use "modular_monolith" if it's a monorepo but with a single deployable unit
+- Monorepo tools (Turborepo, Nx, Lerna, pnpm workspaces) are STRONG evidence of multi-package structure
+- Multiple package.json files are STRONG evidence against "monolith"
+- The README claiming "single package.json" when infra shows otherwise is WRONG - trust the infra signals
+
+OTHER RULES:
+- Never claim "microservices" just because it's a monorepo. A monorepo can still be a modular monolith.
 - Treat "infra" signals as higher confidence than README claims.
 - Provide at least 3 evidence items when style != "unknown".
-- For high_level_diagram:
-  - nodes must be concrete components inferred from structure/infra (e.g., "apps/web", "apps/api", "worker", "postgres", "redis/queue").
-  - edges must reflect actual interactions suggested by infra/stack/code (e.g., "queue", "db", "http").
-- The diagram is conceptual: keep it minimal (4–10 nodes, 3–12 edges). Do not invent components not supported by evidence.
 `.trim();
 
   return `
@@ -164,6 +171,14 @@ DO NOT criticize a project for:
 - **Authentication**: If next-auth, clerk, @auth/*, jsonwebtoken, bcrypt are present, DO NOT claim "lack of security".
 - **UI Style**: If UI is basic but functional, call it "minimalist MVP", not "unfinished".
 
+### TESTING SUGGESTIONS (CRITICAL)
+- If infra.testTools contains a testing framework (jest, vitest, pytest, mocha), DO NOT suggest "implement tests using Jest/Mocha/other tool".
+- Instead, if tests exist but are few (stats.testFiles < 5), suggest "expand test coverage" with the EXISTING tool from infra.testTools.
+- If a test framework is already present, NEVER recommend a different one. Use the one that's already in use.
+- Generic suggestions like "add automated tests" without acknowledging existing test setup are INVALID.
+- Valid test suggestion: "Expand test coverage using Vitest - currently only 2 test files cover critical paths"
+- Invalid test suggestion: "Implement automated tests using Jest or Mocha" (when Vitest is already present)
+
 ${architecturePolicy}
 
 ## EXAMPLES OF GOOD VS BAD ANALYSIS (FOLLOW THESE PATTERNS)
@@ -194,12 +209,14 @@ ${architecturePolicy}
 
 ### Architecture
 - Fill architecture.style based on evidence:
+  - "monorepo": multi-package repository with multiple apps/services/packages managed together (detected via Turborepo, Nx, Lerna, pnpm workspaces, or multiple package.json files). This is about STRUCTURE, not deployment.
   - "microservices": multiple independently deployable services with clear boundaries + infra hints (separate deploy configs, multiple service entrypoints, multiple DBs/queues per service, etc.)
   - "modular_monolith": single deployable backend but multiple modules/packages with clear boundaries
-  - "monolith": single app/service with most concerns inside it
+  - "monolith": single app/service with most concerns inside it AND a single package.json at root
   - "cli_tool": main value delivered via terminal executable
   - "library": primarily reusable package consumed by others
   - "static_site": purely static content build
+- CRITICAL: If infra.isMonorepo is true, NEVER use "monolith". Use "monorepo" or "modular_monolith".
 - Fill architecture.explanation with 4–8 lines explaining why this style fits THIS repo context.
 - Do NOT mention "evidence lists" or refer to internal signals explicitly. Just explain it plainly.
 - If style is "unknown", explain what info is missing to decide.
