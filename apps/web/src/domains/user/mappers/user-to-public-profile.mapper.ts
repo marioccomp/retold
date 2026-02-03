@@ -43,7 +43,7 @@ export function mapUserToPublicProfile(
   return {
     id: user.id,
     username: user.username ?? "",
-    email: user.email,
+    email: user.contactEmail ?? null, // Uses contactEmail field, not account email
     phone: user.phone || null,
     name: user.name,
     title: user.title,

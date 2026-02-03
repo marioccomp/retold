@@ -88,6 +88,14 @@ export const getProfileSchema = (dict: any) => z.object({
             )
             .optional()
     ),
+
+    contactEmail: z.preprocess(
+        trim,
+        z.string()
+            .email({ message: dict.validation.email_invalid })
+            .optional()
+            .or(z.literal(""))
+    ),
 });
 
 export const getProfileDetailsSchema = (dict: any) => z.object({
