@@ -1,6 +1,14 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/src/domains/auth/auth";
 import { SettingsClient } from "./SettingsClient";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+    const session = await auth();
+
+    if (!session?.user) {
+        redirect("/login");
+    }
+
     return (
         <SettingsClient />
     );
