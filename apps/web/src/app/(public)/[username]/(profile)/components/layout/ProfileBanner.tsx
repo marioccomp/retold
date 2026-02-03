@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import Image from "next/image";
-import defaultCover from "@/assets/capa.jpg";
 import { useTranslation } from "@/src/i18n/client";
 import { FiEdit2 } from "react-icons/fi";
 import { useQueryClient } from "@tanstack/react-query";
@@ -72,11 +70,9 @@ export default function ProfileBanner({ cover, ownProfile, username }: Props) {
                         alt={dict.profile.alt_cover}
                     />
                 ) : (
-                    <Image
-                        src={defaultCover}
-                        className="w-full h-[160px] sm:h-[200px] md:h-[250px] object-cover block"
-                        alt={dict.profile.alt_cover}
-                        priority
+                    <div
+                        className="w-full h-[160px] sm:h-[200px] md:h-[250px] bg-gradient-to-r from-[#33bd19] to-[#05dc7f]"
+                        aria-label={dict.profile.alt_cover}
                     />
                 )}
 
