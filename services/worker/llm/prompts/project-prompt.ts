@@ -1,9 +1,12 @@
 import { Heuristic } from "../../types/heuristic";
 
+
 export function projectPrompt(input: Heuristic, repoName: string) {
     const isPt = input.locale?.toLowerCase().startsWith("pt");
 
     const outputLanguage = isPt ? "pt-BR" : "en";
+
+    const { readme: _r, codeSamples: _c, ...inputWithoutReadmeOrCodeSamples } = input;
 
     const languageInstruction = `
 IMPORTANT:
@@ -46,10 +49,43 @@ README POLICY:
     const docsFiles = input.stats.docsFiles;
     const unknownFiles = input.stats.unknownFiles;
 
-    const topLevelDirs = input.structure.topLevelDirs;
-    const secondLevelDirs = input.structure.secondLevelDirs;
     const hasAppsDir = input.structure.hasAppsDir;
     const hasPackagesDir = input.structure.hasPackagesDir;
+
+    // Limite dinâmico: se README é completo (>25k chars), pegamos menos diretórios
+    const readmeLength = input.readme?.length ?? 0;
+    console.log("TAMANHO DO README", readmeLength);
+    const isReadmeComplete = readmeLength > 25000;
+    const dirLimit = isReadmeComplete ? 5 : 20;
+
+    // Helper para pegar dirs com limite
+    const limitDirs = (dirs: string[] | undefined) => (dirs ?? []).slice(0, dirLimit);
+
+    // Monorepos e Spring Boot precisam de mais níveis de profundidade
+    const needsDeepLevels = hasAppsDir || hasPackagesDir || frameworks.includes("Spring Boot");
+
+    const dirs = [
+        ...limitDirs(input.structure.topLevelDirs),
+        ...limitDirs(input.structure.secondLevelDirs),
+        ...limitDirs(input.structure.thirdLevelDirs),
+        ...limitDirs(input.structure.fourthLevelDirs),
+        ...(needsDeepLevels ? limitDirs(input.structure.fifthLevelDirs) : []),
+        ...(needsDeepLevels ? limitDirs(input.structure.sixthLevelDirs) : []),
+    ];
+
+    const inputLite = {
+        ...inputWithoutReadmeOrCodeSamples,
+        structure: {
+            ...input.structure,
+            topLevelDirs: limitDirs(input.structure.topLevelDirs),
+            secondLevelDirs: limitDirs(input.structure.secondLevelDirs),
+            thirdLevelDirs: limitDirs(input.structure.thirdLevelDirs),
+            fourthLevelDirs: limitDirs(input.structure.fourthLevelDirs),
+            fifthLevelDirs: needsDeepLevels ? limitDirs(input.structure.fifthLevelDirs) : [],
+            sixthLevelDirs: needsDeepLevels ? limitDirs(input.structure.sixthLevelDirs) : [],
+        }
+    };
+
 
     const readme = input.readme;
     const codeSamples = input.codeSamples;
@@ -109,21 +145,26 @@ README POLICY:
     So adapt your analysis to this context.
     `
 
+    // Lista compacta de features já presentes no projeto (evita repetição nas políticas)
+    const presentFeatures = [
+        input.infra.hasTests && "tests",
+        input.infra.ciProviders.length > 0 && "CI/CD",
+        input.infra.hasKubernetes && "Kubernetes",
+        input.infra.hasTerraform && "Terraform",
+        input.infra.hasDockerfile && "Dockerfile",
+        input.infra.hasCompose && "Docker Compose",
+        input.infra.lintTools.length > 0 && "linting",
+        input.infra.testTools.length > 0 && "test framework",
+        input.readme && "documentation",
+    ].filter(Boolean) as string[];
+
     const heuristicAnalysisPolicy = `
-        - You MUST analyze how these frameworks ${frameworks.join(", ") + " " + primaryLanguage + " " + appType !== "unknown" ? appType : ""} interact with each other on the project.
-        - You MUST understand how the combination of frameworks impacts the project.
-        - You MUST understand and explain how the combination of frameworks interact with each other.
-        - You MUST say about all the infra stuff: ${input.infra} and how it impacts the project (Says about all present).
-        - You MUST understand if ${input.infra.ciProviders.length > 0 ? "then the project has CI/CD configured" : "then the project has not CI/CD configured"}.
-        - You MUST understand if ${input.infra.hasTests ? "then the project has tests" : "then the project has no tests"}.
-        - You MUST understand if ${input.infra.hasKubernetes ? "then the project has Kubernetes" : "then the project has no Kubernetes"}.
-        - You MUST understand if ${input.infra.hasTerraform ? "then the project has Terraform" : "then the project has no Terraform"}.
-        - You MUST understand if ${input.infra.hasDockerfile ? "then the project has Dockerfile" : "then the project has no Dockerfile"}.
-        - You MUST understand if ${input.infra.hasCompose ? "then the project has Docker Compose" : "then the project has no Docker Compose"}.
-        - You MUST understand if ${input.infra.lintTools.length > 0 ? "then the project has lint tools" : "then the project has no lint tools"}.
-        - You MUST understand if ${input.infra.testTools.length > 0 ? "then the project has test tools" : "then the project has no test tools"}.
-        - You must correlate all these things and explain how they impact the project.
-    `
+FRAMEWORK & TOOL ANALYSIS:
+- Analyze how ${frameworks.join(", ")} interact with ${primaryLanguage} .
+- Explain how the tech stack combination impacts the project architecture.
+- Comment on infrastructure: ${Object.entries(input.infra).filter(([_, v]) => v === true || (Array.isArray(v) && v.length > 0)).map(([k]) => k).join(", ") || "minimal infra detected"}.
+${presentFeatures.length > 0 ? `- Features already present (do NOT criticize or suggest): ${presentFeatures.join(", ")}.` : ""}
+    `.trim();
 
     const documentationPolicy = `
         DOCUMENTATION EVALUATION (BEFORE suggesting doc improvements):
@@ -141,107 +182,73 @@ README POLICY:
         - If README contains detailed setup instructions, this is a STRENGTH, not something to improve.
         `.trim();
 
-    const stackSinergyPolicy = `
-        - You MUST analyze how these tools ${tools.join(", ") + " " + primaryLanguage + " " + appType !== "unknown" ? appType : ""} interact with each other on the project.
-        - You MUST understand how the combination of tools impacts the project.
-        - You MUST understand and explain how the combination of tools interact with each other.
-    `
 
 
     const weaknessValidationPolicy = `
-WEAKNESS VALIDATION (CHECK BEFORE CRITICIZING):
-- MANDATORY pre-checks:
-  - ${input.infra.hasTests ? "Do NOT criticize 'lack of tests' and do NOT recommend add tests, only if there are few tests, and you have to explicity say why to add more tests" : "You can criticize 'lack of tests'"}
-  - ${input.readme ? "Do NOT criticize 'lack of documentation'" : "You can criticize 'lack of documentation'"}
-  - ${input.infra.ciProviders.length > 0 ? "Do NOT criticize 'missing CI/CD'" : "You can criticize 'missing CI/CD'"}
-  - ${input.infra.lintTools.length > 0 ? "Do NOT criticize 'no linting/code quality'" : "You can criticize 'no linting/code quality'"}
-  - ${input.infra.testTools.length > 0 ? "Do NOT criticize 'no test tools' and do NOT recommend any other test tool" : "You can criticize 'no test tools'"}
-  - ${input.stack.tools.includes("orm") ? "Do NOT criticize 'raw SQL' or 'no data layer'" : "You can criticize 'raw SQL' or 'no data layer'"}
-  - ${input.stack.tools.includes("auth") ? "Do NOT criticize 'no authentication'" : "You can criticize 'no authentication' if you have more evidences, this is not enough"}
-- Each weakness MUST have:
-  - Specific file, pattern, or code sample as evidence
-  - Explanation of why it matters for THIS project's domain/purpose
-  - Actionable fix (what specifically to do)
-- Maximum 4 weaknesses - quality over quantity
-- If project is well-structured: return 1-2 genuine issues, or acknowledge it's solid.
+WEAKNESS VALIDATION:
+- DO NOT criticize features already present: ${presentFeatures.join(", ") || "(none detected)"}.
+- Each weakness MUST have: specific evidence (file/pattern/code), why it matters for this project, and actionable fix.
+- Maximum 4 weaknesses - quality over quantity.
+- Before claiming something is "missing", check ALL directory levels first.
+- Adapt rigor to maturity: "${maturityExpectation}" projects have different expectations than production.
+- If project is well-structured: return 1-2 genuine issues or acknowledge it's solid.
 `.trim();
 
     const adaptationPolicy = `
-ADAPTATION POLICY:
-- Vary emphasis based on meta.domain and meta.purpose:
-  - ${purpose === "learning" ? "prioritize clarity, architecture explanation, developer experience, and educational value." : ""}
-  - ${purpose === "production" ? "prioritize reliability, security, scalability, observability, data integrity, and operational concerns." : ""}
-  - ${domain === "web" ? "discuss routing, auth/session, API boundaries, caching, SEO (if relevant), performance, and deployment ergonomics." : ""}
-  - ${domain === "cli" || domain === "systems" ? "discuss UX in terminal, input validation, error handling, portability, performance, and packaging." : ""}
-
-SUGGESTION DIVERSITY (CRITICAL - AVOID GENERIC SUGGESTIONS):
-- NEVER default to "add tests" or "improve documentation" - these are the MOST COMMON and LEAST USEFUL suggestions.
-- Instead, think about UNIQUE aspects of THIS project and suggest improvements in these categories:
-  ARCHITECTURE:
-    - "Consider extracting X into a separate service/package"
-    - "The coupling between A and B could be reduced using dependency injection"
-    - "Consider implementing a repository pattern for data access"
-  PERFORMANCE:
-    - "Add caching for API route X that fetches frequently accessed data"
-    - "Consider lazy loading for the heavy component Y"
-    - "Implement pagination for the list endpoint Z"
-  DEVELOPER EXPERIENCE:
-    - "Add a formatter for the project"
-    - "Add a linter for the project"
-    - "Add path aliases to simplify imports"
-  SECURITY:
-    - "Consider rate limiting on the auth endpoints"
-    - "Add input validation with Zod for API routes"
-    - "Implement CORS configuration for production"
-  OBSERVABILITY:
-    - "Add structured logging for debugging"
-    - "Consider adding error tracking (Sentry, etc.)"
-    - "Add health check endpoints"
-- If the project is WELL-STRUCTURED and has good practices: acknowledge it and suggest ADVANCED improvements, not basics.
-- If you cannot think of a non-generic suggestion, return an EMPTY suggestions array.
+ADAPTATION & SUGGESTIONS:
+- Adapt emphasis to context:
+  ${purpose === "learning" ? "- Learning project: prioritize clarity, architecture explanation, DX." : ""}
+  ${purpose === "production" ? "- Production project: prioritize reliability, security, scalability, observability." : ""}
+  ${domain === "web" ? "- Web domain: consider routing, auth, API design, caching, performance." : ""}
+  ${domain === "cli" || domain === "systems" ? "- CLI/Systems: consider UX, input validation, error handling, portability." : ""}
+- AVOID generic suggestions like "add tests" or "improve docs".
+- Suggest improvements in: ARCHITECTURE, PERFORMANCE, SECURITY, OBSERVABILITY, or DX.
+- For well-structured projects: suggest ADVANCED improvements, not basics.
+- If no meaningful suggestion exists, return EMPTY suggestions array.
 `.trim();
 
     const blockList = `
-        - "Do not make a strength about the project using new technologies"
-        - "Do not make a suggestion about the project using new technologies"
-        - "Do not make a weakness about the project using new technologies"
-    `
+        - NEVER mention the use of "modern", "popular", or "actual" technologies (like TypeScript, Next.js, Tailwind, etc.) as a strength. This is considered a baseline requirement, not a merit.
+        - DO NOT praise the tech stack choice itself. Praise how it is USED or IMPLEMENTED.
+        - NEVER return generic strengths like "Good project structure" without specific evidence from L1-L6.
+        - DO NOT use generic architectural labels (like "Microservices" or "Hexagonal") unless the directory structure provides undeniable proof of that pattern.
+- If a folder's purpose is ambiguous, describe its position in the hierarchy rather than guessing its domain role.
+    `.trim();
 
     const contextInferencePolicy = `
-CONTEXT INFERENCE POLICY:
-- If README is missing:
-    1. Use the repository name "${repoName}" as a PRIMARY HYPOTHESIS.
-    2. Look for evidence in code samples (e.g., Models named "Product", controllers named "Cart") that support this hypothesis.
-    3. If evidence is found, state: "Based on the repository name and code patterns, this project appears to be..."
-    4. If NO evidence is found in the code, state: "The repository name suggests an '${repoName}' project, but the current code structure is generic or early-stage."
-- Do NOT treat the repo name as absolute truth if the code shows something completely different.
-- ALWAYS maintain a tone of professional technical deduction.
+CONTEXT INFERENCE & DOMAIN DEDUCTION:
+- THE NAME CHALLENGE: The repository name "${repoName}" may be a creative brand, an acronym, or a metaphor. Avoid literal translation unless it matches industry-standard technical naming (e.g., "auth-service").
+- DUAL-TRACK ANALYSIS:
+    1. TRACK A (Technical Markers): Scan the directory tree (L1 to L${dirs.length}) for structural markers of intent (e.g., controllers for APIs, components for UI, schemas for data, or scrapers for ingestion).
+    2. TRACK B (Abstract to Concrete): If the name is non-obvious, identify the "Functional Core" by looking for the directory with the most complex nesting or unique naming. 
+- HIERARCHY OF EVIDENCE: 
+    Directory Tree Logic > Source Code Patterns > README Claims > Repository Name.
+- DEDUCTION PROTOCOL:
+    - Use the deep directory levels to "de-mask" creative project names. 
+    - Example Logic: If a project named "Astra" has directories for "trading", "exchange", and "wallets", deduce the domain is Finance, regardless of the brand name.
+- NO-GUESSING RULE: If the directory structure is purely boilerplate (e.g., just framework defaults) and the name is abstract, state that the project's specific domain is "not yet discernible from the current structure."
 `.trim();
 
     const structureAnalysisPolicy = `
-FOLDER ORGANIZATION & COHESION POLICY:
-- Analyze the following directory structure:
-  - Top Level: ${topLevelDirs.join(", ")}
-  - Second Level: ${secondLevelDirs.join(", ")}
-- PRIMARY GOAL: Evaluate if the folder organization is cohesive and facilitates finding code.
-- ARCHITECTURE CAP: Do NOT try to label the architecture (e.g., "Clean Architecture", "Hexagonal") unless the folder names and code samples make it explicitly undeniable. 
-- If the architecture is generic or standard for the framework (e.g., standard Next.js or NestJS structure), treat it as "Framework idiomatic" rather than a specific architectural pattern.
-- Only mention architecture if you notice "Emergent Patterns" (patterns that are being formed but perhaps not fully realized) or clear inconsistencies that affect maintenance.
+FOLDER ORGANIZATION & GEOGRAPHICAL EVIDENCE:
+- You have access to all levels of the directory tree (L1 to L${dirs.length - 1}).
+- PRIMARY RULE: These directories represent the "Ground Truth" of the project's capabilities.
+- GRANULAR ANALYSIS: Use all of them to confirm the existence of specific layers or features. Deep nesting often reveals implementation details that are not mentioned in the README.
+- ARCHITECTURE: Describe the architecture based on how these 4 levels are nested. (e.g., if logic is grouped by feature or by technical role).
 `.trim();
 
     const summaryInstructions = `
-        You MUST write EXACTLY 10-15 lines in summary field. This is MANDATORY. 
-        Follow the following structure:
-            1. What is the project: Explicitly state what the project is. If you are inferring from the name "${repoName}", use cautious language like "appears to be", "likely serves as", or "suggests a domain of".
-            2. PROBLEM it solves: Deduce from README or correlate the Tech Stack with the Repo Name.
-                - If evidence is thin, use speculative language (e.g., "likely addresses", "potentially solves", "appears to target").
-                - Connect the dots: If it's a ${primaryLanguage} project with ${frameworks.join(", ")}, mention what types of problems this specific stack is usually chosen for in the context of "${repoName}", expliciting that it is a supposition.
-            3. TARGET AUDIENCE
-            4. TECHNOLOGY SYNERGY
-            5. ARCHITECTURE OVERVIEW
-        - Do NOT just list technologies - explain their PURPOSE and INTERACTION
-        - If README is thin, infer from code samples and structure, stating that you are inferring.
-        `
+SUMMARY REQUIREMENTS:
+- Write EXACTLY 10-15 lines in the summary field.
+- Use the directory structure from the heuristics data (structure.topLevelDirs, secondLevelDirs, etc.) to understand architecture.
+- Follow this structure:
+  1. WHAT: Project purpose. If "${repoName}" is abstract, deduce from directory names.
+  2. PROBLEM: Be specific, but CONTEXT-AWARE. Interpret folder names based on the stack - e.g., "/queue" in a Node.js project likely means async messaging, but in C/C++ it's probably a data structure implementation.
+  3. AUDIENCE: Who uses this.
+  4. TECH SYNERGY: How tools interact (e.g., "Prisma for data, worker for heavy tasks").
+  5. ARCHITECTURE: Based on folder nesting. ${hasAppsDir ? "This is a monorepo - explain apps/packages relationship." : ""}
+- Do NOT just list technologies - explain PURPOSE and INTERACTION.
+`.trim();
 
 
     const antiHallucinationPolicy = `
@@ -251,12 +258,6 @@ ANTI-HALLUCINATION RULES:
 - ONLY criticize something if you see POOR implementation in the provided code, or if the Project Purpose clearly requires it and there is zero trace of it in the directory structure.
 - If you are unsure if a feature exists, DO NOT mention it as a weakness.
 `.trim();
-
-
-
-
-
-
     return `
         You are a senior software engineer with 10+ years of experience in software development.
         You are analyzing a codebase and providing feedback on its architecture, strengths, weaknesses, and suggestions for improvement.
@@ -268,7 +269,7 @@ ANTI-HALLUCINATION RULES:
         ${structureAnalysisPolicy}
 
         Heuristics data to guide your analysis:
-        ${JSON.stringify(input, null, 2)}
+        ${JSON.stringify(inputLite, null, 2)}
         ${heuristicAnalysisPolicy}
 
         ${input.readme ? `## PROJECT README: ${input.readme}` : "No README provided"}
@@ -283,15 +284,10 @@ ANTI-HALLUCINATION RULES:
         }
         ${contextInferencePolicy}
         ${adaptationPolicy}
-        ${stackSinergyPolicy}
+        ${blockList}
         ${summaryInstructions}
         ${antiHallucinationPolicy}
         ${weaknessValidationPolicy}
-        ${blockList}
-        ${schema}
-
-        If you do not have enough information to generate what the project is, you can use the repo name: ${repoName} to help you to write.
-        
 
         FINAL INSTRUCTION:
         Return a JSON object that strictly follows this schema structure:

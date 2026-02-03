@@ -68,34 +68,6 @@ export async function createProjectAction(
       }
       const data = await res.json();
 
-      // 3. Upsert Repository
-      // We check if this specific user already has this repo linked, or if we need to create a link
-      // Actually, Repository has a unique constraint on githubId? No, checking schema...
-      // Schema: githubId Int @unique. This means a repository can only exist once globally in the system?
-      // Wait, relation: userId Int @relation...
-      // If githubId is unique globally, then multiple users cannot import the same repo?
-      // Let's check schema again.
-      // Schema line 246: githubId Int @unique.
-      // Schema field userId Int.
-      // This implies 1-to-many User->Repository, but `githubId` is unique globally? 
-      // That seems like a schema design flaw if multiple users want to analyze the same popular repo `facebook/react`.
-      // BUT, for now, I must respect the schema.
-      // If the repo exists, we must use that existing record.
-      // CHECK: If repo exists but belongs to ANOTHER user, can we use it?
-      // The Relation is `Project -> Repository`. `Repository` belongs to `User`.
-      // If I use a repository ID that belongs to another user, `prisma.project.create` might fail if there's RLS or logic preventing it?
-      // Prisma doesn't enforce ownership on relation creation unless I check it.
-      // However, `repositories Repository[]` on User implies ownership. 
-      // If I link a project to a repo owned by User A, but Project is owned by User B...
-      // The schema allows `repositoryId` on Project.
-      // But `Repository` table has `userId`.
-      // If I try to create a duplicate `Repository` with same `githubId` but different `userId`, it will fail due to `@unique`.
-      // So I must find the EXISTING repository by `githubId`.
-      // If it exists, I use it. 
-      // PROBLEM: If it exists and belongs to User A, and User B creates a project using it... 
-      // Does that matter? Maybe not for this "test feature".
-      // Ideally, I should check if it exists.
-
       const existingRepo = await prisma.repository.findUnique({
         where: { githubId: data.id }
       });
@@ -112,7 +84,7 @@ export async function createProjectAction(
             url: data.html_url,
             private: data.private,
             isActive: true,
-            userId: Number(session.user.id), // Owner of the record
+            userId: Number(session.user.id),
           }
         });
         repositoryId = newRepo.id;
