@@ -73,6 +73,9 @@ const worker = new Worker(
 
       const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
 
+
+      const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
+
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
       userAnalyzeQueue
@@ -88,7 +91,7 @@ const worker = new Worker(
         readme: readmeContent,
         codeSamples: analysis.codeSamples,
         locale: locale || "en",
-      });
+      }, repoName);
 
       const llmInsightsJson = JSON.stringify(llmInsights);
 

@@ -41,41 +41,30 @@ type LlmReportV21 = {
     appType?: string;
     domain?: string;
     purpose?: string;
-    maturityExpectation?: string;
   };
 
-  general_summary?: {
+  summary?: {
     title?: string;
     description?: string;
   };
 
   architecture?: {
-    style?: string;
     explanation?: string;
-    evidence?: Array<{
-      signal?: string;
-      source?: string;
-    }>;
   };
 
   strengths?: Array<{
-    title: string;
+    name: string;
     explanation: string;
-    related_to?: string;
   }>;
 
   weaknesses?: Array<{
-    title: string;
+    name: string;
     explanation: string;
-    impact: "low" | "medium" | "high";
-    context?: string;
   }>;
 
   suggestions?: Array<{
-    title: string;
-    recommended_action: string;
-    rationale?: string;
-    priority: "low" | "medium" | "high";
+    name: string;
+    explanation: string;
   }>;
 
   error?: string;
@@ -295,13 +284,13 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                 <div className="p-6 md:p-10 space-y-10">
                   {/* Summary Section */}
                   <div className="space-y-4">
-                    {llm.general_summary?.title && (
+                    {llm.summary?.title && (
                       <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-                        {llm.general_summary.title}
+                        {llm.summary.title}
                       </h3>
                     )}
                     <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
-                      {llm.general_summary?.description || (t.overlay as any)?.llm_empty_overview || "No overview available."}
+                      {llm.summary?.description || (t.overlay as any)?.llm_empty_overview || "No overview available."}
                     </p>
                   </div>
 
@@ -322,7 +311,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                         >
                           <div className="font-bold text-gray-900 mb-1 flex items-center gap-2">
                             <CheckCircle2 className="w-4 h-4 text-[#05dc7f]" />
-                            {s.title}
+                            {s.name}
                           </div>
                           <p className="text-sm text-gray-600 leading-relaxed">
                             {s.explanation}
@@ -342,12 +331,6 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                       color="purple"
                     />
                     <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-200/60">
-                      {llm.architecture?.style && (
-                        <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-sm font-bold border border-purple-100">
-                          <Layout className="w-4 h-4" />
-                          {(t.overlay as any)?.architecture_types?.[llm.architecture.style] ?? humanizeEnum(llm.architecture.style)}
-                        </div>
-                      )}
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                         {llm.architecture?.explanation || (t.overlay as any)?.llm_empty_architecture || "No architecture details."}
                       </p>
@@ -403,13 +386,11 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                                 </div>
                               </div>
                               <div>
-                                <div className="font-bold text-gray-900">{s.title}</div>
-                                <p className="text-sm text-gray-700 mt-1 font-medium">
-                                  {s.recommended_action}
-                                </p>
-                                {s.rationale && (
+                                <div className="font-bold text-gray-900">{s.name}</div>
+
+                                {s.explanation && (
                                   <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                                    {s.rationale}
+                                    {s.explanation}
                                   </p>
                                 )}
                               </div>

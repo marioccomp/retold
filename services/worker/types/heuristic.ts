@@ -30,6 +30,7 @@ export type Heuristic = {
   };
   structure: {
     topLevelDirs: string[];
+    secondLevelDirs: string[];
     packageJsonCount: number;
     hasAppsDir: boolean;
     hasPackagesDir: boolean;

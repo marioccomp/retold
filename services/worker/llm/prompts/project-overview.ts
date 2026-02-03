@@ -123,7 +123,7 @@ DOCUMENTATION EVALUATION (BEFORE suggesting doc improvements):
   4. Usage examples or commands
   5. API documentation (if applicable)
 - Scoring:
-  - 4+ items present → WELL documented, do NOT suggest generic "improve documentation"
+  - 3+ items present → WELL documented, do NOT suggest generic "improve documentation"
   - README has > 50 lines with clear sections → Consider it adequate
 - Valid documentation weakness: "API endpoint documentation missing for /api/v1/* routes"
 - INVALID weakness: "Improve documentation" (when README already covers install/usage/config)
