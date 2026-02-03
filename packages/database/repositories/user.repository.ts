@@ -14,6 +14,7 @@ type UpdatableProfileFields = Pick<
   | "skills"
   | "phone"
   | "email"
+  | "contactEmail"
 >;
 type UpdateProfileInput = Partial<UpdatableProfileFields>;
 
@@ -68,15 +69,15 @@ export const userRepository = {
             },
             ...(currentUserId
               ? {
-                  likes: {
-                    where: {
-                      userId: currentUserId,
-                    },
-                    select: {
-                      userId: true,
-                    },
+                likes: {
+                  where: {
+                    userId: currentUserId,
                   },
-                }
+                  select: {
+                    userId: true,
+                  },
+                },
+              }
               : {}),
           },
         },
@@ -88,15 +89,15 @@ export const userRepository = {
         },
         ...(currentUserId
           ? {
-              followers: {
-                where: {
-                  followerId: currentUserId,
-                },
-                select: {
-                  followerId: true,
-                },
+            followers: {
+              where: {
+                followerId: currentUserId,
               },
-            }
+              select: {
+                followerId: true,
+              },
+            },
+          }
           : {}),
         certifications: {
           orderBy: { createdAt: "desc" },
@@ -231,15 +232,15 @@ export const userRepository = {
         skills: true,
         ...(currentUserId
           ? {
-              followers: {
-                where: {
-                  followerId: currentUserId,
-                },
-                select: {
-                  followerId: true,
-                },
+            followers: {
+              where: {
+                followerId: currentUserId,
               },
-            }
+              select: {
+                followerId: true,
+              },
+            },
+          }
           : {}),
       },
       take: 20,
