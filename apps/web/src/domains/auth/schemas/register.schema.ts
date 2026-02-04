@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { USERNAME_REGEX } from "../auth.constants";
 
 const trim = (v: unknown) => (typeof v === "string" ? v.trim() : v);
 
@@ -21,6 +22,7 @@ export const getRegisterSchema = (dict: any) =>
       z.string()
         .min(3, dict.validation.username_min)
         .max(20, dict.validation.username_max)
+        .regex(USERNAME_REGEX, dict.validation.username_regex)
     ),
 
     email: z.preprocess(
