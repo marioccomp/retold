@@ -102,7 +102,6 @@ export function buildInfraAndStats(files: FileEntry[]) {
       hasTests: testFiles > 0,
       hasKubernetes,
       hasTerraform,
-      // Monorepo signals
       isMonorepo,
       monorepoTool,
       packageJsonCount,

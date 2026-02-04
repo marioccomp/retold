@@ -40,7 +40,18 @@ const worker = new Worker(
         data: { status: "ANALYZING" },
       });
 
-      const token = await githubRepository.getToken(projectId);
+      let token = "";
+      try {
+        token = await githubRepository.getToken(projectId);
+      } catch (e: any) {
+        if (e.message.includes("No github installations found")) {
+          console.log("[worker] No GitHub installation found. Attempting public clone without token.");
+        } else {
+          // Log other errors but maybe still try? No, let's rethrow if it's not the specific installation error.
+          // actually, if 'Project not found' or 'User not found' we should fail.
+          throw e; // Rethrow other errors
+        }
+      }
 
       const projectWithUser = await prisma.project.findUnique({
         where: { id: projectId },
@@ -62,6 +73,9 @@ const worker = new Worker(
 
       const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
 
+
+      const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
+
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
       userAnalyzeQueue
@@ -77,7 +91,7 @@ const worker = new Worker(
         readme: readmeContent,
         codeSamples: analysis.codeSamples,
         locale: locale || "en",
-      });
+      }, repoName);
 
       const llmInsightsJson = JSON.stringify(llmInsights);
 

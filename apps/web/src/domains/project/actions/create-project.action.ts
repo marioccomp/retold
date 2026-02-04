@@ -10,7 +10,6 @@ import { getDictionary } from "@/src/i18n/server";
 import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 import { lastCommitQueue } from "@repo/queue";
 // import { analyzeRepoQueue } from "@repo/queue";
-
 type CreateProjectInput = {
   title: string;
   description: string;
@@ -47,14 +46,6 @@ export async function createProjectAction(
     };
   }
 
-  const existingProject = await prisma.project.findFirst({
-    where: { repositoryId: input.repositoryId },
-  });
-
-  if (existingProject) {
-    return { success: false, message: t.already_exists };
-  }
-
   const repository = await prisma.repository.findFirst({
     where: {
       id: input.repositoryId,
@@ -65,6 +56,14 @@ export async function createProjectAction(
 
   if (!repository) {
     return { success: false, message: t.repo_not_found };
+  }
+
+  const existingProject = await prisma.project.findFirst({
+    where: { repositoryId: repository.id },
+  });
+
+  if (existingProject) {
+    return { success: false, message: t.already_exists };
   }
 
   const project = await prisma.project.create({

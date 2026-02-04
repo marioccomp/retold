@@ -158,13 +158,13 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     // Create Project Mutation
     const { mutate: createProject, isPending: mutationIsCreating } = useMutation({
         mutationFn: async () => {
-            if (!title || !description || !selectedRepoId) return;
+            if (!title || !description) return;
 
             const result = await createProjectAction({
                 title,
                 description,
                 visibility,
-                repositoryId: selectedRepoId,
+                repositoryId: selectedRepoId!,
             });
 
             if (!result.success) {
@@ -203,7 +203,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         createProject();
     };
 
-    const canCreate = title.trim() && description.trim() && selectedRepoId && !mutationIsCreating && !isUploadingImages;
+    // Validation
+    const isRepoValid = selectedRepoId !== null;
+    const canCreate = title.trim() && description.trim() && isRepoValid && !mutationIsCreating && !isUploadingImages;
 
     return (
         <div className="bg-white rounded-[16px] border border-[#e7eae9] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-[fadeIn_0.3s_ease-out]">
