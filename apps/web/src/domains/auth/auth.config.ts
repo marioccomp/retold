@@ -84,7 +84,7 @@ export const authConfig = {
       ];
 
       const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
-      const isProfileRoute = /^\/[a-zA-Z0-9_]+$/.test(pathname); // Rota de perfil /{username}
+      const isProfileRoute = /^\/[a-zA-Z0-9_-]+$/.test(pathname); // Rota de perfil /{username}
 
       // Se o usuário está logado mas não tem username
       // Redireciona apenas se NÃO for rota pública e NÃO for rota de perfil

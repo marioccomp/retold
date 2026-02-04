@@ -453,7 +453,7 @@
         "name_max": "Nome deve ter no máximo 20 caracteres",
         "username_min": "Usuário deve ter pelo menos 3 caracteres",
         "username_max": "Usuário deve ter no máximo 20 caracteres",
-        "username_regex": "Usuário deve conter apenas letras, números e sublinhados",
+        "username_regex": "Usuário deve conter apenas letras, números, sublinhados e hífens",
         "current_password_required": "Senha atual é obrigatória",
         "confirm_password_required": "Confirmação de senha é obrigatória",
         "title_max": "Título deve ter no máximo 50 caracteres",
@@ -570,9 +570,76 @@
             "continue": "Continuar",
             "setting_up": "Configurando...",
             "preview_label": "Seu perfil estará disponível em:",
-            "help_text": "3–20 caracteres, apenas letras, números e sublinhados",
+            "help_text": "3–20 caracteres, apenas letras, números, sublinhados e hífens",
             "checking": "Verificando nome de usuário...",
             "available": "Nome de usuário disponível"
+        }
+    },
+    "footer": {
+        "rights": "© {year} Retold. Todos os direitos reservados.",
+        "terms": "Termos de Serviço",
+        "privacy": "Política de Privacidade",
+        "contact": "Contato"
+    },
+    "legal": {
+        "updated_at": "Última atualização: {date}",
+        "terms": {
+            "title": "Termos de Serviço",
+            "description": "Leia os Termos de Serviço do Retold e entenda seus direitos e responsabilidades ao usar nossa plataforma.",
+            "intro_title": "1. Introdução",
+            "intro_text": "Bem-vindo ao Retold. Ao acessar ou usar nossa plataforma, você concorda em cumprir e estar vinculado a estes Termos de Serviço. Se você não concordar com qualquer parte destes termos, você não deve usar nossos serviços.",
+            "usage_title": "2. Uso da Plataforma",
+            "usage_text": "O Retold é uma plataforma destinada a permitir que desenvolvedores e profissionais de tecnologia mostrem seus portfólios, projetos e habilidades.",
+            "usage_list": [
+                "Você deve ter pelo menos 13 anos para usar este serviço.",
+                "Você é responsável por manter a segurança da sua conta e senha.",
+                "Você é responsável por todo o conteúdo postado e atividade que ocorra sob sua conta.",
+                "Você não deve usar o serviço para qualquer finalidade ilegal ou não autorizada."
+            ],
+            "content_title": "3. Conteúdo do Usuário",
+            "content_text": "Você mantém todos os direitos sobre o conteúdo que você envia, posta ou exibe no ou através do serviço. Ao enviar, postar ou exibir conteúdo no ou através do serviço, você nos concede uma licença mundial, não exclusiva e livre de royalties para usar, copiar, reproduzir, processar, adaptar, modificar, publicar, transmitir, exibir e distribuir tal conteúdo em qualquer e todos os meios de comunicação ou métodos de distribuição.",
+            "termination_title": "4. Cancelamento e Rescisão",
+            "termination_text": "Podemos cancelar ou suspender sua conta imediatamente, sem aviso prévio ou responsabilidade, por qualquer motivo, incluindo, sem limitação, se você violar os Termos. Após a rescisão, seu direito de usar o Serviço cessará imediatamente.",
+            "liability_title": "5. Limitação de Responsabilidade",
+            "liability_text": "Em nenhum caso o Retold, nem seus diretores, funcionários, parceiros, agentes, fornecedores ou afiliados, serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.",
+            "changes_title": "6. Alterações",
+            "changes_text": "Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. O uso continuado do serviço após quaisquer alterações constitui aceitação dos novos Termos."
+        },
+        "privacy": {
+            "title": "Política de Privacidade",
+            "description": "Entenda como o Retold coleta, usa e protege suas informações pessoais e nossas políticas de publicidade.",
+            "collection_title": "1. Coleta de Informações",
+            "collection_text": "Coletamos informações que você nos fornece diretamente, como quando cria uma conta, atualiza seu perfil ou se comunica conosco. Isso pode incluir nome, endereço de e-mail, foto de perfil e informações sobre seus projetos.",
+            "usage_title": "2. Uso das Informações",
+            "usage_text": "Usamos as informações coletadas para:",
+            "usage_list": [
+                "Fornecer, manter e melhorar nossos serviços;",
+                "Processar transações e enviar avisos relacionados;",
+                "Responder aos seus comentários, perguntas e solicitações;",
+                "Monitorar e analisar tendências, uso e atividades em conexão com nossos serviços."
+            ],
+            "sharing_title": "3. Compartilhamento de Informações",
+            "sharing_text": "Não vendemos suas informações pessoais. Podemos compartilhar informações agregadas ou não identificáveis pessoalmente com parceiros ou terceiros para fins de pesquisa, análise ou marketing.",
+            "ads_title": "4. Políticas de Publicidade",
+            "ads_text": "O Retold está comprometido com a transparência em relação à publicidade em nossa plataforma.",
+            "ads_list": [
+                {
+                    "title": "Anúncios de Terceiros:",
+                    "text": "Podemos exibir anúncios de terceiros e usar cookies ou outras tecnologias de rastreamento para fornecer anúncios relevantes com base em seus interesses."
+                },
+                {
+                    "title": "Dados de Usuário:",
+                    "text": "Não compartilhamos suas informações de identificação pessoal (como nome ou e-mail) com anunciantes sem o seu consentimento explícito."
+                },
+                {
+                    "title": "Controle:",
+                    "text": "Você pode ajustar as configurações do seu navegador para recusar cookies, o que pode limitar a personalização dos anúncios que você vê."
+                }
+            ],
+            "security_title": "5. Segurança de Dados",
+            "security_text": "Tomamos medidas razoáveis para proteger suas informações pessoais contra perda, roubo e uso não autorizado, divulgação ou modificação. No entanto, nenhum sistema de segurança é impenetrável e não podemos garantir a segurança total dos nossos sistemas.",
+            "contact_title": "6. Contato",
+            "contact_text": "Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco através do nosso e-mail de suporte."
         }
     }
 }

@@ -4,8 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/logo-full.svg";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/src/i18n/client";
 
 export default function Footer() {
+    const { dict } = useTranslation();
     const currentYear = new Date().getFullYear();
 
     return (
@@ -22,20 +24,20 @@ export default function Footer() {
                             />
                         </Link>
                         <p className="text-sm text-gray-500 mt-2">
-                            © {currentYear} Retold. All rights reserved.
+                            {dict.footer.rights.replace("{year}", String(currentYear))}
                         </p>
                     </div>
 
                     {/* Navigation Links */}
                     <nav className="flex flex-wrap justify-center md:justify-end gap-x-2 gap-y-1">
                         <Button asChild variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900">
-                            <Link href="/terms">Terms of Service</Link>
+                            <Link href="/terms">{dict.footer.terms}</Link>
                         </Button>
                         <Button asChild variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900">
-                            <Link href="/privacy">Privacy Policy</Link>
+                            <Link href="/privacy">{dict.footer.privacy}</Link>
                         </Button>
                         <Button asChild variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900">
-                            <Link href="/contact">Contact</Link>
+                            <a href="mailto:contato@retold.com.br">contato@retold.com.br</a>
                         </Button>
                     </nav>
                 </div>

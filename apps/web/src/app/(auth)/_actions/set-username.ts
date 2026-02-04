@@ -4,6 +4,7 @@ import { z } from "zod";
 import { userRepository, prisma } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 import { auth } from "@/src/domains/auth/auth";
+import { USERNAME_REGEX } from "@/src/domains/auth/auth.constants";
 import { revalidatePath } from "next/cache";
 import { getDictionary } from "@/src/i18n/server";
 
@@ -17,7 +18,7 @@ export async function setUsername(formData: FormData): Promise<ActionResponse<{ 
             .min(3, dict.validation.username_min)
             .max(20, dict.validation.username_max)
             .regex(
-                /^[a-zA-Z0-9_]+$/,
+                USERNAME_REGEX,
                 dict.validation.username_regex
             )
             .transform((u) => u.toLowerCase()),
