@@ -6,7 +6,7 @@ import { useTranslation } from "@/src/i18n/client";
 import { toast } from "sonner";
 import { toggleProjectPin } from "@/src/app/(public)/[username]/actions/pin-project";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
-import placeholderImage from "@/assets/mockup-escalonador.jpg";
+import placeholderImage from "@/assets/empty_file.png";
 
 type Props = {
     isOpen: boolean;
