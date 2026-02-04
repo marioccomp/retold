@@ -40,6 +40,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
     const [isUploadingCover, setIsUploadingCover] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [isDraggingCover, setIsDraggingCover] = useState(false);
+    const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,11 +60,34 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             setWebsiteUrl(profile.websiteUrl ?? "");
             setAvatarPreview(profile.image ?? null);
             setCoverPreview(profile.cover ?? null);
+            setPendingAvatarFile(null);
         }
     }, [isOpen, profile]);
 
     const updateProfileMutation = useMutation({
         mutationFn: async () => {
+            // Upload avatar first if there's a pending file
+            if (pendingAvatarFile) {
+                setIsUploadingAvatar(true);
+                const formData = new FormData();
+                formData.append("avatar", pendingAvatarFile);
+                const avatarResult = await uploadAvatarAction(formData);
+                setIsUploadingAvatar(false);
+
+                if (!avatarResult.success) {
+                    throw new Error(avatarResult.message || dict.profile.edit_modal.avatar_error);
+                }
+
+                // Update session with new avatar
+                await update({
+                    ...session,
+                    user: {
+                        ...session?.user,
+                        image: avatarResult.data,
+                    },
+                });
+            }
+
             return updateProfile(
                 {
                     name,
@@ -90,18 +114,19 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 toast.error(data.message || dict.profile.edit_modal.error);
                 return;
             }
+            setPendingAvatarFile(null);
             toast.success(dict.profile.edit_modal.success);
-            update(); // Refresh session to update header name etc
+            update();
             queryClient.invalidateQueries({ queryKey: ["profile", username] });
             queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             onClose();
         },
-        onError: () => {
-            toast.error(dict.profile.edit_modal.unexpected_error);
+        onError: (error) => {
+            toast.error(error instanceof Error ? error.message : dict.profile.edit_modal.unexpected_error);
         },
     });
 
-    async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) {
+    function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) {
         let file: File | undefined;
 
         if ('target' in e && (e.target as HTMLInputElement).files) {
@@ -112,42 +137,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
         if (!file) return;
 
-        // Show preview immediately
         const previewUrl = URL.createObjectURL(file);
         setAvatarPreview(previewUrl);
 
-        // Upload the file
-        setIsUploadingAvatar(true);
-        const formData = new FormData();
-        formData.append("avatar", file);
-
-        try {
-            const result = await uploadAvatarAction(formData);
-            if (!result.success) {
-                toast.error(result.message);
-                setAvatarPreview(profile.image ?? null);
-            } else {
-                toast.success(dict.profile.edit_modal.avatar_success);
-                await update({
-                    ...session,
-                    user: {
-                        ...session?.user,
-                        image: result.data,
-                    },
-                });
-                queryClient.invalidateQueries({ queryKey: ["profile", username] });
-                queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-            }
-        } catch {
-            toast.error(dict.profile.edit_modal.avatar_error);
-            setAvatarPreview(profile.image ?? null);
-        } finally {
-            setIsUploadingAvatar(true); // Wait a bit before clearing to avoid jump
-            setTimeout(() => {
-                setIsUploadingAvatar(false);
-                URL.revokeObjectURL(previewUrl);
-            }, 500);
-        }
+        setPendingAvatarFile(file);
     }
 
     const onDragOver = (e: React.DragEvent) => {
