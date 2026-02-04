@@ -30,7 +30,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth()
+  const session = await auth();
   const lang = await getLocale();
 
   return (
@@ -45,7 +45,24 @@ export default async function RootLayout({
                   <main className="flex-grow w-full">{children}</main>
                   <Footer />
                   <AuthModal />
-                  <Toaster richColors position="top-right" />
+                  <Toaster
+                    richColors
+                    position="top-right"
+                    closeButton
+                    expand={true}
+                    visibleToasts={2}
+                    gap={0}
+                    offset={20}
+                    duration={3000}
+                    toastOptions={{
+                      className: "sonner-toast",
+                      style: {
+                        background: "var(--background)",
+                        color: "var(--foreground)",
+                        border: "1px solid var(--border)",
+                      },
+                    }}
+                  />
                 </SearchProvider>
               </QueryProvider>
             </AuthModalProvider>

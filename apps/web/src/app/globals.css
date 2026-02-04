@@ -150,3 +150,125 @@
     transform: scale(1);
   }
 }
+
+/* Ensure wrapper has no spacing */
+[data-sonner-toast] {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Modern High-Contrast Toast Styles */
+.sonner-toast {
+  padding: 1rem 3rem 1rem 1.25rem !important;
+  margin: 0 !important; /* Force no margin on the card itself */
+  margin-bottom: -3.5rem !important;
+  border-radius: 12px !important;
+  font-family: var(--font-questrial), sans-serif !important;
+  border: none !important;
+  box-shadow:
+    0 10px 30px -5px rgba(0, 0, 0, 0.2),
+    0 5px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Success: Solid Brand Green */
+.sonner-toast[data-rich-colors="true"][data-type="success"] {
+  background-color: #05dc7f !important;
+  color: #000000 !important;
+}
+
+/* Error: Solid Vibrant Red */
+.sonner-toast[data-rich-colors="true"][data-type="error"] {
+  background-color: #ff4d4d !important;
+  color: #ffffff !important;
+}
+
+/* Info: Solid Blue */
+.sonner-toast[data-rich-colors="true"][data-type="info"] {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* Warning: Solid Amber */
+.sonner-toast[data-rich-colors="true"][data-type="warning"] {
+  background-color: #f59e0b !important;
+  color: #000000 !important;
+}
+
+/* Loading/Default: Dark/Light neutral */
+.sonner-toast:not([data-type="success"]):not([data-type="error"]):not([data-type="info"]):not(
+    [data-type="warning"]
+  ) {
+  background-color: var(--foreground) !important;
+  color: var(--background) !important;
+}
+
+.sonner-toast [data-icon] {
+  margin-right: 0.75rem !important;
+  transform: scale(1.2);
+  color: inherit !important;
+}
+
+.sonner-toast [data-title] {
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+}
+
+.sonner-toast [data-description] {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  opacity: 0.9;
+}
+
+/* Minimal & Premium Close Button */
+.sonner-toast [data-close-button] {
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  border: none !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: inherit !important;
+  opacity: 0.6 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  transform: none !important;
+  left: auto !important;
+  box-shadow: none !important;
+}
+
+.sonner-toast [data-close-button]:hover {
+  opacity: 1 !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  transform: scale(1.1) !important;
+}
+
+.sonner-toast[data-type="error"] [data-close-button],
+.sonner-toast[data-type="info"] [data-close-button] {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.sonner-toast[data-type="error"] [data-close-button]:hover,
+.sonner-toast[data-type="info"] [data-close-button]:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Style the X icon specifically */
+.sonner-toast [data-close-button] svg {
+  width: 10px !important;
+  height: 10px !important;
+  margin: 0 !important;
+}
+
+.sonner-toast:hover {
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.25) !important;
+}
