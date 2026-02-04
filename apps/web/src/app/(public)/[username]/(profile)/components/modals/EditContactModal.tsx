@@ -57,7 +57,7 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
             githubUrl: profile.githubUrl || "",
             linkedinUrl: profile.linkedinUrl || "",
             websiteUrl: profile.websiteUrl || "",
-            email: email,
+            contactEmail: email,
             phone: phone
         });
     };

@@ -209,6 +209,7 @@ export async function updateProfile(
   const checkGithubUrlSchema = profileSchema.pick({ githubUrl: true });
   const checkLinkedinUrlSchema = profileSchema.pick({ linkedinUrl: true });
   const checkPhoneSchema = profileSchema.pick({ phone: true });
+  const checkContactEmailSchema = profileSchema.pick({ contactEmail: true });
 
   const updateProfileSchema = z.object({
     name: checkNameSchema.shape.name,
@@ -218,6 +219,7 @@ export async function updateProfile(
     linkedinUrl: checkLinkedinUrlSchema.shape.linkedinUrl,
     websiteUrl: profileSchema.shape.websiteUrl,
     phone: checkPhoneSchema.shape.phone,
+    contactEmail: checkContactEmailSchema.shape.contactEmail,
   });
 
   const parsed = updateProfileSchema.safeParse(data);
@@ -239,6 +241,7 @@ export async function updateProfile(
       linkedinUrl: parsed.data.linkedinUrl || null,
       websiteUrl: parsed.data.websiteUrl || null,
       phone: parsed.data.phone || null,
+      contactEmail: parsed.data.contactEmail || null,
     });
 
     return {

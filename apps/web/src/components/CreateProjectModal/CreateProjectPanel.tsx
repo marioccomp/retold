@@ -10,8 +10,8 @@ import {
     verifyUserInstallation,
 } from "@/src/domains/project/actions";
 import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
-import { FiX, FiArrowLeft, FiArrowRight, FiUpload } from "react-icons/fi";
 import { toast } from "sonner";
+import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
 import { useTranslation } from "@/src/i18n/client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,9 +49,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState<"public" | "private">("public");
     const [selectedRepoId, setSelectedRepoId] = useState<number | null>(null);
-    const [images, setImages] = useState<File[]>([]);
-    const [previews, setPreviews] = useState<string[]>([]);
+    const [sortableImages, setSortableImages] = useState<SortableImage[]>([]);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Track object URLs for cleanup
     const generatedUrls = useRef<string[]>([]);
@@ -80,55 +80,40 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     // Cleanup previews on unmount
     useEffect(() => {
         return () => {
-            generatedUrls.current.forEach((url) => URL.revokeObjectURL(url));
+            sortableImages.forEach((img) => URL.revokeObjectURL(img.preview));
         };
-    }, []);
+    }, [sortableImages]);
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files);
-            const totalImages = images.length + newFiles.length;
+            const totalImages = sortableImages.length + newFiles.length;
 
             if (totalImages > 3) {
                 toast.error(t.toast.max_images);
                 return;
             }
 
-            const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-            generatedUrls.current = [...generatedUrls.current, ...newPreviews];
-            setImages([...images, ...newFiles]);
-            setPreviews([...previews, ...newPreviews]);
+            const newSortableImages: SortableImage[] = newFiles.map((file, idx) => ({
+                id: `new-${Date.now()}-${idx}`,
+                preview: URL.createObjectURL(file),
+                file,
+                isNew: true,
+            }));
+
+            setSortableImages([...sortableImages, ...newSortableImages]);
+
+            // Reset input to allow selecting same file again
+            if (fileInputRef.current) fileInputRef.current.value = "";
         }
     };
 
-    const handleRemoveImage = (index: number) => {
-        const newImages = [...images];
-        const newPreviews = [...previews];
-
-        // Revoke the removed URL and update ref
-        const urlToRemove = newPreviews[index];
-        URL.revokeObjectURL(urlToRemove);
-        generatedUrls.current = generatedUrls.current.filter(u => u !== urlToRemove);
-
-        newImages.splice(index, 1);
-        newPreviews.splice(index, 1);
-        setImages(newImages);
-        setPreviews(newPreviews);
-    };
-
-    const handleMoveImage = (index: number, direction: "left" | "right") => {
-        if (direction === "left" && index === 0) return;
-        if (direction === "right" && index === images.length - 1) return;
-
-        const newImages = [...images];
-        const newPreviews = [...previews];
-        const targetIndex = direction === "left" ? index - 1 : index + 1;
-
-        [newImages[index], newImages[targetIndex]] = [newImages[targetIndex], newImages[index]];
-        [newPreviews[index], newPreviews[targetIndex]] = [newPreviews[targetIndex], newPreviews[index]];
-
-        setImages(newImages);
-        setPreviews(newPreviews);
+    const handleRemoveImage = (id: string) => {
+        const imageToRemove = sortableImages.find(img => img.id === id);
+        if (imageToRemove) {
+            URL.revokeObjectURL(imageToRemove.preview);
+        }
+        setSortableImages(sortableImages.filter(img => img.id !== id));
     };
 
     // GitHub App install URL
@@ -174,11 +159,12 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
             const project = result.data;
             if (!project) throw new Error(t.toast.error);
 
-            if (images.length > 0) {
+            const filesToUpload = sortableImages.filter(img => img.file).map(img => img.file!);
+            if (filesToUpload.length > 0) {
                 setIsUploadingImages(true);
                 try {
                     const formData = new FormData();
-                    images.forEach((file) => {
+                    filesToUpload.forEach((file) => {
                         formData.append("images", file);
                     });
                     await uploadProjectImagesAction(project.id, formData);
@@ -278,42 +264,28 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                         <div>
                             <div className="flex justify-between items-center">
                                 <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">{t.labels.images}</h3>
-                                <span className="text-[0.8rem] text-[#6b7c7a]">{images.length}/3</span>
+                                <span className="text-[0.8rem] text-[#6b7c7a]">{sortableImages.length}/3</span>
                             </div>
                             <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.images_hint}</p>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2">
-                            {previews.map((preview, index) => (
-                                <div key={index} className="relative aspect-video group rounded-md overflow-hidden border border-[#e7eae9] bg-[#fafafa]">
-                                    <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                        <SortableImageGrid
+                            images={sortableImages}
+                            onReorder={setSortableImages}
+                            onRemove={handleRemoveImage}
+                            onAddClick={() => fileInputRef.current?.click()}
+                            maxImages={3}
+                            addLabel={t.add}
+                        />
 
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                                        {index > 0 && (
-                                            <button onClick={() => handleMoveImage(index, "left")} className="p-1 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors" title={t.tooltips.move_left}>
-                                                <FiArrowLeft size={14} />
-                                            </button>
-                                        )}
-                                        <button onClick={() => handleRemoveImage(index)} className="p-1 rounded-full bg-white/20 hover:bg-red-500/80 text-white transition-colors" title={t.tooltips.remove}>
-                                            <FiX size={14} />
-                                        </button>
-                                        {index < images.length - 1 && (
-                                            <button onClick={() => handleMoveImage(index, "right")} className="p-1 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors" title={t.tooltips.move_right}>
-                                                <FiArrowRight size={14} />
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-
-                            {images.length < 3 && (
-                                <label className="flex flex-col items-center justify-center aspect-video border-2 border-dashed border-[#e7eae9] rounded-md cursor-pointer hover:border-[#05dc7f] hover:bg-[#05dc7f]/5 transition-all group">
-                                    <FiUpload className="text-[#6b7c7a] group-hover:text-[#05dc7f]" size={20} />
-                                    <span className="text-[0.75rem] text-[#6b7c7a] mt-1 group-hover:text-[#05dc7f]">{t.add}</span>
-                                    <input type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" />
-                                </label>
-                            )}
-                        </div>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageSelect}
+                            className="hidden"
+                        />
                     </div>
 
                     {/* Repositories Section */}
