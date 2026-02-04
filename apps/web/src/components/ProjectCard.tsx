@@ -31,7 +31,13 @@ interface Props {
   disableConfig?: boolean;
 }
 
-export default function ProjectCard({ project, onClick, ownProfile, disableHover, disableConfig }: Props) {
+export default function ProjectCard({
+  project,
+  onClick,
+  ownProfile,
+  disableHover,
+  disableConfig,
+}: Props) {
   const { data: session } = useSession();
   const { dict } = useTranslation();
   const [isPending, startTransition] = useTransition();
@@ -52,7 +58,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
   const ownerName: string = project.ownerName || "Mario Junior";
 
   // Check if owner is current user
-  const isOwner = ownProfile || (session?.user?.username === project.ownerUsername);
+  const isOwner = ownProfile || session?.user?.username === project.ownerUsername;
 
   const { openLoginModal } = useAuthModal();
 
@@ -66,7 +72,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
     setAnimateLike(true);
-    setLikesCount(prev => newIsLiked ? prev + 1 : prev - 1);
+    setLikesCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
 
     startTransition(async () => {
       const response = await toggleLike(project.id);
@@ -77,7 +83,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
       } else {
         // Rollback se falhar
         setIsLiked(!newIsLiked);
-        setLikesCount(prev => !newIsLiked ? prev + 1 : prev - 1);
+        setLikesCount((prev) => (!newIsLiked ? prev + 1 : prev - 1));
       }
     });
   };
@@ -90,7 +96,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
 
   return (
     <Card
-      className={`group flex flex-col w-full border border-[#f0f0f0] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden bg-white transition-transform duration-200 ease-in-out p-0 ${!disableHover ? 'hover:-translate-y-0.5' : ''}`}
+      className={`group flex flex-col w-full border border-[#f0f0f0] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden bg-white transition-transform duration-200 ease-in-out p-0 ${!disableHover ? "hover:-translate-y-0.5" : ""}`}
       onClick={handleCardClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
@@ -102,13 +108,18 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
         />
 
         {/* Longer Description Overlay */}
-        <div className="absolute left-0 w-full bg-[#152e2b]/95 text-white flex flex-col z-[2] transition-opacity duration-300
+        <div
+          className="absolute left-0 w-full bg-[#152e2b]/95 text-white flex flex-col z-[2] transition-opacity duration-300
           max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border"
         >
           <div className="flex items-center gap-2.5 mb-3 max-[650px]:mb-2 max-[650px]:gap-2">
             <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20">
-              <AvatarImage src={project.ownerImage || undefined} alt={ownerName} className="object-cover" />
+              <AvatarImage
+                src={project.ownerImage || undefined}
+                alt={ownerName}
+                className="object-cover"
+              />
               <AvatarFallback className="bg-[#05dc7f] text-[#152e2b] font-bold text-xs uppercase">
                 {ownerName.substring(0, 2).toUpperCase()}
               </AvatarFallback>
@@ -123,14 +134,13 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
               />
             )}
           </div>
-          <div className="text-[15px] leading-relaxed text-[#f0fdf4] mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
+          <div
+            className="text-[15px] leading-relaxed text-[#f0fdf4] mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
             max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:text-[#e2e8f0] max-[650px]:line-clamp-3"
           >
             <p className="whitespace-pre-wrap">{project.description}</p>
           </div>
-
         </div>
-
 
         {isOwner && !disableConfig && (
           <div className="absolute top-3 right-3 z-[10]">
@@ -142,7 +152,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
         )}
 
         {/* Analyzing Overlay */}
-        {(project.status === 'PENDING' || project.status === 'ANALYZING') && (
+        {(project.status === "PENDING" || project.status === "ANALYZING") && (
           <div className="absolute inset-0 bg-black/60 z-[20] flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
             <div className="animate-spin mb-3">
               <FiLoader size={28} className="text-[#05dc7f]" />
@@ -156,7 +166,8 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
 
       <div className="flex flex-col w-full max-[650px]:flex-row max-[650px]:items-start max-[650px]:justify-between max-[650px]:p-[16px_20px] max-[650px]:gap-2.5 max-[650px]:bg-white max-[380px]:p-[14px_12px]">
         <div className="p-[20px_24px_10px_24px] max-[650px]:p-0 max-[650px]:flex-1 max-[650px]:min-w-0 max-[650px]:mr-3">
-          <h3 className="text-[18px] font-bold text-[#1a202c] m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
+          <h3
+            className="text-[18px] font-bold text-[#1a202c] m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
             max-[650px]:text-[1.1rem] max-[650px]:whitespace-normal max-[650px]:max-w-full max-[380px]:text-[0.95rem]"
           >
             {project.title}
@@ -169,7 +180,10 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
           {project.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
               {project.tags.slice(0, 4).map((tag) => (
-                <Badge key={tag.id} className="bg-[#05dc7f]/12 text-[#047857] px-2 py-[3px] rounded text-[11px] font-semibold hover:bg-[#05dc7f]/20 border-none shadow-none">
+                <Badge
+                  key={tag.id}
+                  className="bg-[#05dc7f]/12 text-[#047857] px-2 py-[3px] rounded text-[11px] font-semibold hover:bg-[#05dc7f]/20 border-none shadow-none"
+                >
                   {tag.name}
                 </Badge>
               ))}
@@ -177,7 +191,8 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
           )}
         </div>
 
-        <div className="flex p-[10px_24px_20px_24px] gap-4 justify-end text-[#4a5568]
+        <div
+          className="flex p-[10px_24px_20px_24px] gap-4 justify-end text-[#4a5568]
           max-[650px]:p-0 max-[650px]:gap-3 max-[650px]:shrink-0 max-[380px]:gap-2"
         >
           {project.repositoryUrl && !project.repositoryIsPrivate && (
@@ -195,7 +210,7 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
 
           <div
             onClick={handleToggleLike}
-            className={`flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer select-none transition-transform duration-100 active:scale-90 group/like ${isPending ? 'opacity-70 pointer-events-none' : ''}`}
+            className={`flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer select-none transition-transform duration-100 active:scale-90 group/like ${isPending ? "opacity-70 pointer-events-none" : ""}`}
           >
             {isLiked ? (
               <MdFavorite
@@ -204,9 +219,16 @@ export default function ProjectCard({ project, onClick, ownProfile, disableHover
                 onAnimationEnd={() => setAnimateLike(false)}
               />
             ) : (
-              <MdFavoriteBorder className="text-[#4a5568] transition-colors duration-200 group-hover/like:text-[#ff4d4d]" size={22} />
+              <MdFavoriteBorder
+                className="text-[#4a5568] transition-colors duration-200 group-hover/like:text-[#ff4d4d]"
+                size={22}
+              />
             )}
-            <p className={`transition-colors duration-200 ${isLiked ? 'text-[#ff4d4d] font-semibold' : ''}`}>{likesCount}</p>
+            <p
+              className={`transition-colors duration-200 ${isLiked ? "text-[#ff4d4d] font-semibold" : ""}`}
+            >
+              {likesCount}
+            </p>
           </div>
           <div className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2">
             <MdOutlineVisibility size={22} />

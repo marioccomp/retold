@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 type FeedProjectPanelProps = {
   project: ProjectForOverlay;
   onClose: () => void;
+  isModal?: boolean;
 };
 
 type LlmReportV21 = {
@@ -93,7 +94,7 @@ function safeParseLlm(input: unknown): LlmReportV21 | null {
   }
 }
 
-export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
+export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanelProps) {
   const { dict } = useTranslation();
   const t = dict.project;
   const { data: session } = useSession();
@@ -115,7 +116,12 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
   const llm = safeParseLlm(data?.llmOverview);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex flex-col w-full h-auto">
+    <div
+      className={cn(
+        "flex flex-col w-full h-auto animate-in fade-in slide-in-from-top-2 duration-300",
+        !isModal && "bg-white rounded-xl border border-gray-200 shadow-2xl"
+      )}
+    >
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
