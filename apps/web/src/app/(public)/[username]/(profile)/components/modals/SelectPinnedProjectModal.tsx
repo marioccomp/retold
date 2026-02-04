@@ -55,7 +55,7 @@ export default function SelectPinnedProjectModal({ isOpen, onClose, unpinnedProj
             <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl max-h-[90vh] rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 border border-white/10">
                 {/* Header */}
                 <div className="relative px-8 py-8 border-b border-border/40 bg-gradient-to-r from-muted/30 to-transparent">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between">
                         <div className="space-y-1">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-[#05dc7f]/10 rounded-xl">
@@ -73,7 +73,7 @@ export default function SelectPinnedProjectModal({ isOpen, onClose, unpinnedProj
                             onClick={onClose}
                             className="group w-10 h-10 flex items-center justify-center rounded-2xl bg-muted/50 hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all duration-200 cursor-pointer"
                         >
-                            <FiX size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                            <FiX size={20} className="transition-transform duration-300" />
                         </button>
                     </div>
 

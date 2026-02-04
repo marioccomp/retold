@@ -574,5 +574,76 @@
             "checking": "Checking username...",
             "available": "Username available"
         }
+    },
+    "footer": {
+        "rights": "© {year} Retold. All rights reserved.",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "contact": "Contact"
+    },
+    "legal": {
+        "updated_at": "Last updated: {date}",
+        "terms": {
+            "title": "Terms of Service",
+            "description": "Read Retold's Terms of Service and understand your rights and responsibilities when using our platform.",
+            "intro_title": "1. Introduction",
+            "intro_text": "Welcome to Retold. By accessing or using our platform, you agree to comply with and be bound by these Terms of Service. If you do not agree with any part of these terms, you must not use our services.",
+            "usage_title": "2. Platform Usage",
+            "usage_text": "Retold is a platform designed to allow developers and tech professionals to showcase their portfolios, projects, and skills.",
+            "usage_list": [
+                "You must be at least 13 years old to use this service.",
+                "You are responsible for maintaining the security of your account and password.",
+                "You are responsible for all content posted and activity that occurs under your account.",
+                "You must not use the service for any illegal or unauthorized purpose."
+            ],
+            "content_title": "3. User Content",
+            "content_text": "You retain all rights to the content you submit, post, or display on or through the service. By submitting, posting, or displaying content on or through the service, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, display, and distribute such content in any and all media or distribution methods.",
+            "termination_title": "4. Cancellation and Termination",
+            "termination_text": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease.",
+            "liability_title": "5. Limitation of Liability",
+            "liability_text": "In no event shall Retold, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.",
+            "changes_title": "6. Changes",
+            "changes_text": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. Continued use of the service after any such changes constitutes your acceptance of the new Terms."
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "description": "Understand how Retold collects, uses, and protects your personal information and our advertising policies.",
+            "collection_title": "1. Information Collection",
+            "collection_text": "We collect information you provide directly to us, such as when you create an account, update your profile, or communicate with us. This may include your name, email address, profile picture, and project information.",
+            "usage_title": "2. Information Usage",
+            "usage_text": "We use the collected information to:",
+            "usage_list": [
+                "Provide, maintain, and improve our services;",
+                "Process transactions and send related notices;",
+                "Respond to your comments, questions, and requests;",
+                "Monitor and analyze trends, usage, and activities in connection with our services."
+            ],
+            "sharing_title": "3. Information Sharing",
+            "sharing_text": "We do not sell your personal information. We may share aggregated or non-personally identifiable information with partners or third parties for research, analysis, or marketing purposes.",
+            "ads_title": "4. Advertising Policies",
+            "ads_text": "Retold is committed to transparency regarding advertising on our platform.",
+            "ads_list": [
+                {
+                    "title": "Third-Party Ads:",
+                    "text": "We may display third-party advertisements and use cookies or other tracking technologies to deliver relevant ads based on your interests."
+                },
+                {
+                    "title": "User Data:",
+                    "text": "We do not share your personally identifiable information (such as name or email) with advertisers without your explicit consent."
+                },
+                {
+                    "title": "Control:",
+                    "text": "You can adjust your browser settings to refuse cookies, which may limit the personalization of the ads you see."
+                },
+                {
+                    "title": "Ad Partners:",
+                    "text": "We work with trusted advertising partners who adhere to industry standards for privacy and data protection."
+                }
+            ],
+            "security_title": "5. Data Security",
+            "security_text": "We take reasonable measures to protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. However, no security system is impenetrable, and we cannot guarantee the security of our systems.",
+            "contact_title": "6. Contact",
+            "contact_text": "If you have any questions about this Privacy Policy, please contact us via our support email."
+        }
     }
 }
