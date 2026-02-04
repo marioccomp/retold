@@ -19,6 +19,7 @@ import { deleteProjectAction, updateProjectAction } from "@/src/domains/project/
 import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
 import { deleteProjectImageAction } from "@/src/domains/user/actions/delete-project-image.action";
 import { useQueryClient } from "@tanstack/react-query";
+import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
 
 type ProjectSettingsProps = {
     project: {
@@ -265,46 +266,28 @@ export const ProjectSettings = ({ project, onUpdate, onDelete, triggerClassName 
                                     </span>
                                 </Label>
 
-                                <div className="grid grid-cols-3 gap-3">
-                                    {/* Local Images List (Both existing and new) */}
-                                    {localImages.map((imgItem) => (
-                                        <div key={imgItem.id} className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 group bg-slate-100">
-                                            <img
-                                                src={imgItem.preview}
-                                                alt="Project image"
-                                                className="w-full h-full object-cover"
-                                            />
-                                            {/* Badge for new images */}
-                                            {imgItem.file && (
-                                                <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-[#05dc7f] text-white text-[10px] font-bold rounded shadow-sm">
-                                                    NEW
-                                                </div>
-                                            )}
-
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setImageToDelete(imgItem);
-                                                }}
-                                                className="absolute top-1 right-1 p-1 bg-red-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 focus:opacity-100 shadow-sm"
-                                                title={t.remove_image_tooltip}
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </div>
-                                    ))}
-
-                                    {/* Upload Button */}
-                                    {localImages.length < 3 && (
-                                        <div
-                                            className="relative aspect-video rounded-lg border-2 border-dashed border-slate-300 overflow-hidden cursor-pointer hover:border-[#05dc7f] transition-colors bg-slate-50 flex flex-col items-center justify-center text-slate-400 hover:text-[#05dc7f] hover:bg-green-50/10"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        >
-                                            <ImagePlus className="w-6 h-6 mb-1" />
-                                            <span className="text-[10px] font-medium uppercase tracking-wide">{t.add}</span>
-                                        </div>
-                                    )}
-                                </div>
+                                <SortableImageGrid
+                                    images={localImages.map(img => ({
+                                        id: img.id,
+                                        preview: img.preview,
+                                        file: img.file,
+                                        isNew: !img.isOriginal,
+                                    }))}
+                                    onReorder={(reordered: SortableImage[]) => {
+                                        const newLocalImages = reordered.map((sortable: SortableImage) => {
+                                            const original = localImages.find(img => img.id === sortable.id);
+                                            return original!;
+                                        });
+                                        setLocalImages(newLocalImages);
+                                    }}
+                                    onRemove={(id: string) => {
+                                        const imgToDelete = localImages.find(img => img.id === id);
+                                        if (imgToDelete) setImageToDelete(imgToDelete);
+                                    }}
+                                    onAddClick={() => fileInputRef.current?.click()}
+                                    maxImages={3}
+                                    addLabel={t.add}
+                                />
 
                                 <input
                                     ref={fileInputRef}
