@@ -37,7 +37,7 @@ export default function Header({ session: initialSession }: { session: Session |
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile
 
   const scrollToContent = () => {
-    const element = document.getElementById('feed-content');
+    const element = document.getElementById("feed-content");
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
@@ -56,7 +56,7 @@ export default function Header({ session: initialSession }: { session: Session |
       }
 
       // Tenta encontrar a barra de pesquisa do feed
-      const feedSearch = document.getElementById('feed-search-container');
+      const feedSearch = document.getElementById("feed-search-container");
 
       let shouldShow = false;
 
@@ -99,7 +99,7 @@ export default function Header({ session: initialSession }: { session: Session |
   if (!userData.email && session?.user?.email) userData.email = session.user.email;
   if (!userData.image && session?.user?.image) userData.image = session.user.image;
 
-  const status = (session?.user || initialSession?.user) ? "authenticated" : "unauthenticated";
+  const status = session?.user || initialSession?.user ? "authenticated" : "unauthenticated";
 
   const userImage = userData?.image;
   const userName = userData?.name || "User";
@@ -120,20 +120,23 @@ export default function Header({ session: initialSession }: { session: Session |
         router.push(`/${currentUsername}`);
       }
     }
-  }
+  };
 
   const handleExploreClick = () => {
     if (pathname === "/") {
-      document.getElementById('feed-content')?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
     } else {
-      router.push('/#feed-content');
+      router.push("/#feed-content");
     }
-  }
+  };
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-black/5 ${isScrolled ? "bg-white shadow-sm" : "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60"
-        }`}
+      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-black/5 ${
+        isScrolled
+          ? "bg-white shadow-sm"
+          : "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60"
+      }`}
     >
       <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
@@ -156,7 +159,10 @@ export default function Header({ session: initialSession }: { session: Session |
             >
               {dict.header.explore}
             </Button>
-            <Button variant="ghost" className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer">
+            <Button
+              variant="ghost"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer"
+            >
               {dict.header.about}
             </Button>
           </nav>
@@ -164,8 +170,11 @@ export default function Header({ session: initialSession }: { session: Session |
 
         {/* Center Search Bar (Desktop) */}
         <div
-          className={`hidden md:flex flex-1 max-w-2xl items-center gap-6 transition-all duration-500 ease-in-out transform ${(showSearch || isSearchFocused) ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
-            }`}
+          className={`hidden md:flex flex-1 max-w-2xl items-center gap-6 transition-all duration-500 ease-in-out transform ${
+            showSearch || isSearchFocused
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-4 pointer-events-none"
+          }`}
         >
           {/* Feed Tabs - Only visible on Home/Feed */}
           {pathname === "/" && (
@@ -175,10 +184,11 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("projects");
                   scrollToContent();
                 }}
-                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === "projects"
-                  ? "bg-white text-[#152e2b] shadow-sm ring-1 ring-black/5"
-                  : "text-gray-500 hover:text-gray-900"
-                  }`}
+                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTab === "projects"
+                    ? "bg-white text-[#152e2b] shadow-sm ring-1 ring-black/5"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
               </button>
@@ -187,10 +197,11 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("people");
                   scrollToContent();
                 }}
-                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === "people"
-                  ? "bg-white text-[#152e2b] shadow-sm ring-1 ring-black/5"
-                  : "text-gray-500 hover:text-gray-900"
-                  }`}
+                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTab === "people"
+                    ? "bg-white text-[#152e2b] shadow-sm ring-1 ring-black/5"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
               </button>
@@ -214,12 +225,12 @@ export default function Header({ session: initialSession }: { session: Session |
           </div>
         </div>
 
-
         {/* Profile / Actions / Mobile Search */}
         <div className="flex items-center gap-3 pl-2">
-
           {/* Mobile Search Icon */}
-          <div className={`md:hidden transition-all duration-300 ${(showSearch || isSearchExpanded) ? 'opacity-100' : 'opacity-0 scale-90 pointer-events-none'}`}>
+          <div
+            className={`md:hidden transition-all duration-300 ${showSearch || isSearchExpanded ? "opacity-100" : "opacity-0 scale-90 pointer-events-none"}`}
+          >
             <Button
               variant="ghost"
               size="icon"
@@ -230,12 +241,11 @@ export default function Header({ session: initialSession }: { session: Session |
             </Button>
           </div>
 
-
           {status === "authenticated" ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#05dc7f] focus-visible:ring-offset-2 transition-all cursor-pointer border-none bg-transparent p-0">
-                  <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-[#05dc7f]/50 transition-all">
+                <button className="relative rounded-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 cursor-pointer border-none bg-transparent p-0 shadow-none">
+                  <Avatar className="h-9 w-9 cursor-pointer hover:opacity-80 transition-opacity shadow-none">
                     {userImage ? (
                       <AvatarImage src={userImage} alt={userName} className="object-cover" />
                     ) : null}
@@ -245,19 +255,27 @@ export default function Header({ session: initialSession }: { session: Session |
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 mt-2">
+              <DropdownMenuContent
+                align="end"
+                className="w-56 mt-2"
+                onCloseAutoFocus={(e) => e.preventDefault()}
+              >
                 <div className="px-3 py-2 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{userName}</p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {userData?.email}
-                  </p>
+                  <p className="text-xs text-gray-500 truncate">{userData?.email}</p>
                 </div>
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2" onClick={handleProfileClick}>
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 py-2"
+                  onClick={handleProfileClick}
+                >
                   <FiUser className="h-4 w-4 text-gray-500" />
-                  <span >{dict.header.profile}</span>
+                  <span>{dict.header.profile}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/settings" className="cursor-pointer gap-2 py-2 w-full flex items-center">
+                  <Link
+                    href="/settings"
+                    className="cursor-pointer gap-2 py-2 w-full flex items-center"
+                  >
                     <FiSettings className="h-4 w-4 text-gray-500" />
                     <span>{dict.header.settings}</span>
                   </Link>
@@ -283,8 +301,13 @@ export default function Header({ session: initialSession }: { session: Session |
       </div>
 
       {/* Mobile Search Overlay */}
-      <div className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 p-4 transition-all duration-300 origin-top shadow-xl ${isSearchExpanded && (showSearch || isSearchFocused) ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 pointer-events-none"
-        }`}>
+      <div
+        className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 p-4 transition-all duration-300 origin-top shadow-xl ${
+          isSearchExpanded && (showSearch || isSearchFocused)
+            ? "opacity-100 scale-y-100"
+            : "opacity-0 scale-y-0 pointer-events-none"
+        }`}
+      >
         <div className="flex flex-col gap-4 w-full">
           {pathname === "/" && (
             <div className="flex items-center gap-1 bg-gray-100/80 p-1 rounded-xl w-full">
@@ -293,10 +316,9 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("projects");
                   scrollToContent();
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "projects"
-                  ? "bg-white text-[#152e2b] shadow-sm"
-                  : "text-gray-500"
-                  }`}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
+                  activeTab === "projects" ? "bg-white text-[#152e2b] shadow-sm" : "text-gray-500"
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
               </button>
@@ -305,10 +327,9 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("people");
                   scrollToContent();
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "people"
-                  ? "bg-white text-[#152e2b] shadow-sm"
-                  : "text-gray-500"
-                  }`}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
+                  activeTab === "people" ? "bg-white text-[#152e2b] shadow-sm" : "text-gray-500"
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
               </button>
@@ -336,4 +357,3 @@ export default function Header({ session: initialSession }: { session: Session |
     </header>
   );
 }
-

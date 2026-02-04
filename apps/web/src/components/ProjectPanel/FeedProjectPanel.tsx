@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 type FeedProjectPanelProps = {
   project: ProjectForOverlay;
   onClose: () => void;
+  isModal?: boolean;
 };
 
 type LlmReportV21 = {
@@ -46,6 +47,7 @@ type LlmReportV21 = {
   summary?: {
     title?: string;
     description?: string;
+    paragraphs?: string[];
   };
 
   architecture?: {
@@ -92,7 +94,7 @@ function safeParseLlm(input: unknown): LlmReportV21 | null {
   }
 }
 
-export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
+export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanelProps) {
   const { dict } = useTranslation();
   const t = dict.project;
   const { data: session } = useSession();
@@ -107,15 +109,19 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
     }
   }, [project.id]);
 
-  const isOwner =
-    session?.user?.id && project.userId && Number(session.user.id) === project.userId;
+  const isOwner = session?.user?.id && project.userId && Number(session.user.id) === project.userId;
 
   const { status, analysis, data, handleAnalyzeRepo } = useProjectAnalysis(project);
 
   const llm = safeParseLlm(data?.llmOverview);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex flex-col w-full h-auto">
+    <div
+      className={cn(
+        "flex flex-col w-full h-auto animate-in fade-in slide-in-from-top-2 duration-300",
+        !isModal && "bg-white rounded-xl border border-gray-200 shadow-2xl"
+      )}
+    >
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -241,9 +247,11 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                 icon={CheckCircle2}
                 label={(t.overlay?.stats as any)?.tests ?? "Tests"}
                 value={data.stats.testFiles}
-                sublabel={data.infra?.hasTests
-                  ? ((t.overlay?.stats as any)?.tests_found ?? "Tests found")
-                  : ((t.overlay?.stats as any)?.no_tests ?? "No tests")}
+                sublabel={
+                  data.infra?.hasTests
+                    ? ((t.overlay?.stats as any)?.tests_found ?? "Tests found")
+                    : ((t.overlay?.stats as any)?.no_tests ?? "No tests")
+                }
                 color={data.stats.testFiles > 0 ? "green" : "gray"}
               />
             </div>
@@ -282,16 +290,29 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
               {llm ? (
                 <div className="p-6 md:p-10 space-y-10">
-                  {/* Summary Section */}
                   <div className="space-y-4">
-                    {llm.summary?.title && (
-                      <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-                        {llm.summary.title}
-                      </h3>
+                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                      {(t.overlay?.sections as any)?.summary ?? "Executive Summary"}
+                    </h3>
+
+                    {llm.summary?.paragraphs && llm.summary.paragraphs.length > 0 ? (
+                      <div className="space-y-4">
+                        {llm.summary.paragraphs.map((p, i) => (
+                          <p
+                            key={i}
+                            className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap"
+                          >
+                            {p}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+                        {llm.summary?.description ||
+                          (t.overlay as any)?.llm_empty_overview ||
+                          "No overview available."}
+                      </p>
                     )}
-                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
-                      {llm.summary?.description || (t.overlay as any)?.llm_empty_overview || "No overview available."}
-                    </p>
                   </div>
 
                   <Separator />
@@ -313,9 +334,7 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                             <CheckCircle2 className="w-4 h-4 text-[#05dc7f]" />
                             {s.name}
                           </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">
-                            {s.explanation}
-                          </p>
+                          <p className="text-sm text-gray-600 leading-relaxed">{s.explanation}</p>
                         </div>
                       ))}
                     </div>
@@ -332,7 +351,9 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                     />
                     <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-200/60">
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {llm.architecture?.explanation || (t.overlay as any)?.llm_empty_architecture || "No architecture details."}
+                        {llm.architecture?.explanation ||
+                          (t.overlay as any)?.llm_empty_architecture ||
+                          "No architecture details."}
                       </p>
                     </div>
                   </div>
@@ -342,7 +363,11 @@ export function FeedProjectPanel({ project, onClose }: FeedProjectPanelProps) {
                     <>
                       <Separator />
                       <div>
-                        <SectionHeader title={(t.overlay?.sections as any)?.tech_stack ?? "Tech Stack"} icon={Code2} color="blue" />
+                        <SectionHeader
+                          title={(t.overlay?.sections as any)?.tech_stack ?? "Tech Stack"}
+                          icon={Code2}
+                          color="blue"
+                        />
                         <div className="mt-4 flex flex-wrap gap-2">
                           {[
                             ...(data.stack.languages || []),
@@ -611,7 +636,8 @@ const RateLimitedView = ({ t }: { t: any }) => (
       {t.overlay?.rate_limited_view?.title || "Service Temporarily Unavailable"}
     </h3>
     <p className="text-amber-600/80 text-base">
-      {t.overlay?.rate_limited_view?.description || "We've reached our analysis limit for today. Please try again in about 1 hour."}
+      {t.overlay?.rate_limited_view?.description ||
+        "We've reached our analysis limit for today. Please try again in about 1 hour."}
     </p>
   </div>
 );

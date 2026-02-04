@@ -3,7 +3,15 @@
 import { useState, useEffect, useTransition } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { FiGithub, FiShield, FiAlertTriangle, FiCheckCircle, FiSettings, FiGlobe, FiAlertCircle } from "react-icons/fi";
+import {
+  FiGithub,
+  FiShield,
+  FiAlertTriangle,
+  FiCheckCircle,
+  FiSettings,
+  FiGlobe,
+  FiAlertCircle,
+} from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,281 +19,325 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { updatePasswordAction, deleteAccountAction, getConnectedProvidersAction } from "@/src/actions/settings";
+import {
+  updatePasswordAction,
+  deleteAccountAction,
+  getConnectedProvidersAction,
+} from "@/src/actions/settings";
 import { setLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
 
 export function SettingsClient() {
-    const { data: session } = useSession();
-    const { dict, lang } = useTranslation();
-    const [providers, setProviders] = useState<string[]>([]);
-    const [loadingProviders, setLoadingProviders] = useState(true);
-    const [isGithubLinked, setIsGithubLinked] = useState(false);
-    const [linkError, setLinkError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState("general");
+  const { data: session } = useSession();
+  const { dict, lang } = useTranslation();
+  const [providers, setProviders] = useState<string[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(true);
+  const [isGithubLinked, setIsGithubLinked] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("general");
 
-    const [pendingPassword, startPasswordTransition] = useTransition();
-    const [pendingDelete, startDeleteTransition] = useTransition();
+  const [pendingPassword, startPasswordTransition] = useTransition();
+  const [pendingDelete, startDeleteTransition] = useTransition();
 
-    useEffect(() => {
-        async function loadProviders() {
-            try {
-                const connected = await getConnectedProvidersAction();
-                setProviders(connected);
-                setIsGithubLinked(connected.includes("github"));
-            } catch (error) {
-                console.error("Failed to load providers", error);
-            } finally {
-                setLoadingProviders(false);
-            }
+  useEffect(() => {
+    async function loadProviders() {
+      try {
+        const connected = await getConnectedProvidersAction();
+        setProviders(connected);
+        setIsGithubLinked(connected.includes("github"));
+      } catch (error) {
+        console.error("Failed to load providers", error);
+      } finally {
+        setLoadingProviders(false);
+      }
+    }
+    loadProviders();
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const github = params.get("github");
+    if (!github) return;
+
+    if (github === "linked") toast.success("GitHub conectado com sucesso.");
+
+    setActiveTab("integrations");
+
+    if (github === "already_linked") setLinkError("already_linked");
+    if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
+
+    window.history.replaceState(null, "", "/settings");
+  }, []);
+
+  async function handleUpdatePassword(formData: FormData) {
+    startPasswordTransition(async () => {
+      const result = await updatePasswordAction(null, formData);
+      if (result?.error) {
+        if (typeof result.error === "string") {
+          toast.error(result.error);
+        } else {
+          const firstError = Object.values(result.error)[0]?.[0];
+          toast.error(firstError || dict.settings.dangerZone.toast.update_error);
         }
-        loadProviders();
-    }, []);
+      } else if (result?.success) {
+        toast.success(result.success);
+        const form = document.getElementById("password-form") as HTMLFormElement;
+        form?.reset();
+      }
+    });
+  }
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const github = params.get("github");
-        if (!github) return;
+  async function handleLinkGithub() {
+    window.location.href = "/api/github/link";
+  }
 
-        if (github === "linked") toast.success("GitHub conectado com sucesso.");
-
-        setActiveTab("integrations");
-
-        if (github === "already_linked") setLinkError("already_linked");
-        if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
-
-        window.history.replaceState(null, "", "/settings");
-    }, []);
-
-    async function handleUpdatePassword(formData: FormData) {
-        startPasswordTransition(async () => {
-            const result = await updatePasswordAction(null, formData);
-            if (result?.error) {
-                if (typeof result.error === "string") {
-                    toast.error(result.error);
-                } else {
-                    const firstError = Object.values(result.error)[0]?.[0];
-                    toast.error(firstError || dict.settings.dangerZone.toast.update_error);
-                }
-            } else if (result?.success) {
-                toast.success(result.success);
-                const form = document.getElementById("password-form") as HTMLFormElement;
-                form?.reset();
-            }
-        });
-    }
-
-    async function handleLinkGithub() {
-        window.location.href = "/api/github/link";
-    }
-
-    async function handleDeleteAccount() {
-        if (window.confirm(dict.settings.dangerZone.toast.delete_confirm)) {
-            startDeleteTransition(async () => {
-                try {
-                    await deleteAccountAction();
-                } catch (error) {
-                    toast.error(dict.settings.dangerZone.toast.delete_error);
-                }
-            });
+  async function handleDeleteAccount() {
+    if (window.confirm(dict.settings.dangerZone.toast.delete_confirm)) {
+      startDeleteTransition(async () => {
+        try {
+          await deleteAccountAction();
+        } catch (error) {
+          toast.error(dict.settings.dangerZone.toast.delete_error);
         }
+      });
     }
+  }
 
-    async function handleLanguageChange(value: string) {
-        const formData = new FormData();
-        formData.append('locale', value);
-        await setLanguageAction(formData);
-        window.location.reload();
-    }
+  async function handleLanguageChange(value: string) {
+    const formData = new FormData();
+    formData.append("locale", value);
+    await setLanguageAction(formData);
+    window.location.reload();
+  }
 
-    const navItems = [
-        { id: "general", label: dict.settings.language.title, icon: FiGlobe },
-        { id: "security", label: dict.settings.security, icon: FiShield },
-        { id: "integrations", label: dict.settings.integrations, icon: FiGithub },
-        { id: "danger", label: dict.settings.danger, icon: FiAlertTriangle },
-    ];
+  const navItems = [
+    { id: "general", label: dict.settings.language.title, icon: FiGlobe },
+    { id: "security", label: dict.settings.security, icon: FiShield },
+    { id: "integrations", label: dict.settings.integrations, icon: FiGithub },
+    { id: "danger", label: dict.settings.danger, icon: FiAlertTriangle },
+  ];
 
-    return (
-        <div className="max-w-6xl mx-auto py-10 px-6">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">{dict.settings.title}</h1>
-                <p className="text-gray-500 mt-2">{dict.settings.description}</p>
-            </div>
+  return (
+    <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 md:px-6">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+          {dict.settings.title}
+        </h1>
+        <p className="text-gray-500 mt-2 text-sm md:text-base">{dict.settings.description}</p>
+      </div>
 
-            <Separator className="mb-8" />
+      <Separator className="mb-8" />
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col md:flex-row md:items-start gap-8">
-                {/* Sidebar Navigation */}
-                <TabsList className="flex flex-row md:flex-col h-auto w-full md:w-56 bg-transparent p-0 gap-1 shrink-0 self-start sticky top-24">
-                    {navItems.map((item) => (
-                        <TabsTrigger
-                            key={item.id}
-                            value={item.id}
-                            className={`cursor-pointer !flex-none justify-start gap-3 px-4 h-12 text-left rounded-lg border transition-all
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8"
+      >
+        {/* Sidebar Navigation */}
+        <TabsList className="grid grid-cols-2 md:flex md:flex-col h-auto w-full md:w-64 bg-transparent p-0 gap-2 shrink-0 self-start sticky md:top-24">
+          {navItems.map((item) => (
+            <TabsTrigger
+              key={item.id}
+              value={item.id}
+              className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 text-left rounded-lg border transition-all h-auto
                                 border-transparent data-[state=active]:bg-gray-100 data-[state=active]:border-gray-200 data-[state=active]:shadow-sm
-                                hover:bg-gray-50 w-full
+                                hover:bg-gray-50 flex-col md:flex-row items-center md:items-center
                                 ${item.id === "danger" ? "text-red-600 data-[state=active]:text-red-700" : "text-gray-700"}
                             `}
-                        >
-                            <item.icon className="h-4 w-4 flex-shrink-0" />
-                            <span className="font-medium">{item.label}</span>
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
+            >
+              <item.icon className="h-4 w-4 shrink-0" />
+              <span className="font-medium text-xs md:text-base text-center md:text-left truncate w-full md:w-auto md:overflow-visible">
+                {item.label}
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-                {/* Content Area */}
-                <div className="flex-1 min-w-0">
-                    {/* General Section (Language) */}
-                    <TabsContent value="general" className="mt-0 space-y-6">
-                        <Card className="border-gray-200 shadow-sm">
-                            <CardHeader>
-                                <CardTitle>{dict.settings.language.title}</CardTitle>
-                                <CardDescription>{dict.settings.language.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2">
-                                    <Label>{dict.settings.language.label}</Label>
-                                    <Select defaultValue={lang} onValueChange={handleLanguageChange}>
-                                        <SelectTrigger className="w-[180px]">
-                                            <SelectValue placeholder="Select language" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="en">English</SelectItem>
-                                            <SelectItem value="pt">Português</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    {/* Security Section */}
-                    <TabsContent value="security" className="mt-0 space-y-6">
-                        <Card className="border-gray-200 shadow-sm">
-                            <CardHeader>
-                                <CardTitle>
-                                    {session?.user?.hasPassword
-                                        ? dict.settings.password.title
-                                        : dict.settings.password.create_title}
-                                </CardTitle>
-                                <CardDescription>
-                                    {session?.user?.hasPassword
-                                        ? dict.settings.password.description
-                                        : dict.settings.password.create_description}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <form id="password-form" action={handleUpdatePassword} className="space-y-4" noValidate>
-                                    {session?.user?.hasPassword ? (
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="currentPassword">{dict.settings.password.current}</Label>
-                                            <Input id="currentPassword" name="currentPassword" type="password" />
-                                        </div>
-                                    ) : (
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="email">{dict.settings.password.confirm_email_label}</Label>
-                                            <Input id="email" name="email" type="email" placeholder="name@example.com" />
-                                        </div>
-                                    )}
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="newPassword">{dict.settings.password.new}</Label>
-                                            <Input id="newPassword" name="newPassword" type="password" />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="confirmPassword">{dict.settings.password.confirm}</Label>
-                                            <Input id="confirmPassword" name="confirmPassword" type="password" />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end pt-2">
-                                        <Button type="submit" disabled={pendingPassword} className="cursor-pointer bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium">
-                                            {pendingPassword
-                                                ? dict.settings.password.buttonUpdating
-                                                : (session?.user?.hasPassword
-                                                    ? dict.settings.password.button
-                                                    : dict.settings.password.button_create)}
-                                        </Button>
-                                    </div>
-                                </form>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    {/* Integrations Section */}
-                    <TabsContent value="integrations" className="mt-0 space-y-6">
-                        <Card className="border-gray-200 shadow-sm">
-                            <CardHeader>
-                                <CardTitle>{dict.settings.connectedAccounts.title}</CardTitle>
-                                <CardDescription>{dict.settings.connectedAccounts.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {linkError === "already_linked" && (
-                                    <Alert variant="destructive">
-                                        <FiAlertCircle className="h-4 w-4" />
-                                        <AlertTitle>Error</AlertTitle>
-                                        <AlertDescription>
-                                            {/* @ts-ignore - Key added dynamically */}
-                                            {dict.settings.connectedAccounts.already_linked_error}
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-                                <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50/50">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-white p-2 rounded-full border shadow-sm">
-                                            <FiGithub className="h-6 w-6" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">GitHub</p>
-                                            <p className="text-sm text-gray-500">{dict.settings.connectedAccounts.github}</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        {loadingProviders ? (
-                                            <Button variant="ghost" disabled size="sm">{dict.settings.connectedAccounts.loading}</Button>
-                                        ) : isGithubLinked ? (
-                                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1">
-                                                <FiCheckCircle className="h-3 w-3" /> {dict.settings.connectedAccounts.connected}
-                                            </Badge>
-                                        ) : (
-                                            <Button variant="outline" className="cursor-pointer" size="sm" onClick={handleLinkGithub}>
-                                                {dict.settings.connectedAccounts.connect}
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    {/* Danger Zone */}
-                    <TabsContent value="danger" className="mt-0 space-y-6">
-                        <div className="bg-red-50/40 border border-red-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-                            <div className="flex items-start gap-4">
-                                <div className="bg-red-100/50 p-3 rounded-xl border border-red-200 text-red-600 shrink-0">
-                                    <FiAlertTriangle size={24} />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-red-900 font-bold text-lg">{dict.settings.dangerZone.title}</h3>
-                                    <p className="text-sm text-red-800/70 leading-relaxed max-w-md">
-                                        {dict.settings.dangerZone.description}
-                                    </p>
-                                </div>
-                            </div>
-                            <Button
-                                variant="destructive"
-                                onClick={handleDeleteAccount}
-                                disabled={pendingDelete}
-                                className="cursor-pointer bg-red-600 text-white font-bold h-11 px-8 rounded-lg shadow-md opacity-60 hover:opacity-100 transition-all duration-300 active:scale-[0.98] shrink-0"
-                            >
-                                {pendingDelete ? dict.settings.dangerZone.buttonDeleting : dict.settings.dangerZone.button}
-                            </Button>
-                        </div>
-                    </TabsContent>
+        {/* Content Area */}
+        <div className="flex-1 min-w-0">
+          {/* General Section (Language) */}
+          <TabsContent value="general" className="mt-0 space-y-6">
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle>{dict.settings.language.title}</CardTitle>
+                <CardDescription>{dict.settings.language.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label>{dict.settings.language.label}</Label>
+                  <Select defaultValue={lang} onValueChange={handleLanguageChange}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="pt">Português</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-            </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Section */}
+          <TabsContent value="security" className="mt-0 space-y-6">
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle>
+                  {session?.user?.hasPassword
+                    ? dict.settings.password.title
+                    : dict.settings.password.create_title}
+                </CardTitle>
+                <CardDescription>
+                  {session?.user?.hasPassword
+                    ? dict.settings.password.description
+                    : dict.settings.password.create_description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form
+                  id="password-form"
+                  action={handleUpdatePassword}
+                  className="space-y-4"
+                  noValidate
+                >
+                  {session?.user?.hasPassword ? (
+                    <div className="grid gap-2">
+                      <Label htmlFor="currentPassword">{dict.settings.password.current}</Label>
+                      <Input id="currentPassword" name="currentPassword" type="password" />
+                    </div>
+                  ) : (
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">{dict.settings.password.confirm_email_label}</Label>
+                      <Input id="email" name="email" type="email" placeholder="name@example.com" />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="newPassword">{dict.settings.password.new}</Label>
+                      <Input id="newPassword" name="newPassword" type="password" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="confirmPassword">{dict.settings.password.confirm}</Label>
+                      <Input id="confirmPassword" name="confirmPassword" type="password" />
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Button
+                      type="submit"
+                      disabled={pendingPassword}
+                      className="cursor-pointer bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium"
+                    >
+                      {pendingPassword
+                        ? dict.settings.password.buttonUpdating
+                        : session?.user?.hasPassword
+                          ? dict.settings.password.button
+                          : dict.settings.password.button_create}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Integrations Section */}
+          <TabsContent value="integrations" className="mt-0 space-y-6">
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle>{dict.settings.connectedAccounts.title}</CardTitle>
+                <CardDescription>{dict.settings.connectedAccounts.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {linkError === "already_linked" && (
+                  <Alert variant="destructive">
+                    <FiAlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>
+                      {/* @ts-ignore - Key added dynamically */}
+                      {dict.settings.connectedAccounts.already_linked_error}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-gray-50/50 gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-white p-2 rounded-full border shadow-sm shrink-0">
+                      <FiGithub className="h-6 w-6" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">GitHub</p>
+                      <p className="text-sm text-gray-500 break-words whitespace-normal leading-tight">
+                        {dict.settings.connectedAccounts.github}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="w-full sm:w-auto">
+                    {loadingProviders ? (
+                      <Button variant="ghost" disabled size="sm" className="w-full sm:w-auto">
+                        {dict.settings.connectedAccounts.loading}
+                      </Button>
+                    ) : isGithubLinked ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1 w-full sm:w-auto justify-center"
+                      >
+                        <FiCheckCircle className="h-3 w-3" />{" "}
+                        {dict.settings.connectedAccounts.connected}
+                      </Badge>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="cursor-pointer w-full sm:w-auto"
+                        size="sm"
+                        onClick={handleLinkGithub}
+                      >
+                        {dict.settings.connectedAccounts.connect}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Danger Zone */}
+          <TabsContent value="danger" className="mt-0 space-y-6">
+            <div className="bg-red-50/40 border border-red-200 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="bg-red-100/50 p-2 md:p-3 rounded-xl border border-red-200 text-red-600 shrink-0">
+                  <FiAlertTriangle size={20} className="md:w-6 md:h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-red-900 font-bold text-base md:text-lg">
+                    {dict.settings.dangerZone.title}
+                  </h3>
+                  <p className="text-xs md:text-sm text-red-800/70 leading-relaxed max-w-md">
+                    {dict.settings.dangerZone.description}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteAccount}
+                disabled={pendingDelete}
+                className="cursor-pointer bg-red-600 text-white font-bold h-10 md:h-11 px-6 md:px-8 rounded-lg shadow-md opacity-60 hover:opacity-100 transition-all duration-300 active:scale-[0.98] shrink-0 w-full md:w-auto"
+              >
+                {pendingDelete
+                  ? dict.settings.dangerZone.buttonDeleting
+                  : dict.settings.dangerZone.button}
+              </Button>
+            </div>
+          </TabsContent>
         </div>
-    );
+      </Tabs>
+    </div>
+  );
 }
