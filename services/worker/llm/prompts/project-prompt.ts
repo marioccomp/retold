@@ -52,16 +52,13 @@ README POLICY:
     const hasAppsDir = input.structure.hasAppsDir;
     const hasPackagesDir = input.structure.hasPackagesDir;
 
-    // Limite dinâmico: se README é completo (>25k chars), pegamos menos diretórios
     const readmeLength = input.readme?.length ?? 0;
     console.log("TAMANHO DO README", readmeLength);
     const isReadmeComplete = readmeLength > 25000;
-    const dirLimit = isReadmeComplete ? 5 : 20;
+    const dirLimit = isReadmeComplete ? 5 : 40;
 
-    // Helper para pegar dirs com limite
     const limitDirs = (dirs: string[] | undefined) => (dirs ?? []).slice(0, dirLimit);
 
-    // Monorepos e Spring Boot precisam de mais níveis de profundidade
     const needsDeepLevels = hasAppsDir || hasPackagesDir || frameworks.includes("Spring Boot");
 
     const dirs = [
@@ -107,18 +104,12 @@ README POLICY:
         },
         summary: {
             title: "",
-            description: "",
+            description: "<string: cohesive narrative text, 150-250 words, structured in paragraphs. DO NOT use bullet points or lists.>",
         },
         architecture: {
             explanation: "",
         },
         strengths: [
-            {
-                name: "",
-                explanation: "",
-            }
-        ],
-        weaknesses: [
             {
                 name: "",
                 explanation: "",
@@ -145,7 +136,8 @@ README POLICY:
     So adapt your analysis to this context.
     `
 
-    // Lista compacta de features já presentes no projeto (evita repetição nas políticas)
+    const hasAuthFolder = dirs.some(d => d.toLowerCase().includes("auth") || d.toLowerCase().includes("login") || d.toLowerCase().includes("signin"));
+
     const presentFeatures = [
         input.infra.hasTests && "tests",
         input.infra.ciProviders.length > 0 && "CI/CD",
@@ -156,6 +148,7 @@ README POLICY:
         input.infra.lintTools.length > 0 && "linting",
         input.infra.testTools.length > 0 && "test framework",
         input.readme && "documentation",
+        (input.stack.tools.includes("auth") || hasAuthFolder) && "authentication",
     ].filter(Boolean) as string[];
 
     const heuristicAnalysisPolicy = `
@@ -177,18 +170,18 @@ ${presentFeatures.length > 0 ? `- Features already present (do NOT criticize or 
         - Scoring:
         - 3+ items present → WELL documented, do NOT suggest generic "improve documentation"
         - README has > 50 lines with clear sections → Consider it adequate
-        - Valid documentation weakness: "API endpoint documentation missing for /api/v1/* routes"
-        - INVALID weakness: "Improve documentation" (when README already covers install/usage/config)
+        - Valid documentation suggestion: "API endpoint documentation missing for /api/v1/* routes"
+        - INVALID suggestion: "Improve documentation" (when README already covers install/usage/config)
         - If README contains detailed setup instructions, this is a STRENGTH, not something to improve.
         `.trim();
 
 
 
-    const weaknessValidationPolicy = `
-WEAKNESS VALIDATION:
+    const suggestionValidationPolicy = `
+suggestion VALIDATION:
 - DO NOT criticize features already present: ${presentFeatures.join(", ") || "(none detected)"}.
-- Each weakness MUST have: specific evidence (file/pattern/code), why it matters for this project, and actionable fix.
-- Maximum 4 weaknesses - quality over quantity.
+- Each suggestion MUST have: specific evidence (file/pattern/code), why it matters for this project, and actionable fix.
+- Maximum 4 suggestiones - quality over quantity.
 - Before claiming something is "missing", check ALL directory levels first.
 - Adapt rigor to maturity: "${maturityExpectation}" projects have different expectations than production.
 - If project is well-structured: return 1-2 genuine issues or acknowledge it's solid.
@@ -208,12 +201,21 @@ ADAPTATION & SUGGESTIONS:
 `.trim();
 
     const blockList = `
-        - NEVER mention the use of "modern", "popular", or "actual" technologies (like TypeScript, Next.js, Tailwind, etc.) as a strength. This is considered a baseline requirement, not a merit.
-        - DO NOT praise the tech stack choice itself. Praise how it is USED or IMPLEMENTED.
-        - NEVER return generic strengths like "Good project structure" without specific evidence from L1-L6.
-        - DO NOT use generic architectural labels (like "Microservices" or "Hexagonal") unless the directory structure provides undeniable proof of that pattern.
-- If a folder's purpose is ambiguous, describe its position in the hierarchy rather than guessing its domain role.
-    `.trim();
+STRICT PROHIBITIONS (BLACKLIST):
+- NEVER mention "modern technologies", "popular frameworks", or "industry standards" (like TypeScript, Next.js, Tailwind, Prisma) as a strength. Using them is a baseline requirement, not a merit.
+- DO NOT praise the tech stack choice itself (e.g., "Good choice of React"). Praise how it is IMPLEMENTED or ORGANIZED.
+- NEVER return generic strengths like "Efficient project structure", "Clean code", or "Good organization" without specific evidence from L1-L6 directories or code samples.
+- DO NOT use generic architectural labels (like "Clean Architecture" or "Hexagonal") unless the directory structure provides undeniable proof (e.g., /domain, /infrastructure, /application layers).
+- AVOID praising "The Presence of Tests" or "The Presence of Documentation" as a strength. Only praise them if the implementation is exceptionally thorough or follows an advanced pattern.
+`.trim();
+
+    const strengthRigorPolicy = `
+STRENGTH RIGOR POLICY:
+- A "Strength" must be a technical achievement in implementation, not just "using a tool".
+- VALID STRENGTH: "Granular error handling factory found in /infra/errors" or "Domain-driven folder structure that isolates business logic from framework concerns".
+- INVALID STRENGHT: "Uses TypeScript for type safety" or "Next.js for performance".
+- If no high-quality strength is found, return fewer items (min 1) rather than generic fluff.
+`.trim();
 
     const contextInferencePolicy = `
 CONTEXT INFERENCE & DOMAIN DEDUCTION:
@@ -238,29 +240,36 @@ FOLDER ORGANIZATION & GEOGRAPHICAL EVIDENCE:
 `.trim();
 
     const summaryInstructions = `
-SUMMARY REQUIREMENTS:
-- Write EXACTLY 10-15 lines in the summary field.
-- Use the directory structure from the heuristics data (structure.topLevelDirs, secondLevelDirs, etc.) to understand architecture.
-- Follow this structure:
-  1. WHAT: Project purpose. If "${repoName}" is abstract, deduce from directory names.
-  2. PROBLEM: Be specific, but CONTEXT-AWARE. Interpret folder names based on the stack - e.g., "/queue" in a Node.js project likely means async messaging, but in C/C++ it's probably a data structure implementation.
-  3. AUDIENCE: Who uses this.
-  4. TECH SYNERGY: How tools interact (e.g., "Prisma for data, worker for heavy tasks").
-  5. ARCHITECTURE: Based on folder nesting. ${hasAppsDir ? "This is a monorepo - explain apps/packages relationship." : ""}
-- Do NOT just list technologies - explain PURPOSE and INTERACTION.
+SUMMARY REQUIREMENTS (PROSE NARRATIVE):
+- Write a COHESIVE, PROFESSIONAL NARRATIVE of 150-250 words.
+- Use 2 to 3 well-structured paragraphs.
+- ⚠️ STRICT RULE: DO NOT use bullet points, numbered lists, or "line-by-line" sentences.
+- The text must flow naturally like a professional review or an executive summary.
+
+CONTENT GUIDELINES (Integrate these naturally into the prose):
+- Start by explaining the core identity and purpose of "${repoName}". Deduce the domain from README or folder structure (e.g., structure.topLevelDirs).
+- Discuss the specific problem it solves, interpreting folder names based on the tech stack (e.g., logic in "/services" vs "/components").
+- Identify the target audience and how the project serves them.
+- Describe the "Tech Synergy": how the tools (like ${frameworks.join(", ") || "the stack"}) interact to achieve the project's goals.
+- Detail the architecture based on folder nesting (e.g., "${hasAppsDir ? "explain the monorepo packages relationship" : "explain the layer/feature organization"}") and mention specific structural patterns observed.
+- Highlight unique differentiators or high-quality implementations found in the code samples.
+
+TONE: Senior Software Engineer, analytical, objective, and insightful.
 `.trim();
 
 
     const antiHallucinationPolicy = `
 ANTI-HALLUCINATION RULES:
-- ABSENCE OF EVIDENCE IS NOT EVIDENCE OF ABSENCE: If you do not see a specific feature (like Auth, Database, or Tests) in the provided folders or code samples, DO NOT assume it is missing.
-- DO NOT invent weaknesses based on what you "think" might be missing. 
+- ABSENCE OF EVIDENCE IS NOT EVIDENCE OF ABSENCE: If you do not see a specific feature (like Auth, Database, or Tests) in the provided folders on directory structure (structure.topLevelDirs, structure.secondLevelDirs, etc.) or code samples, DO NOT assume it is missing.
+- DO NOT invent suggestiones based on what you "think" might be missing. 
 - ONLY criticize something if you see POOR implementation in the provided code, or if the Project Purpose clearly requires it and there is zero trace of it in the directory structure.
-- If you are unsure if a feature exists, DO NOT mention it as a weakness.
+- If you are unsure if a feature exists, DO NOT mention it as a suggestion.
 `.trim();
+
+
     return `
         You are a senior software engineer with 10+ years of experience in software development.
-        You are analyzing a codebase and providing feedback on its architecture, strengths, weaknesses, and suggestions for improvement.
+        You are analyzing a codebase and providing feedback on its architecture, strengths and suggestions for improvement.
         
         ${languageInstruction}
 
@@ -268,8 +277,11 @@ ANTI-HALLUCINATION RULES:
 
         ${structureAnalysisPolicy}
 
-        Heuristics data to guide your analysis:
         ${JSON.stringify(inputLite, null, 2)}
+        ${antiHallucinationPolicy}
+
+        ${summaryInstructions}
+
         ${heuristicAnalysisPolicy}
 
         ${input.readme ? `## PROJECT README: ${input.readme}` : "No README provided"}
@@ -285,9 +297,8 @@ ANTI-HALLUCINATION RULES:
         ${contextInferencePolicy}
         ${adaptationPolicy}
         ${blockList}
-        ${summaryInstructions}
-        ${antiHallucinationPolicy}
-        ${weaknessValidationPolicy}
+        ${strengthRigorPolicy}
+        ${suggestionValidationPolicy}
 
         FINAL INSTRUCTION:
         Return a JSON object that strictly follows this schema structure:

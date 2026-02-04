@@ -68,11 +68,11 @@ export function buildStructure(files: FileEntry[]) {
 
   return {
     topLevelDirs: [...topLevelDirs].slice(0, 20),
-    secondLevelDirs: [...secondLevelDirs].sort().slice(0, 20),
-    thirdLevelDirs: [...thirdLevelDirs].sort().slice(0, 20),
-    fourthLevelDirs: [...fourthLevelDirs].sort().slice(0, 20),
-    fifthLevelDirs: [...fifthLevelDirs].sort().slice(0, 20),
-    sixthLevelDirs: [...sixthLevelDirs].sort().slice(0, 20),
+    secondLevelDirs: [...secondLevelDirs].sort().slice(0, 40),
+    thirdLevelDirs: [...thirdLevelDirs].sort().slice(0, 40),
+    fourthLevelDirs: [...fourthLevelDirs].sort().slice(0, 40),
+    fifthLevelDirs: [...fifthLevelDirs].sort().slice(0, 40),
+    sixthLevelDirs: [...sixthLevelDirs].sort().slice(0, 40),
     packageJsonCount,
     hasAppsDir,
     hasPackagesDir,
