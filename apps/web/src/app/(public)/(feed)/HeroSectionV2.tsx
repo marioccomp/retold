@@ -15,6 +15,8 @@ import ProjectDetailsModal from "@/src/app/(public)/[username]/(profile)/compone
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 import { useTranslation } from "@/src/i18n/client";
+import { useProjectModal } from "@/src/hooks/useProjectModal";
+import { useSearch } from "@/src/providers/SearchContext";
 
 import { FiArrowRight, FiCheckCircle, FiPlus, FiSearch, FiTrendingUp } from "react-icons/fi";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,7 +30,8 @@ type Props = {
 
 export default function HeroSectionV2({ projectDTO, session }: Props) {
     const { dict } = useTranslation();
-    const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
+    const { projectId, openProject, closeProject } = useProjectModal();
+    const { setActiveTab } = useSearch();
     const [isCreating, setIsCreating] = useState(false);
     const uid = useId();
     const queryClient = useQueryClient();
@@ -63,10 +66,11 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
     const handleProjectClick = () => {
         if (!featuredProject) return;
-        setSelectedProject(featuredProject);
+        openProject(featuredProject.id);
     };
 
-    const handleProjectClose = () => setSelectedProject(null);
+    // Determine if modal should show based on URL
+    const selectedProject = projectId === featuredProject?.id ? featuredProject : null;
 
     // Overlay criar projeto
     if (isCreating) {
@@ -189,7 +193,10 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                             <Button
                                 variant="outline"
                                 className="h-12 px-6 rounded-full border-[#05dc7f]/35 text-[#052e16] bg-white/70 hover:bg-[#eafff5] hover:border-[#05dc7f] transition-all cursor-pointer"
-                                onClick={() => document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" })}
+                                onClick={() => {
+                                    setActiveTab("projects");
+                                    document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
+                                }}
                             >
                                 <FiSearch className="mr-2 text-[#05dc7f]" />
                                 {dict.feed.feedhero.explore_projects}
@@ -252,7 +259,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
             <ProjectDetailsModal
                 isOpen={!!selectedProject}
-                onClose={handleProjectClose}
+                onClose={closeProject}
                 project={selectedProject}
             />
 
