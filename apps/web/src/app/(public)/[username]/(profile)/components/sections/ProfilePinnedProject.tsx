@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { FiStar, FiPlus, FiX, FiTrash } from "react-icons/fi";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +11,7 @@ import SelectPinnedProjectModal from "../modals/SelectPinnedProjectModal";
 import ProjectDetailsModal from "../modals/ProjectDetailsModal";
 import { toggleProjectPin } from "@/src/app/(public)/[username]/actions/pin-project";
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
+import { useProjectModal } from "@/src/hooks/useProjectModal";
 import { toast } from "sonner";
 
 type Props = {
@@ -19,7 +22,7 @@ type Props = {
 export default function ProfilePinnedProject({ allProjects, ownProfile }: Props) {
   const { dict } = useTranslation();
   const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<ProjectForOverlay | null>(null);
+  const { projectId, openProject, closeProject } = useProjectModal();
 
   const pinnedProjects = allProjects.filter((p) => p.isPinned);
   const unpinnedProjects = allProjects.filter((p) => !p.isPinned);
@@ -34,7 +37,15 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
   };
 
   const handleProjectClick = (project: ProjectCardDTO) => {
-    setSelectedProject({
+    openProject(project.id);
+  };
+
+  // Build ProjectForOverlay from projectId in URL
+  const selectedProject = (() => {
+    if (!projectId) return null;
+    const project = allProjects.find((p) => p.id === projectId);
+    if (!project) return null;
+    return {
       id: project.id,
       userId: project.ownerId,
       title: project.title,
@@ -49,16 +60,16 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
       },
       repository: project.repositoryUrl
         ? {
-            id: 0,
-            url: project.repositoryUrl,
-            fullName: project.repositoryFullName || "",
-            name: project.repositoryFullName?.split("/")[1] || "",
-            isActive: true,
-            private: project.repositoryIsPrivate ?? false,
-          }
+          id: 0,
+          url: project.repositoryUrl,
+          fullName: project.repositoryFullName || "",
+          name: project.repositoryFullName?.split("/")[1] || "",
+          isActive: true,
+          private: project.repositoryIsPrivate ?? false,
+        }
         : null,
-    });
-  };
+    } as ProjectForOverlay;
+  })();
 
   if (!pinnedProjects.length && !ownProfile) return null;
 
@@ -129,7 +140,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
 
       <ProjectDetailsModal
         isOpen={!!selectedProject}
-        onClose={() => setSelectedProject(null)}
+        onClose={closeProject}
         project={selectedProject}
       />
     </section>

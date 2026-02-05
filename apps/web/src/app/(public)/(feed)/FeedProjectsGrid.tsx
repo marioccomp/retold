@@ -8,7 +8,6 @@ import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/src/i18n/client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { useSearch } from "@/src/providers/SearchContext";
 
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
@@ -52,17 +51,6 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
             private: projectData.repositoryIsPrivate ?? false,
         } : null,
     } : null;
-
-    // Scroll to project content when opening a project
-    useEffect(() => {
-        if (selectedProject) {
-            const feedContent = document.getElementById('feed-content');
-            if (feedContent) {
-                // We use smooth scroll to give context, and scroll-mt-4 in FeedContent handles the offset
-                feedContent.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    }, [selectedProject?.id]);
 
     const filteredProjects = projects.filter(
         (project) =>

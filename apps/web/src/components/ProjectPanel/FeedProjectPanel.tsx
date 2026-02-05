@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   Github,
@@ -218,6 +218,15 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
           </div>
         </div>
       </div>
+
+      {/* Project Images Gallery */}
+      {project.images && project.images.length > 0 && (
+        <div className="px-4 md:px-8 py-6 bg-white border-b border-gray-100">
+          <div className="max-w-5xl mx-auto">
+            <ImageGallery images={project.images} />
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="bg-gray-50/50 p-4 md:p-8">
@@ -644,3 +653,122 @@ const RateLimitedView = ({ t }: { t: any }) => (
     </p>
   </div>
 );
+
+const ImageGallery = ({ images }: { images: string[] }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  if (!images || images.length === 0) return null;
+
+  const hasMultiple = images.length > 1;
+
+  return (
+    <>
+      <div className="flex gap-3 w-full">
+        {/* Main Featured Image */}
+        <div className={cn(
+          "relative overflow-hidden rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center group cursor-zoom-in",
+          hasMultiple ? "flex-1" : "w-full",
+          "min-h-[200px] max-h-[400px]"
+        )}
+          onClick={() => setIsZoomed(true)}
+        >
+          <img
+            src={images[activeIndex]}
+            alt={`Project image ${activeIndex + 1}`}
+            className="max-w-full max-h-[400px] object-contain transition-all duration-300"
+          />
+          {/* Zoom hint overlay */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-lg">
+              🔍 Clique para ampliar
+            </div>
+          </div>
+        </div>
+
+        {/* Thumbnail Stack */}
+        {hasMultiple && (
+          <div className="flex flex-col gap-2 shrink-0">
+            {images.map((img, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveIndex(idx)}
+                className={cn(
+                  "w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer",
+                  activeIndex === idx
+                    ? "border-[#05dc7f] ring-2 ring-[#05dc7f]/20 scale-105"
+                    : "border-gray-200 hover:border-gray-300 opacity-70 hover:opacity-100"
+                )}
+              >
+                <img
+                  src={img}
+                  alt={`Thumbnail ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Zoom Modal */}
+      {isZoomed && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center animate-in fade-in duration-200"
+          onClick={() => setIsZoomed(false)}
+        >
+          {/* Close button */}
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+            onClick={() => setIsZoomed(false)}
+          >
+            <XCircle className="w-8 h-8" />
+          </button>
+
+          {/* Navigation arrows */}
+          {hasMultiple && (
+            <>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                }}
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                }}
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Zoomed image */}
+          <img
+            src={images[activeIndex]}
+            alt={`Project image ${activeIndex + 1}`}
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {/* Image counter */}
+          {hasMultiple && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium">
+              {activeIndex + 1} / {images.length}
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
