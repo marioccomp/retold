@@ -134,18 +134,20 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
       {/* Modern Glassy Header */}
       <div className="relative px-6 py-6 border-b border-gray-100 bg-white/80 backdrop-blur-md z-10">
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          <StatusBadge status={status || "PENDING"} isOwner={!!isOwner} t={t} />
-          {isOwner && (
-            <ProjectSettings
-              project={{
-                ...project,
-                ownerUsername: project.owner?.username,
-              }}
-              onDelete={onClose}
-              triggerClassName="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-100"
-            />
-          )}
+        <div className="flex justify-end mb-4 md:mb-0 md:absolute md:top-4 md:right-4 z-20">
+          <div className="flex items-center gap-2">
+            <StatusBadge status={status || "PENDING"} isOwner={!!isOwner} t={t} />
+            {isOwner && (
+              <ProjectSettings
+                project={{
+                  ...project,
+                  ownerUsername: project.owner?.username,
+                }}
+                onDelete={onClose}
+                triggerClassName="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-100"
+              />
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 md:items-start max-w-5xl mx-auto w-full">
@@ -158,18 +160,18 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
           {/* Title & Meta */}
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left min-w-0">
-            <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-tight break-all line-clamp-2">
+            <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-tight break-words w-full">
               {project.title}
             </h2>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3 w-full">
               {/* Owner */}
               {project.owner && (
                 <Link
                   href={`/${project.owner.username}`}
-                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-50 border border-gray-200/60 hover:border-[#05dc7f]/30 hover:bg-white transition-all text-sm group"
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-50 border border-gray-200/60 hover:border-[#05dc7f]/30 hover:bg-white transition-all text-sm group max-w-full"
                 >
-                  <Avatar className="w-5 h-5 border border-white shadow-sm">
+                  <Avatar className="w-5 h-5 border border-white shadow-sm shrink-0">
                     <AvatarImage src={project.owner.image || undefined} />
                     <AvatarFallback className="text-[9px] bg-[#05dc7f]/10 text-[#0f2f28] font-bold">
                       {project.owner.name.substring(0, 2).toUpperCase()}
@@ -187,17 +189,17 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50"
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50 max-w-full"
                 >
-                  <Github className="w-3.5 h-3.5" />
-                  <span className="truncate max-w-[200px]">{repo.fullName}</span>
+                  <Github className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate max-w-[150px] md:max-w-[200px]">{repo.fullName}</span>
                 </a>
               )}
             </div>
 
             {/* Classification Tags */}
             {data?.summary && (
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4 w-full">
                 {data.summary.primaryLanguage && (
                   <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">
                     {data.summary.primaryLanguage}
@@ -225,32 +227,32 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               <StatCard
                 icon={FileCode}
-                label={t.metrics.files.replace("{count}", "")}
+                label={t.metrics.files.replace("{count}", "").trim()}
                 value={data.stats.totalFiles}
-                sublabel={(t.overlay?.stats as any)?.total_files ?? "Total Files"}
+                sublabel={t.overlay.stats.total_files}
               />
               <StatCard
                 icon={Code2}
-                label={(t.overlay?.stats as any)?.sources ?? "Sources"}
+                label={t.overlay.stats.sources}
                 value={data.stats.sourceFiles}
-                sublabel={(t.overlay?.stats as any)?.code_files ?? "Code Files"}
+                sublabel={t.overlay.stats.code_files}
                 color="blue"
               />
               <StatCard
                 icon={Settings}
-                label={(t.overlay?.stats as any)?.config ?? "Config"}
+                label={t.overlay.stats.config}
                 value={data.stats.configFiles}
-                sublabel={(t.overlay?.stats as any)?.infra_setup ?? "Infra & Setup"}
+                sublabel={t.overlay.stats.infra_setup}
                 color="orange"
               />
               <StatCard
                 icon={CheckCircle2}
-                label={(t.overlay?.stats as any)?.tests ?? "Tests"}
+                label={t.overlay.stats.tests}
                 value={data.stats.testFiles}
                 sublabel={
                   data.infra?.hasTests
-                    ? ((t.overlay?.stats as any)?.tests_found ?? "Tests found")
-                    : ((t.overlay?.stats as any)?.no_tests ?? "No tests")
+                    ? t.overlay.stats.tests_found
+                    : t.overlay.stats.no_tests
                 }
                 color={data.stats.testFiles > 0 ? "green" : "gray"}
               />
@@ -292,7 +294,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                 <div className="p-6 md:p-10 space-y-10">
                   <div className="space-y-4">
                     <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-                      {(t.overlay?.sections as any)?.summary ?? "Executive Summary"}
+                      {t.overlay.sections.summary}
                     </h3>
 
                     {llm.summary?.paragraphs && llm.summary.paragraphs.length > 0 ? (
@@ -309,8 +311,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                     ) : (
                       <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
                         {llm.summary?.description ||
-                          (t.overlay as any)?.llm_empty_overview ||
-                          "No overview available."}
+                          t.overlay.llm_empty_overview}
                       </p>
                     )}
                   </div>
@@ -320,7 +321,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   {/* Key Strengths */}
                   <div>
                     <SectionHeader
-                      title={(t.overlay?.sections as any)?.strengths ?? "Key Strengths"}
+                      title={t.overlay.sections.strengths}
                       icon={Sparkles}
                       color="green"
                     />
@@ -345,15 +346,14 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   {/* Architecture Section */}
                   <div>
                     <SectionHeader
-                      title={(t.overlay?.sections as any)?.architecture ?? "Architecture"}
+                      title={t.overlay.sections.architecture}
                       icon={Layout}
                       color="purple"
                     />
                     <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-200/60">
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                         {llm.architecture?.explanation ||
-                          (t.overlay as any)?.llm_empty_architecture ||
-                          "No architecture details."}
+                          t.overlay.llm_empty_architecture}
                       </p>
                     </div>
                   </div>
@@ -364,7 +364,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                       <Separator />
                       <div>
                         <SectionHeader
-                          title={(t.overlay?.sections as any)?.tech_stack ?? "Tech Stack"}
+                          title={t.overlay.sections.tech_stack}
                           icon={Code2}
                           color="blue"
                         />
@@ -394,7 +394,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                       <Separator />
                       <div>
                         <SectionHeader
-                          title={(t.overlay?.sections as any)?.suggestions ?? "Suggestions"}
+                          title={t.overlay.sections.suggestions}
                           icon={Lightbulb}
                           color="blue"
                         />
@@ -429,7 +429,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               ) : (
                 <div className="p-12 text-center text-gray-500">
                   <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-gray-400" />
-                  <p>{(t.overlay?.sections as any)?.loading_report ?? "Loading report data..."}</p>
+                  <p>{t.overlay.sections.loading_report}</p>
                 </div>
               )}
             </div>
@@ -465,14 +465,18 @@ const StatCard = ({
   const c = colors[color];
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow">
+    <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow min-w-0">
       <div className={`p-2.5 rounded-lg ${c} shrink-0`}>
         <Icon className="w-5 h-5" />
       </div>
-      <div>
-        <div className="text-2xl font-black text-gray-900 leading-none mb-1">{value}</div>
-        <div className="text-xs font-bold text-gray-500 uppercase tracking-wide">{label}</div>
-        <div className="text-[10px] text-gray-400 mt-1 font-medium">{sublabel}</div>
+      <div className="min-w-0 flex-1">
+        <div className="text-xl md:text-2xl font-black text-gray-900 leading-none mb-1 truncate">
+          {value}
+        </div>
+        <div className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wide truncate">
+          {label}
+        </div>
+        <div className="text-[10px] text-gray-400 mt-1 font-medium truncate">{sublabel}</div>
       </div>
     </div>
   );
@@ -633,11 +637,10 @@ const RateLimitedView = ({ t }: { t: any }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center bg-amber-50/30 rounded-2xl border border-amber-100">
     <Clock className="w-12 h-12 text-amber-500 mb-5" />
     <h3 className="text-xl font-bold text-amber-900 mb-2">
-      {t.overlay?.rate_limited_view?.title || "Service Temporarily Unavailable"}
+      {t.overlay.rate_limited_view.title}
     </h3>
     <p className="text-amber-600/80 text-base">
-      {t.overlay?.rate_limited_view?.description ||
-        "We've reached our analysis limit for today. Please try again in about 1 hour."}
+      {t.overlay.rate_limited_view.description}
     </p>
   </div>
 );

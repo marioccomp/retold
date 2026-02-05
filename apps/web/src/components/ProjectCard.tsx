@@ -22,6 +22,7 @@ import { FiLoader } from "react-icons/fi";
 import { FollowButton } from "./FollowButton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthModal } from "@/src/providers/AuthModalContext";
+import Link from "next/link";
 
 interface Props {
   project: ProjectCardDTO;
@@ -114,17 +115,25 @@ export default function ProjectCard({
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border"
         >
           <div className="flex items-center gap-2.5 mb-3 max-[650px]:mb-2 max-[650px]:gap-2">
-            <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20">
-              <AvatarImage
-                src={project.ownerImage || undefined}
-                alt={ownerName}
-                className="object-cover"
-              />
-              <AvatarFallback className="bg-[#05dc7f] text-[#152e2b] font-bold text-xs uppercase">
-                {ownerName.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold">{ownerName}</p>
+            <Link
+              href={`/${project.ownerUsername}`}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+              className="flex items-center gap-2.5 group/creator cursor-pointer"
+            >
+              <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20 transition-all duration-200 group-hover/creator:border-[#05dc7f]/50 group-hover/creator:scale-105">
+                <AvatarImage
+                  src={project.ownerImage || undefined}
+                  alt={ownerName}
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-[#05dc7f] text-[#152e2b] font-bold text-xs uppercase">
+                  {ownerName.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold group-hover/creator:text-[#05dc7f] transition-colors duration-200">
+                {ownerName}
+              </p>
+            </Link>
             {!isOwner && project.ownerId && (
               <FollowButton
                 targetUserId={project.ownerId}

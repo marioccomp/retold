@@ -153,7 +153,9 @@
             "ownership": {
                 "authored_prefix": "Desenvolveu",
                 "authored_suffix": "do código base"
-            }
+            },
+            "llm_empty_overview": "Nenhum resumo disponível.",
+            "llm_empty_architecture": "Nenhum detalhe de arquitetura disponível."
         },
         "create_panel": {
             "title": "Novo projeto",
@@ -346,6 +348,15 @@
             "no_results": "Nenhum resultado encontrado",
             "no_results_desc": "Tente buscar por outro nome ou username.",
             "loading": "Carregando..."
+        },
+        "stat_last_commit_label": "Último commit",
+        "stat_no_commits": "Nenhum commit recente encontrado",
+        "stat_updated_label": "Atualizado",
+        "relative_time": {
+            "just_now": "agora mesmo",
+            "m": "m",
+            "h": "h",
+            "d": "d"
         },
         "edit_profile": "Editar Perfil",
         "edit_details": "Editar detalhes",
