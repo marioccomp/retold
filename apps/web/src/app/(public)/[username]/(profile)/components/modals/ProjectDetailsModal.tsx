@@ -1,6 +1,9 @@
+"use client";
+
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
 
 type Props = {
@@ -23,7 +26,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, project }: Props)
 
   if (!isOpen || !project) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 p-4 md:p-8"
       onMouseDown={(e) => {
@@ -48,6 +51,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, project }: Props)
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

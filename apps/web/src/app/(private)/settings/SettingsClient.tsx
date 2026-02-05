@@ -147,14 +147,14 @@ export function SettingsClient() {
             <TabsTrigger
               key={item.id}
               value={item.id}
-              className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 text-left rounded-lg border transition-all h-auto
+              className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 w-full text-left rounded-xl border transition-all
                                 border-transparent data-[state=active]:bg-gray-100 data-[state=active]:border-gray-200 data-[state=active]:shadow-sm
-                                hover:bg-gray-50 flex-col md:flex-row items-center md:items-center
+                                hover:bg-gray-50 flex flex-col md:flex-row items-center md:items-center
                                 ${item.id === "danger" ? "text-red-600 data-[state=active]:text-red-700" : "text-gray-700"}
                             `}
             >
               <item.icon className="h-4 w-4 shrink-0" />
-              <span className="font-medium text-xs md:text-base text-center md:text-left truncate w-full md:w-auto md:overflow-visible">
+              <span className="font-medium text-xs md:text-base text-center md:text-left truncate w-full md:w-auto">
                 {item.label}
               </span>
             </TabsTrigger>
@@ -310,16 +310,16 @@ export function SettingsClient() {
 
           {/* Danger Zone */}
           <TabsContent value="danger" className="mt-0 space-y-6">
-            <div className="bg-red-50/40 border border-red-200 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="bg-red-100/50 p-2 md:p-3 rounded-xl border border-red-200 text-red-600 shrink-0">
-                  <FiAlertTriangle size={20} className="md:w-6 md:h-6" />
+            <div className="bg-red-50/40 border border-red-100 rounded-xl p-4 md:p-10 flex flex-col items-center text-center gap-6 shadow-sm">
+              <div className="flex flex-col items-center gap-4">
+                <div className="bg-white p-3 md:p-4 rounded-2xl border border-red-100 text-red-600 shadow-sm">
+                  <FiAlertTriangle size={24} className="md:w-8 md:h-8" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-red-900 font-bold text-base md:text-lg">
+                <div className="space-y-2">
+                  <h3 className="text-red-900 font-black text-xl md:text-2xl tracking-tight">
                     {dict.settings.dangerZone.title}
                   </h3>
-                  <p className="text-xs md:text-sm text-red-800/70 leading-relaxed max-w-md">
+                  <p className="text-sm md:text-base text-red-800/70 leading-relaxed max-w-md mx-auto">
                     {dict.settings.dangerZone.description}
                   </p>
                 </div>
@@ -328,7 +328,7 @@ export function SettingsClient() {
                 variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={pendingDelete}
-                className="cursor-pointer bg-red-600 text-white font-bold h-10 md:h-11 px-6 md:px-8 rounded-lg shadow-md opacity-60 hover:opacity-100 transition-all duration-300 active:scale-[0.98] shrink-0 w-full md:w-auto"
+                className="cursor-pointer bg-red-600 hover:bg-red-700 text-white font-bold h-11 md:h-12 px-8 md:px-10 rounded-xl shadow-lg shadow-red-200 transition-all duration-300 active:scale-95 shrink-0 w-full sm:w-auto"
               >
                 {pendingDelete
                   ? dict.settings.dangerZone.buttonDeleting

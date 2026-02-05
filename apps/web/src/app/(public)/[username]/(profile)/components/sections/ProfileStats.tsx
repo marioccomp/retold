@@ -12,8 +12,7 @@ type Props = {
 };
 
 export default function ProfileStats({ stats }: Props) {
-  console.log(stats);
-  const { dict } = useTranslation();
+  const { dict, lang } = useTranslation();
   const lastCommit = stats.lastCommit;
 
   const formatRelative = (iso: string) => {
@@ -24,15 +23,18 @@ export default function ProfileStats({ stats }: Props) {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return "just now";
-    if (minutes < 60) return `${minutes}${"m"}`;
-    if (hours < 24) return `${hours}${"h"}`;
-    return `${days}${"d"}`;
+    const rel = dict.profile.relative_time;
+
+    if (minutes < 1) return rel.just_now;
+    if (minutes < 60) return `${minutes}${rel.m}`;
+    if (hours < 24) return `${hours}${rel.h}`;
+    return `${days}${rel.d}`;
   };
 
   const formatDate = (iso: string) => {
     const dt = new Date(iso);
-    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(dt);
+    const localeString = lang === "pt" ? "pt-BR" : "en-US";
+    return new Intl.DateTimeFormat(localeString, { dateStyle: "medium" }).format(dt);
   };
 
   // Calculate total lines changed as impact
@@ -113,7 +115,7 @@ export default function ProfileStats({ stats }: Props) {
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-[#6b7c7a] dark:text-gray-400 uppercase tracking-wider font-medium">
-                  {"Last commit"}
+                  {dict.profile.stat_last_commit_label}
                 </span>
 
                 {lastCommit?.repo ? (
@@ -124,7 +126,7 @@ export default function ProfileStats({ stats }: Props) {
               </div>
 
               <p className="text-sm font-semibold text-[#152e2b] dark:text-gray-100 mt-1">
-                {lastCommit?.message ? lastCommit.message : "No recent commits found"}
+                {lastCommit?.message ? lastCommit.message : dict.profile.stat_no_commits}
               </p>
 
               {lastCommit?.date ? (
@@ -138,7 +140,7 @@ export default function ProfileStats({ stats }: Props) {
           {/* Small right-side indicator */}
           {lastCommit?.date ? (
             <div className="shrink-0 text-right">
-              <div className="text-xs text-[#6b7c7a] dark:text-gray-400">{"Updated"}</div>
+              <div className="text-xs text-[#6b7c7a] dark:text-gray-400">{dict.profile.stat_updated_label}</div>
               <div className="text-sm font-bold text-[#152e2b] dark:text-gray-100">
                 {formatRelative(lastCommit.date)}
               </div>

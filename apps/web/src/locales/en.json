@@ -153,7 +153,9 @@
             "ownership": {
                 "authored_prefix": "Authored",
                 "authored_suffix": "of the codebase"
-            }
+            },
+            "llm_empty_overview": "No overview available.",
+            "llm_empty_architecture": "No architecture details."
         },
         "create_panel": {
             "title": "New project",
@@ -346,6 +348,15 @@
             "no_results": "No results found",
             "no_results_desc": "Try searching for another name or username.",
             "loading": "Loading..."
+        },
+        "stat_last_commit_label": "Last commit",
+        "stat_no_commits": "No recent commits found",
+        "stat_updated_label": "Updated",
+        "relative_time": {
+            "just_now": "just now",
+            "m": "m",
+            "h": "h",
+            "d": "d"
         },
         "edit_profile": "Edit Profile",
         "edit_details": "Edit details",

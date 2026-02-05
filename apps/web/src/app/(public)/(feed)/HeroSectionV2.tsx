@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 import ProjectCard from "@/src/components/ProjectCard";
 import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
-import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
+import ProjectDetailsModal from "@/src/app/(public)/[username]/(profile)/components/modals/ProjectDetailsModal";
 
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
@@ -95,26 +95,6 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                             }}
                         />
                     </div>
-                </div>
-            </div>
-        );
-    }
-
-    // Overlay ver projeto
-    if (selectedProject) {
-        return (
-            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl w-full max-w-5xl h-[90vh] overflow-y-auto flex flex-col relative shadow-2xl scrollbar-fintech">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-4 right-4 z-10 hover:bg-black/10 rounded-full"
-                        onClick={handleProjectClose}
-                        aria-label="Close"
-                    >
-                        <span className="text-xl">×</span>
-                    </Button>
-                    <FeedProjectPanel project={selectedProject} onClose={handleProjectClose} />
                 </div>
             </div>
         );
@@ -269,6 +249,12 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                     </div>
                 </div>
             </div>
+
+            <ProjectDetailsModal
+                isOpen={!!selectedProject}
+                onClose={handleProjectClose}
+                project={selectedProject}
+            />
 
 
             {/* keyframes */}
