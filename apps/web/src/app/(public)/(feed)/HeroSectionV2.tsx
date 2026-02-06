@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Session } from "next-auth";
 import { Button } from "@/components/ui/button";
@@ -72,37 +73,17 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
     // Determine if modal should show based on URL
     const selectedProject = projectId === featuredProject?.id ? featuredProject : null;
 
-    // Overlay criar projeto
-    if (isCreating) {
-        return (
-            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col relative shadow-2xl">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-4 right-4 z-10 hover:bg-black/10 rounded-full"
-                        onClick={() => setIsCreating(false)}
-                        aria-label="Close"
-                    >
-                        <span className="text-xl">×</span>
-                    </Button>
-
-                    <div className="p-6">
-                        <CreateProjectPanel
-                            onClose={() => setIsCreating(false)}
-                            onSuccess={() => {
-                                setIsCreating(false);
-                                queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
-                                setTimeout(() => {
-                                    document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
-                                }, 100);
-                            }}
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // Lock body scroll when creating project overlay is open
+    useEffect(() => {
+        if (isCreating) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isCreating]);
 
     return (
         <section className="relative w-full overflow-hidden bg-white">
@@ -262,6 +243,35 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 onClose={closeProject}
                 project={selectedProject}
             />
+
+            {/* Create Project Overlay */}
+            {isCreating && createPortal(
+                <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col relative">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-3 right-3 z-10 cursor-pointer hover:bg-black/10 rounded-full text-gray-500 hover:text-gray-700"
+                            onClick={() => setIsCreating(false)}
+                            aria-label="Close"
+                        >
+                            <span className="text-2xl leading-none">×</span>
+                        </Button>
+
+                        <CreateProjectPanel
+                            onClose={() => setIsCreating(false)}
+                            onSuccess={() => {
+                                setIsCreating(false);
+                                queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+                                setTimeout(() => {
+                                    document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
+                                }, 100);
+                            }}
+                        />
+                    </div>
+                </div>,
+                document.body
+            )}
 
 
             {/* keyframes */}
