@@ -119,9 +119,9 @@ export default function ProfileStats({ stats }: Props) {
                 </span>
 
                 {lastCommit?.repo ? (
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f] border border-[#05dc7f]/20">
+                  <a href={`https://github.com/${lastCommit.repo}`} target="_blank" rel="noopener noreferrer" className="text-[11px] px-2 py-0.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f] border border-[#05dc7f]/20">
                     {lastCommit.repo}
-                  </span>
+                  </a>
                 ) : null}
               </div>
 
