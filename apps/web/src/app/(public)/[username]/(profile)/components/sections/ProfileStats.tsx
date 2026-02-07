@@ -119,7 +119,12 @@ export default function ProfileStats({ stats }: Props) {
                 </span>
 
                 {lastCommit?.repo ? (
-                  <a href={`https://github.com/${lastCommit.repo}`} target="_blank" rel="noopener noreferrer" className="text-[11px] px-2 py-0.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f] border border-[#05dc7f]/20">
+                  <a
+                    href={`https://github.com/${lastCommit.repo}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] px-2 py-0.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f] border border-[#05dc7f]/20"
+                  >
                     {lastCommit.repo}
                   </a>
                 ) : null}
@@ -140,7 +145,9 @@ export default function ProfileStats({ stats }: Props) {
           {/* Small right-side indicator */}
           {lastCommit?.date ? (
             <div className="shrink-0 text-right">
-              <div className="text-xs text-[#6b7c7a] dark:text-gray-400">{dict.profile.stat_updated_label}</div>
+              <div className="text-xs text-[#6b7c7a] dark:text-gray-400">
+                {dict.profile.stat_updated_label}
+              </div>
               <div className="text-sm font-bold text-[#152e2b] dark:text-gray-100">
                 {formatRelative(lastCommit.date)}
               </div>

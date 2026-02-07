@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   Github,
@@ -100,14 +101,17 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
   const { data: session } = useSession();
   const repo = project.repository;
 
+  const queryClient = useQueryClient();
   const hasIncremented = useRef(false);
 
   useEffect(() => {
     if (!hasIncremented.current) {
-      incrementView(project.id);
+      incrementView(project.id).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+      });
       hasIncremented.current = true;
     }
-  }, [project.id]);
+  }, [project.id, queryClient]);
 
   const isOwner = session?.user?.id && project.userId && Number(session.user.id) === project.userId;
 
@@ -259,9 +263,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                 label={t.overlay.stats.tests}
                 value={data.stats.testFiles}
                 sublabel={
-                  data.infra?.hasTests
-                    ? t.overlay.stats.tests_found
-                    : t.overlay.stats.no_tests
+                  data.infra?.hasTests ? t.overlay.stats.tests_found : t.overlay.stats.no_tests
                 }
                 color={data.stats.testFiles > 0 ? "green" : "gray"}
               />
@@ -319,8 +321,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                       </div>
                     ) : (
                       <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
-                        {llm.summary?.description ||
-                          t.overlay.llm_empty_overview}
+                        {llm.summary?.description || t.overlay.llm_empty_overview}
                       </p>
                     )}
                   </div>
@@ -361,8 +362,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                     />
                     <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-200/60">
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {llm.architecture?.explanation ||
-                          t.overlay.llm_empty_architecture}
+                        {llm.architecture?.explanation || t.overlay.llm_empty_architecture}
                       </p>
                     </div>
                   </div>
@@ -645,12 +645,8 @@ const ErrorView = ({ onRetry, t }: { onRetry: () => void; t: any }) => (
 const RateLimitedView = ({ t }: { t: any }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center bg-amber-50/30 rounded-2xl border border-amber-100">
     <Clock className="w-12 h-12 text-amber-500 mb-5" />
-    <h3 className="text-xl font-bold text-amber-900 mb-2">
-      {t.overlay.rate_limited_view.title}
-    </h3>
-    <p className="text-amber-600/80 text-base">
-      {t.overlay.rate_limited_view.description}
-    </p>
+    <h3 className="text-xl font-bold text-amber-900 mb-2">{t.overlay.rate_limited_view.title}</h3>
+    <p className="text-amber-600/80 text-base">{t.overlay.rate_limited_view.description}</p>
   </div>
 );
 
@@ -666,11 +662,12 @@ const ImageGallery = ({ images }: { images: string[] }) => {
     <>
       <div className="flex gap-3 w-full">
         {/* Main Featured Image */}
-        <div className={cn(
-          "relative overflow-hidden rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center group cursor-zoom-in",
-          hasMultiple ? "flex-1" : "w-full",
-          "min-h-[200px] max-h-[400px]"
-        )}
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center group cursor-zoom-in",
+            hasMultiple ? "flex-1" : "w-full",
+            "min-h-[200px] max-h-[400px]"
+          )}
           onClick={() => setIsZoomed(true)}
         >
           <img
@@ -736,7 +733,12 @@ const ImageGallery = ({ images }: { images: string[] }) => {
                 }}
               >
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
               <button
@@ -747,7 +749,12 @@ const ImageGallery = ({ images }: { images: string[] }) => {
                 }}
               >
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </>
