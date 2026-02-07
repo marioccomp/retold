@@ -45,7 +45,9 @@ const worker = new Worker(
         token = await githubRepository.getToken(projectId);
       } catch (e: any) {
         if (e.message.includes("No github installations found")) {
-          console.log("[worker] No GitHub installation found. Attempting public clone without token.");
+          console.log(
+            "[worker] No GitHub installation found. Attempting public clone without token."
+          );
         } else {
           // Log other errors but maybe still try? No, let's rethrow if it's not the specific installation error.
           // actually, if 'Project not found' or 'User not found' we should fail.
@@ -73,7 +75,6 @@ const worker = new Worker(
 
       const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
 
-
       const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
 
       // Trigger user analysis in parallel with LLM processing
@@ -86,12 +87,15 @@ const worker = new Worker(
         })
         .catch((e) => console.error("[worker] failed to queue user analysis", e));
 
-      const llmInsights = await analyzeProjectWithLLM({
-        ...analysis,
-        readme: readmeContent,
-        codeSamples: analysis.codeSamples,
-        locale: locale || "en",
-      }, repoName);
+      const llmInsights = await analyzeProjectWithLLM(
+        {
+          ...analysis,
+          readme: readmeContent,
+          codeSamples: analysis.codeSamples,
+          locale: locale || "en",
+        },
+        repoName
+      );
 
       const llmInsightsJson = JSON.stringify(llmInsights);
 
@@ -129,8 +133,27 @@ const worker = new Worker(
       // Prioritized framework selection
       if (analysis.stack.frameworks && Array.isArray(analysis.stack.frameworks)) {
         // Priority tiers: backend/main frameworks > frontend frameworks > SDKs/tools
-        const highPriority = ["NestJS", "Express", "FastAPI", "Django", "Flask", "AdonisJS", "Next.js", "Nuxt.js", "Rails"];
-        const mediumPriority = ["React Native", "React", "Vue", "Angular", "Svelte", "Flutter", "Spring Boot", "Laravel"];
+        const highPriority = [
+          "NestJS",
+          "Express",
+          "FastAPI",
+          "Django",
+          "Flask",
+          "AdonisJS",
+          "Next.js",
+          "Nuxt.js",
+          "Rails",
+        ];
+        const mediumPriority = [
+          "React Native",
+          "React",
+          "Vue",
+          "Angular",
+          "Svelte",
+          "Flutter",
+          "Spring Boot",
+          "Laravel",
+        ];
         const lowPriority = ["Expo", "Electron"]; // SDKs/runners that are less important as tags
 
         const sortedFrameworks = [...analysis.stack.frameworks].sort((a, b) => {
@@ -204,18 +227,20 @@ const worker = new Worker(
 
         const resetAt = new Date(Date.now() + addMs);
 
-        console.log(`[worker] Rate limit duration parsed: ${addMs}ms. Reset at: ${resetAt.toISOString()}`);
+        console.log(
+          `[worker] Rate limit duration parsed: ${addMs}ms. Reset at: ${resetAt.toISOString()}`
+        );
 
         // Find owner to lock
         const project = await prisma.project.findUnique({
           where: { id: projectId },
-          select: { userId: true }
+          select: { userId: true },
         });
 
         if (project) {
           await prisma.user.update({
             where: { id: project.userId },
-            data: { rateLimitResetAt: resetAt }
+            data: { rateLimitResetAt: resetAt },
           });
           console.log(`[worker] User ${project.userId} locked until ${resetAt.toISOString()}`);
         }
@@ -242,7 +267,7 @@ const worker = new Worker(
   },
   {
     connection: redisConnection,
-    concurrency: 2,
+    concurrency: 1,
   }
 );
 

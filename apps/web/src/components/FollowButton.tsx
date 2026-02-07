@@ -13,120 +13,132 @@ import { useSession } from "next-auth/react";
 import { useAuthModal } from "@/src/providers/AuthModalContext";
 
 interface FollowButtonProps {
-    targetUserId: number;
-    initialIsFollowing: boolean;
-    className?: string;
-    variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
-    size?: "default" | "sm" | "lg" | "icon";
+  targetUserId: number;
+  initialIsFollowing: boolean;
+  className?: string;
+  variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
+  size?: "default" | "sm" | "lg" | "icon";
 }
 
 export function FollowButton({
-    targetUserId,
-    initialIsFollowing,
-    className,
-    variant = "default",
-    size = "default",
+  targetUserId,
+  initialIsFollowing,
+  className,
+  variant = "default",
+  size = "default",
 }: FollowButtonProps) {
-    const { dict } = useTranslation();
-    const queryClient = useQueryClient();
-    const router = useRouter();
-    const { status: sessionStatus } = useSession();
-    const { openLoginModal } = useAuthModal();
-    const [isPending, startTransition] = useTransition();
-    const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+  const { dict } = useTranslation();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { status: sessionStatus } = useSession();
+  const { openLoginModal } = useAuthModal();
+  const [isPending, startTransition] = useTransition();
+  const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
 
-    // Sincroniza o estado local se o prop mudar (importante ao navegar entre páginas)
-    useEffect(() => {
-        setIsFollowing(initialIsFollowing);
-    }, [initialIsFollowing]);
+  // Sincroniza o estado local se o prop mudar (importante ao navegar entre páginas)
+  useEffect(() => {
+    setIsFollowing(initialIsFollowing);
+  }, [initialIsFollowing]);
 
-    const handleToggleFollow = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+  const handleToggleFollow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-        if (sessionStatus !== "authenticated") {
-            openLoginModal();
-            return;
+    if (sessionStatus !== "authenticated") {
+      openLoginModal();
+      return;
+    }
+
+    const previousState = isFollowing;
+    const newState = !previousState;
+
+    setIsFollowing(newState);
+
+    startTransition(async () => {
+      // Optimistic Update no Cache do React Query
+      // Atualiza todas as queries de "users" (feed de pessoas)
+      queryClient.setQueriesData({ queryKey: ["users"] }, (old: any) => {
+        if (Array.isArray(old)) {
+          return old.map((u: any) => (u.id === targetUserId ? { ...u, isFollowing: newState } : u));
         }
+        if (old?.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: old.data.map((u: any) =>
+              u.id === targetUserId ? { ...u, isFollowing: newState } : u
+            ),
+          };
+        }
+        return old;
+      });
 
-        const previousState = isFollowing;
-        const newState = !previousState;
+      // Atualiza o feed de projetos
+      queryClient.setQueriesData({ queryKey: ["feed-projects"] }, (old: any) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((p: any) =>
+          p.ownerId === targetUserId ? { ...p, isFollowingOwner: newState } : p
+        );
+      });
 
-        setIsFollowing(newState);
+      // Atualiza queries de "profile" (página de perfil)
+      queryClient.setQueriesData({ queryKey: ["profile"] }, (old: any) => {
+        if (!old || old.id !== targetUserId) return old;
+        return {
+          ...old,
+          isFollowing: newState,
+          followersCount: newState ? old.followersCount + 1 : old.followersCount - 1,
+        };
+      });
 
-        startTransition(async () => {
-            // Optimistic Update no Cache do React Query
-            // Atualiza todas as queries de "users" (feed de pessoas)
-            queryClient.setQueriesData({ queryKey: ["users"] }, (old: any) => {
-                if (!old?.data) return old;
-                return {
-                    ...old,
-                    data: old.data.map((u: any) =>
-                        u.id === targetUserId ? { ...u, isFollowing: newState } : u
-                    )
-                };
-            });
+      const result = await toggleFollowAction(targetUserId);
 
-            // Atualiza queries de "profile" (página de perfil)
-            queryClient.setQueriesData({ queryKey: ["profile"] }, (old: any) => {
-                if (!old || old.id !== targetUserId) return old;
-                return {
-                    ...old,
-                    isFollowing: newState,
-                    followersCount: newState ? (old.followersCount + 1) : (old.followersCount - 1)
-                };
-            });
+      if (result.success) {
+        // Sincroniza o servidor e invalida para garantir que os dados estão 100% corretos
+        router.refresh();
+        queryClient.invalidateQueries({ queryKey: ["followers"] });
+        queryClient.invalidateQueries({ queryKey: ["following"] });
+        queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+        queryClient.invalidateQueries({ queryKey: ["users"] }); // Re-validar usuários para garantir que todas as listas estão em dia
+      } else {
+        // Rollback em caso de erro
+        setIsFollowing(previousState);
+        toast.error(result.error || "Failed to process request");
 
-            const result = await toggleFollowAction(targetUserId);
+        // Reverte o cache
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+      }
+    });
+  };
 
-            if (result.success) {
-                // Sincroniza o servidor e invalida para garantir que os dados estão 100% corretos
-                router.refresh();
-                queryClient.invalidateQueries({ queryKey: ["followers"] });
-                queryClient.invalidateQueries({ queryKey: ["following"] });
-            } else {
-                // Rollback em caso de erro
-                setIsFollowing(previousState);
-                toast.error(result.error || "Failed to process request");
-
-                // Reverte o cache
-                queryClient.invalidateQueries({ queryKey: ["users"] });
-                queryClient.invalidateQueries({ queryKey: ["profile"] });
-            }
-        });
-    };
-
-    return (
-        <Button
-            onClick={handleToggleFollow}
-            disabled={isPending}
-            size={size}
-            variant={variant}
-            className={cn(
-                "transition-all duration-300 font-bold rounded-full cursor-pointer active:scale-95 px-6 shrink-0",
-                // Overlay variant (for ProjectCard images, etc)
-                variant === "ghost" ? (
-                    !isFollowing ? (
-                        "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-lg"
-                    ) : (
-                        "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 shadow-none font-medium"
-                    )
-                ) : (
-                    // Default brand styles
-                    !className?.includes("bg-") && (!isFollowing ? (
-                        "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-[0_4px_12px_rgba(5,220,127,0.2)] hover:shadow-[0_6px_16px_rgba(5,220,127,0.3)]"
-                    ) : (
-                        "bg-transparent border border-[#05dc7f] text-[#05dc7f] hover:bg-[#05dc7f]/10 shadow-none"
-                    ))
-                ),
-                className
-            )}
-        >
-            {isPending ? (
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-                isFollowing ? dict.profile.unfollow : dict.profile.follow
-            )}
-        </Button>
-    );
+  return (
+    <Button
+      onClick={handleToggleFollow}
+      disabled={isPending}
+      size={size}
+      variant={variant}
+      className={cn(
+        "transition-all duration-300 font-bold rounded-full cursor-pointer active:scale-95 px-6 shrink-0",
+        // Overlay variant (for ProjectCard images, etc)
+        variant === "ghost"
+          ? !isFollowing
+            ? "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-lg"
+            : "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 shadow-none font-medium"
+          : // Default brand styles
+            !className?.includes("bg-") &&
+              (!isFollowing
+                ? "bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] border-none shadow-[0_4px_12px_rgba(5,220,127,0.2)] hover:shadow-[0_6px_16px_rgba(5,220,127,0.3)]"
+                : "bg-transparent border border-[#05dc7f] text-[#05dc7f] hover:bg-[#05dc7f]/10 shadow-none"),
+        className
+      )}
+    >
+      {isPending ? (
+        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+      ) : isFollowing ? (
+        dict.profile.unfollow
+      ) : (
+        dict.profile.follow
+      )}
+    </Button>
+  );
 }

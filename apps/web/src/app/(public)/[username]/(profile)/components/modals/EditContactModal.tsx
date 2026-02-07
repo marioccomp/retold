@@ -49,7 +49,14 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
     },
   });
 
+  const hasChanges = email !== (profile.email || "") || phone !== (profile.phone || "");
+
   const onSave = () => {
+    if (!hasChanges) {
+      onClose();
+      return;
+    }
+
     realMutation.mutate({
       name: profile.name || "",
       title: profile.title || "",
@@ -132,8 +139,8 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
           </Button>
           <Button
             onClick={onSave}
-            disabled={realMutation.isPending}
-            className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] px-8 font-bold transition-all shadow-lg shadow-[#05dc7f]/20 cursor-pointer"
+            disabled={realMutation.isPending || !hasChanges}
+            className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] px-8 font-bold transition-all shadow-lg shadow-[#05dc7f]/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {realMutation.isPending ? dict.profile.saving : dict.profile.contact_section.save}
           </Button>

@@ -158,6 +158,6 @@ export const userWorker = new Worker(
   },
   {
     connection: redisConnection,
-    concurrency: 2, // Baixa concorrência pois é pesado
+    concurrency: 1,
   }
 );

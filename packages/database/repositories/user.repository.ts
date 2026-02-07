@@ -69,15 +69,15 @@ export const userRepository = {
             },
             ...(currentUserId
               ? {
-                likes: {
-                  where: {
-                    userId: currentUserId,
+                  likes: {
+                    where: {
+                      userId: currentUserId,
+                    },
+                    select: {
+                      userId: true,
+                    },
                   },
-                  select: {
-                    userId: true,
-                  },
-                },
-              }
+                }
               : {}),
           },
         },
@@ -89,15 +89,15 @@ export const userRepository = {
         },
         ...(currentUserId
           ? {
-            followers: {
-              where: {
-                followerId: currentUserId,
+              followers: {
+                where: {
+                  followerId: currentUserId,
+                },
+                select: {
+                  followerId: true,
+                },
               },
-              select: {
-                followerId: true,
-              },
-            },
-          }
+            }
           : {}),
         certifications: {
           orderBy: { createdAt: "desc" },
@@ -229,18 +229,19 @@ export const userRepository = {
         image: true,
         title: true,
         bio: true,
+        cover: true,
         skills: true,
         ...(currentUserId
           ? {
-            followers: {
-              where: {
-                followerId: currentUserId,
+              followers: {
+                where: {
+                  followerId: currentUserId,
+                },
+                select: {
+                  followerId: true,
+                },
               },
-              select: {
-                followerId: true,
-              },
-            },
-          }
+            }
           : {}),
       },
       take: 20,
