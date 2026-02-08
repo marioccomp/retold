@@ -220,7 +220,7 @@ export default function Header({ session: initialSession }: { session: Session |
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className="w-full h-10 pl-10 pr-4 bg-gray-100/50 hover:bg-gray-100 focus:bg-white border-transparent focus:border-[#05dc7f] focus:ring-0 rounded-full text-sm transition-all outline-none"
+              className="w-full h-10 pl-10 pr-4 bg-gray-100/50 hover:bg-gray-100 focus:bg-white border border-transparent focus:border-[#05dc7f] focus:ring-4 focus:ring-[#05dc7f]/10 rounded-full text-sm transition-all outline-none placeholder:text-gray-400"
             />
           </div>
         </div>

@@ -53,7 +53,7 @@ The refresh of the last commit status is managed by a dual-strategy caching mech
 
 ## Queues and Concurrency
 
-- **User Analyze:** Has low concurrency (`concurrency: 2`) as it is a process that consumes significant I/O and CPU (cloning and log parsing).
-- **Last Commit:** Also operates with low concurrency, focusing on GitHub API call efficiency and respecting rate limits.
+- **User Analyze:** Has low concurrency (`concurrency: 1`) as it is a process that consumes significant I/O and CPU (cloning and log parsing).
+- **Last Commit:** Also operates with low concurrency (2), focusing on GitHub API call efficiency and respecting rate limits.
 
 > **Note:** The full project analysis workers are currently being refactored and will be documented soon.

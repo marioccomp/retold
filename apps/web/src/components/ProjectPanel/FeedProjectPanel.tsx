@@ -106,7 +106,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
   const hasIncremented = useRef(false);
 
   useEffect(() => {
-    if (!hasIncremented.current) {
+    if (!hasIncremented.current && project.owner?.username !== session?.user?.username) {
       incrementView(project.id).then(() => {
         queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
       });
@@ -138,10 +138,31 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
       `}</style>
 
       {/* Modern Glassy Header */}
-      <div className="relative px-6 py-6 border-b border-gray-100 bg-white/80 backdrop-blur-md z-10">
-        <div className="flex justify-end mb-4 md:mb-0 md:absolute md:top-4 md:right-4 z-20">
-          <div className="flex items-center gap-2">
-            <StatusBadge status={status || "PENDING"} isOwner={!!isOwner} t={t} />
+      <div className="sticky top-0 left-0 right-0 px-6 py-4 border-b border-gray-100 bg-white z-50 flex items-center justify-between gap-4">
+        {/* Close Button - Left side on mobile, or right side? User asked for "header com X pra fechar" */}
+        {/* Based on print, X is on left, title center/left, actions right. But usually X is top-right or top-left. */}
+        {/* Let's put X on the top-right for consistency with previous design, or top-left if it's a bottom sheet... */}
+        {/* The user print shows "X Nova Resenha ... Publicar". X is on the LEFT. */}
+        {/* So I will put X on the LEFT for mobile feel. */}
+
+        <div className="relative flex items-center justify-between w-full">
+          {isModal && (
+            <button
+              onClick={onClose}
+              className="p-2 -ml-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors z-10 cursor-pointer"
+              aria-label="Close"
+            >
+              <XCircle className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Title in Header for Sticky context - Centered */}
+          <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-900 truncate max-w-[60%] text-center">
+            {t.overlay?.details || "Detalhes do Projeto"}
+          </h2>
+
+          <div className="flex items-center gap-2 shrink-0 z-10 ml-auto">
+            {/* StatusBadge removed from header as requested */}
             {isOwner && (
               <ProjectSettings
                 project={{
@@ -154,13 +175,28 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
             )}
           </div>
         </div>
+      </div>
 
+      <div className="relative px-6 py-6 border-b border-gray-100 bg-white z-10 w-full">
         <div className="flex flex-col md:flex-row gap-6 md:items-start max-w-5xl mx-auto w-full">
-          {/* Icon */}
+          {/* Owner Avatar & Name */}
           <div className="shrink-0 mx-auto md:mx-0">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100/50 flex items-center justify-center shadow-sm group">
-              <PackageSearch className="w-8 h-8 md:w-10 md:h-10 text-[#05dc7f] group-hover:scale-110 transition-transform duration-300" />
-            </div>
+            {project.owner && (
+              <Link
+                href={`/${project.owner.username}`}
+                className="flex flex-col items-center gap-3 group"
+              >
+                <Avatar className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-green-100/50 shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:shadow-md cursor-pointer">
+                  <AvatarImage src={project.owner.image || undefined} />
+                  <AvatarFallback className="rounded-full text-xl bg-green-50 text-[#0f2f28] font-bold">
+                    {project.owner.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-semibold text-gray-700 group-hover:text-[#05dc7f] transition-colors text-center max-w-[120px] leading-tight break-words">
+                  {project.owner.name}
+                </span>
+              </Link>
+            )}
           </div>
 
           {/* Title & Meta */}
@@ -169,27 +205,31 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               {project.title}
             </h2>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3 w-full">
-              {/* Owner */}
-              {project.owner && (
-                <Link
-                  href={`/${project.owner.username}`}
-                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-50 border border-gray-200/60 hover:border-[#05dc7f]/30 hover:bg-white transition-all text-sm group max-w-full"
-                >
-                  <Avatar className="w-5 h-5 border border-white shadow-sm shrink-0">
-                    <AvatarImage src={project.owner.image || undefined} />
-                    <AvatarFallback className="text-[9px] bg-[#05dc7f]/10 text-[#0f2f28] font-bold">
-                      {project.owner.name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-gray-600 font-medium group-hover:text-gray-900 truncate max-w-[120px]">
-                    {project.owner.name}
-                  </span>
-                </Link>
+            {/* Description & Repo Row */}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mt-2 w-full">
+              {project.description && (
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
+                  {project.description}
+                </p>
               )}
 
-              {/* Repo Link */}
+              {/* Repo Link - Hidden on mobile, shown on right on desktop */}
               {repo && !repo.private && (
+                <a
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden md:inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50 shrink-0"
+                >
+                  <Github className="w-3.5 h-3.5 shrink-0" />
+                  <span>{repo.fullName}</span>
+                </a>
+              )}
+            </div>
+
+            {/* Mobile Repo Link (shown below description on mobile) */}
+            {repo && !repo.private && (
+              <div className="md:hidden mt-3 flex justify-start w-full">
                 <a
                   href={repo.url}
                   target="_blank"
@@ -197,29 +237,31 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50 max-w-full"
                 >
                   <Github className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate max-w-[150px] md:max-w-[200px]">{repo.fullName}</span>
+                  <span>{repo.fullName}</span>
                 </a>
-              )}
-            </div>
-
-            {/* Classification Tags */}
-            {data?.summary && (
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4 w-full">
-                {data.summary.primaryLanguage && (
-                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">
-                    {data.summary.primaryLanguage}
-                  </Badge>
-                )}
-                {data.summary.appType && data.summary.appType !== "Unknown" && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-purple-50 text-purple-700 border-purple-100"
-                  >
-                    {humanizeEnum(data.summary.appType)}
-                  </Badge>
-                )}
               </div>
             )}
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4 w-full">
+              {/* Classification Tags */}
+              {data?.summary && (
+                <>
+                  {data.summary.primaryLanguage && (
+                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">
+                      {data.summary.primaryLanguage}
+                    </Badge>
+                  )}
+                  {data.summary.appType && data.summary.appType !== "Unknown" && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-purple-50 text-purple-700 border-purple-100"
+                    >
+                      {humanizeEnum(data.summary.appType)}
+                    </Badge>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

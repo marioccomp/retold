@@ -1,660 +1,662 @@
 {
-    "settings": {
-        "title": "Settings",
-        "description": "Manage your account settings and preferences.",
-        "language": {
-            "title": "Language",
-            "description": "Select your preferred language",
-            "label": "Interface Language"
-        },
-        "security": "Security",
-        "integrations": "Integrations",
-        "danger": "Danger Zone",
-        "dangerZone": {
-            "title": "Delete Account",
-            "description": "Permanently delete your account and all of your data. This action cannot be undone. All your project data will be lost.",
-            "button": "Delete Account",
-            "buttonDeleting": "Deleting...",
-            "toast": {
-                "update_error": "Failed to update password",
-                "delete_error": "Failed to delete account",
-                "delete_confirm": "Are you sure you want to delete your account? This action cannot be undone and will delete all your projects and data."
-            }
-        },
-        "password": {
-            "title": "Change Password",
-            "description": "Update your password to keep your account secure.",
-            "current": "Current Password",
-            "new": "New Password",
-            "confirm": "Confirm Password",
-            "button": "Update Password",
-            "buttonUpdating": "Updating...",
-            "errors": {
-                "user_not_found": "User not found or password not set",
-                "incorrect_password": "Incorrect password",
-                "unauthorized": "Unauthorized",
-                "email_mismatch": "Email does not match your account email"
-            },
-            "success_message": "Password updated successfully",
-            "create_title": "Create Password",
-            "create_description": "You don't have a password set. Create one to enable email login.",
-            "confirm_email_label": "Confirm your email",
-            "button_create": "Create Password"
-        },
-        "connectedAccounts": {
-            "title": "Connected Accounts",
-            "description": "Manage your connected accounts for easier login.",
-            "github": "Connect your GitHub account",
-            "connected": "Connected",
-            "connect": "Connect",
-            "loading": "Loading...",
-            "already_linked_error": "This GitHub account is already linked to another user."
-        }
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences.",
+    "language": {
+      "title": "Language",
+      "description": "Select your preferred language",
+      "label": "Interface Language"
     },
-    "project": {
-        "status": {
-            "PENDING": "Pending",
-            "ANALYZING": "Processing",
-            "DONE": "Analyzed",
-            "ERROR": "Error"
-        },
-        "analysis": {
-            "started": "Analysis started",
-            "start_error": "Failed to start analysis"
-        },
-        "metrics": {
-            "language": "Language",
-            "architecture": "Architecture",
-            "complexity": "Complexity",
-            "files": "{count} files"
-        },
-        "overlay": {
-            "analysis_not_started": {
-                "title": "Analysis Not Started",
-                "description": "The owner has not processed this project yet."
-            },
-            "analysis_error": {
-                "title": "Analysis Error",
-                "description": "Could not analyze the technical details of this project."
-            },
-            "pending_view": {
-                "title": "Project Analysis",
-                "description": "Generate a full technical report with insights about architecture, stack, and code quality.",
-                "button": "Run Analysis"
-            },
-            "analyzing_view": {
-                "title": "Analyzing Repository",
-                "description": "Identifying technologies and patterns..."
-            },
-            "error_view": {
-                "title": "Analysis Failed",
-                "description": "Could not process the repository data.",
-                "button": "Try Again"
-            },
-            "rate_limited_view": {
-                "title": "Service Temporarily Unavailable",
-                "description": "We've reached our analysis limit for today. Please try again in about 1 hour.",
-                "button": "Retry Later"
-            },
-            "sections": {
-                "summary": "Executive Summary",
-                "tech_stack": "Tech Stack",
-                "files": "Files",
-                "infra": "Infra & Quality",
-                "structure": "Structure",
-                "strengths": "Key Strengths",
-                "architecture": "Architecture",
-                "suggestions": "Suggestions",
-                "loading_report": "Loading report data..."
-            },
-            "stats": {
-                "source": "Source",
-                "tests": "Tests",
-                "config": "Config",
-                "docs": "Docs",
-                "total_files": "Total Files",
-                "sources": "Sources",
-                "code_files": "Code Files",
-                "infra_setup": "Infra & Setup",
-                "tests_found": "Tests found",
-                "no_tests": "No tests"
-            },
-            "infra": {
-                "ci_cd": "CI/CD Pipeline",
-                "docker": "Container (Docker)",
-                "lint": "Linting / Formatting",
-                "tests": "Test Coverage",
-                "active": "Active",
-                "missing": "Missing"
-            },
-            "structure": {
-                "src": "/src",
-                "tests": "/tests",
-                "depth": "Max Depth",
-                "present": "Present",
-                "missing": "Missing"
-            },
-            "architecture_types": {
-                "monorepo": "Monorepo",
-                "monolith": "Monolith",
-                "modular_monolith": "Modular Monolith",
-                "microservices": "Microservices",
-                "library": "Library",
-                "cli_tool": "CLI Tool",
-                "mobile_app": "Mobile App",
-                "static_site": "Static Site",
-                "unknown": "Unknown"
-            },
-            "gallery": {
-                "alt_preview": "Project preview",
-                "alt_active": "Active project preview",
-                "alt_index": "Preview {index}"
-            },
-            "ownership": {
-                "authored_prefix": "Authored",
-                "authored_suffix": "of the codebase"
-            },
-            "llm_empty_overview": "No overview available.",
-            "llm_empty_architecture": "No architecture details."
-        },
-        "create_panel": {
-            "title": "New project",
-            "subtitle": "Fill in the information for your new project",
-            "labels": {
-                "title": "Title",
-                "description": "Description",
-                "visibility": "Visibility",
-                "images": "Project Images",
-                "repository": "Repository"
-            },
-            "placeholders": {
-                "title": "Name of your project",
-                "description": "A brief description of the project",
-                "visibility": "Select visibility"
-            },
-            "visibility_options": {
-                "public": "Public",
-                "private": "Private"
-            },
-            "images_hint": "Add up to 3 images to highlight your project",
-            "tooltips": {
-                "move_left": "Move left",
-                "move_right": "Move right",
-                "remove": "Remove"
-            },
-            "add": "Add",
-            "repo_hint": "Select a GitHub repository",
-            "repo_loading": "Loading repositories...",
-            "repo_selected": "Selected",
-            "repo_none": "No repository connected yet.",
-            "repo_manage": "Manage repositories",
-            "repo_connect": "Connect repositories",
-            "cancel": "Cancel",
-            "submit": "Create project",
-            "submitting": "Creating...",
-            "uploading_images": "Uploading images...",
-            "toast": {
-                "success": "Project created successfully!",
-                "error": "Error creating project. Try again.",
-                "max_images": "Maximum of 3 images allowed.",
-                "already_exists": "You already have a project for this repository.",
-                "repo_not_found": "Repository not found or disconnected.",
-                "no_files": "No images provided.",
-                "upload_failed": "Failed to upload project images."
-            }
-        },
-        "settings_modal": {
-            "edit_project": "Edit project",
-            "delete_project": "Delete project",
-            "title": "Edit Project",
-            "images_label": "Project Images",
-            "max_images_hint": "Max 3 images",
-            "remove_image_tooltip": "Remove image",
-            "add": "Add",
-            "labels": {
-                "title": "Title",
-                "description": "Description"
-            },
-            "placeholders": {
-                "title": "Project name",
-                "description": "Short description"
-            },
-            "cancel": "Cancel",
-            "save": "Save changes",
-            "saving": "Saving...",
-            "remove_img_modal": {
-                "title": "Remove image?",
-                "description": "This image will be removed when you save changes.",
-                "confirm": "Remove"
-            },
-            "delete_project_modal": {
-                "title": "Delete Project?",
-                "description": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
-                "confirm": "Yes, delete project",
-                "deleting": "Deleting..."
-            },
-            "toast": {
-                "success": "Project updated successfully!",
-                "error": "Error saving changes",
-                "delete_success": "Project deleted successfully!",
-                "delete_error": "Error deleting project",
-                "title_required": "Title cannot be empty",
-                "max_images": "Maximum of 3 images allowed."
-            }
-        }
+    "security": "Security",
+    "integrations": "Integrations",
+    "danger": "Danger Zone",
+    "dangerZone": {
+      "title": "Delete Account",
+      "description": "Permanently delete your account and all of your data. This action cannot be undone. All your project data will be lost.",
+      "button": "Delete Account",
+      "buttonDeleting": "Deleting...",
+      "toast": {
+        "update_error": "Failed to update password",
+        "delete_error": "Failed to delete account",
+        "delete_confirm": "Are you sure you want to delete your account? This action cannot be undone and will delete all your projects and data."
+      }
     },
-    "feed": {
-        "feedhero": {
-            "title_prefix": "Showcase your",
-            "title_highlight": "portfolio",
-            "subtitle": "More than code, show impact. The place where developers build authority through real projects.",
-            "create_profile": "Create my profile",
-            "new_project": "New project",
-            "explore_projects": "Explore projects",
-            "free_portfolio": "Free Portfolio",
-            "community_feedback": "Community Feedback",
-            "featured_week": "Featured of the week",
-            "loading_featured": "Loading featured...",
-            "worker_analysis": "Worker Analysis",
-            "tests": "Tests",
-            "performance": "Performance",
-            "excellent": "Excellent",
-            "clean_code": "Clean and optimized code"
-        },
-        "feedcontent": {
-            "tabs": {
-                "projects": "Projects",
-                "people": "People"
-            },
-            "search_placeholder": "Search projects, people, tags...",
-            "people_coming_soon": {
-                "title": "Coming soon",
-                "description": "People search will be available soon"
-            }
-        },
-        "feedprojectsgrid": {
-            "back_to_projects": "Back to projects",
-            "no_projects": {
-                "title": "No projects found",
-                "description": "Try searching for another term"
-            }
-        },
-        "feedpeoplegrid": {
-            "loading": "Finding people...",
-            "no_users": {
-                "title": "No people found",
-                "description": "Try searching for a name or username"
-            }
-        },
-        "usercard": {
-            "no_title": "No title defined",
-            "no_skills": "No skills listed",
-            "view_profile": "View Profile"
-        }
+    "password": {
+      "title": "Change Password",
+      "description": "Update your password to keep your account secure.",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm Password",
+      "button": "Update Password",
+      "buttonUpdating": "Updating...",
+      "errors": {
+        "user_not_found": "User not found or password not set",
+        "incorrect_password": "Incorrect password",
+        "unauthorized": "Unauthorized",
+        "email_mismatch": "Email does not match your account email"
+      },
+      "success_message": "Password updated successfully",
+      "create_title": "Create Password",
+      "create_description": "You don't have a password set. Create one to enable email login.",
+      "confirm_email_label": "Confirm your email",
+      "button_create": "Create Password"
     },
-    "header": {
-        "explore": "Explore",
-        "about": "About",
-        "login": "Login",
-        "profile": "Profile",
-        "settings": "Settings",
-        "logout": "Log out"
-    },
-    "profile": {
-        "alt_cover": "Profile cover",
-        "alt_avatar": "Profile picture",
-        "change_photo": "Change photo",
-        "no_title": "No title defined",
-        "no_description": "No description",
-        "about_section": "About",
-        "education_section": "Education",
-        "skills_section": "Skills",
-        "education_mock": {
-            "degree": "Computer Science",
-            "school": "University of Technology",
-            "year": "2018 - 2022"
-        },
-        "skills_empty": "No skills listed",
-        "stats_section": "Statistics",
-        "pinned_projects_section": "Featured Projects",
-        "stat_commits": "Commits",
-        "stat_prs": "Pull Requests",
-        "stat_issues": "Issues",
-        "stat_projects": "Projects analyzed",
-        "stat_lines_changed": "Lines Changed",
-        "stat_active_days": "Active Days",
-        "pinned_projects_empty": "This user hasn't pinned any projects yet.",
-        "add_pinned_project": "Add Pinned Project",
-        "select_project_to_pin": "Select a project to pin",
-        "pin_error_limit_reached": "You can only pin up to 3 projects.",
-        "unpin_project": "Unpin Project",
-        "search_projects_placeholder": "Search projects...",
-        "success": "Success",
-        "error": "Error",
-        "unexpected_error": "An unexpected error occurred.",
-        "saving": "Saving...",
-        "currently": "Currently",
-        "views": "views",
-        "likes": "likes",
-        "followers": "followers",
-        "following": "following",
-        "follow": "Follow",
-        "unfollow": "Following",
-        "follows_you": "Follows you",
-        "network": {
-            "followers": "Followers",
-            "following": "Following",
-            "search_placeholder": "Search users...",
-            "no_results": "No results found",
-            "no_results_desc": "Try searching for another name or username.",
-            "loading": "Loading..."
-        },
-        "stat_last_commit_label": "Last commit",
-        "stat_no_commits": "No recent commits found",
-        "stat_updated_label": "Updated",
-        "relative_time": {
-            "just_now": "just now",
-            "m": "m",
-            "h": "h",
-            "d": "d"
-        },
-        "edit_profile": "Edit Profile",
-        "edit_details": "Edit details",
-        "contact": "Contact",
-        "copy_email": "Copy Email",
-        "send_email": "Send Email",
-        "email_copied": "Email copied to clipboard!",
-        "no_email_error": "This user has not provided an email",
-        "search_placeholder": "Search...",
-        "tabs": {
-            "projects": "Projects",
-            "profile": "Profile",
-            "certifications": "Certifications",
-            "participations": "Participations"
-        },
-        "back_to_projects": "Back to projects",
-        "new_project": "New project",
-        "new_certification": "New certification",
-        "new_participation": "New participation",
-        "no_projects_found": {
-            "title": "No projects yet",
-            "description": "This user hasn't published any projects here yet."
-        },
-        "edit_modal": {
-            "title": "Edit Profile",
-            "name_label": "Name",
-            "name_placeholder": "Your full name",
-            "job_label": "Title / Job",
-            "job_placeholder": "Ex: Full Stack Developer",
-            "headline_label": "Headline",
-            "headline_placeholder": "Briefly describe your focus (e.g. React | Node.js | UI/UX)",
-            "social_title": "Social Media",
-            "github_label": "GitHub URL",
-            "github_placeholder": "github.com/your-username",
-            "linkedin_label": "LinkedIn URL",
-            "linkedin_placeholder": "linkedin.com/in/your-username",
-            "website_label": "Website / Portfolio",
-            "website_placeholder": "your-site.com",
-            "cancel": "Cancel",
-            "save": "Save Changes",
-            "saving": "Saving...",
-            "success": "Profile updated successfully!",
-            "error": "Error updating profile",
-            "unexpected_error": "Unexpected error updating profile",
-            "avatar_success": "Avatar updated successfully!",
-            "avatar_error": "Unexpected error uploading avatar.",
-            "avatar_hint": "Click to upload a new avatar"
-        },
-        "edit_section_modal": {
-            "title": "Edit Profile Details",
-            "long_bio_label": "About Me (Detailed)",
-            "long_bio_placeholder": "Describe your professional journey in detail...",
-            "education_label": "Academic Formation",
-            "add_button": "Add",
-            "course_label": "Course",
-            "course_placeholder": "Ex: Software Engineering",
-            "institution_label": "Institution",
-            "institution_placeholder": "Ex: MIT, Stanford, etc.",
-            "start_label": "Start",
-            "end_label": "End",
-            "currently_label": "Currently",
-            "skills_label": "Skills",
-            "skills_placeholder": "Type a skill and press Enter",
-            "skills_none": "No skills added",
-            "education_none": "No education listed"
-        },
-        "contact_section": {
-            "title": "Contact",
-            "phone_label": "Phone Number",
-            "email_label": "Email",
-            "copy": "Copy",
-            "copied": "Copied!",
-            "edit": "Edit",
-            "save": "Save",
-            "cancel": "Cancel",
-            "country_selector": "Select Country",
-            "phone_placeholder": "+55 (11) 99999-9999",
-            "email_placeholder": "example@email.com",
-            "no_phone": "No phone added",
-            "no_email": "No email added",
-            "validation": {
-                "phone_invalid": "Invalid phone number",
-                "email_invalid": "Invalid email address"
-            }
-        }
-    },
-    "validation": {
-        "name_help": "3–40 characters",
-        "username_help": "3–20 characters, no spaces",
-        "username_checking": "Checking username...",
-        "username_available": "Username available",
-        "email_invalid": "Invalid email format",
-        "email_checking": "Checking email...",
-        "email_available": "Email available",
-        "email_in_use": "This email is already in use",
-        "password_min": "Password must have at least 6 characters",
-        "password_max": "Password must have at most 17 characters",
-        "password_help": "6–17 characters",
-        "passwords_dont_match": "Passwords do not match",
-        "fields_invalid": "Invalid fields",
-        "generic_error": "Unexpected error. Please try again.",
-        "identifier_required": "Email or username is required",
-        "password_required": "Password is required",
-        "name_min": "Name must have at least 3 characters",
-        "name_max": "Name must have at most 20 characters",
-        "username_min": "Username must have at least 3 characters",
-        "username_max": "Username must have at most 20 characters",
-        "username_regex": "Username can only contain letters, numbers, underscores, and hyphens",
-        "current_password_required": "Current password is required",
-        "confirm_password_required": "Confirm password is required",
-        "title_max": "Title must have at most 50 characters",
-        "headline_max": "Headline must have at most 100 characters",
-        "github_invalid": "Use format: github.com/your-username",
-        "linkedin_invalid": "Use format: linkedin.com/in/your-username",
-        "url_invalid": "Invalid URL",
-        "course_required": "Course is required",
-        "institution_required": "Institution is required",
-        "start_date_required": "Start date is required",
-        "title_format_invalid": "Invalid title format",
-        "title_empty": "User has no title set",
-        "bio_format_invalid": "Invalid bio format",
-        "bio_empty": "User has no bio set",
-        "name_format_invalid": "Invalid name format",
-        "name_empty": "User has no name set",
-        "url_format_invalid": "Invalid URL format",
-        "details_update_error": "Unexpected error updating details"
-    },
-    "auth": {
-        "errors": {
-            "title": "Authentication Error",
-            "incorrect_credentials": "Incorrect email/username or password",
-            "too_many_attempts": "Too many login attempts. Please try again later.",
-            "login_generic": "Unable to sign in. Please try again.",
-            "invalid_fields": "Invalid fields",
-            "passwords_mismatch": "Passwords do not match",
-            "email_in_use": "This email is already in use",
-            "username_in_use": "This username is already in use",
-            "create_account_generic": "Unable to create account. Please try again.",
-            "unauthorized": "You must be logged in",
-            "invalid_username": "Invalid username",
-            "invalid_email": "Invalid email address",
-            "user_not_found": "Result user not found",
-            "forgot_password_success": "If this email address is registered, you will receive a recovery link.",
-            "reset_password_error": "Invalid or expired recovery link."
-        },
-        "login": {
-            "welcome_title": "Welcome to Retold",
-            "welcome_subtitle": "Connecting talent with opportunity. Build your professional story and unlock new possibilities.",
-            "feature_journey": "Showcase your professional journey",
-            "feature_leaders": "Connect with industry leaders",
-            "feature_opportunities": "Discover new opportunities",
-            "title": "Sign in",
-            "subtitle": "Enter your credentials to access your account",
-            "identifier_label": "Email or Username",
-            "password_label": "Password",
-            "remember_me": "Remember me",
-            "forgot_password": "Forgot password?",
-            "submit": "Sign in",
-            "submitting": "Signing in...",
-            "social_divider": "Or continue with",
-            "no_account": "Don't have an account?",
-            "create_one": "Create one",
-            "success": "Signed in successfully"
-        },
-        "register": {
-            "welcome_title": "Join Retold",
-            "welcome_subtitle": "Start your professional journey today. Create your portfolio and get discovered.",
-            "title": "Create account",
-            "subtitle": "Fill in your details to get started",
-            "name_label": "Name",
-            "username_label": "Username",
-            "email_label": "Email",
-            "password_label": "Password",
-            "confirm_password_label": "Confirm Password",
-            "username_placeholder": "yourhandle",
-            "submit": "Create account",
-            "submitting": "Creating account...",
-            "has_account": "Already have an account?",
-            "sign_in": "Sign in",
-            "success": "Welcome to Retold",
-            "login_failed": "Account created, but login failed."
-        },
-        "forgot_password": {
-            "welcome_title": "Password Recovery",
-            "welcome_subtitle": "Don't worry, we've got you covered. Enter your email to reset your password.",
-            "title": "Forgot password?",
-            "subtitle": "Enter your email address to verify your account",
-            "submit": "Send Recovery Link",
-            "submitting": "Sending...",
-            "success_message": "Check your email for instructions.",
-            "remember_password": "Remember your password?",
-            "sign_in": "Sign in"
-        },
-        "reset_password": {
-            "welcome_title": "Reset Password",
-            "welcome_subtitle": "Create a new password to secure your account and get back on track.",
-            "title": "New Password",
-            "subtitle": "Enter your new password below",
-            "password_label": "New Password",
-            "submit": "Confirm Change",
-            "submitting": "Updating...",
-            "success_message": "Password changed successfully!",
-            "invalid_link_title": "Invalid Link",
-            "invalid_link_desc": "Token not found in URL. Please make sure you accessed this page from the link sent to your email.",
-            "back_to_login": "Return to Login",
-            "loading": "Loading..."
-        },
-        "choose_username": {
-            "welcome_title": "Almost there!",
-            "welcome_subtitle": "Just one more step to complete your profile. Choose a unique username that represents you.",
-            "feature_identity": "Your unique identity on Retold",
-            "feature_share": "Easy to share and remember",
-            "feature_url": "Your personal portfolio URL",
-            "title": "Choose your username",
-            "welcome_prefix": "Welcome, ",
-            "welcome_suffix": "! Pick a unique username to continue.",
-            "subtitle_default": "Pick a unique username that will be your identity on Retold.",
-            "username_label": "Username",
-            "username_placeholder": "yourhandle",
-            "error_generic": "Something went wrong. Please try again.",
-            "toast_welcome": "Welcome to Retold, @{username}",
-            "continue": "Continue",
-            "setting_up": "Setting up...",
-            "preview_label": "Your profile will be available at:",
-            "help_text": "3–20 characters, letters, numbers, underscores, and hyphens only",
-            "checking": "Checking username...",
-            "available": "Username available"
-        }
-    },
-    "footer": {
-        "rights": "© {year} Retold. All rights reserved.",
-        "terms": "Terms of Service",
-        "privacy": "Privacy Policy",
-        "contact": "Contact"
-    },
-    "legal": {
-        "updated_at": "Last updated: {date}",
-        "terms": {
-            "title": "Terms of Service",
-            "description": "Read Retold's Terms of Service and understand your rights and responsibilities when using our platform.",
-            "intro_title": "1. Introduction",
-            "intro_text": "Welcome to Retold. By accessing or using our platform, you agree to comply with and be bound by these Terms of Service. If you do not agree with any part of these terms, you must not use our services.",
-            "usage_title": "2. Platform Usage",
-            "usage_text": "Retold is a platform designed to allow developers and tech professionals to showcase their portfolios, projects, and skills.",
-            "usage_list": [
-                "You must be at least 13 years old to use this service.",
-                "You are responsible for maintaining the security of your account and password.",
-                "You are responsible for all content posted and activity that occurs under your account.",
-                "You must not use the service for any illegal or unauthorized purpose."
-            ],
-            "content_title": "3. User Content",
-            "content_text": "You retain all rights to the content you submit, post, or display on or through the service. By submitting, posting, or displaying content on or through the service, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, display, and distribute such content in any and all media or distribution methods.",
-            "termination_title": "4. Cancellation and Termination",
-            "termination_text": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease.",
-            "liability_title": "5. Limitation of Liability",
-            "liability_text": "In no event shall Retold, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.",
-            "changes_title": "6. Changes",
-            "changes_text": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. Continued use of the service after any such changes constitutes your acceptance of the new Terms."
-        },
-        "privacy": {
-            "title": "Privacy Policy",
-            "description": "Understand how Retold collects, uses, and protects your personal information and our advertising policies.",
-            "collection_title": "1. Information Collection",
-            "collection_text": "We collect information you provide directly to us, such as when you create an account, update your profile, or communicate with us. This may include your name, email address, profile picture, and project information.",
-            "usage_title": "2. Information Usage",
-            "usage_text": "We use the collected information to:",
-            "usage_list": [
-                "Provide, maintain, and improve our services;",
-                "Process transactions and send related notices;",
-                "Respond to your comments, questions, and requests;",
-                "Monitor and analyze trends, usage, and activities in connection with our services."
-            ],
-            "sharing_title": "3. Information Sharing",
-            "sharing_text": "We do not sell your personal information. We may share aggregated or non-personally identifiable information with partners or third parties for research, analysis, or marketing purposes.",
-            "ads_title": "4. Advertising Policies",
-            "ads_text": "Retold is committed to transparency regarding advertising on our platform.",
-            "ads_list": [
-                {
-                    "title": "Third-Party Ads:",
-                    "text": "We may display third-party advertisements and use cookies or other tracking technologies to deliver relevant ads based on your interests."
-                },
-                {
-                    "title": "User Data:",
-                    "text": "We do not share your personally identifiable information (such as name or email) with advertisers without your explicit consent."
-                },
-                {
-                    "title": "Control:",
-                    "text": "You can adjust your browser settings to refuse cookies, which may limit the personalization of the ads you see."
-                },
-                {
-                    "title": "Ad Partners:",
-                    "text": "We work with trusted advertising partners who adhere to industry standards for privacy and data protection."
-                }
-            ],
-            "security_title": "5. Data Security",
-            "security_text": "We take reasonable measures to protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. However, no security system is impenetrable, and we cannot guarantee the security of our systems.",
-            "contact_title": "6. Contact",
-            "contact_text": "If you have any questions about this Privacy Policy, please contact us via our support email."
-        }
+    "connectedAccounts": {
+      "title": "Connected Accounts",
+      "description": "Manage your connected accounts for easier login.",
+      "github": "Connect your GitHub account",
+      "connected": "Connected",
+      "connect": "Connect",
+      "loading": "Loading...",
+      "already_linked_error": "This GitHub account is already linked to another user.",
+      "error_title": "Error"
     }
+  },
+  "project": {
+    "status": {
+      "PENDING": "Pending",
+      "ANALYZING": "Processing",
+      "DONE": "Analyzed",
+      "ERROR": "Error"
+    },
+    "analysis": {
+      "started": "Analysis started",
+      "start_error": "Failed to start analysis"
+    },
+    "metrics": {
+      "language": "Language",
+      "architecture": "Architecture",
+      "complexity": "Complexity",
+      "files": "{count} files"
+    },
+    "overlay": {
+      "analysis_not_started": {
+        "title": "Analysis Not Started",
+        "description": "The owner has not processed this project yet."
+      },
+      "details": "Project Details",
+      "analysis_error": {
+        "title": "Analysis Error",
+        "description": "Could not analyze the technical details of this project."
+      },
+      "pending_view": {
+        "title": "Project Analysis",
+        "description": "Generate a full technical report with insights about architecture, stack, and code quality.",
+        "button": "Run Analysis"
+      },
+      "analyzing_view": {
+        "title": "Analyzing Repository",
+        "description": "Identifying technologies and patterns..."
+      },
+      "error_view": {
+        "title": "Analysis Failed",
+        "description": "Could not process the repository data.",
+        "button": "Try Again"
+      },
+      "rate_limited_view": {
+        "title": "Service Temporarily Unavailable",
+        "description": "We've reached our analysis limit for today. Please try again in about 1 hour.",
+        "button": "Retry Later"
+      },
+      "sections": {
+        "summary": "Executive Summary",
+        "tech_stack": "Tech Stack",
+        "files": "Files",
+        "infra": "Infra & Quality",
+        "structure": "Structure",
+        "strengths": "Key Strengths",
+        "architecture": "Architecture",
+        "suggestions": "Suggestions",
+        "loading_report": "Loading report data..."
+      },
+      "stats": {
+        "source": "Source",
+        "tests": "Tests",
+        "config": "Config",
+        "docs": "Docs",
+        "total_files": "Total Files",
+        "sources": "Sources",
+        "code_files": "Code Files",
+        "infra_setup": "Infra & Setup",
+        "tests_found": "Tests found",
+        "no_tests": "No tests"
+      },
+      "infra": {
+        "ci_cd": "CI/CD Pipeline",
+        "docker": "Container (Docker)",
+        "lint": "Linting / Formatting",
+        "tests": "Test Coverage",
+        "active": "Active",
+        "missing": "Missing"
+      },
+      "structure": {
+        "src": "/src",
+        "tests": "/tests",
+        "depth": "Max Depth",
+        "present": "Present",
+        "missing": "Missing"
+      },
+      "architecture_types": {
+        "monorepo": "Monorepo",
+        "monolith": "Monolith",
+        "modular_monolith": "Modular Monolith",
+        "microservices": "Microservices",
+        "library": "Library",
+        "cli_tool": "CLI Tool",
+        "mobile_app": "Mobile App",
+        "static_site": "Static Site",
+        "unknown": "Unknown"
+      },
+      "gallery": {
+        "alt_preview": "Project preview",
+        "alt_active": "Active project preview",
+        "alt_index": "Preview {index}"
+      },
+      "ownership": {
+        "authored_prefix": "Authored",
+        "authored_suffix": "of the codebase"
+      },
+      "llm_empty_overview": "No overview available.",
+      "llm_empty_architecture": "No architecture details."
+    },
+    "create_panel": {
+      "title": "New project",
+      "subtitle": "Fill in the information for your new project",
+      "labels": {
+        "title": "Title",
+        "description": "Description",
+        "visibility": "Visibility",
+        "images": "Project Images",
+        "repository": "Repository"
+      },
+      "placeholders": {
+        "title": "Name of your project",
+        "description": "A brief description of the project",
+        "visibility": "Select visibility"
+      },
+      "visibility_options": {
+        "public": "Public",
+        "private": "Private"
+      },
+      "images_hint": "Add up to 3 images to highlight your project",
+      "tooltips": {
+        "move_left": "Move left",
+        "move_right": "Move right",
+        "remove": "Remove"
+      },
+      "add": "Add",
+      "repo_hint": "Select a GitHub repository",
+      "repo_loading": "Loading repositories...",
+      "repo_selected": "Selected",
+      "repo_none": "No repository connected yet.",
+      "repo_manage": "Manage repositories",
+      "repo_connect": "Connect repositories",
+      "cancel": "Cancel",
+      "submit": "Create project",
+      "submitting": "Creating...",
+      "uploading_images": "Uploading images...",
+      "toast": {
+        "success": "Project created successfully!",
+        "error": "Error creating project. Try again.",
+        "max_images": "Maximum of 3 images allowed.",
+        "already_exists": "You already have a project for this repository.",
+        "repo_not_found": "Repository not found or disconnected.",
+        "no_files": "No images provided.",
+        "upload_failed": "Failed to upload project images."
+      }
+    },
+    "settings_modal": {
+      "edit_project": "Edit project",
+      "delete_project": "Delete project",
+      "title": "Edit Project",
+      "images_label": "Project Images",
+      "max_images_hint": "Max 3 images",
+      "remove_image_tooltip": "Remove image",
+      "add": "Add",
+      "labels": {
+        "title": "Title",
+        "description": "Description"
+      },
+      "placeholders": {
+        "title": "Project name",
+        "description": "Short description"
+      },
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "remove_img_modal": {
+        "title": "Remove image?",
+        "description": "This image will be removed when you save changes.",
+        "confirm": "Remove"
+      },
+      "delete_project_modal": {
+        "title": "Delete Project?",
+        "description": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+        "confirm": "Yes, delete project",
+        "deleting": "Deleting..."
+      },
+      "toast": {
+        "success": "Project updated successfully!",
+        "error": "Error saving changes",
+        "delete_success": "Project deleted successfully!",
+        "delete_error": "Error deleting project",
+        "title_required": "Title cannot be empty",
+        "max_images": "Maximum of 3 images allowed."
+      }
+    }
+  },
+  "feed": {
+    "feedhero": {
+      "title_prefix": "Showcase your",
+      "title_highlight": "portfolio",
+      "subtitle": "More than code, show impact. The place where developers build authority through real projects.",
+      "create_profile": "Create my profile",
+      "new_project": "New project",
+      "explore_projects": "Explore projects",
+      "free_portfolio": "Free Portfolio",
+      "community_feedback": "Community Feedback",
+      "featured_week": "Featured of the week",
+      "loading_featured": "Loading featured...",
+      "worker_analysis": "Worker Analysis",
+      "tests": "Tests",
+      "performance": "Performance",
+      "excellent": "Excellent",
+      "clean_code": "Clean and optimized code"
+    },
+    "feedcontent": {
+      "tabs": {
+        "projects": "Projects",
+        "people": "People"
+      },
+      "search_placeholder": "Search projects, people, tags...",
+      "people_coming_soon": {
+        "title": "Coming soon",
+        "description": "People search will be available soon"
+      }
+    },
+    "feedprojectsgrid": {
+      "back_to_projects": "Back to projects",
+      "no_projects": {
+        "title": "No projects found",
+        "description": "Try searching for another term"
+      }
+    },
+    "feedpeoplegrid": {
+      "loading": "Finding people...",
+      "no_users": {
+        "title": "No people found",
+        "description": "Try searching for a name or username"
+      }
+    },
+    "usercard": {
+      "no_title": "No title defined",
+      "no_skills": "No skills listed",
+      "view_profile": "View Profile"
+    }
+  },
+  "header": {
+    "explore": "Explore",
+    "about": "About",
+    "login": "Login",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "profile": {
+    "alt_cover": "Profile cover",
+    "alt_avatar": "Profile picture",
+    "change_photo": "Change photo",
+    "no_title": "No title defined",
+    "no_description": "No description",
+    "about_section": "About",
+    "education_section": "Education",
+    "skills_section": "Skills",
+    "education_mock": {
+      "degree": "Computer Science",
+      "school": "University of Technology",
+      "year": "2018 - 2022"
+    },
+    "skills_empty": "No skills listed",
+    "stats_section": "Statistics",
+    "pinned_projects_section": "Featured Projects",
+    "stat_commits": "Commits",
+    "stat_prs": "Pull Requests",
+    "stat_issues": "Issues",
+    "stat_projects": "Projects analyzed",
+    "stat_lines_changed": "Lines Changed",
+    "stat_active_days": "Active Days",
+    "pinned_projects_empty": "This user hasn't pinned any projects yet.",
+    "add_pinned_project": "Add Pinned Project",
+    "select_project_to_pin": "Select a project to pin",
+    "pin_error_limit_reached": "You can only pin up to 3 projects.",
+    "unpin_project": "Unpin Project",
+    "search_projects_placeholder": "Search projects...",
+    "success": "Success",
+    "error": "Error",
+    "unexpected_error": "An unexpected error occurred.",
+    "saving": "Saving...",
+    "currently": "Currently",
+    "views": "views",
+    "likes": "likes",
+    "followers": "followers",
+    "following": "following",
+    "follow": "Follow",
+    "unfollow": "Following",
+    "follows_you": "Follows you",
+    "network": {
+      "followers": "Followers",
+      "following": "Following",
+      "search_placeholder": "Search users...",
+      "no_results": "No results found",
+      "no_results_desc": "Try searching for another name or username.",
+      "loading": "Loading..."
+    },
+    "stat_last_commit_label": "Last commit",
+    "stat_no_commits": "No recent commits found",
+    "stat_updated_label": "Updated",
+    "relative_time": {
+      "just_now": "just now",
+      "m": "m",
+      "h": "h",
+      "d": "d"
+    },
+    "edit_profile": "Edit Profile",
+    "edit_details": "Edit details",
+    "contact": "Contact",
+    "copy_email": "Copy Email",
+    "send_email": "Send Email",
+    "email_copied": "Email copied to clipboard!",
+    "no_email_error": "This user has not provided an email",
+    "search_placeholder": "Search...",
+    "tabs": {
+      "projects": "Projects",
+      "profile": "Profile",
+      "certifications": "Certifications",
+      "participations": "Participations"
+    },
+    "back_to_projects": "Back to projects",
+    "new_project": "New project",
+    "new_certification": "New certification",
+    "new_participation": "New participation",
+    "no_projects_found": {
+      "title": "No projects yet",
+      "description": "This user hasn't published any projects here yet."
+    },
+    "edit_modal": {
+      "title": "Edit Profile",
+      "name_label": "Name",
+      "name_placeholder": "Your full name",
+      "job_label": "Title / Job",
+      "job_placeholder": "Ex: Full Stack Developer",
+      "headline_label": "Headline",
+      "headline_placeholder": "Briefly describe your focus (e.g. React | Node.js | UI/UX)",
+      "social_title": "Social Media",
+      "github_label": "GitHub URL",
+      "github_placeholder": "github.com/your-username",
+      "linkedin_label": "LinkedIn URL",
+      "linkedin_placeholder": "linkedin.com/in/your-username",
+      "website_label": "Website / Portfolio",
+      "website_placeholder": "your-site.com",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "success": "Profile updated successfully!",
+      "error": "Error updating profile",
+      "unexpected_error": "Unexpected error updating profile",
+      "avatar_success": "Avatar updated successfully!",
+      "avatar_error": "Unexpected error uploading avatar.",
+      "avatar_hint": "Click to upload a new avatar"
+    },
+    "edit_section_modal": {
+      "title": "Edit Profile Details",
+      "long_bio_label": "About Me (Detailed)",
+      "long_bio_placeholder": "Describe your professional journey in detail...",
+      "education_label": "Academic Formation",
+      "add_button": "Add",
+      "course_label": "Course",
+      "course_placeholder": "Ex: Software Engineering",
+      "institution_label": "Institution",
+      "institution_placeholder": "Ex: MIT, Stanford, etc.",
+      "start_label": "Start",
+      "end_label": "End",
+      "currently_label": "Currently",
+      "skills_label": "Skills",
+      "skills_placeholder": "Type a skill and press Enter",
+      "skills_none": "No skills added",
+      "education_none": "No education listed"
+    },
+    "contact_section": {
+      "title": "Contact",
+      "phone_label": "Phone Number",
+      "email_label": "Email",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "country_selector": "Select Country",
+      "phone_placeholder": "+55 (11) 99999-9999",
+      "email_placeholder": "example@email.com",
+      "no_phone": "No phone added",
+      "no_email": "No email added",
+      "validation": {
+        "phone_invalid": "Invalid phone number",
+        "email_invalid": "Invalid email address"
+      }
+    }
+  },
+  "validation": {
+    "name_help": "3–40 characters",
+    "username_help": "3–20 characters, no spaces",
+    "username_checking": "Checking username...",
+    "username_available": "Username available",
+    "email_invalid": "Invalid email format",
+    "email_checking": "Checking email...",
+    "email_available": "Email available",
+    "email_in_use": "This email is already in use",
+    "password_min": "Password must have at least 6 characters",
+    "password_max": "Password must have at most 17 characters",
+    "password_help": "6–17 characters",
+    "passwords_dont_match": "Passwords do not match",
+    "fields_invalid": "Invalid fields",
+    "generic_error": "Unexpected error. Please try again.",
+    "identifier_required": "Email or username is required",
+    "password_required": "Password is required",
+    "name_min": "Name must have at least 3 characters",
+    "name_max": "Name must have at most 20 characters",
+    "username_min": "Username must have at least 3 characters",
+    "username_max": "Username must have at most 20 characters",
+    "username_regex": "Username can only contain letters, numbers, underscores, and hyphens",
+    "current_password_required": "Current password is required",
+    "confirm_password_required": "Confirm password is required",
+    "title_max": "Title must have at most 50 characters",
+    "headline_max": "Headline must have at most 100 characters",
+    "github_invalid": "Use format: github.com/your-username",
+    "linkedin_invalid": "Use format: linkedin.com/in/your-username",
+    "url_invalid": "Invalid URL",
+    "course_required": "Course is required",
+    "institution_required": "Institution is required",
+    "start_date_required": "Start date is required",
+    "title_format_invalid": "Invalid title format",
+    "title_empty": "User has no title set",
+    "bio_format_invalid": "Invalid bio format",
+    "bio_empty": "User has no bio set",
+    "name_format_invalid": "Invalid name format",
+    "name_empty": "User has no name set",
+    "url_format_invalid": "Invalid URL format",
+    "details_update_error": "Unexpected error updating details"
+  },
+  "auth": {
+    "errors": {
+      "title": "Authentication Error",
+      "incorrect_credentials": "Incorrect email/username or password",
+      "too_many_attempts": "Too many login attempts. Please try again later.",
+      "login_generic": "Unable to sign in. Please try again.",
+      "invalid_fields": "Invalid fields",
+      "passwords_mismatch": "Passwords do not match",
+      "email_in_use": "This email is already in use",
+      "username_in_use": "This username is already in use",
+      "create_account_generic": "Unable to create account. Please try again.",
+      "unauthorized": "You must be logged in",
+      "invalid_username": "Invalid username",
+      "invalid_email": "Invalid email address",
+      "user_not_found": "Result user not found",
+      "forgot_password_success": "If this email address is registered, you will receive a recovery link.",
+      "reset_password_error": "Invalid or expired recovery link."
+    },
+    "login": {
+      "welcome_title": "Welcome to Retold",
+      "welcome_subtitle": "Connecting talent with opportunity. Build your professional story and unlock new possibilities.",
+      "feature_journey": "Showcase your professional journey",
+      "feature_leaders": "Connect with industry leaders",
+      "feature_opportunities": "Discover new opportunities",
+      "title": "Sign in",
+      "subtitle": "Enter your credentials to access your account",
+      "identifier_label": "Email or Username",
+      "password_label": "Password",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot password?",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "social_divider": "Or continue with",
+      "no_account": "Don't have an account?",
+      "create_one": "Create one",
+      "success": "Signed in successfully"
+    },
+    "register": {
+      "welcome_title": "Join Retold",
+      "welcome_subtitle": "Start your professional journey today. Create your portfolio and get discovered.",
+      "title": "Create account",
+      "subtitle": "Fill in your details to get started",
+      "name_label": "Name",
+      "username_label": "Username",
+      "email_label": "Email",
+      "password_label": "Password",
+      "confirm_password_label": "Confirm Password",
+      "username_placeholder": "yourhandle",
+      "submit": "Create account",
+      "submitting": "Creating account...",
+      "has_account": "Already have an account?",
+      "sign_in": "Sign in",
+      "success": "Welcome to Retold",
+      "login_failed": "Account created, but login failed."
+    },
+    "forgot_password": {
+      "welcome_title": "Password Recovery",
+      "welcome_subtitle": "Don't worry, we've got you covered. Enter your email to reset your password.",
+      "title": "Forgot password?",
+      "subtitle": "Enter your email address to verify your account",
+      "submit": "Send Recovery Link",
+      "submitting": "Sending...",
+      "success_message": "Check your email for instructions.",
+      "remember_password": "Remember your password?",
+      "sign_in": "Sign in"
+    },
+    "reset_password": {
+      "welcome_title": "Reset Password",
+      "welcome_subtitle": "Create a new password to secure your account and get back on track.",
+      "title": "New Password",
+      "subtitle": "Enter your new password below",
+      "password_label": "New Password",
+      "submit": "Confirm Change",
+      "submitting": "Updating...",
+      "success_message": "Password changed successfully!",
+      "invalid_link_title": "Invalid Link",
+      "invalid_link_desc": "Token not found in URL. Please make sure you accessed this page from the link sent to your email.",
+      "back_to_login": "Return to Login",
+      "loading": "Loading..."
+    },
+    "choose_username": {
+      "welcome_title": "Almost there!",
+      "welcome_subtitle": "Just one more step to complete your profile. Choose a unique username that represents you.",
+      "feature_identity": "Your unique identity on Retold",
+      "feature_share": "Easy to share and remember",
+      "feature_url": "Your personal portfolio URL",
+      "title": "Choose your username",
+      "welcome_prefix": "Welcome, ",
+      "welcome_suffix": "! Pick a unique username to continue.",
+      "subtitle_default": "Pick a unique username that will be your identity on Retold.",
+      "username_label": "Username",
+      "username_placeholder": "yourhandle",
+      "error_generic": "Something went wrong. Please try again.",
+      "toast_welcome": "Welcome to Retold, @{username}",
+      "continue": "Continue",
+      "setting_up": "Setting up...",
+      "preview_label": "Your profile will be available at:",
+      "help_text": "3–20 characters, letters, numbers, underscores, and hyphens only",
+      "checking": "Checking username...",
+      "available": "Username available"
+    }
+  },
+  "footer": {
+    "rights": "© {year} Retold. All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact"
+  },
+  "legal": {
+    "updated_at": "Last updated: {date}",
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Read Retold's Terms of Service and understand your rights and responsibilities when using our platform.",
+      "intro_title": "1. Introduction",
+      "intro_text": "Welcome to Retold. By accessing or using our platform, you agree to comply with and be bound by these Terms of Service. If you do not agree with any part of these terms, you must not use our services.",
+      "usage_title": "2. Platform Usage",
+      "usage_text": "Retold is a platform designed to allow developers and tech professionals to showcase their portfolios, projects, and skills.",
+      "usage_list": [
+        "You must be at least 13 years old to use this service.",
+        "You are responsible for maintaining the security of your account and password.",
+        "You are responsible for all content posted and activity that occurs under your account.",
+        "You must not use the service for any illegal or unauthorized purpose."
+      ],
+      "content_title": "3. User Content",
+      "content_text": "You retain all rights to the content you submit, post, or display on or through the service. By submitting, posting, or displaying content on or through the service, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, display, and distribute such content in any and all media or distribution methods.",
+      "termination_title": "4. Cancellation and Termination",
+      "termination_text": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease.",
+      "liability_title": "5. Limitation of Liability",
+      "liability_text": "In no event shall Retold, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.",
+      "changes_title": "6. Changes",
+      "changes_text": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. Continued use of the service after any such changes constitutes your acceptance of the new Terms."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "Understand how Retold collects, uses, and protects your personal information and our advertising policies.",
+      "collection_title": "1. Information Collection",
+      "collection_text": "We collect information you provide directly to us, such as when you create an account, update your profile, or communicate with us. This may include your name, email address, profile picture, and project information.",
+      "usage_title": "2. Information Usage",
+      "usage_text": "We use the collected information to:",
+      "usage_list": [
+        "Provide, maintain, and improve our services;",
+        "Process transactions and send related notices;",
+        "Respond to your comments, questions, and requests;",
+        "Monitor and analyze trends, usage, and activities in connection with our services."
+      ],
+      "sharing_title": "3. Information Sharing",
+      "sharing_text": "We do not sell your personal information. We may share aggregated or non-personally identifiable information with partners or third parties for research, analysis, or marketing purposes.",
+      "ads_title": "4. Advertising Policies",
+      "ads_text": "Retold is committed to transparency regarding advertising on our platform.",
+      "ads_list": [
+        {
+          "title": "Third-Party Ads:",
+          "text": "We may display third-party advertisements and use cookies or other tracking technologies to deliver relevant ads based on your interests."
+        },
+        {
+          "title": "User Data:",
+          "text": "We do not share your personally identifiable information (such as name or email) with advertisers without your explicit consent."
+        },
+        {
+          "title": "Control:",
+          "text": "You can adjust your browser settings to refuse cookies, which may limit the personalization of the ads you see."
+        },
+        {
+          "title": "Ad Partners:",
+          "text": "We work with trusted advertising partners who adhere to industry standards for privacy and data protection."
+        }
+      ],
+      "security_title": "5. Data Security",
+      "security_text": "We take reasonable measures to protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. However, no security system is impenetrable, and we cannot guarantee the security of our systems.",
+      "contact_title": "6. Contact",
+      "contact_text": "If you have any questions about this Privacy Policy, please contact us via our support email."
+    }
+  }
 }
