@@ -260,7 +260,8 @@ export function SettingsClient() {
                 {linkError === "already_linked" && (
                   <Alert variant="destructive">
                     <FiAlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
+                    {/* @ts-ignore - Key added dynamically */}
+                    <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
                     <AlertDescription>
                       {/* @ts-ignore - Key added dynamically */}
                       {dict.settings.connectedAccounts.already_linked_error}

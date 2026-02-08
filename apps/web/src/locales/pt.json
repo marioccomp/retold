@@ -1,656 +1,658 @@
 {
-    "settings": {
-        "title": "Configurações",
-        "description": "Gerencie as configurações e preferências da sua conta.",
-        "language": {
-            "title": "Idioma",
-            "description": "Selecione seu idioma de preferência",
-            "label": "Idioma da Interface"
-        },
-        "security": "Segurança",
-        "integrations": "Integrações",
-        "danger": "Zona de Perigo",
-        "dangerZone": {
-            "title": "Excluir Conta",
-            "description": "Exclua permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita. Todos os seus dados de projeto serão perdidos.",
-            "button": "Excluir Conta",
-            "buttonDeleting": "Excluindo...",
-            "toast": {
-                "update_error": "Falha ao atualizar senha",
-                "delete_error": "Falha ao excluir conta",
-                "delete_confirm": "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita e excluirá todos os seus projetos e dados."
-            }
-        },
-        "password": {
-            "title": "Alterar Senha",
-            "description": "Atualize sua senha para manter sua conta segura.",
-            "current": "Senha Atual",
-            "new": "Nova Senha",
-            "confirm": "Confirmar Nova Senha",
-            "button": "Atualizar Senha",
-            "buttonUpdating": "Atualizando...",
-            "errors": {
-                "user_not_found": "Usuário não encontrado ou senha não definida",
-                "incorrect_password": "Senha incorreta",
-                "unauthorized": "Não autorizado",
-                "email_mismatch": "O e-mail não corresponde ao e-mail da sua conta"
-            },
-            "success_message": "Senha atualizada com sucesso",
-            "create_title": "Criar Senha",
-            "create_description": "Você não tem uma senha definida. Crie uma para ativar o login por e-mail.",
-            "confirm_email_label": "Confirme seu e-mail",
-            "button_create": "Criar Senha"
-        },
-        "connectedAccounts": {
-            "title": "Contas Conectadas",
-            "description": "Gerencie suas contas conectadas para facilitar o login.",
-            "github": "Conecte sua conta do GitHub",
-            "connected": "Conectado",
-            "connect": "Conectar",
-            "loading": "Carregando...",
-            "already_linked_error": "Esta conta do GitHub já está vinculada a outro usuário."
-        }
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerencie as configurações e preferências da sua conta.",
+    "language": {
+      "title": "Idioma",
+      "description": "Selecione seu idioma de preferência",
+      "label": "Idioma da Interface"
     },
-    "project": {
-        "status": {
-            "PENDING": "Pendente",
-            "ANALYZING": "Processando",
-            "DONE": "Analisado",
-            "ERROR": "Erro"
-        },
-        "analysis": {
-            "started": "Análise iniciada",
-            "start_error": "Falha ao iniciar análise"
-        },
-        "metrics": {
-            "language": "Linguagem",
-            "architecture": "Arquitetura",
-            "complexity": "Complexidade",
-            "files": "{count} arquivos"
-        },
-        "overlay": {
-            "analysis_not_started": {
-                "title": "Análise não Iniciada",
-                "description": "O proprietário ainda não processou este projeto."
-            },
-            "analysis_error": {
-                "title": "Erro na Análise",
-                "description": "Não foi possível analisar os detalhes técnicos deste projeto."
-            },
-            "pending_view": {
-                "title": "Análise de Projeto",
-                "description": "Gere um relatório técnico completo com insights sobre arquitetura, stack e qualidade de código.",
-                "button": "Executar Análise"
-            },
-            "analyzing_view": {
-                "title": "Analisando Repositório",
-                "description": "Identificando tecnologias e padrões..."
-            },
-            "error_view": {
-                "title": "Falha na Análise",
-                "description": "Não foi possível processar os dados do repositório.",
-                "button": "Tentar Novamente"
-            },
-            "rate_limited_view": {
-                "title": "Serviço Temporariamente Indisponível",
-                "description": "Atingimos nosso limite de análises por hoje. Tente novamente em cerca de 1 hora.",
-                "button": "Tentar Depois"
-            },
-            "sections": {
-                "summary": "Resumo Executivo",
-                "tech_stack": "Stack Tecnológica",
-                "files": "Arquivos",
-                "infra": "Infra & Qualidade",
-                "structure": "Estrutura",
-                "strengths": "Pontos Fortes",
-                "architecture": "Arquitetura",
-                "suggestions": "Sugestões",
-                "loading_report": "Carregando relatório..."
-            },
-            "stats": {
-                "source": "Fonte",
-                "tests": "Testes",
-                "config": "Config",
-                "docs": "Docs",
-                "total_files": "Arquivos Totais",
-                "sources": "Códigos",
-                "code_files": "Arquivos de Código",
-                "infra_setup": "Infra & Config",
-                "tests_found": "Testes encontrados",
-                "no_tests": "Sem testes"
-            },
-            "infra": {
-                "ci_cd": "Pipeline CI/CD",
-                "docker": "Container (Docker)",
-                "lint": "Linting / Formatação",
-                "tests": "Cobertura de Testes",
-                "active": "Ativo",
-                "missing": "Ausente"
-            },
-            "structure": {
-                "src": "/src",
-                "tests": "/tests",
-                "depth": "Profundidade Máx",
-                "present": "Presente",
-                "missing": "Ausente"
-            },
-            "architecture_types": {
-                "monorepo": "Monorepo",
-                "monolith": "Monolito",
-                "modular_monolith": "Monolito Modular",
-                "microservices": "Microsserviços",
-                "library": "Biblioteca",
-                "cli_tool": "Ferramenta CLI",
-                "mobile_app": "App Mobile",
-                "static_site": "Site Estático",
-                "unknown": "Desconhecido"
-            },
-            "gallery": {
-                "alt_preview": "Prévia do projeto",
-                "alt_active": "Prévia ativa do projeto",
-                "alt_index": "Prévia {index}"
-            },
-            "ownership": {
-                "authored_prefix": "Desenvolveu",
-                "authored_suffix": "do código base"
-            },
-            "llm_empty_overview": "Nenhum resumo disponível.",
-            "llm_empty_architecture": "Nenhum detalhe de arquitetura disponível."
-        },
-        "create_panel": {
-            "title": "Novo projeto",
-            "subtitle": "Preencha as informações do seu novo projeto",
-            "labels": {
-                "title": "Título",
-                "description": "Descrição",
-                "visibility": "Visibilidade",
-                "images": "Imagens do Projeto",
-                "repository": "Repositório"
-            },
-            "placeholders": {
-                "title": "Nome do seu projeto",
-                "description": "Uma breve descrição do projeto",
-                "visibility": "Selecione a visibilidade"
-            },
-            "visibility_options": {
-                "public": "Público",
-                "private": "Privado"
-            },
-            "images_hint": "Adicione até 3 imagens para destacar seu projeto",
-            "tooltips": {
-                "move_left": "Mover para esquerda",
-                "move_right": "Mover para direita",
-                "remove": "Remover"
-            },
-            "add": "Adicionar",
-            "repo_hint": "Selecione um repositório do GitHub",
-            "repo_loading": "Carregando repositórios...",
-            "repo_selected": "Selecionado",
-            "repo_none": "Nenhum repositório conectado ainda.",
-            "repo_manage": "Gerenciar repositórios",
-            "repo_connect": "Conectar repositórios",
-            "cancel": "Cancelar",
-            "submit": "Criar projeto",
-            "submitting": "Criando...",
-            "uploading_images": "Enviando imagens...",
-            "toast": {
-                "success": "Projeto criado com sucesso!",
-                "error": "Erro ao criar projeto. Tente novamente.",
-                "max_images": "Máximo de 3 imagens permitido.",
-                "already_exists": "Você já tem um projeto para este repositório.",
-                "repo_not_found": "Repositório não encontrado ou desconectado.",
-                "no_files": "Nenhuma imagem selecionada.",
-                "upload_failed": "Falha ao enviar as imagens do projeto."
-            }
-        },
-        "settings_modal": {
-            "edit_project": "Editar projeto",
-            "delete_project": "Excluir projeto",
-            "title": "Editar Projeto",
-            "images_label": "Imagens do Projeto",
-            "max_images_hint": "Máximo de 3 imagens",
-            "remove_image_tooltip": "Remover imagem",
-            "add": "Adicionar",
-            "labels": {
-                "title": "Título",
-                "description": "Descrição"
-            },
-            "placeholders": {
-                "title": "Nome do projeto",
-                "description": "Descrição breve"
-            },
-            "cancel": "Cancelar",
-            "save": "Salvar alterações",
-            "saving": "Salvando...",
-            "remove_img_modal": {
-                "title": "Remover imagem?",
-                "description": "Esta imagem será removida quando você salvar as alterações.",
-                "confirm": "Remover"
-            },
-            "delete_project_modal": {
-                "title": "Excluir Projeto?",
-                "description": "Tem certeza que deseja excluir \"{title}\"? Esta ação não pode ser desfeita.",
-                "confirm": "Sim, excluir projeto",
-                "deleting": "Excluindo..."
-            },
-            "toast": {
-                "success": "Projeto atualizado com sucesso!",
-                "error": "Erro ao salvar alterações",
-                "delete_success": "Projeto excluído com sucesso!",
-                "delete_error": "Erro ao excluir projeto",
-                "title_required": "O título não pode estar vazio",
-                "max_images": "Máximo de 3 imagens permitido."
-            }
-        }
+    "security": "Segurança",
+    "integrations": "Integrações",
+    "danger": "Zona de Perigo",
+    "dangerZone": {
+      "title": "Excluir Conta",
+      "description": "Exclua permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita. Todos os seus dados de projeto serão perdidos.",
+      "button": "Excluir Conta",
+      "buttonDeleting": "Excluindo...",
+      "toast": {
+        "update_error": "Falha ao atualizar senha",
+        "delete_error": "Falha ao excluir conta",
+        "delete_confirm": "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita e excluirá todos os seus projetos e dados."
+      }
     },
-    "feed": {
-        "feedhero": {
-            "title_prefix": "Destaque seu",
-            "title_highlight": "portfólio",
-            "subtitle": "Mais que código, mostre impacto. O lugar onde desenvolvedores constroem autoridade através de projetos reais.",
-            "create_profile": "Criar meu perfil",
-            "new_project": "Novo projeto",
-            "explore_projects": "Explorar projetos",
-            "free_portfolio": "Portfólio Grátis",
-            "community_feedback": "Feedback da Comunidade",
-            "featured_week": "Destaque da semana",
-            "loading_featured": "Carregando destaque...",
-            "worker_analysis": "Análise do Worker",
-            "tests": "Testes",
-            "performance": "Performance",
-            "excellent": "Excelente",
-            "clean_code": "Código limpo e otimizado"
-        },
-        "feedcontent": {
-            "tabs": {
-                "projects": "Projetos",
-                "people": "Pessoas"
-            },
-            "search_placeholder": "Buscar projetos, pessoas, tags...",
-            "people_coming_soon": {
-                "title": "Em breve",
-                "description": "A busca de pessoas estará disponível em breve"
-            }
-        },
-        "feedprojectsgrid": {
-            "back_to_projects": "Voltar para projetos",
-            "no_projects": {
-                "title": "Nenhum projeto encontrado",
-                "description": "Tente buscar por outro termo"
-            }
-        },
-        "feedpeoplegrid": {
-            "loading": "Buscando pessoas...",
-            "no_users": {
-                "title": "Nenhuma pessoa encontrada",
-                "description": "Tente buscar por um nome ou usuário"
-            }
-        },
-        "usercard": {
-            "no_title": "Nenhum título definido",
-            "no_skills": "Nenhuma habilidade listada",
-            "view_profile": "Ver Perfil"
-        }
+    "password": {
+      "title": "Alterar Senha",
+      "description": "Atualize sua senha para manter sua conta segura.",
+      "current": "Senha Atual",
+      "new": "Nova Senha",
+      "confirm": "Confirmar Nova Senha",
+      "button": "Atualizar Senha",
+      "buttonUpdating": "Atualizando...",
+      "errors": {
+        "user_not_found": "Usuário não encontrado ou senha não definida",
+        "incorrect_password": "Senha incorreta",
+        "unauthorized": "Não autorizado",
+        "email_mismatch": "O e-mail não corresponde ao e-mail da sua conta"
+      },
+      "success_message": "Senha atualizada com sucesso",
+      "create_title": "Criar Senha",
+      "create_description": "Você não tem uma senha definida. Crie uma para ativar o login por e-mail.",
+      "confirm_email_label": "Confirme seu e-mail",
+      "button_create": "Criar Senha"
     },
-    "header": {
-        "explore": "Explorar",
-        "about": "Sobre",
-        "login": "Entrar",
-        "profile": "Perfil",
-        "settings": "Configurações",
-        "logout": "Sair"
-    },
-    "profile": {
-        "alt_cover": "Capa do perfil",
-        "alt_avatar": "Foto de perfil",
-        "change_photo": "Alterar foto",
-        "no_title": "Nenhum título definido",
-        "no_description": "Nenhuma descrição",
-        "about_section": "Sobre",
-        "education_section": "Educação",
-        "skills_section": "Habilidades",
-        "education_mock": {
-            "degree": "Ciência da Computação",
-            "school": "Universidade de Tecnologia",
-            "year": "2018 - 2022"
-        },
-        "skills_empty": "Nenhuma habilidade listada",
-        "stats_section": "Estatísticas",
-        "pinned_projects_section": "Projetos em Destaque",
-        "stat_commits": "Commits",
-        "stat_prs": "Pull Requests",
-        "stat_issues": "Issues",
-        "stat_projects": "Projetos analisados",
-        "stat_lines_changed": "Linhas Alteradas",
-        "stat_active_days": "Dias Ativos",
-        "pinned_projects_empty": "Este usuário ainda não fixou nenhum projeto.",
-        "add_pinned_project": "Adicionar Projeto Fixado",
-        "select_project_to_pin": "Selecione um projeto para fixar",
-        "pin_error_limit_reached": "Você só pode fixar até 3 projetos.",
-        "unpin_project": "Desafixar Projeto",
-        "search_projects_placeholder": "Buscar projetos...",
-        "success": "Sucesso",
-        "error": "Erro",
-        "unexpected_error": "Ocorreu um erro inesperado.",
-        "saving": "Salvando...",
-        "currently": "Atualmente",
-        "views": "visualizações",
-        "likes": "curtidas",
-        "followers": "seguidores",
-        "following": "seguindo",
-        "follow": "Seguir",
-        "unfollow": "Seguindo",
-        "follows_you": "Segue você",
-        "network": {
-            "followers": "Seguidores",
-            "following": "Seguindo",
-            "search_placeholder": "Buscar usuários...",
-            "no_results": "Nenhum resultado encontrado",
-            "no_results_desc": "Tente buscar por outro nome ou username.",
-            "loading": "Carregando..."
-        },
-        "stat_last_commit_label": "Último commit",
-        "stat_no_commits": "Nenhum commit recente encontrado",
-        "stat_updated_label": "Atualizado",
-        "relative_time": {
-            "just_now": "agora mesmo",
-            "m": "m",
-            "h": "h",
-            "d": "d"
-        },
-        "edit_profile": "Editar Perfil",
-        "edit_details": "Editar detalhes",
-        "contact": "Contato",
-        "copy_email": "Copiar E-mail",
-        "send_email": "Enviar E-mail",
-        "email_copied": "E-mail copiado para a área de transferência!",
-        "no_email_error": "Este usuário não disponibilizou e-mail",
-        "search_placeholder": "Buscar...",
-        "tabs": {
-            "projects": "Projetos",
-            "profile": "Perfil",
-            "certifications": "Certificações",
-            "participations": "Participações"
-        },
-        "back_to_projects": "Voltar para projetos",
-        "new_project": "Novo projeto",
-        "new_certification": "Nova certificação",
-        "new_participation": "Nova participação",
-        "no_projects_found": {
-            "title": "Nenhum projeto ainda",
-            "description": "Este usuário ainda não publicou nenhum projeto aqui."
-        },
-        "edit_modal": {
-            "title": "Editar Perfil",
-            "name_label": "Nome",
-            "name_placeholder": "Seu nome completo",
-            "job_label": "Título / Cargo",
-            "job_placeholder": "Ex: Desenvolvedor Full Stack",
-            "headline_label": "Headline",
-            "headline_placeholder": "Descreva brevemente seu foco (ex: React | Node.js | UI/UX)",
-            "social_title": "Redes Sociais",
-            "github_label": "URL do GitHub",
-            "github_placeholder": "github.com/seu-usuario",
-            "linkedin_label": "URL do LinkedIn",
-            "linkedin_placeholder": "linkedin.com/in/seu-usuario",
-            "website_label": "Website / Portfólio",
-            "website_placeholder": "seu-site.com",
-            "cancel": "Cancelar",
-            "save": "Salvar Alterações",
-            "saving": "Salvando...",
-            "success": "Perfil atualizado com sucesso!",
-            "error": "Erro ao atualizar perfil",
-            "unexpected_error": "Erro inesperado ao atualizar perfil",
-            "avatar_success": "Avatar atualizado com sucesso!",
-            "avatar_error": "Erro inesperado ao enviar avatar.",
-            "avatar_hint": "Clique para enviar um novo avatar"
-        },
-        "edit_section_modal": {
-            "title": "Editar Detalhes do Perfil",
-            "long_bio_label": "Sobre Mim (Detalhado)",
-            "long_bio_placeholder": "Descreva sua jornada profissional em detalhes...",
-            "education_label": "Formação Acadêmica",
-            "add_button": "Adicionar",
-            "course_label": "Curso",
-            "course_placeholder": "Ex: Engenharia de Software",
-            "institution_label": "Instituição",
-            "institution_placeholder": "Ex: USP, UFRJ, etc.",
-            "start_label": "Início",
-            "end_label": "Término",
-            "currently_label": "Em andamento",
-            "skills_label": "Habilidades",
-            "skills_placeholder": "Digite uma habilidade e aperte Enter",
-            "skills_none": "Nenhuma habilidade adicionada",
-            "education_none": "Nenhuma formação listada"
-        },
-        "contact_section": {
-            "title": "Contato",
-            "phone_label": "Número de Celular",
-            "email_label": "E-mail",
-            "copy": "Copiar",
-            "copied": "Copiado!",
-            "edit": "Editar",
-            "save": "Salvar",
-            "cancel": "Cancelar",
-            "country_selector": "Selecione o País",
-            "phone_placeholder": "+55 (11) 99999-9999",
-            "email_placeholder": "exemplo@email.com",
-            "no_phone": "Nenhum telefone adicionado",
-            "no_email": "Nenhum e-mail adicionado",
-            "validation": {
-                "phone_invalid": "Número de telefone inválido",
-                "email_invalid": "Endereço de e-mail inválido"
-            }
-        }
-    },
-    "validation": {
-        "name_help": "3–40 caracteres",
-        "username_help": "3–20 caracteres, sem espaços",
-        "username_checking": "Verificando disponibilidade...",
-        "username_available": "Nome de usuário disponível",
-        "email_invalid": "Formato de e-mail inválido",
-        "email_checking": "Verificando e-mail...",
-        "email_available": "E-mail disponível",
-        "email_in_use": "Este e-mail já está em uso",
-        "password_min": "A senha deve ter pelo menos 6 caracteres",
-        "password_max": "A senha deve ter no máximo 17 caracteres",
-        "password_help": "6–17 caracteres",
-        "passwords_dont_match": "As senhas não coincidem",
-        "fields_invalid": "Campos inválidos",
-        "generic_error": "Erro inesperado. Por favor, tente novamente.",
-        "identifier_required": "E-mail ou usuário é obrigatório",
-        "password_required": "Senha é obrigatória",
-        "name_min": "Nome deve ter pelo menos 3 caracteres",
-        "name_max": "Nome deve ter no máximo 20 caracteres",
-        "username_min": "Usuário deve ter pelo menos 3 caracteres",
-        "username_max": "Usuário deve ter no máximo 20 caracteres",
-        "username_regex": "Usuário deve conter apenas letras, números, sublinhados e hífens",
-        "current_password_required": "Senha atual é obrigatória",
-        "confirm_password_required": "Confirmação de senha é obrigatória",
-        "title_max": "Título deve ter no máximo 50 caracteres",
-        "headline_max": "Headline deve ter no máximo 100 caracteres",
-        "github_invalid": "Use o formato: github.com/seu-usuario",
-        "linkedin_invalid": "Use o formato: linkedin.com/in/seu-usuario",
-        "url_invalid": "URL inválida",
-        "course_required": "Curso é obrigatório",
-        "institution_required": "Instituição é obrigatória",
-        "start_date_required": "Data de início é obrigatória",
-        "title_format_invalid": "Formato de título inválido",
-        "title_empty": "Usuário não possui título definido",
-        "bio_format_invalid": "Formato de bio inválido",
-        "bio_empty": "Usuário não possui bio definida",
-        "name_format_invalid": "Formato de nome inválido",
-        "name_empty": "Usuário não possui nome definido",
-        "url_format_invalid": "Formato de URL inválido",
-        "details_update_error": "Erro inesperado ao atualizar detalhes"
-    },
-    "auth": {
-        "errors": {
-            "title": "Erro de Autenticação",
-            "incorrect_credentials": "E-mail/usuário ou senha incorretos",
-            "too_many_attempts": "Muitas tentativas de login. Tente novamente mais tarde.",
-            "login_generic": "Não foi possível entrar. Tente novamente.",
-            "invalid_fields": "Campos inválidos",
-            "passwords_mismatch": "As senhas não coincidem",
-            "email_in_use": "Este e-mail já está em uso",
-            "username_in_use": "Este nome de usuário já está em uso",
-            "create_account_generic": "Não foi possível criar conta. Tente novamente.",
-            "unauthorized": "Você precisa estar logado",
-            "invalid_username": "Nome de usuário inválido",
-            "invalid_email": "Endereço de e-mail inválido",
-            "user_not_found": "Usuário resultante não encontrado",
-            "forgot_password_success": "Se este endereço de e-mail estiver registrado, você receberá um link de recuperação.",
-            "reset_password_error": "Link de recuperação inválido ou expirado."
-        },
-        "login": {
-            "welcome_title": "Bem-vindo ao Retold",
-            "welcome_subtitle": "Conectando talento com oportunidade. Construa sua história profissional e abra novas possibilidades.",
-            "feature_journey": "Destaque sua jornada profissional",
-            "feature_leaders": "Conecte-se com líderes da indústria",
-            "feature_opportunities": "Descubra novas oportunidades",
-            "title": "Entrar",
-            "subtitle": "Digite suas credenciais para acessar sua conta",
-            "identifier_label": "E-mail ou Usuário",
-            "password_label": "Senha",
-            "remember_me": "Lembrar de mim",
-            "forgot_password": "Esqueceu a senha?",
-            "submit": "Entrar",
-            "submitting": "Entrando...",
-            "social_divider": "Ou continue com",
-            "no_account": "Não tem uma conta?",
-            "create_one": "Crie uma agora",
-            "success": "Logado com sucesso"
-        },
-        "register": {
-            "welcome_title": "Junte-se ao Retold",
-            "welcome_subtitle": "Comece sua jornada profissional hoje. Crie seu portfólio e seja descoberto.",
-            "title": "Criar conta",
-            "subtitle": "Preencha seus dados para começar",
-            "name_label": "Nome",
-            "username_label": "Usuário",
-            "email_label": "E-mail",
-            "password_label": "Senha",
-            "confirm_password_label": "Confirmar Senha",
-            "username_placeholder": "Seu nome de usuário",
-            "submit": "Criar conta",
-            "submitting": "Criando conta...",
-            "has_account": "Já tem uma conta?",
-            "sign_in": "Entrar",
-            "success": "Bem-vindo ao Retold",
-            "login_failed": "Conta criada, mas o login falhou."
-        },
-        "forgot_password": {
-            "welcome_title": "Recuperação de Senha",
-            "welcome_subtitle": "Não se preocupe, estamos aqui para ajudar. Digite seu e-mail para redefinir sua senha.",
-            "title": "Esqueceu a senha?",
-            "subtitle": "Digite seu endereço de e-mail para verificar sua conta",
-            "submit": "Enviar Link de Recuperação",
-            "submitting": "Enviando...",
-            "success_message": "Verifique seu e-mail para instruções.",
-            "remember_password": "Lembrou da sua senha?",
-            "sign_in": "Entrar"
-        },
-        "reset_password": {
-            "welcome_title": "Redefinir Senha",
-            "welcome_subtitle": "Crie uma nova senha para proteger sua conta e voltar ao trabalho.",
-            "title": "Nova Senha",
-            "subtitle": "Digite sua nova senha abaixo",
-            "password_label": "Nova Senha",
-            "submit": "Confirmar Alteração",
-            "submitting": "Atualizando...",
-            "success_message": "Senha alterada com sucesso!",
-            "invalid_link_title": "Link Inválido",
-            "invalid_link_desc": "Token não encontrado na URL. Certifique-se de que você acessou esta página a partir do link enviado para o seu e-mail.",
-            "back_to_login": "Voltar para o Login",
-            "loading": "Carregando..."
-        },
-        "choose_username": {
-            "welcome_title": "Quase lá!",
-            "welcome_subtitle": "Apenas mais um passo para completar seu perfil. Escolha um nome de usuário único que represente você.",
-            "feature_identity": "Sua identidade única no Retold",
-            "feature_share": "Fácil de compartilhar e lembrar",
-            "feature_url": "Sua URL de portfólio pessoal",
-            "title": "Escolha seu nome de usuário",
-            "welcome_prefix": "Bem-vindo, ",
-            "welcome_suffix": "! Escolha um nome de usuário único para continuar.",
-            "subtitle_default": "Escolha um nome de usuário único que será sua identidade no Retold.",
-            "username_label": "Nome de usuário",
-            "username_placeholder": "seu nome de usuário",
-            "error_generic": "Algo deu errado. Por favor, tente novamente.",
-            "toast_welcome": "Bem-vindo ao Retold, @{username}",
-            "continue": "Continuar",
-            "setting_up": "Configurando...",
-            "preview_label": "Seu perfil estará disponível em:",
-            "help_text": "3–20 caracteres, apenas letras, números, sublinhados e hífens",
-            "checking": "Verificando nome de usuário...",
-            "available": "Nome de usuário disponível"
-        }
-    },
-    "footer": {
-        "rights": "© {year} Retold. Todos os direitos reservados.",
-        "terms": "Termos de Serviço",
-        "privacy": "Política de Privacidade",
-        "contact": "Contato"
-    },
-    "legal": {
-        "updated_at": "Última atualização: {date}",
-        "terms": {
-            "title": "Termos de Serviço",
-            "description": "Leia os Termos de Serviço do Retold e entenda seus direitos e responsabilidades ao usar nossa plataforma.",
-            "intro_title": "1. Introdução",
-            "intro_text": "Bem-vindo ao Retold. Ao acessar ou usar nossa plataforma, você concorda em cumprir e estar vinculado a estes Termos de Serviço. Se você não concordar com qualquer parte destes termos, você não deve usar nossos serviços.",
-            "usage_title": "2. Uso da Plataforma",
-            "usage_text": "O Retold é uma plataforma destinada a permitir que desenvolvedores e profissionais de tecnologia mostrem seus portfólios, projetos e habilidades.",
-            "usage_list": [
-                "Você deve ter pelo menos 13 anos para usar este serviço.",
-                "Você é responsável por manter a segurança da sua conta e senha.",
-                "Você é responsável por todo o conteúdo postado e atividade que ocorra sob sua conta.",
-                "Você não deve usar o serviço para qualquer finalidade ilegal ou não autorizada."
-            ],
-            "content_title": "3. Conteúdo do Usuário",
-            "content_text": "Você mantém todos os direitos sobre o conteúdo que você envia, posta ou exibe no ou através do serviço. Ao enviar, postar ou exibir conteúdo no ou através do serviço, você nos concede uma licença mundial, não exclusiva e livre de royalties para usar, copiar, reproduzir, processar, adaptar, modificar, publicar, transmitir, exibir e distribuir tal conteúdo em qualquer e todos os meios de comunicação ou métodos de distribuição.",
-            "termination_title": "4. Cancelamento e Rescisão",
-            "termination_text": "Podemos cancelar ou suspender sua conta imediatamente, sem aviso prévio ou responsabilidade, por qualquer motivo, incluindo, sem limitação, se você violar os Termos. Após a rescisão, seu direito de usar o Serviço cessará imediatamente.",
-            "liability_title": "5. Limitação de Responsabilidade",
-            "liability_text": "Em nenhum caso o Retold, nem seus diretores, funcionários, parceiros, agentes, fornecedores ou afiliados, serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.",
-            "changes_title": "6. Alterações",
-            "changes_text": "Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. O uso continuado do serviço após quaisquer alterações constitui aceitação dos novos Termos."
-        },
-        "privacy": {
-            "title": "Política de Privacidade",
-            "description": "Entenda como o Retold coleta, usa e protege suas informações pessoais e nossas políticas de publicidade.",
-            "collection_title": "1. Coleta de Informações",
-            "collection_text": "Coletamos informações que você nos fornece diretamente, como quando cria uma conta, atualiza seu perfil ou se comunica conosco. Isso pode incluir nome, endereço de e-mail, foto de perfil e informações sobre seus projetos.",
-            "usage_title": "2. Uso das Informações",
-            "usage_text": "Usamos as informações coletadas para:",
-            "usage_list": [
-                "Fornecer, manter e melhorar nossos serviços;",
-                "Processar transações e enviar avisos relacionados;",
-                "Responder aos seus comentários, perguntas e solicitações;",
-                "Monitorar e analisar tendências, uso e atividades em conexão com nossos serviços."
-            ],
-            "sharing_title": "3. Compartilhamento de Informações",
-            "sharing_text": "Não vendemos suas informações pessoais. Podemos compartilhar informações agregadas ou não identificáveis pessoalmente com parceiros ou terceiros para fins de pesquisa, análise ou marketing.",
-            "ads_title": "4. Políticas de Publicidade",
-            "ads_text": "O Retold está comprometido com a transparência em relação à publicidade em nossa plataforma.",
-            "ads_list": [
-                {
-                    "title": "Anúncios de Terceiros:",
-                    "text": "Podemos exibir anúncios de terceiros e usar cookies ou outras tecnologias de rastreamento para fornecer anúncios relevantes com base em seus interesses."
-                },
-                {
-                    "title": "Dados de Usuário:",
-                    "text": "Não compartilhamos suas informações de identificação pessoal (como nome ou e-mail) com anunciantes sem o seu consentimento explícito."
-                },
-                {
-                    "title": "Controle:",
-                    "text": "Você pode ajustar as configurações do seu navegador para recusar cookies, o que pode limitar a personalização dos anúncios que você vê."
-                }
-            ],
-            "security_title": "5. Segurança de Dados",
-            "security_text": "Tomamos medidas razoáveis para proteger suas informações pessoais contra perda, roubo e uso não autorizado, divulgação ou modificação. No entanto, nenhum sistema de segurança é impenetrável e não podemos garantir a segurança total dos nossos sistemas.",
-            "contact_title": "6. Contato",
-            "contact_text": "Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco através do nosso e-mail de suporte."
-        }
+    "connectedAccounts": {
+      "title": "Contas Conectadas",
+      "description": "Gerencie suas contas conectadas para facilitar o login.",
+      "github": "Conecte sua conta do GitHub",
+      "connected": "Conectado",
+      "connect": "Conectar",
+      "loading": "Carregando...",
+      "already_linked_error": "Esta conta do GitHub já está vinculada a outro usuário.",
+      "error_title": "Erro"
     }
+  },
+  "project": {
+    "status": {
+      "PENDING": "Pendente",
+      "ANALYZING": "Processando",
+      "DONE": "Analisado",
+      "ERROR": "Erro"
+    },
+    "analysis": {
+      "started": "Análise iniciada",
+      "start_error": "Falha ao iniciar análise"
+    },
+    "metrics": {
+      "language": "Linguagem",
+      "architecture": "Arquitetura",
+      "complexity": "Complexidade",
+      "files": "{count} arquivos"
+    },
+    "overlay": {
+      "analysis_not_started": {
+        "title": "Análise não Iniciada",
+        "description": "O proprietário ainda não processou este projeto."
+      },
+      "details": "Detalhes do Projeto",
+      "analysis_error": {
+        "title": "Erro na Análise",
+        "description": "Não foi possível analisar os detalhes técnicos deste projeto."
+      },
+      "pending_view": {
+        "title": "Análise de Projeto",
+        "description": "Gere um relatório técnico completo com insights sobre arquitetura, stack e qualidade de código.",
+        "button": "Executar Análise"
+      },
+      "analyzing_view": {
+        "title": "Analisando Repositório",
+        "description": "Identificando tecnologias e padrões..."
+      },
+      "error_view": {
+        "title": "Falha na Análise",
+        "description": "Não foi possível processar os dados do repositório.",
+        "button": "Tentar Novamente"
+      },
+      "rate_limited_view": {
+        "title": "Serviço Temporariamente Indisponível",
+        "description": "Atingimos nosso limite de análises por hoje. Tente novamente em cerca de 1 hora.",
+        "button": "Tentar Depois"
+      },
+      "sections": {
+        "summary": "Resumo Executivo",
+        "tech_stack": "Stack Tecnológica",
+        "files": "Arquivos",
+        "infra": "Infra & Qualidade",
+        "structure": "Estrutura",
+        "strengths": "Pontos Fortes",
+        "architecture": "Arquitetura",
+        "suggestions": "Sugestões",
+        "loading_report": "Carregando relatório..."
+      },
+      "stats": {
+        "source": "Fonte",
+        "tests": "Testes",
+        "config": "Config",
+        "docs": "Docs",
+        "total_files": "Arquivos Totais",
+        "sources": "Códigos",
+        "code_files": "Arquivos de Código",
+        "infra_setup": "Infra & Config",
+        "tests_found": "Testes encontrados",
+        "no_tests": "Sem testes"
+      },
+      "infra": {
+        "ci_cd": "Pipeline CI/CD",
+        "docker": "Container (Docker)",
+        "lint": "Linting / Formatação",
+        "tests": "Cobertura de Testes",
+        "active": "Ativo",
+        "missing": "Ausente"
+      },
+      "structure": {
+        "src": "/src",
+        "tests": "/tests",
+        "depth": "Profundidade Máx",
+        "present": "Presente",
+        "missing": "Ausente"
+      },
+      "architecture_types": {
+        "monorepo": "Monorepo",
+        "monolith": "Monolito",
+        "modular_monolith": "Monolito Modular",
+        "microservices": "Microsserviços",
+        "library": "Biblioteca",
+        "cli_tool": "Ferramenta CLI",
+        "mobile_app": "App Mobile",
+        "static_site": "Site Estático",
+        "unknown": "Desconhecido"
+      },
+      "gallery": {
+        "alt_preview": "Prévia do projeto",
+        "alt_active": "Prévia ativa do projeto",
+        "alt_index": "Prévia {index}"
+      },
+      "ownership": {
+        "authored_prefix": "Desenvolveu",
+        "authored_suffix": "do código base"
+      },
+      "llm_empty_overview": "Nenhum resumo disponível.",
+      "llm_empty_architecture": "Nenhum detalhe de arquitetura disponível."
+    },
+    "create_panel": {
+      "title": "Novo projeto",
+      "subtitle": "Preencha as informações do seu novo projeto",
+      "labels": {
+        "title": "Título",
+        "description": "Descrição",
+        "visibility": "Visibilidade",
+        "images": "Imagens do Projeto",
+        "repository": "Repositório"
+      },
+      "placeholders": {
+        "title": "Nome do seu projeto",
+        "description": "Uma breve descrição do projeto",
+        "visibility": "Selecione a visibilidade"
+      },
+      "visibility_options": {
+        "public": "Público",
+        "private": "Privado"
+      },
+      "images_hint": "Adicione até 3 imagens para destacar seu projeto",
+      "tooltips": {
+        "move_left": "Mover para esquerda",
+        "move_right": "Mover para direita",
+        "remove": "Remover"
+      },
+      "add": "Adicionar",
+      "repo_hint": "Selecione um repositório do GitHub",
+      "repo_loading": "Carregando repositórios...",
+      "repo_selected": "Selecionado",
+      "repo_none": "Nenhum repositório conectado ainda.",
+      "repo_manage": "Gerenciar repositórios",
+      "repo_connect": "Conectar repositórios",
+      "cancel": "Cancelar",
+      "submit": "Criar projeto",
+      "submitting": "Criando...",
+      "uploading_images": "Enviando imagens...",
+      "toast": {
+        "success": "Projeto criado com sucesso!",
+        "error": "Erro ao criar projeto. Tente novamente.",
+        "max_images": "Máximo de 3 imagens permitido.",
+        "already_exists": "Você já tem um projeto para este repositório.",
+        "repo_not_found": "Repositório não encontrado ou desconectado.",
+        "no_files": "Nenhuma imagem selecionada.",
+        "upload_failed": "Falha ao enviar as imagens do projeto."
+      }
+    },
+    "settings_modal": {
+      "edit_project": "Editar projeto",
+      "delete_project": "Excluir projeto",
+      "title": "Editar Projeto",
+      "images_label": "Imagens do Projeto",
+      "max_images_hint": "Máximo de 3 imagens",
+      "remove_image_tooltip": "Remover imagem",
+      "add": "Adicionar",
+      "labels": {
+        "title": "Título",
+        "description": "Descrição"
+      },
+      "placeholders": {
+        "title": "Nome do projeto",
+        "description": "Descrição breve"
+      },
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "saving": "Salvando...",
+      "remove_img_modal": {
+        "title": "Remover imagem?",
+        "description": "Esta imagem será removida quando você salvar as alterações.",
+        "confirm": "Remover"
+      },
+      "delete_project_modal": {
+        "title": "Excluir Projeto?",
+        "description": "Tem certeza que deseja excluir \"{title}\"? Esta ação não pode ser desfeita.",
+        "confirm": "Sim, excluir projeto",
+        "deleting": "Excluindo..."
+      },
+      "toast": {
+        "success": "Projeto atualizado com sucesso!",
+        "error": "Erro ao salvar alterações",
+        "delete_success": "Projeto excluído com sucesso!",
+        "delete_error": "Erro ao excluir projeto",
+        "title_required": "O título não pode estar vazio",
+        "max_images": "Máximo de 3 imagens permitido."
+      }
+    }
+  },
+  "feed": {
+    "feedhero": {
+      "title_prefix": "Destaque seu",
+      "title_highlight": "portfólio",
+      "subtitle": "Mais que código, mostre impacto. O lugar onde desenvolvedores constroem autoridade através de projetos reais.",
+      "create_profile": "Criar meu perfil",
+      "new_project": "Novo projeto",
+      "explore_projects": "Explorar projetos",
+      "free_portfolio": "Portfólio Grátis",
+      "community_feedback": "Feedback da Comunidade",
+      "featured_week": "Destaque da semana",
+      "loading_featured": "Carregando destaque...",
+      "worker_analysis": "Análise do Worker",
+      "tests": "Testes",
+      "performance": "Performance",
+      "excellent": "Excelente",
+      "clean_code": "Código limpo e otimizado"
+    },
+    "feedcontent": {
+      "tabs": {
+        "projects": "Projetos",
+        "people": "Pessoas"
+      },
+      "search_placeholder": "Buscar projetos, pessoas, tags...",
+      "people_coming_soon": {
+        "title": "Em breve",
+        "description": "A busca de pessoas estará disponível em breve"
+      }
+    },
+    "feedprojectsgrid": {
+      "back_to_projects": "Voltar para projetos",
+      "no_projects": {
+        "title": "Nenhum projeto encontrado",
+        "description": "Tente buscar por outro termo"
+      }
+    },
+    "feedpeoplegrid": {
+      "loading": "Buscando pessoas...",
+      "no_users": {
+        "title": "Nenhuma pessoa encontrada",
+        "description": "Tente buscar por um nome ou usuário"
+      }
+    },
+    "usercard": {
+      "no_title": "Nenhum título definido",
+      "no_skills": "Nenhuma habilidade listada",
+      "view_profile": "Ver Perfil"
+    }
+  },
+  "header": {
+    "explore": "Explorar",
+    "about": "Sobre",
+    "login": "Entrar",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "logout": "Sair"
+  },
+  "profile": {
+    "alt_cover": "Capa do perfil",
+    "alt_avatar": "Foto de perfil",
+    "change_photo": "Alterar foto",
+    "no_title": "Nenhum título definido",
+    "no_description": "Nenhuma descrição",
+    "about_section": "Sobre",
+    "education_section": "Educação",
+    "skills_section": "Habilidades",
+    "education_mock": {
+      "degree": "Ciência da Computação",
+      "school": "Universidade de Tecnologia",
+      "year": "2018 - 2022"
+    },
+    "skills_empty": "Nenhuma habilidade listada",
+    "stats_section": "Estatísticas",
+    "pinned_projects_section": "Projetos em Destaque",
+    "stat_commits": "Commits",
+    "stat_prs": "Pull Requests",
+    "stat_issues": "Issues",
+    "stat_projects": "Projetos analisados",
+    "stat_lines_changed": "Linhas Alteradas",
+    "stat_active_days": "Dias Ativos",
+    "pinned_projects_empty": "Este usuário ainda não fixou nenhum projeto.",
+    "add_pinned_project": "Adicionar Projeto Fixado",
+    "select_project_to_pin": "Selecione um projeto para fixar",
+    "pin_error_limit_reached": "Você só pode fixar até 3 projetos.",
+    "unpin_project": "Desafixar Projeto",
+    "search_projects_placeholder": "Buscar projetos...",
+    "success": "Sucesso",
+    "error": "Erro",
+    "unexpected_error": "Ocorreu um erro inesperado.",
+    "saving": "Salvando...",
+    "currently": "Atualmente",
+    "views": "visualizações",
+    "likes": "curtidas",
+    "followers": "seguidores",
+    "following": "seguindo",
+    "follow": "Seguir",
+    "unfollow": "Seguindo",
+    "follows_you": "Segue você",
+    "network": {
+      "followers": "Seguidores",
+      "following": "Seguindo",
+      "search_placeholder": "Buscar usuários...",
+      "no_results": "Nenhum resultado encontrado",
+      "no_results_desc": "Tente buscar por outro nome ou username.",
+      "loading": "Carregando..."
+    },
+    "stat_last_commit_label": "Último commit",
+    "stat_no_commits": "Nenhum commit recente encontrado",
+    "stat_updated_label": "Atualizado",
+    "relative_time": {
+      "just_now": "agora mesmo",
+      "m": "m",
+      "h": "h",
+      "d": "d"
+    },
+    "edit_profile": "Editar Perfil",
+    "edit_details": "Editar detalhes",
+    "contact": "Contato",
+    "copy_email": "Copiar E-mail",
+    "send_email": "Enviar E-mail",
+    "email_copied": "E-mail copiado para a área de transferência!",
+    "no_email_error": "Este usuário não disponibilizou e-mail",
+    "search_placeholder": "Buscar...",
+    "tabs": {
+      "projects": "Projetos",
+      "profile": "Perfil",
+      "certifications": "Certificações",
+      "participations": "Participações"
+    },
+    "back_to_projects": "Voltar para projetos",
+    "new_project": "Novo projeto",
+    "new_certification": "Nova certificação",
+    "new_participation": "Nova participação",
+    "no_projects_found": {
+      "title": "Nenhum projeto ainda",
+      "description": "Este usuário ainda não publicou nenhum projeto aqui."
+    },
+    "edit_modal": {
+      "title": "Editar Perfil",
+      "name_label": "Nome",
+      "name_placeholder": "Seu nome completo",
+      "job_label": "Título / Cargo",
+      "job_placeholder": "Ex: Desenvolvedor Full Stack",
+      "headline_label": "Headline",
+      "headline_placeholder": "Descreva brevemente seu foco (ex: React | Node.js | UI/UX)",
+      "social_title": "Redes Sociais",
+      "github_label": "URL do GitHub",
+      "github_placeholder": "github.com/seu-usuario",
+      "linkedin_label": "URL do LinkedIn",
+      "linkedin_placeholder": "linkedin.com/in/seu-usuario",
+      "website_label": "Website / Portfólio",
+      "website_placeholder": "seu-site.com",
+      "cancel": "Cancelar",
+      "save": "Salvar Alterações",
+      "saving": "Salvando...",
+      "success": "Perfil atualizado com sucesso!",
+      "error": "Erro ao atualizar perfil",
+      "unexpected_error": "Erro inesperado ao atualizar perfil",
+      "avatar_success": "Avatar atualizado com sucesso!",
+      "avatar_error": "Erro inesperado ao enviar avatar.",
+      "avatar_hint": "Clique para enviar um novo avatar"
+    },
+    "edit_section_modal": {
+      "title": "Editar Detalhes do Perfil",
+      "long_bio_label": "Sobre Mim (Detalhado)",
+      "long_bio_placeholder": "Descreva sua jornada profissional em detalhes...",
+      "education_label": "Formação Acadêmica",
+      "add_button": "Adicionar",
+      "course_label": "Curso",
+      "course_placeholder": "Ex: Engenharia de Software",
+      "institution_label": "Instituição",
+      "institution_placeholder": "Ex: USP, UFRJ, etc.",
+      "start_label": "Início",
+      "end_label": "Término",
+      "currently_label": "Em andamento",
+      "skills_label": "Habilidades",
+      "skills_placeholder": "Digite uma habilidade e aperte Enter",
+      "skills_none": "Nenhuma habilidade adicionada",
+      "education_none": "Nenhuma formação listada"
+    },
+    "contact_section": {
+      "title": "Contato",
+      "phone_label": "Número de Celular",
+      "email_label": "E-mail",
+      "copy": "Copiar",
+      "copied": "Copiado!",
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "country_selector": "Selecione o País",
+      "phone_placeholder": "+55 (11) 99999-9999",
+      "email_placeholder": "exemplo@email.com",
+      "no_phone": "Nenhum telefone adicionado",
+      "no_email": "Nenhum e-mail adicionado",
+      "validation": {
+        "phone_invalid": "Número de telefone inválido",
+        "email_invalid": "Endereço de e-mail inválido"
+      }
+    }
+  },
+  "validation": {
+    "name_help": "3–40 caracteres",
+    "username_help": "3–20 caracteres, sem espaços",
+    "username_checking": "Verificando disponibilidade...",
+    "username_available": "Nome de usuário disponível",
+    "email_invalid": "Formato de e-mail inválido",
+    "email_checking": "Verificando e-mail...",
+    "email_available": "E-mail disponível",
+    "email_in_use": "Este e-mail já está em uso",
+    "password_min": "A senha deve ter pelo menos 6 caracteres",
+    "password_max": "A senha deve ter no máximo 17 caracteres",
+    "password_help": "6–17 caracteres",
+    "passwords_dont_match": "As senhas não coincidem",
+    "fields_invalid": "Campos inválidos",
+    "generic_error": "Erro inesperado. Por favor, tente novamente.",
+    "identifier_required": "E-mail ou usuário é obrigatório",
+    "password_required": "Senha é obrigatória",
+    "name_min": "Nome deve ter pelo menos 3 caracteres",
+    "name_max": "Nome deve ter no máximo 20 caracteres",
+    "username_min": "Usuário deve ter pelo menos 3 caracteres",
+    "username_max": "Usuário deve ter no máximo 20 caracteres",
+    "username_regex": "Usuário deve conter apenas letras, números, sublinhados e hífens",
+    "current_password_required": "Senha atual é obrigatória",
+    "confirm_password_required": "Confirmação de senha é obrigatória",
+    "title_max": "Título deve ter no máximo 50 caracteres",
+    "headline_max": "Headline deve ter no máximo 100 caracteres",
+    "github_invalid": "Use o formato: github.com/seu-usuario",
+    "linkedin_invalid": "Use o formato: linkedin.com/in/seu-usuario",
+    "url_invalid": "URL inválida",
+    "course_required": "Curso é obrigatório",
+    "institution_required": "Instituição é obrigatória",
+    "start_date_required": "Data de início é obrigatória",
+    "title_format_invalid": "Formato de título inválido",
+    "title_empty": "Usuário não possui título definido",
+    "bio_format_invalid": "Formato de bio inválido",
+    "bio_empty": "Usuário não possui bio definida",
+    "name_format_invalid": "Formato de nome inválido",
+    "name_empty": "Usuário não possui nome definido",
+    "url_format_invalid": "Formato de URL inválido",
+    "details_update_error": "Erro inesperado ao atualizar detalhes"
+  },
+  "auth": {
+    "errors": {
+      "title": "Erro de Autenticação",
+      "incorrect_credentials": "E-mail/usuário ou senha incorretos",
+      "too_many_attempts": "Muitas tentativas de login. Tente novamente mais tarde.",
+      "login_generic": "Não foi possível entrar. Tente novamente.",
+      "invalid_fields": "Campos inválidos",
+      "passwords_mismatch": "As senhas não coincidem",
+      "email_in_use": "Este e-mail já está em uso",
+      "username_in_use": "Este nome de usuário já está em uso",
+      "create_account_generic": "Não foi possível criar conta. Tente novamente.",
+      "unauthorized": "Você precisa estar logado",
+      "invalid_username": "Nome de usuário inválido",
+      "invalid_email": "Endereço de e-mail inválido",
+      "user_not_found": "Usuário resultante não encontrado",
+      "forgot_password_success": "Se este endereço de e-mail estiver registrado, você receberá um link de recuperação.",
+      "reset_password_error": "Link de recuperação inválido ou expirado."
+    },
+    "login": {
+      "welcome_title": "Bem-vindo ao Retold",
+      "welcome_subtitle": "Conectando talento com oportunidade. Construa sua história profissional e abra novas possibilidades.",
+      "feature_journey": "Destaque sua jornada profissional",
+      "feature_leaders": "Conecte-se com líderes da indústria",
+      "feature_opportunities": "Descubra novas oportunidades",
+      "title": "Entrar",
+      "subtitle": "Digite suas credenciais para acessar sua conta",
+      "identifier_label": "E-mail ou Usuário",
+      "password_label": "Senha",
+      "remember_me": "Lembrar de mim",
+      "forgot_password": "Esqueceu a senha?",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "social_divider": "Ou continue com",
+      "no_account": "Não tem uma conta?",
+      "create_one": "Crie uma agora",
+      "success": "Logado com sucesso"
+    },
+    "register": {
+      "welcome_title": "Junte-se ao Retold",
+      "welcome_subtitle": "Comece sua jornada profissional hoje. Crie seu portfólio e seja descoberto.",
+      "title": "Criar conta",
+      "subtitle": "Preencha seus dados para começar",
+      "name_label": "Nome",
+      "username_label": "Usuário",
+      "email_label": "E-mail",
+      "password_label": "Senha",
+      "confirm_password_label": "Confirmar Senha",
+      "username_placeholder": "Seu nome de usuário",
+      "submit": "Criar conta",
+      "submitting": "Criando conta...",
+      "has_account": "Já tem uma conta?",
+      "sign_in": "Entrar",
+      "success": "Bem-vindo ao Retold",
+      "login_failed": "Conta criada, mas o login falhou."
+    },
+    "forgot_password": {
+      "welcome_title": "Recuperação de Senha",
+      "welcome_subtitle": "Não se preocupe, estamos aqui para ajudar. Digite seu e-mail para redefinir sua senha.",
+      "title": "Esqueceu a senha?",
+      "subtitle": "Digite seu endereço de e-mail para verificar sua conta",
+      "submit": "Enviar Link de Recuperação",
+      "submitting": "Enviando...",
+      "success_message": "Verifique seu e-mail para instruções.",
+      "remember_password": "Lembrou da sua senha?",
+      "sign_in": "Entrar"
+    },
+    "reset_password": {
+      "welcome_title": "Redefinir Senha",
+      "welcome_subtitle": "Crie uma nova senha para proteger sua conta e voltar ao trabalho.",
+      "title": "Nova Senha",
+      "subtitle": "Digite sua nova senha abaixo",
+      "password_label": "Nova Senha",
+      "submit": "Confirmar Alteração",
+      "submitting": "Atualizando...",
+      "success_message": "Senha alterada com sucesso!",
+      "invalid_link_title": "Link Inválido",
+      "invalid_link_desc": "Token não encontrado na URL. Certifique-se de que você acessou esta página a partir do link enviado para o seu e-mail.",
+      "back_to_login": "Voltar para o Login",
+      "loading": "Carregando..."
+    },
+    "choose_username": {
+      "welcome_title": "Quase lá!",
+      "welcome_subtitle": "Apenas mais um passo para completar seu perfil. Escolha um nome de usuário único que represente você.",
+      "feature_identity": "Sua identidade única no Retold",
+      "feature_share": "Fácil de compartilhar e lembrar",
+      "feature_url": "Sua URL de portfólio pessoal",
+      "title": "Escolha seu nome de usuário",
+      "welcome_prefix": "Bem-vindo, ",
+      "welcome_suffix": "! Escolha um nome de usuário único para continuar.",
+      "subtitle_default": "Escolha um nome de usuário único que será sua identidade no Retold.",
+      "username_label": "Nome de usuário",
+      "username_placeholder": "seu nome de usuário",
+      "error_generic": "Algo deu errado. Por favor, tente novamente.",
+      "toast_welcome": "Bem-vindo ao Retold, @{username}",
+      "continue": "Continuar",
+      "setting_up": "Configurando...",
+      "preview_label": "Seu perfil estará disponível em:",
+      "help_text": "3–20 caracteres, apenas letras, números, sublinhados e hífens",
+      "checking": "Verificando nome de usuário...",
+      "available": "Nome de usuário disponível"
+    }
+  },
+  "footer": {
+    "rights": "© {year} Retold. Todos os direitos reservados.",
+    "terms": "Termos de Serviço",
+    "privacy": "Política de Privacidade",
+    "contact": "Contato"
+  },
+  "legal": {
+    "updated_at": "Última atualização: {date}",
+    "terms": {
+      "title": "Termos de Serviço",
+      "description": "Leia os Termos de Serviço do Retold e entenda seus direitos e responsabilidades ao usar nossa plataforma.",
+      "intro_title": "1. Introdução",
+      "intro_text": "Bem-vindo ao Retold. Ao acessar ou usar nossa plataforma, você concorda em cumprir e estar vinculado a estes Termos de Serviço. Se você não concordar com qualquer parte destes termos, você não deve usar nossos serviços.",
+      "usage_title": "2. Uso da Plataforma",
+      "usage_text": "O Retold é uma plataforma destinada a permitir que desenvolvedores e profissionais de tecnologia mostrem seus portfólios, projetos e habilidades.",
+      "usage_list": [
+        "Você deve ter pelo menos 13 anos para usar este serviço.",
+        "Você é responsável por manter a segurança da sua conta e senha.",
+        "Você é responsável por todo o conteúdo postado e atividade que ocorra sob sua conta.",
+        "Você não deve usar o serviço para qualquer finalidade ilegal ou não autorizada."
+      ],
+      "content_title": "3. Conteúdo do Usuário",
+      "content_text": "Você mantém todos os direitos sobre o conteúdo que você envia, posta ou exibe no ou através do serviço. Ao enviar, postar ou exibir conteúdo no ou através do serviço, você nos concede uma licença mundial, não exclusiva e livre de royalties para usar, copiar, reproduzir, processar, adaptar, modificar, publicar, transmitir, exibir e distribuir tal conteúdo em qualquer e todos os meios de comunicação ou métodos de distribuição.",
+      "termination_title": "4. Cancelamento e Rescisão",
+      "termination_text": "Podemos cancelar ou suspender sua conta imediatamente, sem aviso prévio ou responsabilidade, por qualquer motivo, incluindo, sem limitação, se você violar os Termos. Após a rescisão, seu direito de usar o Serviço cessará imediatamente.",
+      "liability_title": "5. Limitação de Responsabilidade",
+      "liability_text": "Em nenhum caso o Retold, nem seus diretores, funcionários, parceiros, agentes, fornecedores ou afiliados, serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.",
+      "changes_title": "6. Alterações",
+      "changes_text": "Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. O uso continuado do serviço após quaisquer alterações constitui aceitação dos novos Termos."
+    },
+    "privacy": {
+      "title": "Política de Privacidade",
+      "description": "Entenda como o Retold coleta, usa e protege suas informações pessoais e nossas políticas de publicidade.",
+      "collection_title": "1. Coleta de Informações",
+      "collection_text": "Coletamos informações que você nos fornece diretamente, como quando cria uma conta, atualiza seu perfil ou se comunica conosco. Isso pode incluir nome, endereço de e-mail, foto de perfil e informações sobre seus projetos.",
+      "usage_title": "2. Uso das Informações",
+      "usage_text": "Usamos as informações coletadas para:",
+      "usage_list": [
+        "Fornecer, manter e melhorar nossos serviços;",
+        "Processar transações e enviar avisos relacionados;",
+        "Responder aos seus comentários, perguntas e solicitações;",
+        "Monitorar e analisar tendências, uso e atividades em conexão com nossos serviços."
+      ],
+      "sharing_title": "3. Compartilhamento de Informações",
+      "sharing_text": "Não vendemos suas informações pessoais. Podemos compartilhar informações agregadas ou não identificáveis pessoalmente com parceiros ou terceiros para fins de pesquisa, análise ou marketing.",
+      "ads_title": "4. Políticas de Publicidade",
+      "ads_text": "O Retold está comprometido com a transparência em relação à publicidade em nossa plataforma.",
+      "ads_list": [
+        {
+          "title": "Anúncios de Terceiros:",
+          "text": "Podemos exibir anúncios de terceiros e usar cookies ou outras tecnologias de rastreamento para fornecer anúncios relevantes com base em seus interesses."
+        },
+        {
+          "title": "Dados de Usuário:",
+          "text": "Não compartilhamos suas informações de identificação pessoal (como nome ou e-mail) com anunciantes sem o seu consentimento explícito."
+        },
+        {
+          "title": "Controle:",
+          "text": "Você pode ajustar as configurações do seu navegador para recusar cookies, o que pode limitar a personalização dos anúncios que você vê."
+        }
+      ],
+      "security_title": "5. Segurança de Dados",
+      "security_text": "Tomamos medidas razoáveis para proteger suas informações pessoais contra perda, roubo e uso não autorizado, divulgação ou modificação. No entanto, nenhum sistema de segurança é impenetrável e não podemos garantir a segurança total dos nossos sistemas.",
+      "contact_title": "6. Contato",
+      "contact_text": "Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco através do nosso e-mail de suporte."
+    }
+  }
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
+import ProjectDetailsModal from "@/src/app/(public)/[username]/(profile)/components/modals/ProjectDetailsModal";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/src/i18n/client";
@@ -80,6 +81,8 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
   };
 
   // Se um projeto está selecionado, mostrar o painel do projeto
+  // REMOVIDO PARA USAR OVERLAY
+  /*
   if (selectedProject) {
     return (
       <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] max-w-[1400px] mx-auto w-full">
@@ -100,17 +103,25 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
       </div>
     );
   }
+  */
 
   if (filteredProjects.length === 0) {
     return (
-      <div className="col-span-full flex flex-col items-center justify-center min-h-[500px] py-16 text-center">
-        <p className="text-[#6b7c7a] text-lg font-medium">
-          {dict.feed.feedprojectsgrid.no_projects.title}
-        </p>
-        <p className="text-[#a0aaa8] text-sm mt-1">
-          {dict.feed.feedprojectsgrid.no_projects.description}
-        </p>
-      </div>
+      <>
+        <div className="col-span-full flex flex-col items-center justify-center min-h-[500px] py-16 text-center">
+          <p className="text-[#6b7c7a] text-lg font-medium">
+            {dict.feed.feedprojectsgrid.no_projects.title}
+          </p>
+          <p className="text-[#a0aaa8] text-sm mt-1">
+            {dict.feed.feedprojectsgrid.no_projects.description}
+          </p>
+        </div>
+        <ProjectDetailsModal
+          isOpen={!!selectedProject}
+          onClose={handleProjectClose}
+          project={selectedProject}
+        />
+      </>
     );
   }
 
@@ -123,6 +134,11 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
           onClick={() => handleProjectClick(project)}
         />
       ))}
+      <ProjectDetailsModal
+        isOpen={!!selectedProject}
+        onClose={handleProjectClose}
+        project={selectedProject}
+      />
     </>
   );
 }
