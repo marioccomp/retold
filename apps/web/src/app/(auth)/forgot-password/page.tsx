@@ -91,9 +91,7 @@ export default function ForgotPasswordForm() {
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
               {dict.auth.forgot_password.title}
             </h2>
-            <p className="text-gray-500 text-center">
-              {dict.auth.forgot_password.subtitle}
-            </p>
+            <p className="text-gray-500 text-center">{dict.auth.forgot_password.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,7 +103,7 @@ export default function ForgotPasswordForm() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="john@example.com"
+                placeholder={dict.auth.forgot_password.email_placeholder}
                 required
                 className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
                 disabled={forgotMutation.isPending}

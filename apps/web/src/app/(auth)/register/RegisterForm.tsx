@@ -166,12 +166,7 @@ export default function RegisterForm() {
         <div className="w-full max-w-[400px]">
           {/* Mobile logo */}
           <div className="flex justify-center mb-8 lg:hidden">
-            <Image
-              src={retoldImg}
-              alt="Retold Logo"
-              priority
-              className="w-50 h-auto"
-            />
+            <Image src={retoldImg} alt="Retold Logo" priority className="w-50 h-auto" />
           </div>
 
           {/* Form header */}
@@ -179,9 +174,7 @@ export default function RegisterForm() {
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
               {dict.auth.register.title}
             </h2>
-            <p className="text-gray-500 text-center">
-              {dict.auth.register.subtitle}
-            </p>
+            <p className="text-gray-500 text-center">{dict.auth.register.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -273,7 +266,7 @@ export default function RegisterForm() {
                 id="email"
                 type="email"
                 name="email"
-                placeholder="john@example.com"
+                placeholder={dict.auth.register.email_placeholder}
                 required
                 className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
                 onChange={() => {
@@ -298,9 +291,7 @@ export default function RegisterForm() {
                 <p className="text-xs text-green-500 mt-1">{dict.validation.email_available}</p>
               )}
               {(emailError || fieldErrors?.email) && (
-                <p className="text-red-500 text-xs mt-1">
-                  {emailError ?? fieldErrors?.email?.[0]}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{emailError ?? fieldErrors?.email?.[0]}</p>
               )}
             </div>
 
@@ -332,7 +323,9 @@ export default function RegisterForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
-                  aria-label={showPassword ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
+                  aria-label={
+                    showPassword ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save
+                  }
                 >
                   {showPassword ? (
                     <FaEye className="text-lg" />
@@ -376,7 +369,11 @@ export default function RegisterForm() {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
-                  aria-label={showConfirmPassword ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
+                  aria-label={
+                    showConfirmPassword
+                      ? dict.profile.edit_modal.saving
+                      : dict.profile.edit_modal.save
+                  }
                 >
                   {showConfirmPassword ? (
                     <FaEye className="text-lg" />
@@ -410,8 +407,20 @@ export default function RegisterForm() {
               {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                   {dict.auth.register.submitting}
                 </span>
@@ -443,10 +452,7 @@ export default function RegisterForm() {
           {/* Login link */}
           <p className="text-center text-gray-500 text-sm mt-4">
             {dict.auth.register.has_account}{" "}
-            <Link
-              href="/login"
-              className="text-[#05dc7f] font-semibold hover:underline"
-            >
+            <Link href="/login" className="text-[#05dc7f] font-semibold hover:underline">
               {dict.auth.register.sign_in}
             </Link>
           </p>

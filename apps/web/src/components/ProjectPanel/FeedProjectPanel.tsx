@@ -208,7 +208,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
             {/* Description & Repo Row */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mt-2 w-full">
               {project.description && (
-                <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl">
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl text-justify">
                   {project.description}
                 </p>
               )}
@@ -229,7 +229,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
             {/* Mobile Repo Link (shown below description on mobile) */}
             {repo && !repo.private && (
-              <div className="md:hidden mt-3 flex justify-start w-full">
+              <div className="md:hidden mt-3 flex justify-center w-full">
                 <a
                   href={repo.url}
                   target="_blank"
@@ -356,14 +356,14 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                         {llm.summary.paragraphs.map((p, i) => (
                           <p
                             key={i}
-                            className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap"
+                            className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap text-justify"
                           >
                             {p}
                           </p>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+                      <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap text-justify">
                         {llm.summary?.description || t.overlay.llm_empty_overview}
                       </p>
                     )}

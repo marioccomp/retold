@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/src/i18n/client";
 import { updateProfileDetails } from "../../../_actions/edit-profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { capitalizeSkill } from "@/lib/utils";
 
 type Props = {
   isOpen: boolean;
@@ -47,8 +48,9 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
   });
 
   const handleAddSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
+    const cleanedSkill = capitalizeSkill(newSkill);
+    if (cleanedSkill && !skills.includes(cleanedSkill)) {
+      setSkills([...skills, cleanedSkill]);
       setNewSkill("");
     }
   };
@@ -65,7 +67,7 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
       onClose();
       return;
     }
-    mutation.mutate({ skills });
+    mutation.mutate({ skills: skills.map(capitalizeSkill) });
   };
 
   const handleOverlayMouseDown = (e: React.MouseEvent) => {
