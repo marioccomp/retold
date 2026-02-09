@@ -49,11 +49,11 @@ export default async function RootLayout({
                     richColors
                     position="top-right"
                     closeButton
-                    expand={true}
-                    visibleToasts={2}
+                    expand={false}
+                    visibleToasts={1}
                     gap={0}
-                    offset={20}
-                    duration={3000}
+                    offset={80}
+                    duration={2000}
                     toastOptions={{
                       className: "sonner-toast",
                       style: {

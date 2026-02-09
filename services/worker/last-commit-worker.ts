@@ -22,6 +22,8 @@ export const lastCommitWorker = new Worker(
       },
     });
 
+    const publicRepos = user?.projects.filter((p) => p.repository?.private === false);
+
     if (!user || user.githubInstallations.length === 0) {
       console.log("no installations or user not found");
       return;
@@ -33,8 +35,8 @@ export const lastCommitWorker = new Worker(
 
     const octokit = new Octokit({ auth: token });
 
-    const repoFullNames = user.projects
-      .map((p) => p.repository?.fullName)
+    const repoFullNames = publicRepos
+      ?.map((p) => p.repository?.fullName)
       .filter(Boolean) as string[];
 
     if (repoFullNames.length === 0) {

@@ -387,9 +387,9 @@
       "name_label": "Nome",
       "name_placeholder": "Seu nome completo",
       "job_label": "Título / Cargo",
-      "job_placeholder": "Ex: Desenvolvedor Full Stack",
-      "headline_label": "Headline",
-      "headline_placeholder": "Descreva brevemente seu foco (ex: React | Node.js | UI/UX)",
+      "job_placeholder": "Ex: Desenvolvedor Javascript Senior",
+      "headline_label": "Bio curta",
+      "headline_placeholder": "Como você se descreve em uma frase? (Ex: Focado em construir APIs performáticas)",
       "social_title": "Redes Sociais",
       "github_label": "URL do GitHub",
       "github_placeholder": "github.com/seu-usuario",
@@ -424,6 +424,11 @@
       "skills_placeholder": "Digite uma habilidade e aperte Enter",
       "skills_none": "Nenhuma habilidade adicionada",
       "education_none": "Nenhuma formação listada"
+    },
+    "social_links": {
+      "add_github": "Adicione seu perfil do GitHub",
+      "add_linkedin": "Adicione seu perfil do LinkedIn",
+      "add_website": "Adicione seu site ou portfólio"
     },
     "contact_section": {
       "title": "Contato",
@@ -513,6 +518,7 @@
       "title": "Entrar",
       "subtitle": "Digite suas credenciais para acessar sua conta",
       "identifier_label": "E-mail ou Usuário",
+      "email_placeholder": "seu@email.com",
       "password_label": "Senha",
       "remember_me": "Lembrar de mim",
       "forgot_password": "Esqueceu a senha?",
@@ -531,6 +537,7 @@
       "name_label": "Nome",
       "username_label": "Usuário",
       "email_label": "E-mail",
+      "email_placeholder": "seu@email.com",
       "password_label": "Senha",
       "confirm_password_label": "Confirmar Senha",
       "username_placeholder": "Seu nome de usuário",
@@ -546,6 +553,7 @@
       "welcome_subtitle": "Não se preocupe, estamos aqui para ajudar. Digite seu e-mail para redefinir sua senha.",
       "title": "Esqueceu a senha?",
       "subtitle": "Digite seu endereço de e-mail para verificar sua conta",
+      "email_placeholder": "seu@email.com",
       "submit": "Enviar Link de Recuperação",
       "submitting": "Enviando...",
       "success_message": "Verifique seu e-mail para instruções.",

@@ -387,9 +387,9 @@
       "name_label": "Name",
       "name_placeholder": "Your full name",
       "job_label": "Title / Job",
-      "job_placeholder": "Ex: Full Stack Developer",
-      "headline_label": "Headline",
-      "headline_placeholder": "Briefly describe your focus (e.g. React | Node.js | UI/UX)",
+      "job_placeholder": "e.g. Senior Javascript Developer",
+      "headline_label": "Short Bio",
+      "headline_placeholder": "How do you describe yourself in one sentence? (e.g. Focused on building high-performance APIs)",
       "social_title": "Social Media",
       "github_label": "GitHub URL",
       "github_placeholder": "github.com/your-username",
@@ -424,6 +424,11 @@
       "skills_placeholder": "Type a skill and press Enter",
       "skills_none": "No skills added",
       "education_none": "No education listed"
+    },
+    "social_links": {
+      "add_github": "Add your GitHub profile",
+      "add_linkedin": "Add your LinkedIn profile",
+      "add_website": "Add your website or portfolio"
     },
     "contact_section": {
       "title": "Contact",
@@ -513,6 +518,7 @@
       "title": "Sign in",
       "subtitle": "Enter your credentials to access your account",
       "identifier_label": "Email or Username",
+      "email_placeholder": "john@example.com",
       "password_label": "Password",
       "remember_me": "Remember me",
       "forgot_password": "Forgot password?",
@@ -531,6 +537,7 @@
       "name_label": "Name",
       "username_label": "Username",
       "email_label": "Email",
+      "email_placeholder": "john@example.com",
       "password_label": "Password",
       "confirm_password_label": "Confirm Password",
       "username_placeholder": "yourhandle",
@@ -546,6 +553,7 @@
       "welcome_subtitle": "Don't worry, we've got you covered. Enter your email to reset your password.",
       "title": "Forgot password?",
       "subtitle": "Enter your email address to verify your account",
+      "email_placeholder": "john@example.com",
       "submit": "Send Recovery Link",
       "submitting": "Sending...",
       "success_message": "Check your email for instructions.",

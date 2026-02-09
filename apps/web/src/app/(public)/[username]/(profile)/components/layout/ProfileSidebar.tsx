@@ -33,12 +33,38 @@ const SocialLinkItem = memo(function SocialLinkItem({
   type,
   url,
   Icon,
+  ownProfile,
+  onAddClick,
+  addTooltip,
 }: {
   type: "github" | "linkedin" | "website";
   url: string | null;
   Icon: typeof FiGithub;
+  ownProfile?: boolean;
+  onAddClick?: () => void;
+  addTooltip?: string;
 }) {
-  if (!url || url.trim() === "") return null;
+  const isEmpty = !url || url.trim() === "";
+
+  // If empty and not profile owner, hide the icon completely
+  if (isEmpty && !ownProfile) return null;
+
+  // If empty but is profile owner, show faded/placeholder state
+  if (isEmpty && ownProfile) {
+    return (
+      <li>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onAddClick}
+          title={addTooltip}
+          className="w-[42px] h-[42px] border border-dashed border-[#c5cccb] rounded-[10px] bg-white/50 text-[#a0aaa8] opacity-50 hover:opacity-80 hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[rgba(5,220,127,0.06)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(5,220,127,0.15)] transition-all cursor-pointer"
+        >
+          <Icon size={18} />
+        </Button>
+      </li>
+    );
+  }
 
   return (
     <li>
@@ -49,7 +75,7 @@ const SocialLinkItem = memo(function SocialLinkItem({
         className="w-[42px] h-[42px] border border-[#e7eae9] rounded-[10px] bg-white text-[#152e2b] hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[rgba(5,220,127,0.06)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(5,220,127,0.2)] transition-all cursor-pointer"
       >
         <a
-          href={url}
+          href={url ?? ""}
           target="_blank"
           rel="noopener noreferrer ugc"
           title={type === "github" ? "GitHub" : type === "linkedin" ? "LinkedIn" : "Website"}
@@ -99,7 +125,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
   });
 
   return (
-    <aside className="flex flex-col items-center w-full md:pl-0 lg:pl-12">
+    <aside className="flex flex-col items-center w-full">
       <div className="-mt-20 sm:-mt-[100px] md:-mt-[110px] lg:-mt-[135px] flex flex-col items-center">
         <div
           className={`relative group ${ownProfile ? "cursor-pointer" : ""}`}
@@ -146,8 +172,11 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
 
       <section className="mt-3 w-full max-w-[300px] md:max-w-full flex flex-col gap-4 items-center">
         {/* Title */}
-        <div className="w-full rounded-xl p-4 text-center border border-[#e7eae9] bg-white shadow-sm overflow-hidden">
-          <h3 className="m-0 break-all overflow-wrap-anywhere inline-block font-semibold text-[#152e2b]">
+        <div className="w-full rounded-xl py-4 px-5 text-center border border-[#e7eae9] bg-white shadow-sm">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-[#a0aaa8] font-black block mb-1.5 opacity-80">
+            {dict.profile.edit_modal.job_label}
+          </span>
+          <h3 className="m-0 break-words font-bold text-[1.1rem] text-[#152e2b] tracking-tight leading-tight">
             {profile.title || (
               <span className="text-[#a0aaa8] italic font-normal text-sm">
                 {dict.profile.no_title}
@@ -157,10 +186,14 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         </div>
 
         {/* Description/Bio */}
-        <div className="w-full rounded-xl p-4 text-center border border-[#e7eae9] bg-white shadow-sm">
-          <p className="m-0 text-[0.95rem] text-[#6b7c7a] leading-relaxed font-medium">
-            {profile.bio || (
-              <span className="text-[#a0aaa8] italic text-sm">{dict.profile.no_description}</span>
+        <div className="w-full rounded-xl p-5 text-center border border-[#e7eae9] bg-[#fafafa]/50 shadow-sm border-dashed">
+          <p className="m-0 text-[1rem] text-[#243b38] leading-relaxed font-medium italic">
+            {profile.bio ? (
+              <>"{profile.bio}"</>
+            ) : (
+              <span className="text-[#a0aaa8] italic text-sm font-normal">
+                {dict.profile.no_description}
+              </span>
             )}
           </p>
         </div>
@@ -201,9 +234,30 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
 
         {/* Social Links */}
         <ul className="flex flex-wrap items-center justify-center gap-3 p-0 m-0 list-none w-full">
-          <SocialLinkItem type="github" url={profile.githubUrl} Icon={FiGithub} />
-          <SocialLinkItem type="linkedin" url={profile.linkedinUrl} Icon={FiLinkedin} />
-          <SocialLinkItem type="website" url={profile.websiteUrl} Icon={FiGlobe} />
+          <SocialLinkItem
+            type="github"
+            url={profile.githubUrl}
+            Icon={FiGithub}
+            ownProfile={ownProfile}
+            onAddClick={onEditClick}
+            addTooltip={dict.profile.social_links?.add_github}
+          />
+          <SocialLinkItem
+            type="linkedin"
+            url={profile.linkedinUrl}
+            Icon={FiLinkedin}
+            ownProfile={ownProfile}
+            onAddClick={onEditClick}
+            addTooltip={dict.profile.social_links?.add_linkedin}
+          />
+          <SocialLinkItem
+            type="website"
+            url={profile.websiteUrl}
+            Icon={FiGlobe}
+            ownProfile={ownProfile}
+            onAddClick={onEditClick}
+            addTooltip={dict.profile.social_links?.add_website}
+          />
         </ul>
 
         {/* Action Button */}

@@ -151,6 +151,12 @@
   }
 }
 
+/* Ensure sonner container and toasts don't block clicks and don't pause on hover */
+[data-sonner-toaster],
+[data-sonner-toast] {
+  pointer-events: none !important;
+}
+
 /* Ensure wrapper has no spacing */
 [data-sonner-toast] {
   margin: 0 !important;
@@ -161,8 +167,6 @@
 .sonner-toast {
   padding: 1rem 3rem 1rem 1.25rem !important;
   margin: 0 !important; /* Force no margin on the card itself */
-  margin-bottom: -3.5rem !important;
-  margin-top: 3.5rem !important;
   border-radius: 12px !important;
   font-family: var(--font-questrial), sans-serif !important;
   border: none !important;
