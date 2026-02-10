@@ -419,6 +419,11 @@
       "avatar_error": "Unexpected error uploading avatar.",
       "avatar_hint": "Click to upload a new avatar"
     },
+    "crop_modal": {
+      "title": "Adjust image",
+      "cancel": "Cancel",
+      "apply": "Apply"
+    },
     "edit_section_modal": {
       "title": "Edit Profile Details",
       "long_bio_label": "About Me (Detailed)",

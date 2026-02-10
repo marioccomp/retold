@@ -150,11 +150,22 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
     if (!file) return;
 
-    const previewUrl = URL.createObjectURL(file);
-    setAvatarPreview(previewUrl);
+    // Reset input so the same file can be re-selected
+    if ("target" in e && (e.target as HTMLInputElement).value) {
+      (e.target as HTMLInputElement).value = "";
+    }
 
-    setPendingAvatarFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setImageToCrop(previewUrl);
+    setCropModalOpen(true);
   }
+
+  const handleCroppedAvatar = (croppedBlob: Blob) => {
+    const croppedFile = new File([croppedBlob], "avatar.webp", { type: "image/webp" });
+    const previewUrl = URL.createObjectURL(croppedBlob);
+    setAvatarPreview(previewUrl);
+    setPendingAvatarFile(croppedFile);
+  };
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -401,6 +412,20 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
           </Button>
         </div>
       </div>
+
+      <CropImageModal
+        isOpen={cropModalOpen}
+        onClose={() => {
+          setCropModalOpen(false);
+          if (imageToCrop?.startsWith("blob:")) {
+            URL.revokeObjectURL(imageToCrop);
+          }
+          setImageToCrop(null);
+        }}
+        imageSrc={imageToCrop ?? ""}
+        aspectRatio={1}
+        onCropComplete={handleCroppedAvatar}
+      />
     </div>
   );
 }
