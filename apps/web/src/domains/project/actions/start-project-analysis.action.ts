@@ -35,11 +35,19 @@ export async function startProjectAnalysisAction(projectId: number) {
     const currentCount = isToday ? user.dailyAnalysisCount : 0;
 
     if (currentCount >= DAILY_ANALYSIS_LIMIT) {
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const msUntilReset = tomorrow.getTime() - Date.now();
+        const hoursLeft = Math.floor(msUntilReset / 3600000);
+        const minutesLeft = Math.floor((msUntilReset % 3600000) / 60000);
+
         return {
             queued: false,
             limitReached: true,
             remaining: 0,
             limit: DAILY_ANALYSIS_LIMIT,
+            hoursLeft,
+            minutesLeft,
         };
     }
 

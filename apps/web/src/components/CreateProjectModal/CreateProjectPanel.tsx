@@ -173,10 +173,18 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                 }
             }
 
-            return project;
+            return { project, remaining: result.remaining, limit: result.limit };
         },
-        onSuccess: () => {
-            toast.success(t.toast.success);
+        onSuccess: (data) => {
+            if (data && data.remaining !== undefined && data.limit !== undefined) {
+                toast.success(t.toast.success, {
+                    description: dict.project.analysis.remaining
+                        .replace("{remaining}", String(data.remaining))
+                        .replace("{limit}", String(data.limit)),
+                });
+            } else {
+                toast.success(t.toast.success);
+            }
             onSuccess();
         },
         onError: (error: any) => {
