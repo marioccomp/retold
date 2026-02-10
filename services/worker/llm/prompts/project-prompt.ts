@@ -1,22 +1,28 @@
 import { Heuristic } from "../../types/heuristic";
 
 export function projectPrompt(input: Heuristic, repoName: string) {
-  const isPt = input.locale?.toLowerCase().startsWith("pt");
-
-  const outputLanguage = isPt ? "pt-BR" : "en";
+  const locale = input.locale?.toLowerCase() ?? "en";
+  const outputLanguage = locale.startsWith("pt")
+    ? "pt-BR"
+    : locale.startsWith("es")
+      ? "es"
+      : "en";
 
   const { readme: _r, codeSamples: _c, ...inputWithoutReadmeOrCodeSamples } = input;
+
+  const technicalTermsPolicy =
+    outputLanguage === "pt-BR"
+      ? "- TECHNICAL TERMS POLICY: When writing in Portuguese, keep industry-standard technical terms, software architecture patterns, and common development jargon in English. Only translate prose and explanations; maintain the 'language of the craft' as it is used globally."
+      : outputLanguage === "es"
+        ? "- TECHNICAL TERMS POLICY: When writing in Spanish, keep industry-standard technical terms, software architecture patterns, and common development jargon in English. Only translate prose and explanations; maintain the 'language of the craft' as it is used globally."
+        : "";
 
   const languageInstruction = `
 IMPORTANT:
 - JSON object keys MUST be in English exactly as in the schema.
 - ALL string VALUES (except enum fields) MUST be written in ${outputLanguage}.
 - Do NOT translate keys.
-- ${
-    outputLanguage === "pt-BR"
-      ? "- TECHNICAL TERMS POLICY: When writing in Portuguese, keep industry-standard technical terms, software architecture patterns, and common development jargon in English. Only translate prose and explanations; maintain the 'language of the craft' as it is used globally."
-      : ""
-  }
+${technicalTermsPolicy}
 `.trim();
 
   const primaryLanguage = input.summary.primaryLanguage;
@@ -95,7 +101,7 @@ README POLICY:
   const maturityExpectation = c.maturityExpectation;
 
   const schema = {
-    language: input.locale?.startsWith("pt") ? "pt-BR" : "en",
+    language: outputLanguage,
     meta: {
       primaryLanguage: primaryLanguage,
       appType: appType,
@@ -172,17 +178,15 @@ README POLICY:
 FRAMEWORK & TOOL ANALYSIS:
 - Analyze how ${frameworks.join(", ")} interact with ${primaryLanguage} .
 - Explain how the tech stack combination impacts the project architecture.
-- Comment on infrastructure: ${
-    Object.entries(input.infra)
+- Comment on infrastructure: ${Object.entries(input.infra)
       .filter(([_, v]) => v === true || (Array.isArray(v) && v.length > 0))
       .map(([k]) => k)
       .join(", ") || "minimal infra detected"
-  }.
-${
-  presentFeatures.length > 0
-    ? `- Features already present (do NOT criticize or suggest): ${presentFeatures.join(", ")}.`
-    : ""
-}
+    }.
+${presentFeatures.length > 0
+      ? `- Features already present (do NOT criticize or suggest): ${presentFeatures.join(", ")}.`
+      : ""
+    }
 TEST EVIDENCE RULES (STRICT):
 - You must classify test evidence as: "${testsEvidence}".
 - If test evidence is "weak" (exactly 1 test file), you MAY suggest adding more tests, but you MUST phrase it as:
@@ -220,26 +224,22 @@ suggestion VALIDATION:
   const adaptationPolicy = `
 ADAPTATION & SUGGESTIONS:
 - Adapt emphasis to context:
-  ${
-    purpose === "learning"
+  ${purpose === "learning"
       ? "- Learning project: prioritize clarity, architecture explanation, DX."
       : ""
-  }
-  ${
-    purpose === "production"
+    }
+  ${purpose === "production"
       ? "- Production project: prioritize reliability, security, scalability, observability."
       : ""
-  }
-  ${
-    domain === "web"
+    }
+  ${domain === "web"
       ? "- Web domain: consider routing, auth, API design, caching, performance."
       : ""
-  }
-  ${
-    domain === "cli" || domain === "systems"
+    }
+  ${domain === "cli" || domain === "systems"
       ? "- CLI/Systems: consider UX, input validation, error handling, portability."
       : ""
-  }
+    }
 - AVOID generic suggestions like "add tests" or "improve docs".
 - Suggest improvements in: ARCHITECTURE, PERFORMANCE, SECURITY, OBSERVABILITY, or DX.
 - For well-structured projects: suggest ADVANCED improvements, not basics.
@@ -306,19 +306,16 @@ CONTENT GUIDELINES (Integrate naturally into the prose):
 
 - Paragraph 2 (Architecture & Tech Synergy):
   - Describe the architecture based on folder nesting and organization (feature-based vs layer-based), including monorepo implications:
-    ${
-      hasAppsDir
-        ? '- Explain the monorepo relationship: what "apps" vs "packages" likely represent and how responsibilities are split.'
-        : ""
+    ${hasAppsDir
+      ? '- Explain the monorepo relationship: what "apps" vs "packages" likely represent and how responsibilities are split.'
+      : ""
     }
-    ${
-      !hasAppsDir
-        ? "- Explain the layer/feature organization and how responsibilities are separated across directories."
-        : ""
+    ${!hasAppsDir
+      ? "- Explain the layer/feature organization and how responsibilities are separated across directories."
+      : ""
     }
-  - Explain the "Tech Synergy": how ${
-    frameworks.join(", ") || "the stack"
-  } interact with ${primaryLanguage} and how that impacts architecture, coupling, and DX.
+  - Explain the "Tech Synergy": how ${frameworks.join(", ") || "the stack"
+    } interact with ${primaryLanguage} and how that impacts architecture, coupling, and DX.
   - Mention meaningful infra signals (CI/CD, Docker/Compose, IaC, etc.) only when they are explicitly present in the provided signals.
 
 - Paragraph 3 (Differentiators, Tradeoffs & Quality Signals):
@@ -364,16 +361,15 @@ NAMING / REFERENCING POLICY (STRICT):
 
         ${input.readme ? `## PROJECT README: ${input.readme}` : "No README provided"}
         ${input.readme ? readmePolicy + " " + documentationPolicy : ""}
-        ${
-          input.codeSamples?.length
-            ? `## Code Samples (evidence)\n${input.codeSamples
-                .map(
-                  (s: any) =>
-                    `File: ${s.relativePath} (${s.language})\n` + `\`\`\`\n${s.excerpt}\n\`\`\``
-                )
-                .join("\n\n")}\n`
-            : `## Code Samples (evidence)\n<missing>\n`
-        }
+        ${input.codeSamples?.length
+      ? `## Code Samples (evidence)\n${input.codeSamples
+        .map(
+          (s: any) =>
+            `File: ${s.relativePath} (${s.language})\n` + `\`\`\`\n${s.excerpt}\n\`\`\``
+        )
+        .join("\n\n")}\n`
+      : `## Code Samples (evidence)\n<missing>\n`
+    }
         ${contextInferencePolicy}
         ${adaptationPolicy}
         ${blockList}

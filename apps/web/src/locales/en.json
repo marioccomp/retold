@@ -5,7 +5,10 @@
     "language": {
       "title": "Language",
       "description": "Select your preferred language",
-      "label": "Interface Language"
+      "label": "Interface Language",
+      "analysis_language_label": "Analysis Language",
+      "analysis_language_description": "Choose the language for AI-generated project reports. This is independent from your interface language.",
+      "analysis_language_same": "Same as interface"
     },
     "security": "Security",
     "integrations": "Integrations",

@@ -98,10 +98,11 @@ function tryParseJson(s: string): { ok: true; value: any } | { ok: false; error:
   }
 }
 
-function normalizeLocale(locale?: string): "pt-BR" | "en" {
+function normalizeLocale(locale?: string): "pt-BR" | "en" | "es" {
   if (!locale) return "en";
   const l = locale.toLowerCase();
   if (l.startsWith("pt")) return "pt-BR";
+  if (l.startsWith("es")) return "es";
   return "en";
 }
 

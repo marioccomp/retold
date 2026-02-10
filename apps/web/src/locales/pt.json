@@ -5,7 +5,10 @@
     "language": {
       "title": "Idioma",
       "description": "Selecione seu idioma de preferência",
-      "label": "Idioma da Interface"
+      "label": "Idioma da Interface",
+      "analysis_language_label": "Idioma da Análise",
+      "analysis_language_description": "Escolha em qual idioma os relatórios de análise serão gerados. Independente do idioma da interface.",
+      "analysis_language_same": "Mesmo da interface"
     },
     "security": "Segurança",
     "integrations": "Integrações",
