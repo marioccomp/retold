@@ -1,10 +1,9 @@
 "use server";
 
-import { auth, signOut } from "@/src/domains/auth/auth";
+import { auth } from "@/src/domains/auth/auth";
 import { getUpdatePasswordSchema, getCreatePasswordSchema } from "@/src/domains/auth/schemas/register.schema";
 import { prisma, userRepository } from "@repo/database";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 import { getDictionary } from "@/src/i18n/server";
 
 export async function updatePasswordAction(
@@ -101,8 +100,7 @@ export async function deleteAccountAction() {
         throw new Error("Failed to delete account");
     }
 
-    await signOut({ redirect: false });
-    redirect("/");
+    return { success: true };
 }
 
 export async function getConnectedProvidersAction() {

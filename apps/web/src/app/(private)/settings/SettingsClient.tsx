@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { createPortal } from "react-dom";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
   FiGithub,
@@ -43,9 +44,15 @@ export function SettingsClient() {
   const [isGithubLinked, setIsGithubLinked] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("general");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const [pendingPassword, startPasswordTransition] = useTransition();
   const [pendingDelete, startDeleteTransition] = useTransition();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadProviders() {
@@ -129,16 +136,20 @@ export function SettingsClient() {
     window.location.href = "/api/github/link";
   }
 
-  async function handleDeleteAccount() {
-    if (window.confirm(dict.settings.dangerZone.toast.delete_confirm)) {
-      startDeleteTransition(async () => {
-        try {
-          await deleteAccountAction();
-        } catch (error) {
-          toast.error(dict.settings.dangerZone.toast.delete_error);
-        }
-      });
-    }
+  function handleDeleteAccount() {
+    setShowDeleteModal(true);
+  }
+
+  function confirmDeleteAccount() {
+    startDeleteTransition(async () => {
+      try {
+        await deleteAccountAction();
+        setShowDeleteModal(false);
+        await signOut({ callbackUrl: "/" });
+      } catch (error) {
+        toast.error(dict.settings.dangerZone.toast.delete_error);
+      }
+    });
   }
 
   async function handleLanguageChange(value: string) {
@@ -372,6 +383,58 @@ export function SettingsClient() {
           </TabsContent>
         </div>
       </Tabs>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal &&
+        mounted &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowDeleteModal(false);
+              }
+            }}
+          >
+            <div
+              className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 text-center">
+                <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <FiAlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {dict.settings.dangerZone.modal_title}
+                </h3>
+                <p className="text-gray-500 text-sm mb-6">
+                  {dict.settings.dangerZone.modal_description}
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="destructive"
+                    className="w-full font-medium cursor-pointer"
+                    onClick={confirmDeleteAccount}
+                    disabled={pendingDelete}
+                  >
+                    {pendingDelete
+                      ? dict.settings.dangerZone.buttonDeleting
+                      : dict.settings.dangerZone.modal_confirm}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium cursor-pointer"
+                    onClick={() => setShowDeleteModal(false)}
+                    disabled={pendingDelete}
+                  >
+                    {dict.settings.dangerZone.modal_cancel}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

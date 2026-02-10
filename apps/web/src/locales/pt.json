@@ -15,10 +15,13 @@
       "description": "Exclua permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita. Todos os seus dados de projeto serão perdidos.",
       "button": "Excluir Conta",
       "buttonDeleting": "Excluindo...",
+      "modal_title": "Excluir Conta?",
+      "modal_description": "Tem certeza? Isso irá excluir permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita.",
+      "modal_confirm": "Sim, excluir minha conta",
+      "modal_cancel": "Cancelar",
       "toast": {
         "update_error": "Falha ao atualizar senha",
-        "delete_error": "Falha ao excluir conta",
-        "delete_confirm": "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita e excluirá todos os seus projetos e dados."
+        "delete_error": "Falha ao excluir conta"
       }
     },
     "password": {

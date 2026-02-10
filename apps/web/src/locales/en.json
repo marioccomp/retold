@@ -15,10 +15,13 @@
       "description": "Permanently delete your account and all of your data. This action cannot be undone. All your project data will be lost.",
       "button": "Delete Account",
       "buttonDeleting": "Deleting...",
+      "modal_title": "Delete Account?",
+      "modal_description": "Are you sure? This will permanently delete your account and all your data. This action cannot be undone.",
+      "modal_confirm": "Yes, delete my account",
+      "modal_cancel": "Cancel",
       "toast": {
         "update_error": "Failed to update password",
-        "delete_error": "Failed to delete account",
-        "delete_confirm": "Are you sure you want to delete your account? This action cannot be undone and will delete all your projects and data."
+        "delete_error": "Failed to delete account"
       }
     },
     "password": {
