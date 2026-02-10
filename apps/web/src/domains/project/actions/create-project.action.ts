@@ -33,7 +33,7 @@ export async function createProjectAction(
   // Check rate limit
   const user = await prisma.user.findUnique({
     where: { id: Number(session.user.id) },
-    select: { rateLimitResetAt: true }
+    select: { rateLimitResetAt: true, dailyAnalysisCount: true, dailyAnalysisDate: true }
   });
 
   if (user?.rateLimitResetAt && user.rateLimitResetAt > new Date()) {
@@ -43,6 +43,21 @@ export async function createProjectAction(
     return {
       success: false,
       message: `Limite de análises atingido. Tente novamente em ${minutes}m ${seconds}s.`
+    };
+  }
+
+  // Check daily analysis limit (3 per day)
+  const DAILY_ANALYSIS_LIMIT = 3;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const lastDate = user?.dailyAnalysisDate ? new Date(user.dailyAnalysisDate) : null;
+  const isToday = lastDate && lastDate.getTime() >= today.getTime();
+  const currentCount = isToday ? (user?.dailyAnalysisCount ?? 0) : 0;
+
+  if (currentCount >= DAILY_ANALYSIS_LIMIT) {
+    return {
+      success: false,
+      message: dict.project.analysis.limit_reached_description
     };
   }
 

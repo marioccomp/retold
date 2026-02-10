@@ -26,8 +26,21 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
     const handleAnalyzeRepo = async () => {
         try {
             const result = await startProjectAnalysisAction(project.id);
+
+            if (result.limitReached) {
+                toast.error(dict.project.analysis.limit_reached_title, {
+                    description: dict.project.analysis.limit_reached_description,
+                });
+                return;
+            }
+
             if (result.queued) {
-                toast.success(dict.project.analysis.started);
+                const remaining = result.remaining ?? 0;
+                toast.success(dict.project.analysis.started, {
+                    description: dict.project.analysis.remaining
+                        .replace("{remaining}", String(remaining))
+                        .replace("{limit}", String(result.limit)),
+                });
                 refetch();
                 queryClient.invalidateQueries({ queryKey: ["projects"] });
             } else {

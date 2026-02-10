@@ -29,7 +29,6 @@ const worker = new Worker(
   async (job) => {
     const { projectId, repoUrl, locale } = job.data;
 
-    // Create a temporary path for this specific job
     const tmpPath = path.resolve("/tmp/retold", String(projectId));
 
     console.log(`[worker] analyzing project ${projectId}`);
@@ -49,9 +48,7 @@ const worker = new Worker(
             "[worker] No GitHub installation found. Attempting public clone without token."
           );
         } else {
-          // Log other errors but maybe still try? No, let's rethrow if it's not the specific installation error.
-          // actually, if 'Project not found' or 'User not found' we should fail.
-          throw e; // Rethrow other errors
+          throw e;
         }
       }
 
@@ -191,6 +188,40 @@ const worker = new Worker(
         where: { id: projectId },
         data: { status: "DONE" },
       });
+
+      // Increment daily analysis counter only on SUCCESS
+      const ownerProject = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { userId: true },
+      });
+
+      if (ownerProject) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const owner = await prisma.user.findUnique({
+          where: { id: ownerProject.userId },
+          select: { dailyAnalysisCount: true, dailyAnalysisDate: true },
+        });
+
+        const lastDate = owner?.dailyAnalysisDate
+          ? new Date(owner.dailyAnalysisDate)
+          : null;
+        const isToday = lastDate && lastDate.getTime() >= today.getTime();
+
+        await prisma.user.update({
+          where: { id: ownerProject.userId },
+          data: {
+            dailyAnalysisCount: isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1,
+            dailyAnalysisDate: today,
+          },
+        });
+
+        console.log(
+          `[worker] User ${ownerProject.userId} daily analysis count: ${isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1
+          }`
+        );
+      }
     } catch (err: any) {
       console.error(err);
 

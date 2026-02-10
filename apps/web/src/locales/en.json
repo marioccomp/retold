@@ -61,7 +61,10 @@
     },
     "analysis": {
       "started": "Analysis started",
-      "start_error": "Failed to start analysis"
+      "start_error": "Failed to start analysis",
+      "limit_reached_title": "Daily limit reached",
+      "limit_reached_description": "You've used all 3 analyses for today. Come back tomorrow!",
+      "remaining": "{remaining} of {limit} analyses remaining today"
     },
     "metrics": {
       "language": "Language",
