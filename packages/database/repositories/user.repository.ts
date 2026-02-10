@@ -53,12 +53,35 @@ export const userRepository = {
       data: { password: passwordHash },
     });
   },
-  async findPublicProfileByUsername(username: string, currentUserId?: number) {
-    const user = prisma.user.findUnique({
+  async findPublicProfileByUsername(
+    username: string,
+    currentUserId?: number,
+    projectsPage: number = 1,
+    projectsLimit: number = 12,
+    projectsQuery: string = ""
+  ) {
+    const skip = (projectsPage - 1) * projectsLimit;
+
+    // Filter condition for projects
+    const projectsWhereInput: any = {
+      ...(projectsQuery
+        ? {
+            OR: [
+              { title: { contains: projectsQuery, mode: "insensitive" } },
+              { tags: { some: { name: { contains: projectsQuery, mode: "insensitive" } } } },
+            ],
+          }
+        : {}),
+    };
+
+    const user = await prisma.user.findUnique({
       where: { username },
       include: {
         projects: {
+          where: projectsWhereInput,
           orderBy: { createdAt: "desc" },
+          skip,
+          take: projectsLimit,
           include: {
             tags: true,
             repository: true,
@@ -85,6 +108,7 @@ export const userRepository = {
           select: {
             followers: true,
             following: true,
+            projects: true, // This counts ALL projects, not filtered ones
           },
         },
         ...(currentUserId
@@ -118,6 +142,17 @@ export const userRepository = {
         githubStats: true,
       },
     });
+
+    if (user && projectsQuery) {
+      // If there's a search query, we need to correct the count
+      const filteredCount = await prisma.project.count({
+        where: {
+          userId: user.id,
+          ...projectsWhereInput,
+        },
+      });
+      (user as any)._count.projects = filteredCount;
+    }
 
     return user;
   },
@@ -213,39 +248,52 @@ export const userRepository = {
     });
   },
 
-  async searchUsers(query: string, currentUserId?: number) {
-    return prisma.user.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { username: { contains: query, mode: "insensitive" } },
-          { title: { contains: query, mode: "insensitive" } },
-        ],
-      },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        image: true,
-        title: true,
-        bio: true,
-        cover: true,
-        skills: true,
-        ...(currentUserId
-          ? {
-              followers: {
-                where: {
-                  followerId: currentUserId,
+  async searchUsers(query: string, currentUserId?: number, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+
+    const whereClause: any = {
+      OR: [
+        { name: { contains: query, mode: "insensitive" } },
+        { username: { contains: query, mode: "insensitive" } },
+        { title: { contains: query, mode: "insensitive" } },
+      ],
+      ...(currentUserId ? { id: { not: currentUserId } } : {}),
+    };
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          image: true,
+          title: true,
+          bio: true,
+          cover: true,
+          skills: true,
+          ...(currentUserId
+            ? {
+                followers: {
+                  where: {
+                    followerId: currentUserId,
+                  },
+                  select: {
+                    followerId: true,
+                  },
                 },
-                select: {
-                  followerId: true,
-                },
-              },
-            }
-          : {}),
-      },
-      take: 20,
-    });
+              }
+            : {}),
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.user.count({
+        where: whereClause,
+      }),
+    ]);
+
+    return { users, total };
   },
 
   async createOrUpdateGithubStats(userId: number, data: any) {

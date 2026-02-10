@@ -385,6 +385,10 @@
       "title": "Nenhum projeto ainda",
       "description": "Este usuário ainda não publicou nenhum projeto aqui."
     },
+    "no_search_results": {
+      "title": "Nenhum projeto encontrado",
+      "description": "Tente buscar por outro termo."
+    },
     "edit_modal": {
       "title": "Editar Perfil",
       "name_label": "Nome",
@@ -423,6 +427,10 @@
       "start_label": "Início",
       "end_label": "Término",
       "currently_label": "Em andamento",
+      "course_hint": "Dica: Você pode escrever o nome do seu curso se não estiver na lista.",
+      "institution_hint": "Dica: Você pode escrever o nome da instituição se não estiver na lista.",
+      "select_date": "Selecione uma data",
+      "use_value": "Usar \"{value}\"",
       "skills_label": "Habilidades",
       "skills_placeholder": "Digite uma habilidade e aperte Enter",
       "skills_none": "Nenhuma habilidade adicionada",

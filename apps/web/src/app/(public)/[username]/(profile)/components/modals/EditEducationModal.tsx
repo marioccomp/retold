@@ -11,6 +11,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslation } from "@/src/i18n/client";
 import { updateProfileDetails } from "../../../_actions/edit-profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { ptBR, enUS } from "date-fns/locale";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ComboboxInput } from "@/components/ui/combobox-input";
+import { INSTITUTIONS, getCourses } from "@/src/lib/education-options";
+import { useParams } from "next/navigation";
 
 type Props = {
   isOpen: boolean;
@@ -19,7 +28,10 @@ type Props = {
 };
 
 export default function EditEducationModal({ isOpen, onClose, profile }: Props) {
-  const { dict } = useTranslation();
+  const { dict, lang } = useTranslation();
+  const courses = getCourses(lang);
+  const dateLocale = lang === "pt" ? ptBR : enUS;
+
   const queryClient = useQueryClient();
   const [educations, setEducations] = useState<Partial<EducationDTO>[]>(
     profile.educations?.length > 0
@@ -94,7 +106,18 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
   };
 
   const handleRemoveEducation = (index: number) => {
-    setEducations(educations.filter((_, i) => i !== index));
+    if (educations.length === 1) {
+      setEducations([
+        {
+          degree: "",
+          institution: "",
+          startDate: new Date().toISOString(),
+          endDate: null,
+        },
+      ]);
+    } else {
+      setEducations(educations.filter((_, i) => i !== index));
+    }
   };
 
   const hasChanges =
@@ -122,14 +145,22 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
       ]
     );
 
+  const hasInvalidDates = educations.some(
+    (edu) => edu.startDate && edu.endDate && new Date(edu.startDate) > new Date(edu.endDate)
+  );
+
   const handleSave = () => {
-    if (!hasChanges) {
+    if (!hasChanges || hasInvalidDates) {
       onClose();
       return;
     }
 
+    const cleanedEducations = educations.filter(
+      (edu) => edu.degree?.trim() || edu.institution?.trim()
+    );
+
     mutation.mutate({
-      educations: educations.map((edu) => ({
+      educations: cleanedEducations.map((edu) => ({
         degree: edu.degree || "",
         institution: edu.institution || "",
         startDate: edu.startDate || new Date().toISOString(),
@@ -182,35 +213,37 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                 key={idx}
                 className="p-4 border border-border/60 rounded-xl bg-muted/5 space-y-4 relative group"
               >
-                {educations.length > 1 && (
-                  <button
-                    onClick={() => handleRemoveEducation(idx)}
-                    className="absolute top-4 right-4 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                  >
-                    <FiTrash2 size={16} />
-                  </button>
-                )}
+                <button
+                  onClick={() => handleRemoveEducation(idx)}
+                  className="absolute top-4 right-4 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                >
+                  <FiTrash2 size={16} />
+                </button>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.course_label}
                     </Label>
-                    <Input
-                      value={edu.degree}
-                      onChange={(e) => handleUpdateEducation(idx, "degree", e.target.value)}
+                    <ComboboxInput
+                      options={courses}
+                      value={edu.degree || ""}
+                      onChange={(val: string) => handleUpdateEducation(idx, "degree", val)}
                       placeholder={dict.profile.edit_section_modal.course_placeholder}
-                      className="focus-visible:ring-[#05dc7f] h-9 font-medium"
+                      emptyMessage={dict.profile.edit_section_modal.course_hint}
+                      createLabel={dict.profile.edit_section_modal.use_value}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.institution_label}
                     </Label>
-                    <Input
-                      value={edu.institution}
-                      onChange={(e) => handleUpdateEducation(idx, "institution", e.target.value)}
+                    <ComboboxInput
+                      options={INSTITUTIONS}
+                      value={edu.institution || ""}
+                      onChange={(val: string) => handleUpdateEducation(idx, "institution", val)}
                       placeholder={dict.profile.edit_section_modal.institution_placeholder}
-                      className="focus-visible:ring-[#05dc7f] h-9 font-medium"
+                      emptyMessage={dict.profile.edit_section_modal.institution_hint}
+                      createLabel={dict.profile.edit_section_modal.use_value}
                     />
                   </div>
                 </div>
@@ -220,37 +253,88 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.start_label}
                     </Label>
-                    <Input
-                      type="month"
-                      value={edu.startDate?.substring(0, 7) || ""}
-                      onChange={(e) =>
-                        handleUpdateEducation(
-                          idx,
-                          "startDate",
-                          new Date(e.target.value).toISOString()
-                        )
-                      }
-                      className="focus-visible:ring-[#05dc7f] h-9 font-medium"
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal focus-visible:ring-[#05dc7f] h-9 font-medium px-3",
+                            !edu.startDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {edu.startDate ? (
+                            format(new Date(edu.startDate), "PPP", { locale: dateLocale })
+                          ) : (
+                            <span>{dict.profile.edit_section_modal.select_date}</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={edu.startDate ? new Date(edu.startDate) : undefined}
+                          onSelect={(date) =>
+                            handleUpdateEducation(
+                              idx,
+                              "startDate",
+                              date ? date.toISOString() : undefined
+                            )
+                          }
+                          initialFocus
+                          locale={dateLocale}
+                          captionLayout="dropdown"
+                          fromYear={1970}
+                          toYear={new Date().getFullYear() + 5}
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.end_label}
                     </Label>
                     <div className="space-y-2">
-                      <Input
-                        type="month"
-                        disabled={!edu.endDate}
-                        value={edu.endDate?.substring(0, 7) || ""}
-                        onChange={(e) =>
-                          handleUpdateEducation(
-                            idx,
-                            "endDate",
-                            new Date(e.target.value).toISOString()
-                          )
-                        }
-                        className="focus-visible:ring-[#05dc7f] h-9 font-medium"
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            disabled={!edu.endDate}
+                            className={cn(
+                              "w-full justify-start text-left font-normal focus-visible:ring-[#05dc7f] h-9 font-medium px-3",
+                              !edu.endDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {edu.endDate ? (
+                              format(new Date(edu.endDate), "PPP", { locale: dateLocale })
+                            ) : (
+                              <span>{dict.profile.edit_section_modal.select_date}</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={edu.endDate ? new Date(edu.endDate) : undefined}
+                            onSelect={(date) =>
+                              handleUpdateEducation(
+                                idx,
+                                "endDate",
+                                date ? date.toISOString() : undefined
+                              )
+                            }
+                            disabled={(date) =>
+                              edu.startDate ? date < new Date(edu.startDate) : false
+                            }
+                            initialFocus
+                            locale={dateLocale}
+                            captionLayout="dropdown"
+                            fromYear={1970}
+                            toYear={new Date().getFullYear() + 5}
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <div className="flex items-center gap-2 px-1">
                         <Checkbox
                           id={`current-${idx}`}
@@ -286,7 +370,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
           </Button>
           <Button
             onClick={handleSave}
-            disabled={mutation.isPending || !hasChanges}
+            disabled={mutation.isPending || !hasChanges || hasInvalidDates}
             className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] px-8 font-bold transition-all shadow-lg shadow-[#05dc7f]/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {mutation.isPending ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}

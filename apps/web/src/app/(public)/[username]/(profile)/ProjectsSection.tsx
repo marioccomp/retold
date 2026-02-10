@@ -7,6 +7,7 @@ import { FiPlus, FiArrowLeft } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
 import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
+import { PaginationControls } from "@/src/components/ui/pagination-controls";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +19,7 @@ type Props = {
   profile: PublicProfileDTO;
   ownProfile: boolean;
   searchQuery: string;
+  onPageChange?: (page: number) => void;
 };
 
 // Tipo adaptado para o overlay (campos mínimos necessários)
@@ -36,7 +38,7 @@ type ProjectForOverlay = {
   };
 };
 
-export default function ProjectsSection({ searchQuery, ownProfile, profile }: Props) {
+export default function ProjectsSection({ searchQuery, ownProfile, profile, onPageChange }: Props) {
   const { dict } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -45,7 +47,10 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
+  // Projects are already filtered and paginated from the backend
   const projects = profile.projects;
+  const metadata = profile.projectsMetadata;
+
   const currentTab = searchParams.get("tab") || "profile";
   // Only consider project selection when on the projects tab
   const selectedProjectId = currentTab === "projects" ? searchParams.get("project") : null;
@@ -82,11 +87,8 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
       }
     : null;
 
-  const filteredProjects = projects.filter(
-    (project) =>
-      project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.tags.some((tag) => tag.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Use projects directly, no need to filter on client side as backend handles it
+  const filteredProjects = projects;
 
   const handleNewProject = () => {
     setIsCreating(true);
@@ -172,15 +174,30 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile }: Pr
                     <FiPlus className="w-8 h-8 text-[#a0aaa8] rotate-45" />
                   </div>
                   <h3 className="text-xl font-bold text-[#152e2b]">
-                    {dict.profile.no_projects_found.title}
+                    {searchQuery !== ""
+                      ? dict.profile.no_search_results.title
+                      : dict.profile.no_projects_found.title}
                   </h3>
                   <p className="text-[#6b7c7a] max-w-[300px] leading-relaxed">
-                    {dict.profile.no_projects_found.description}
+                    {searchQuery !== ""
+                      ? dict.profile.no_search_results.description
+                      : dict.profile.no_projects_found.description}
                   </p>
                 </CardContent>
               </Card>
             </div>
           )}
+
+      {/* Pagination Controls */}
+      {metadata && metadata.totalPages > 1 && onPageChange && (
+        <div className="col-span-full">
+          <PaginationControls
+            currentPage={metadata.page}
+            totalPages={metadata.totalPages}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
 
       <ProjectDetailsModal
         isOpen={!!selectedProject}

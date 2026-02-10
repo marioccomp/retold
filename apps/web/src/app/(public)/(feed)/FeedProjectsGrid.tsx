@@ -14,11 +14,23 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 
+import { cn } from "@/lib/utils";
+import { PaginationControls } from "@/src/components/ui/pagination-controls";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+
 type Props = {
   projects: ProjectCardDTO[];
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 };
 
-export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDTO[] }) {
+export default function FeedProjectsGrid({
+  projects,
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange,
+}: Props) {
   const { debouncedSearchQuery } = useSearch();
   const { dict } = useTranslation();
   const router = useRouter();
@@ -59,13 +71,8 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
       }
     : null;
 
-  const filteredProjects = projects.filter(
-    (project) =>
-      project.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-      project.tags.some((tag) =>
-        tag.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-      )
-  );
+  // Use projects directly, as they are already filtered by the backend
+  const filteredProjects = projects;
 
   const handleProjectClick = (project: ProjectCardDTO) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -79,31 +86,6 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
     router.back();
     queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
   };
-
-  // Se um projeto está selecionado, mostrar o painel do projeto
-  // REMOVIDO PARA USAR OVERLAY
-  /*
-  if (selectedProject) {
-    return (
-      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] max-w-[1400px] mx-auto w-full">
-        <div className="sticky top-16 z-40 pt-4 pb-2 mb-2 bg-white/40 backdrop-blur-sm -mx-4 px-4 md:-mx-0 md:px-0">
-          <button
-            className="cursor-pointer inline-flex items-center gap-2.5 text-sm font-semibold text-gray-400 hover:text-[#05dc7f] transition-all duration-300 group bg-white/80 border border-gray-100 px-3 py-1.5 rounded-full shadow-sm hover:shadow-md hover:border-[#05dc7f]/30"
-            onClick={handleProjectClose}
-          >
-            <FiArrowLeft
-              size={16}
-              className="transition-transform duration-300 group-hover:-translate-x-1"
-            />
-            <span className="tracking-tight">{dict.feed.feedprojectsgrid.back_to_projects}</span>
-          </button>
-        </div>
-
-        <FeedProjectPanel project={selectedProject} onClose={handleProjectClose} />
-      </div>
-    );
-  }
-  */
 
   if (filteredProjects.length === 0) {
     return (
@@ -126,19 +108,31 @@ export default function FeedProjectsGrid({ projects }: { projects: ProjectCardDT
   }
 
   return (
-    <>
-      {filteredProjects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          onClick={() => handleProjectClick(project)}
+    <div className="flex flex-col gap-8 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 m-0 p-0 ring-0 focus-visible:ring-0">
+        {filteredProjects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onClick={() => handleProjectClick(project)}
+          />
+        ))}
+      </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && onPageChange && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
         />
-      ))}
+      )}
+
       <ProjectDetailsModal
         isOpen={!!selectedProject}
         onClose={handleProjectClose}
         project={selectedProject}
       />
-    </>
+    </div>
   );
 }

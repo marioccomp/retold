@@ -6,23 +6,25 @@ import { getProfile } from "../_actions/get-profile";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { getGithubDatabaseStats } from "../_actions/get-github-database-stats.action";
 
-
 type PageProps = {
   params: Promise<{
     username: string;
   }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { username } = await params;
+  const resolvedSearchParams = await searchParams;
+  const page = Number(resolvedSearchParams.page) || 1;
   const session = await auth();
 
   const queryClient = new QueryClient();
 
   await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: ["profile", username],
-      queryFn: () => getProfile(username),
+      queryKey: ["profile", username, page, ""], // Match ProfileClient key: ["profile", username, page, debouncedSearchQuery]
+      queryFn: () => getProfile(username, page, ""),
     }),
     queryClient.prefetchQuery({
       queryKey: ["github-stats", username],
@@ -30,12 +32,14 @@ export default async function Page({ params }: PageProps) {
     }),
   ]);
 
-  const profile: PublicProfileDTO | null | undefined = await queryClient.getQueryData(["profile", username]);
-
+  const profile: PublicProfileDTO | null | undefined = await queryClient.getQueryData([
+    "profile",
+    username,
+    page,
+    "",
+  ]);
 
   if (!profile) notFound();
-
-
 
   // const user = await userRepository.findPublicProfileByUsername(username);
 
