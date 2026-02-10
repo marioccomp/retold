@@ -62,7 +62,7 @@ export function PaginationControls({
         size="icon"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="rounded-full text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9]"
+        className="rounded-full text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9] cursor-pointer"
       >
         <FiChevronLeft size={20} />
       </Button>
@@ -82,8 +82,8 @@ export function PaginationControls({
               className={cn(
                 "rounded-full w-9 h-9 p-0 font-medium transition-all duration-300",
                 currentPage === page
-                  ? "bg-[#152e2b] text-white hover:bg-[#152e2b]/90 shadow-md"
-                  : "text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9]"
+                  ? "bg-[#152e2b] text-white hover:bg-[#152e2b]/90 shadow-md cursor-pointer"
+                  : "text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9] cursor-pointer"
               )}
             >
               {page}
@@ -97,7 +97,7 @@ export function PaginationControls({
         size="icon"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="rounded-full text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9]"
+        className="rounded-full text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9] cursor-pointer"
       >
         <FiChevronRight size={20} />
       </Button>

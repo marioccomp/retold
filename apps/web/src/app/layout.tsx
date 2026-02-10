@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   description: "Reimagine your stories.", // ajustar dps
 };
 
+import { CookieBanner } from "../components/CookieBanner";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -45,6 +47,7 @@ export default async function RootLayout({
                   <main className="flex-grow w-full">{children}</main>
                   <Footer />
                   <AuthModal />
+                  <CookieBanner />
                   <Toaster
                     richColors
                     position="top-right"

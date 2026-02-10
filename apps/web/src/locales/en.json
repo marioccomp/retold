@@ -611,7 +611,13 @@
     "rights": "© {year} Retold. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "contact": "Contact"
+    "contact": "Contact",
+    "email_copied": "Email copied to clipboard!",
+    "cookie_banner": {
+      "message": "We use cookies to improve your experience and ensure the platform functions correctly. By continuing to browse, you agree to our use of cookies.",
+      "accept": "Accept",
+      "more_info": "Learn more"
+    }
   },
   "legal": {
     "updated_at": "Last updated: {date}",
@@ -635,7 +641,11 @@
       "liability_title": "5. Limitation of Liability",
       "liability_text": "In no event shall Retold, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.",
       "changes_title": "6. Changes",
-      "changes_text": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. Continued use of the service after any such changes constitutes your acceptance of the new Terms."
+      "changes_text": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. Continued use of the service after any such changes constitutes your acceptance of the new Terms.",
+      "ai_disclaimer_title": "7. AI Disclaimer",
+      "ai_disclaimer_text": "Retold uses large language models (AI) to generate summaries, scores, and technical analyses. You acknowledge that these analyses are automated and may contain inaccuracies. Retold does not guarantee absolute technical accuracy and should not be used as the sole basis for hiring decisions or formal evaluations.",
+      "repo_authority_title": "8. Repository Authority",
+      "repo_authority_text": "By linking a GitHub repository to Retold, you represent and warrant that you own the necessary rights or have explicit permission to submit such code for analysis. Retold is not liable for third-party confidentiality breaches caused by unauthorized use of the tool."
     },
     "privacy": {
       "title": "Privacy Policy",
@@ -652,6 +662,8 @@
       ],
       "sharing_title": "3. Information Sharing",
       "sharing_text": "We do not sell your personal information. We may share aggregated or non-personally identifiable information with partners or third parties for research, analysis, or marketing purposes.",
+      "private_repos_title": "4. Private Repositories",
+      "private_repos_text": "When analyzing private repositories, Retold does not expose the repository URL or sensitive metadata (such as exact commit dates) publicly on your profile. Only the AI-generated technical report and summary will be visible if you choose to publish the project.",
       "ads_title": "4. Advertising Policies",
       "ads_text": "Retold is committed to transparency regarding advertising on our platform.",
       "ads_list": [
@@ -675,7 +687,13 @@
       "security_title": "5. Data Security",
       "security_text": "We take reasonable measures to protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. However, no security system is impenetrable, and we cannot guarantee the security of our systems.",
       "contact_title": "6. Contact",
-      "contact_text": "If you have any questions about this Privacy Policy, please contact us via our support email."
+      "contact_text": "If you have any questions about this Privacy Policy, please contact us via our support email.",
+      "ai_processing_title": "7. AI Processing and Third Parties",
+      "ai_processing_text": "To provide our technical analyses, we use large language model providers (such as OpenAI or Google). Repository metadata and structural code snippets may be processed by these services. We do not use your code data to train models without your explicit consent.",
+      "lgpd_rights_title": "8. Your Rights (GDPR/LGPD)",
+      "lgpd_rights_text": "Depending on your location, you have the right to: (a) Access your personal data; (b) Correct inaccuracies; (c) Request deletion; (d) Withdraw consent at any time via your account settings.",
+      "cookies_title": "9. Cookie Usage",
+      "cookies_text": "We use essential cookies for Retold's operation, including: (a) Authentication and Security; (b) Language Preferences; and (c) Session Processing. These cookies are necessary to protect your account and provide the requested service."
     }
   }
 }

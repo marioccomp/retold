@@ -611,7 +611,13 @@
     "rights": "© {year} Retold. Todos os direitos reservados.",
     "terms": "Termos de Serviço",
     "privacy": "Política de Privacidade",
-    "contact": "Contato"
+    "contact": "Contato",
+    "email_copied": "E-mail copiado para a área de transferência!",
+    "cookie_banner": {
+      "message": "Nós usamos cookies para melhorar sua experiência e garantir o funcionamento da plataforma. Ao continuar navegando, você concorda com nosso uso de cookies.",
+      "accept": "Aceitar",
+      "more_info": "Saiba mais"
+    }
   },
   "legal": {
     "updated_at": "Última atualização: {date}",
@@ -635,7 +641,11 @@
       "liability_title": "5. Limitação de Responsabilidade",
       "liability_text": "Em nenhum caso o Retold, nem seus diretores, funcionários, parceiros, agentes, fornecedores ou afiliados, serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.",
       "changes_title": "6. Alterações",
-      "changes_text": "Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. O uso continuado do serviço após quaisquer alterações constitui aceitação dos novos Termos."
+      "changes_text": "Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. O uso continuado do serviço após quaisquer alterações constitui aceitação dos novos Termos.",
+      "ai_disclaimer_title": "7. Isenção de Responsabilidade de IA",
+      "ai_disclaimer_text": "O Retold utiliza sistemas de inteligência artificial para gerar resumos, pontuações e análises técnicas. Você reconhece que estas análises são automatizadas e podem conter imprecisões. O Retold não garante a veracidade técnica absoluta dos relatórios gerados e não deve ser utilizado como única base para decisões de contratação ou avaliações formais.",
+      "repo_authority_title": "8. Autoridade sobre Repositórios",
+      "repo_authority_text": "Ao vincular um repositório do GitHub ao Retold, você declara e garante que possui os direitos necessários ou permissão explícita para submeter tal código à análise. O Retold não se responsabiliza por violações de confidencialidade de terceiros causadas pelo uso indevido da ferramenta por parte do usuário."
     },
     "privacy": {
       "title": "Política de Privacidade",
@@ -652,6 +662,8 @@
       ],
       "sharing_title": "3. Compartilhamento de Informações",
       "sharing_text": "Não vendemos suas informações pessoais. Podemos compartilhar informações agregadas ou não identificáveis pessoalmente com parceiros ou terceiros para fins de pesquisa, análise ou marketing.",
+      "private_repos_title": "4. Repositórios Privados",
+      "private_repos_text": "Ao analisar repositórios privados, o Retold não expõe a URL do repositório ou metadados sensíveis (como datas exatas de commits) publicamente no seu perfil. Apenas o relatório técnico e o resumo gerados pela IA serão visíveis caso você escolha publicar o projeto.",
       "ads_title": "4. Políticas de Publicidade",
       "ads_text": "O Retold está comprometido com a transparência em relação à publicidade em nossa plataforma.",
       "ads_list": [
@@ -671,7 +683,13 @@
       "security_title": "5. Segurança de Dados",
       "security_text": "Tomamos medidas razoáveis para proteger suas informações pessoais contra perda, roubo e uso não autorizado, divulgação ou modificação. No entanto, nenhum sistema de segurança é impenetrável e não podemos garantir a segurança total dos nossos sistemas.",
       "contact_title": "6. Contato",
-      "contact_text": "Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco através do nosso e-mail de suporte."
+      "contact_text": "Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco através do nosso e-mail de suporte.",
+      "ai_processing_title": "7. Processamento de IA e Terceiros",
+      "ai_processing_text": "Para fornecer nossas análises técnicas, utilizamos provedores de modelos de linguagem de grande escala (como OpenAI ou Google). Metadados de repositórios e trechos de código estrutural podem ser processados por esses serviços. Não utilizamos seus dados de código para treinar modelos próprios sem seu consentimento.",
+      "lgpd_rights_title": "8. Seus Direitos (LGPD)",
+      "lgpd_rights_text": "Conforme a Lei Geral de Proteção de Dados (LGPD), você tem o direito de: (a) Confirmar a existência de tratamento; (b) Acessar seus dados; (c) Corrigir dados incompletos; (d) Solicitar a anonimização ou exclusão; (e) Revogar este consentimento a qualquer momento através das configurações da conta.",
+      "cookies_title": "9. Uso de Cookies",
+      "cookies_text": "Utilizamos cookies essenciais para o funcionamento do Retold, incluindo: (a) Autenticação e Segurança; (b) Preferências de Idioma; e (c) Processamento de Sessões. Estes cookies são necessários para proteger sua conta e fornecer o serviço solicitado."
     }
   }
 }
