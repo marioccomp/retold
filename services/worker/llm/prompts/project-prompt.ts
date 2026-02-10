@@ -3,17 +3,17 @@ import { Heuristic } from "../../types/heuristic";
 export function projectPrompt(input: Heuristic, repoName: string) {
   const locale = input.locale?.toLowerCase() ?? "en";
   const outputLanguage = locale.startsWith("pt")
-    ? "pt-BR"
+    ? "Portuguese (pt-BR)"
     : locale.startsWith("es")
-      ? "es"
-      : "en";
+      ? "Spanish (es)"
+      : "English";
 
   const { readme: _r, codeSamples: _c, ...inputWithoutReadmeOrCodeSamples } = input;
 
   const technicalTermsPolicy =
-    outputLanguage === "pt-BR"
+    locale.startsWith("pt")
       ? "- TECHNICAL TERMS POLICY: When writing in Portuguese, keep industry-standard technical terms, software architecture patterns, and common development jargon in English. Only translate prose and explanations; maintain the 'language of the craft' as it is used globally."
-      : outputLanguage === "es"
+      : locale.startsWith("es")
         ? "- TECHNICAL TERMS POLICY: When writing in Spanish, keep industry-standard technical terms, software architecture patterns, and common development jargon in English. Only translate prose and explanations; maintain the 'language of the craft' as it is used globally."
         : "";
 
@@ -101,7 +101,7 @@ README POLICY:
   const maturityExpectation = c.maturityExpectation;
 
   const schema = {
-    language: outputLanguage,
+    language: locale.startsWith("pt") ? "pt-BR" : locale.startsWith("es") ? "es" : "en",
     meta: {
       primaryLanguage: primaryLanguage,
       appType: appType,
