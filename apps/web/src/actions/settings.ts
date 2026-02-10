@@ -5,6 +5,7 @@ import { getUpdatePasswordSchema, getCreatePasswordSchema } from "@/src/domains/
 import { prisma, userRepository } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { getDictionary } from "@/src/i18n/server";
+import { cookies } from "next/headers";
 
 export async function updatePasswordAction(
     prevState: any,
@@ -99,6 +100,11 @@ export async function deleteAccountAction() {
         console.error("Error deleting account:", error);
         throw new Error("Failed to delete account");
     }
+
+    // Clear language preference cookies so new accounts start fresh
+    const cookieStore = await cookies();
+    cookieStore.delete('NEXT_LOCALE');
+    cookieStore.delete('ANALYSIS_LOCALE');
 
     return { success: true };
 }
