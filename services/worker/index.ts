@@ -204,9 +204,7 @@ const worker = new Worker(
           select: { dailyAnalysisCount: true, dailyAnalysisDate: true },
         });
 
-        const lastDate = owner?.dailyAnalysisDate
-          ? new Date(owner.dailyAnalysisDate)
-          : null;
+        const lastDate = owner?.dailyAnalysisDate ? new Date(owner.dailyAnalysisDate) : null;
         const isToday = lastDate && lastDate.getTime() >= today.getTime();
 
         await prisma.user.update({
@@ -218,7 +216,8 @@ const worker = new Worker(
         });
 
         console.log(
-          `[worker] User ${ownerProject.userId} daily analysis count: ${isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1
+          `[worker] User ${ownerProject.userId} daily analysis count: ${
+            isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1
           }`
         );
       }
@@ -276,17 +275,15 @@ const worker = new Worker(
           console.log(`[worker] User ${project.userId} locked until ${resetAt.toISOString()}`);
         }
 
-        await prisma.project.update({
+        await prisma.project.delete({
           where: { id: projectId },
-          data: { status: "RATE_LIMITED" },
         });
 
         return;
       }
 
-      await prisma.project.update({
+      await prisma.project.delete({
         where: { id: projectId },
-        data: { status: "ERROR" },
       });
 
       throw err;
