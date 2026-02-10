@@ -419,6 +419,11 @@
       "avatar_error": "Erro inesperado ao enviar avatar.",
       "avatar_hint": "Clique para enviar um novo avatar"
     },
+    "crop_modal": {
+      "title": "Ajustar imagem",
+      "cancel": "Cancelar",
+      "apply": "Aplicar"
+    },
     "edit_section_modal": {
       "title": "Editar Detalhes do Perfil",
       "long_bio_label": "Sobre Mim (Detalhado)",

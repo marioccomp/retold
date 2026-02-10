@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import { Button } from "@/components/ui/button";
 import { FiZoomIn, FiZoomOut, FiCheck, FiX } from "react-icons/fi";
+import { useTranslation } from "@/src/i18n/client";
 
 type Props = {
     isOpen: boolean;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export default function CropImageModal({ isOpen, onClose, imageSrc, aspectRatio, onCropComplete }: Props) {
+    const { dict } = useTranslation();
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -60,7 +62,7 @@ export default function CropImageModal({ isOpen, onClose, imageSrc, aspectRatio,
             <div className="bg-white w-[90vw] h-[90vh] max-w-[1200px] rounded-2xl shadow-2xl overflow-hidden m-4 animate-in zoom-in-95 flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[#e7eae9] shrink-0">
-                    <h2 className="text-xl font-semibold text-[#152e2b]">Ajustar imagem</h2>
+                    <h2 className="text-xl font-semibold text-[#152e2b]">{dict.profile.crop_modal.title}</h2>
                     <button
                         onClick={handleClose}
                         className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#f3f6f5] text-[#6b7c7a] transition-colors cursor-pointer"
@@ -138,7 +140,7 @@ export default function CropImageModal({ isOpen, onClose, imageSrc, aspectRatio,
                         className="text-[#6b7c7a] hover:bg-[#e7eae9] cursor-pointer"
                         disabled={isProcessing}
                     >
-                        Cancelar
+                        {dict.profile.crop_modal.cancel}
                     </Button>
                     <Button
                         onClick={handleConfirm}
@@ -150,7 +152,7 @@ export default function CropImageModal({ isOpen, onClose, imageSrc, aspectRatio,
                         ) : (
                             <FiCheck className="mr-2" size={16} />
                         )}
-                        Aplicar
+                        {dict.profile.crop_modal.apply}
                     </Button>
                 </div>
             </div>
