@@ -6,6 +6,8 @@ import { analyzeRepoQueue } from "@repo/queue";
 
 import { getLocale } from "@/src/i18n/server";
 
+const DAILY_ANALYSIS_LIMIT = 3;
+
 export async function startProjectAnalysisAction(projectId: number) {
     const session = await auth();
     const locale = await getLocale();
@@ -14,10 +16,37 @@ export async function startProjectAnalysisAction(projectId: number) {
         throw new Error("Unauthorized");
     }
 
+    const userId = Number(session.user.id);
+
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { dailyAnalysisCount: true, dailyAnalysisDate: true },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const lastDate = user.dailyAnalysisDate
+        ? new Date(user.dailyAnalysisDate)
+        : null;
+    const isToday = lastDate && lastDate.getTime() >= today.getTime();
+    const currentCount = isToday ? user.dailyAnalysisCount : 0;
+
+    if (currentCount >= DAILY_ANALYSIS_LIMIT) {
+        return {
+            queued: false,
+            limitReached: true,
+            remaining: 0,
+            limit: DAILY_ANALYSIS_LIMIT,
+        };
+    }
+
     const project = await prisma.project.findUnique({
         where: {
             id: projectId,
-            userId: Number(session.user.id),
+            userId: userId,
         },
         include: {
             repository: true,
@@ -54,5 +83,7 @@ export async function startProjectAnalysisAction(projectId: number) {
         queued: true,
         projectId: project.id,
         repoUrl: project.repository.url,
+        remaining: DAILY_ANALYSIS_LIMIT - currentCount - 1,
+        limit: DAILY_ANALYSIS_LIMIT,
     };
 }

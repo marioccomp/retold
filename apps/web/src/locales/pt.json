@@ -61,7 +61,10 @@
     },
     "analysis": {
       "started": "Análise iniciada",
-      "start_error": "Falha ao iniciar análise"
+      "start_error": "Falha ao iniciar análise",
+      "limit_reached_title": "Limite diário atingido",
+      "limit_reached_description": "Você já usou todas as 3 análises de hoje. Volte amanhã!",
+      "remaining": "{remaining} de {limit} análises restantes hoje"
     },
     "metrics": {
       "language": "Linguagem",
