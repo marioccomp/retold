@@ -36,7 +36,7 @@ import { setLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
 
 export function SettingsClient() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const { dict, lang } = useTranslation();
   const [providers, setProviders] = useState<string[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(true);
@@ -78,18 +78,48 @@ export function SettingsClient() {
   }, []);
 
   async function handleUpdatePassword(formData: FormData) {
+    const form = document.getElementById("password-form") as HTMLFormElement;
+
     startPasswordTransition(async () => {
       const result = await updatePasswordAction(null, formData);
       if (result?.error) {
         if (typeof result.error === "string") {
           toast.error(result.error);
         } else {
-          const firstError = Object.values(result.error)[0]?.[0];
+          const errors = result.error as Record<string, string[]>;
+          const firstError = Object.values(errors)[0]?.[0];
           toast.error(firstError || dict.settings.dangerZone.toast.update_error);
+
+          // Limpeza Seletiva:
+          // 1. Se erro for na senha atual, limpa ela
+          if (errors.currentPassword) {
+            const currentInput = form?.querySelector(
+              'input[name="currentPassword"]'
+            ) as HTMLInputElement;
+            if (currentInput) currentInput.value = "";
+          }
+
+          // 2. Se erro for no email (fluxo de criação), limpa ele
+          if (errors.email) {
+            const emailInput = form?.querySelector('input[name="email"]') as HTMLInputElement;
+            if (emailInput) emailInput.value = "";
+          }
+
+          // 3. Se erro for na nova senha ou confirmação, limpa AMBAS
+          if (errors.newPassword || errors.confirmPassword) {
+            const newPwdInput = form?.querySelector(
+              'input[name="newPassword"]'
+            ) as HTMLInputElement;
+            const confirmInput = form?.querySelector(
+              'input[name="confirmPassword"]'
+            ) as HTMLInputElement;
+            if (newPwdInput) newPwdInput.value = "";
+            if (confirmInput) confirmInput.value = "";
+          }
         }
       } else if (result?.success) {
         toast.success(result.success);
-        const form = document.getElementById("password-form") as HTMLFormElement;
+        await update({ hasPassword: true });
         form?.reset();
       }
     });
@@ -205,7 +235,10 @@ export function SettingsClient() {
               <CardContent>
                 <form
                   id="password-form"
-                  action={handleUpdatePassword}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleUpdatePassword(new FormData(e.currentTarget));
+                  }}
                   className="space-y-4"
                   noValidate
                 >

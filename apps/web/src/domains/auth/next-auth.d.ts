@@ -9,6 +9,7 @@ declare module "next-auth" {
       role: "USER" | "RECRUITER" | "ADMIN";
       plan: "FREE" | "PREMIUM";
       username: string;
+      hasPassword: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -19,6 +20,7 @@ declare module "next-auth/jwt" {
     role: "USER" | "RECRUITER" | "ADMIN";
     plan: "FREE" | "PREMIUM";
     username: string;
+    hasPassword: boolean;
     accessToken: string;
     scope: string;
   }

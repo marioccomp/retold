@@ -9,14 +9,15 @@ export const authConfig = {
   callbacks: {
     async jwt({ token, user, account, trigger, session }) {
       if (user) {
+        console.log(token);
         token.id = user.id;
         token.role = (user as any).role;
         token.plan = (user as any).plan;
         token.name = user.name;
         token.image = user.image;
         token.username = (user as any).username;
-        // Check if user has password (password field exists and is not null in DB user object)
-        token.hasPassword = !!(user as any).password;
+        token.hasPassword =
+          "hasPassword" in user ? (user as any).hasPassword : !!(user as any).password;
       }
 
       // When session.update() is called, fetch fresh user data from DB
@@ -27,7 +28,14 @@ export const authConfig = {
           const { prisma } = await import("@repo/database");
           const freshUser = await prisma.user.findUnique({
             where: { id: Number(token.id) },
-            select: { username: true, name: true, image: true, role: true, plan: true, password: true },
+            select: {
+              username: true,
+              name: true,
+              image: true,
+              role: true,
+              plan: true,
+              password: true,
+            },
           });
           if (freshUser) {
             token.username = freshUser.username;
@@ -35,7 +43,8 @@ export const authConfig = {
             token.image = freshUser.image;
             token.role = freshUser.role;
             token.plan = freshUser.plan;
-            token.hasPassword = !!freshUser.password;
+            token.hasPassword =
+              session?.hasPassword !== undefined ? session.hasPassword : !!freshUser.password;
           }
         }
       }
@@ -83,7 +92,7 @@ export const authConfig = {
         "/favicon.ico",
       ];
 
-      const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+      const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
       const isProfileRoute = /^\/[a-zA-Z0-9_-]+$/.test(pathname); // Rota de perfil /{username}
 
       // Se o usuário está logado mas não tem username
@@ -133,4 +142,3 @@ declare module "next-auth" {
     user: User;
   }
 }
-
