@@ -382,6 +382,10 @@
       "title": "Nenhum projeto ainda",
       "description": "Este usuário ainda não publicou nenhum projeto aqui."
     },
+    "no_search_results": {
+      "title": "Nenhum projeto encontrado",
+      "description": "Tente buscar por outro termo."
+    },
     "edit_modal": {
       "title": "Editar Perfil",
       "name_label": "Nome",

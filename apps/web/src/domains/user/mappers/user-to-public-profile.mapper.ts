@@ -12,6 +12,7 @@ const userWithProfileData = Prisma.validator<Prisma.UserDefaultArgs>()({
       select: {
         followers: true,
         following: true,
+        projects: true,
       },
     },
     followers: true,
@@ -36,7 +37,9 @@ function normalizeLastCommit(value: unknown): LastCommitDTO {
 
 export function mapUserToPublicProfile(
   user: UserWithProfileData,
-  currentUserId?: number
+  currentUserId?: number,
+  projectsPage: number = 1,
+  projectsLimit: number = 12
 ): PublicProfileDTO {
   const isFollowing = user.followers && user.followers.length > 0;
 
@@ -138,9 +141,15 @@ export function mapUserToPublicProfile(
       linesAdded: user.userStats.reduce((acc, curr) => acc + curr.linesAdded, 0),
       linesDeleted: user.userStats.reduce((acc, curr) => acc + curr.linesDeleted, 0),
       activeDays: user.userStats.reduce((acc, curr) => acc + curr.activeDays, 0),
-      projectsCount: user.projects.length,
+      projectsCount: user._count.projects, // Use the total count from DB
       lastCommitFetchedAt: user.githubStats?.lastCommitFetchedAt || null,
       lastCommit: normalizeLastCommit(user.githubStats?.lastCommit),
+    },
+    projectsMetadata: {
+      total: user._count.projects,
+      page: projectsPage,
+      limit: projectsLimit,
+      totalPages: Math.ceil(user._count.projects / projectsLimit),
     },
   };
 }

@@ -382,6 +382,10 @@
       "title": "No projects yet",
       "description": "This user hasn't published any projects here yet."
     },
+    "no_search_results": {
+      "title": "No projects found",
+      "description": "Try searching for another term."
+    },
     "edit_modal": {
       "title": "Edit Profile",
       "name_label": "Name",

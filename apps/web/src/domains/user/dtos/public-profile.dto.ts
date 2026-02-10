@@ -44,6 +44,12 @@ export type PublicProfileDTO = {
   websiteUrl: string | null;
   createdAt: string;
   projects: ProjectCardDTO[];
+  projectsMetadata?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
   certifications: CertificationCardDTO[];
   participations: ParticipationCardDTO[];
   educations: EducationDTO[];
