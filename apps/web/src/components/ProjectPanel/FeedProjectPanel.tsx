@@ -146,23 +146,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
         {/* So I will put X on the LEFT for mobile feel. */}
 
         <div className="relative flex items-center justify-between w-full">
-          {isModal && (
-            <button
-              onClick={onClose}
-              className="p-2 -ml-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors z-10 cursor-pointer"
-              aria-label="Close"
-            >
-              <XCircle className="w-6 h-6" />
-            </button>
-          )}
-
-          {/* Title in Header for Sticky context - Centered */}
-          <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-900 truncate max-w-[60%] text-center">
-            {t.overlay?.details || "Detalhes do Projeto"}
-          </h2>
-
-          <div className="flex items-center gap-2 shrink-0 z-10 ml-auto">
-            {/* StatusBadge removed from header as requested */}
+          <div className="flex items-center gap-2 shrink-0 z-10">
             {isOwner && (
               <ProjectSettings
                 project={{
@@ -170,8 +154,25 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   ownerUsername: project.owner?.username,
                 }}
                 onDelete={onClose}
-                triggerClassName="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-red-100"
+                triggerClassName="p-2 -ml-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer border border-transparent hover:border-gray-200"
               />
+            )}
+          </div>
+
+          {/* Title in Header for Sticky context - Centered */}
+          <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-900 truncate max-w-[60%] text-center">
+            {t.overlay?.details || "Detalhes do Projeto"}
+          </h2>
+
+          <div className="flex items-center gap-2 shrink-0 z-10">
+            {isModal && (
+              <button
+                onClick={onClose}
+                className="p-2 -mr-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors z-10 cursor-pointer"
+                aria-label="Close"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
             )}
           </div>
         </div>

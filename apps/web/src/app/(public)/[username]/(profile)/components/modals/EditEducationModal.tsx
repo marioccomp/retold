@@ -258,7 +258,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full justify-start text-left font-normal focus-visible:ring-[#05dc7f] h-9 font-medium px-3",
+                            "w-full justify-start text-left font-normal h-9 font-medium px-3",
                             !edu.startDate && "text-muted-foreground"
                           )}
                         >
@@ -301,7 +301,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                             variant={"outline"}
                             disabled={!edu.endDate}
                             className={cn(
-                              "w-full justify-start text-left font-normal focus-visible:ring-[#05dc7f] h-9 font-medium px-3",
+                              "w-full justify-start text-left font-normal h-9 font-medium px-3",
                               !edu.endDate && "text-muted-foreground"
                             )}
                           >

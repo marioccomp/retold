@@ -140,7 +140,7 @@ export default function LoginForm() {
                 name="identifier"
                 required
                 placeholder={dict.auth.login.email_placeholder}
-                className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                className="h-11 shadow-none"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function LoginForm() {
                   name="password"
                   required
                   placeholder="••••••••"
-                  className="h-11 pr-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                  className="h-11 pr-11 shadow-none"
                 />
                 <button
                   type="button"
