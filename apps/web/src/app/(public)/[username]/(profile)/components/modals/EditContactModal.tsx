@@ -107,7 +107,7 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={dict.profile.contact_section.email_placeholder}
-                className="pl-9 bg-white border-border/60 focus-visible:ring-[#05dc7f]"
+                className="pl-9 bg-white"
               />
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder={dict.profile.contact_section.phone_placeholder}
-                className="pl-9 bg-white border-border/60 focus-visible:ring-[#05dc7f]"
+                className="pl-9 bg-white"
               />
             </div>
           </div>

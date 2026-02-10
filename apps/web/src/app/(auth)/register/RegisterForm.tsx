@@ -188,7 +188,7 @@ export default function RegisterForm() {
                 name="name"
                 placeholder={dict.profile.edit_modal.name_placeholder}
                 required
-                className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                className="h-11 shadow-none"
                 onChange={(e) => {
                   const value = e.target.value;
 
@@ -217,7 +217,7 @@ export default function RegisterForm() {
                 name="username"
                 placeholder={dict.auth.register.username_placeholder}
                 required
-                className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                className="h-11 shadow-none"
                 onChange={(e) => {
                   const value = e.target.value;
 
@@ -268,7 +268,7 @@ export default function RegisterForm() {
                 name="email"
                 placeholder={dict.auth.register.email_placeholder}
                 required
-                className="h-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                className="h-11 shadow-none"
                 onChange={() => {
                   if (emailError) setEmailError(null);
                   if (emailAvailable) setEmailAvailable(false);
@@ -307,7 +307,7 @@ export default function RegisterForm() {
                   name="password"
                   placeholder="••••••••"
                   required
-                  className="h-11 pr-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                  className="h-11 pr-11 shadow-none"
                   onChange={(e) => {
                     const value = e.target.value;
                     setPasswordValue(value);
@@ -354,7 +354,7 @@ export default function RegisterForm() {
                   name="confirmPassword"
                   placeholder="••••••••"
                   required
-                  className="h-11 pr-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                  className="h-11 pr-11 shadow-none"
                   onChange={(e) => {
                     const value = e.target.value;
 

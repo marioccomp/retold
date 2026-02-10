@@ -104,7 +104,7 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
                 onChange={(e) => setNewSkill(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSkill())}
                 placeholder={dict.profile.edit_section_modal.skills_placeholder}
-                className="focus-visible:ring-[#05dc7f] flex-1 h-10 font-medium"
+                className="flex-1 h-10 font-medium"
               />
               <Button
                 type="button"

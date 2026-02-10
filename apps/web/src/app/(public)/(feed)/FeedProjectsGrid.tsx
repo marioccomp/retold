@@ -48,7 +48,7 @@ export default function FeedProjectsGrid({
   const selectedProject: ProjectForOverlay | null = projectData
     ? {
         id: projectData.id,
-        userId: undefined,
+        userId: projectData.ownerId,
         title: projectData.title,
         description: projectData.description,
         status: projectData.status,

@@ -266,7 +266,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
+              className="bg-white"
               placeholder={dict.profile.edit_modal.name_placeholder}
               maxLength={20}
             />
@@ -282,7 +282,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
+              className="bg-white"
               placeholder={dict.profile.edit_modal.job_placeholder}
               maxLength={50}
             />
@@ -298,7 +298,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={2}
-              className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8] resize-none min-h-[60px]"
+              className="bg-white resize-none min-h-[60px]"
               placeholder={dict.profile.edit_modal.headline_placeholder}
               maxLength={100}
             />
@@ -322,7 +322,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 type="text"
                 value={githubUrl}
                 onChange={(e) => setGithubUrl(e.target.value)}
-                className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
+                className="bg-white"
                 placeholder={dict.profile.edit_modal.github_placeholder}
               />
             </div>
@@ -336,7 +336,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 type="text"
                 value={linkedinUrl}
                 onChange={(e) => setLinkedinUrl(e.target.value)}
-                className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
+                className="bg-white"
                 placeholder={dict.profile.edit_modal.linkedin_placeholder}
               />
             </div>
@@ -350,7 +350,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 type="text"
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                className="bg-white border-[#e7eae9] focus-visible:ring-[#05dc7f] text-[#152e2b] placeholder:text-[#a0aaa8]"
+                className="bg-white"
                 placeholder={dict.profile.edit_modal.website_placeholder}
               />
             </div>
