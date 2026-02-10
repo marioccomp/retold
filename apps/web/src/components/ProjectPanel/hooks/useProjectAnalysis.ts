@@ -28,8 +28,18 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
             const result = await startProjectAnalysisAction(project.id);
 
             if (result.limitReached) {
+                const hoursLeft = result.hoursLeft ?? 0;
+                const minutesLeft = result.minutesLeft ?? 0;
+
+                const timeStr = hoursLeft > 0
+                    ? dict.project.analysis.retry_time_hours
+                        .replace("{hours}", String(hoursLeft))
+                        .replace("{minutes}", String(minutesLeft))
+                    : dict.project.analysis.retry_time_minutes
+                        .replace("{minutes}", String(minutesLeft));
+
                 toast.error(dict.project.analysis.limit_reached_title, {
-                    description: dict.project.analysis.limit_reached_description,
+                    description: `${dict.project.analysis.limit_reached_description} ${timeStr}`,
                 });
                 return;
             }

@@ -55,9 +55,22 @@ export async function createProjectAction(
   const currentCount = isToday ? (user?.dailyAnalysisCount ?? 0) : 0;
 
   if (currentCount >= DAILY_ANALYSIS_LIMIT) {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const msUntilReset = tomorrow.getTime() - Date.now();
+    const hoursLeft = Math.floor(msUntilReset / 3600000);
+    const minutesLeft = Math.floor((msUntilReset % 3600000) / 60000);
+
+    const timeStr = hoursLeft > 0
+      ? dict.project.analysis.retry_time_hours
+        .replace("{hours}", String(hoursLeft))
+        .replace("{minutes}", String(minutesLeft))
+      : dict.project.analysis.retry_time_minutes
+        .replace("{minutes}", String(minutesLeft));
+
     return {
       success: false,
-      message: dict.project.analysis.limit_reached_description
+      message: `${dict.project.analysis.limit_reached_description} ${timeStr}`
     };
   }
 
@@ -111,5 +124,13 @@ export async function createProjectAction(
 
   await startProjectAnalysisAction(projectId);
 
-  return { success: true, data: project };
+  // Calculate remaining analyses for notification
+  const remaining = DAILY_ANALYSIS_LIMIT - currentCount - 1;
+
+  return {
+    success: true,
+    data: project,
+    remaining,
+    limit: DAILY_ANALYSIS_LIMIT,
+  };
 }
