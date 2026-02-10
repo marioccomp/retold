@@ -4,13 +4,13 @@ import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { analyzeRepoQueue } from "@repo/queue";
 
-import { getLocale } from "@/src/i18n/server";
+import { getAnalysisLocale } from "@/src/i18n/server";
 
 const DAILY_ANALYSIS_LIMIT = 3;
 
 export async function startProjectAnalysisAction(projectId: number) {
     const session = await auth();
-    const locale = await getLocale();
+    const locale = await getAnalysisLocale();
 
     if (!session?.user?.id) {
         throw new Error("Unauthorized");

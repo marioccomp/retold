@@ -23,3 +23,16 @@ export async function getLocale() {
 
     return 'en';
 }
+
+export async function getAnalysisLocale() {
+    const cookieStore = await cookies();
+    const analysisLang = cookieStore.get('ANALYSIS_LOCALE')?.value;
+
+    // If set to a specific language, use it
+    if (analysisLang && analysisLang !== 'auto') {
+        return analysisLang;
+    }
+
+    // Default: same as interface language
+    return getLocale();
+}

@@ -1,8 +1,10 @@
 export function projectOverviewPrompt(input: any, locale: string = "en") {
-  const isPt = locale?.toLowerCase().startsWith("pt");
+  const l = locale?.toLowerCase() ?? "en";
+  const isPt = l.startsWith("pt");
+  const isEs = l.startsWith("es");
 
   // Output text language (values), but JSON keys remain ENGLISH.
-  const outputLanguage = isPt ? "Portuguese (pt-BR)" : "English";
+  const outputLanguage = isPt ? "Portuguese (pt-BR)" : isEs ? "Spanish (es)" : "English";
 
   const languageInstruction = `
 IMPORTANT:
@@ -17,7 +19,7 @@ IMPORTANT:
   // Keep schema keys in ENGLISH
   const schema = {
     schema_version: "2.1",
-    language: isPt ? "pt-BR" : "en",
+    language: isPt ? "pt-BR" : isEs ? "es" : "en",
     meta: {
       primaryLanguage: input?.summary?.primaryLanguage ?? "Unknown",
       appType: input?.summary?.appType ?? "Unknown",

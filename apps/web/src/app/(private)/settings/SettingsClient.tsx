@@ -33,10 +33,10 @@ import {
   deleteAccountAction,
   getConnectedProvidersAction,
 } from "@/src/actions/settings";
-import { setLanguageAction } from "@/src/actions/language";
+import { setLanguageAction, setAnalysisLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
 
-export function SettingsClient() {
+export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnalysisLocale?: string }) {
   const { data: session, update } = useSession();
   const { dict, lang } = useTranslation();
   const [providers, setProviders] = useState<string[]>([]);
@@ -159,6 +159,12 @@ export function SettingsClient() {
     window.location.reload();
   }
 
+  async function handleAnalysisLanguageChange(value: string) {
+    const formData = new FormData();
+    formData.append("analysisLocale", value);
+    await setAnalysisLanguageAction(formData);
+  }
+
   const navItems = [
     { id: "general", label: dict.settings.language.title, icon: FiGlobe },
     { id: "security", label: dict.settings.security, icon: FiShield },
@@ -211,7 +217,7 @@ export function SettingsClient() {
                 <CardTitle>{dict.settings.language.title}</CardTitle>
                 <CardDescription>{dict.settings.language.description}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label>{dict.settings.language.label}</Label>
                   <Select defaultValue={lang} onValueChange={handleLanguageChange}>
@@ -221,6 +227,26 @@ export function SettingsClient() {
                     <SelectContent>
                       <SelectItem value="en">English</SelectItem>
                       <SelectItem value="pt">Português</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label>{dict.settings.language.analysis_language_label}</Label>
+                  <p className="text-sm text-gray-500">
+                    {dict.settings.language.analysis_language_description}
+                  </p>
+                  <Select defaultValue={initialAnalysisLocale} onValueChange={handleAnalysisLanguageChange}>
+                    <SelectTrigger className="w-full sm:w-[220px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">{dict.settings.language.analysis_language_same}</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="pt">Português</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
