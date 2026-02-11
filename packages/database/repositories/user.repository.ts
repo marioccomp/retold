@@ -1,4 +1,5 @@
 import { prisma } from "../index";
+import { Prisma } from "@prisma/client";
 import { GithubStats, User } from "@prisma/client";
 
 type UpdatableProfileFields = Pick<
@@ -58,28 +59,44 @@ export const userRepository = {
     currentUserId?: number,
     projectsPage: number = 1,
     projectsLimit: number = 12,
-    projectsQuery: string = ""
+    projectsQuery: string = "",
+    projectsSort: "newest" | "oldest" | "popular" = "newest"
   ) {
     const skip = (projectsPage - 1) * projectsLimit;
 
     // Filter condition for projects
     const projectsWhereInput: any = {
-      ...(projectsQuery
-        ? {
-            OR: [
-              { title: { contains: projectsQuery, mode: "insensitive" } },
-              { tags: { some: { name: { contains: projectsQuery, mode: "insensitive" } } } },
-            ],
-          }
-        : {}),
+      AND: [
+        {
+          OR: [{ visibility: "public" }, { userId: currentUserId }],
+        },
+      ],
     };
+
+    if (projectsQuery) {
+      projectsWhereInput.AND.push({
+        OR: [
+          { title: { contains: projectsQuery, mode: "insensitive" } },
+          {
+            tags: {
+              some: { name: { contains: projectsQuery, mode: "insensitive" } },
+            },
+          },
+        ],
+      });
+    }
 
     const user = await prisma.user.findUnique({
       where: { username },
       include: {
         projects: {
           where: projectsWhereInput,
-          orderBy: { createdAt: "desc" },
+          orderBy:
+            projectsSort === "popular"
+              ? { views: "desc" }
+              : projectsSort === "oldest"
+                ? { createdAt: "asc" }
+                : { createdAt: "desc" },
           skip,
           take: projectsLimit,
           include: {
@@ -143,8 +160,8 @@ export const userRepository = {
       },
     });
 
-    if (user && projectsQuery) {
-      // If there's a search query, we need to correct the count
+    if (user) {
+      // Correction of the count to always match the filters (visibility, repository, query)
       const filteredCount = await prisma.project.count({
         where: {
           userId: user.id,
@@ -248,14 +265,41 @@ export const userRepository = {
     });
   },
 
-  async searchUsers(query: string, currentUserId?: number, page: number = 1, limit: number = 20) {
+  async searchUsers(
+    query: string,
+    currentUserId?: number,
+    page: number = 1,
+    limit: number = 20,
+    sort: "active" | "newest" | "oldest" | "name" = "active"
+  ) {
     const skip = (page - 1) * limit;
+
+    // When searching, fall back to newest (ranking + text search don't mix well)
+    const effectiveSort = query ? "newest" : sort;
+
+    // Use raw SQL scoring for "active" sort
+    if (effectiveSort === "active") {
+      return this._getActiveUsers(currentUserId, page, limit);
+    }
+
+    // Normalize query for case-insensitive skill matching on scalar list
+    const queryLower = query.toLowerCase();
 
     const whereClause: any = {
       OR: [
         { name: { contains: query, mode: "insensitive" } },
         { username: { contains: query, mode: "insensitive" } },
         { title: { contains: query, mode: "insensitive" } },
+        // Match users who have a skill containing the search query
+        {
+          skills: {
+            hasSome: [
+              query,
+              queryLower,
+              query.charAt(0).toUpperCase() + query.slice(1).toLowerCase(),
+            ],
+          },
+        },
       ],
       ...(currentUserId ? { id: { not: currentUserId } } : {}),
     };
@@ -287,6 +331,12 @@ export const userRepository = {
         },
         skip,
         take: limit,
+        orderBy:
+          sort === "name"
+            ? { name: "asc" }
+            : sort === "oldest"
+              ? { createdAt: "asc" }
+              : { createdAt: "desc" },
       }),
       prisma.user.count({
         where: whereClause,
@@ -294,6 +344,97 @@ export const userRepository = {
     ]);
 
     return { users, total };
+  },
+
+  // ─── Activity-Based People Ranking ────────────────────────────────────────────
+  // activity_score = (recent_projects_30d × 10) + (recent_likes_30d × 1)
+  //                + (followers × 2) + profile_completeness_bonus
+
+  async _getActiveUsers(currentUserId?: number, page: number = 1, limit: number = 20) {
+    const offset = (page - 1) * limit;
+
+    const excludeClause = currentUserId ? Prisma.sql`AND u.id != ${currentUserId}` : Prisma.empty;
+
+    // Get total count
+    const [{ count: total }] = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(*)::bigint as count
+      FROM "User" u
+      WHERE u.username IS NOT NULL
+      ${excludeClause}
+    `;
+
+    // Get scored user IDs
+    const scoredIds = await prisma.$queryRaw<{ id: number }[]>`
+      SELECT u.id
+      FROM "User" u
+      LEFT JOIN (
+        SELECT "userId", COUNT(*)::int as cnt
+        FROM "Project"
+        WHERE "createdAt" > NOW() - INTERVAL '30 days' AND visibility = 'public'
+        GROUP BY "userId"
+      ) recent_projects ON u.id = recent_projects."userId"
+      LEFT JOIN (
+        SELECT "userId", COUNT(*)::int as cnt
+        FROM "Like"
+        WHERE "createdAt" > NOW() - INTERVAL '30 days'
+        GROUP BY "userId"
+      ) recent_likes ON u.id = recent_likes."userId"
+      LEFT JOIN (
+        SELECT "followingId" as user_id, COUNT(*)::int as cnt
+        FROM "Follows"
+        GROUP BY "followingId"
+      ) follower_count ON u.id = follower_count.user_id
+      WHERE u.username IS NOT NULL
+      ${excludeClause}
+      ORDER BY (
+        COALESCE(recent_projects.cnt, 0) * 10 +
+        COALESCE(recent_likes.cnt, 0) * 1 +
+        COALESCE(follower_count.cnt, 0) * 2 +
+        CASE WHEN u.image IS NOT NULL THEN 5 ELSE 0 END +
+        CASE WHEN u.bio IS NOT NULL THEN 3 ELSE 0 END +
+        CASE WHEN array_length(u.skills, 1) > 0 THEN 2 ELSE 0 END +
+        CASE WHEN EXISTS (
+          SELECT 1 FROM "Project" WHERE "userId" = u.id AND visibility = 'public'
+        ) THEN 5 ELSE 0 END
+      ) DESC,
+      u."createdAt" DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    if (scoredIds.length === 0) {
+      return { users: [], total: Number(total) };
+    }
+
+    const ids = scoredIds.map((r) => r.id);
+
+    // Fetch full user data with Prisma
+    const users = await prisma.user.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+        title: true,
+        bio: true,
+        cover: true,
+        skills: true,
+        ...(currentUserId
+          ? {
+              followers: {
+                where: { followerId: currentUserId },
+                select: { followerId: true },
+              },
+            }
+          : {}),
+      },
+    });
+
+    // Preserve scored order
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    const orderedUsers = ids.map((id) => userMap.get(id)).filter(Boolean);
+
+    return { users: orderedUsers, total: Number(total) };
   },
 
   async createOrUpdateGithubStats(userId: number, data: any) {

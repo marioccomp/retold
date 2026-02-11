@@ -226,11 +226,13 @@
       "add": "Add",
       "labels": {
         "title": "Title",
-        "description": "Description"
+        "description": "Description",
+        "visibility": "Visibility"
       },
       "placeholders": {
         "title": "Project name",
-        "description": "Short description"
+        "description": "Short description",
+        "visibility": "Select visibility"
       },
       "cancel": "Cancel",
       "save": "Save changes",
@@ -253,6 +255,10 @@
         "delete_error": "Error deleting project",
         "title_required": "Title cannot be empty",
         "max_images": "Maximum of 3 images allowed."
+      },
+      "visibility_options": {
+        "public": "Public",
+        "private": "Private"
       }
     }
   },
@@ -274,12 +280,23 @@
       "excellent": "Excellent",
       "clean_code": "Clean and optimized code"
     },
+    "sort": {
+      "recommended": "Recommended",
+      "most_active": "Most Active",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "popular": "Popular",
+      "alphabetical": "Alphabetical",
+      "placeholder": "Sort by"
+    },
     "feedcontent": {
       "tabs": {
         "projects": "Projects",
         "people": "People"
       },
       "search_placeholder": "Search projects, people, tags...",
+      "search_placeholder_projects": "Search projects, tags...",
+      "search_placeholder_people": "Search people, skills...",
       "people_coming_soon": {
         "title": "Coming soon",
         "description": "People search will be available soon"
@@ -443,6 +460,8 @@
       "course_hint": "Tip: You can type your course name if it's not in the list.",
       "institution_hint": "Tip: You can type the institution name if it's not in the list.",
       "select_date": "Select a date",
+      "month": "Month",
+      "year": "Year",
       "use_value": "Use \"{value}\"",
       "skills_label": "Skills",
       "skills_placeholder": "Type a skill and press Enter",

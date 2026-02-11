@@ -14,12 +14,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { useTranslation } from "@/src/i18n/client";
 import ProjectDetailsModal from "./components/modals/ProjectDetailsModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Props = {
   profile: PublicProfileDTO;
   ownProfile: boolean;
   searchQuery: string;
   onPageChange?: (page: number) => void;
+  sort?: "newest" | "oldest" | "popular";
+  onSortChange?: (sort: "newest" | "oldest" | "popular") => void;
 };
 
 // Tipo adaptado para o overlay (campos mínimos necessários)
@@ -29,6 +38,7 @@ type ProjectForOverlay = {
   title: string;
   description: string | null;
   status: string;
+  visibility?: string;
   repository: any;
   images: string[];
   owner?: {
@@ -38,7 +48,14 @@ type ProjectForOverlay = {
   };
 };
 
-export default function ProjectsSection({ searchQuery, ownProfile, profile, onPageChange }: Props) {
+export default function ProjectsSection({
+  searchQuery,
+  ownProfile,
+  profile,
+  onPageChange,
+  sort,
+  onSortChange,
+}: Props) {
   const { dict } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -68,6 +85,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile, onPa
         title: projectData.title,
         description: projectData.description,
         status: projectData.status,
+        visibility: projectData.visibility,
         images: projectData.images, // Pass images directly
         repository: projectData.repositoryUrl
           ? {
@@ -142,6 +160,31 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile, onPa
 
   return (
     <>
+      {/* Sorting Control */}
+      {onSortChange && filteredProjects.length > 0 && (
+        <div className="col-span-full flex">
+          <Select
+            value={sort}
+            onValueChange={(val: "newest" | "oldest" | "popular") => onSortChange(val)}
+          >
+            <SelectTrigger className="w-[180px] bg-white border-[#e7eae9] cursor-pointer">
+              <SelectValue placeholder={dict.feed.sort.placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest" className="cursor-pointer">
+                {dict.feed.sort.newest}
+              </SelectItem>
+              <SelectItem value="oldest" className="cursor-pointer">
+                {dict.feed.sort.oldest}
+              </SelectItem>
+              <SelectItem value="popular" className="cursor-pointer">
+                {dict.feed.sort.popular}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {ownProfile && searchQuery === "" && (
         <Button
           variant="ghost"

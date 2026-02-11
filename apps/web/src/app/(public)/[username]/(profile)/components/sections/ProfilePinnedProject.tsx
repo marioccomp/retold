@@ -25,7 +25,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
   const { projectId, openProject, closeProject } = useProjectModal();
 
   const pinnedProjects = allProjects.filter((p) => p.isPinned);
-  const unpinnedProjects = allProjects.filter((p) => !p.isPinned);
+  const unpinnedProjects = allProjects.filter((p) => !p.isPinned && p.visibility === "public");
 
   const handleUnpin = async (projectId: number) => {
     try {
@@ -60,13 +60,13 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
       },
       repository: project.repositoryUrl
         ? {
-          id: 0,
-          url: project.repositoryUrl,
-          fullName: project.repositoryFullName || "",
-          name: project.repositoryFullName?.split("/")[1] || "",
-          isActive: true,
-          private: project.repositoryIsPrivate ?? false,
-        }
+            id: 0,
+            url: project.repositoryUrl,
+            fullName: project.repositoryFullName || "",
+            name: project.repositoryFullName?.split("/")[1] || "",
+            isActive: true,
+            private: project.repositoryIsPrivate ?? false,
+          }
         : null,
     } as ProjectForOverlay;
   })();

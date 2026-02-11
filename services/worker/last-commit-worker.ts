@@ -22,7 +22,9 @@ export const lastCommitWorker = new Worker(
       },
     });
 
-    const publicRepos = user?.projects.filter((p) => p.repository?.private === false);
+    const publicRepos = user?.projects.filter(
+      (p) => p.visibility === "public" && p.repository?.private === false
+    );
 
     if (!user || user.githubInstallations.length === 0) {
       console.log("no installations or user not found");

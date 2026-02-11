@@ -7,7 +7,8 @@ import { auth } from "@/src/domains/auth/auth";
 export async function getProfile(
   username: string,
   projectsPage: number = 1,
-  projectsQuery: string = ""
+  projectsQuery: string = "",
+  projectsSort: "newest" | "oldest" | "popular" = "newest"
 ) {
   const session = await auth();
   const currentUserId = session?.user?.id ? Number(session.user.id) : undefined;
@@ -18,7 +19,8 @@ export async function getProfile(
     currentUserId,
     projectsPage,
     projectsLimit,
-    projectsQuery
+    projectsQuery,
+    projectsSort
   );
   if (!user) return null;
   return mapUserToPublicProfile(user!, currentUserId, projectsPage, projectsLimit);

@@ -25,6 +25,11 @@ export const userWorker = new Worker(
 
       if (!project) throw new Error("Project not found");
 
+      if (project.visibility === "private") {
+        console.log(`[user-worker] Skipping stats for private project ${projectId}`);
+        return;
+      }
+
       // 1. Preparar o repositório
       // Se não tiver URL no projeto, tentamos pegar do repositório linkado ou abortar
       const repoUrl = project.repository?.url;

@@ -5,7 +5,7 @@ import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
 import { MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Lock } from "lucide-react";
 import placeholderImage from "@/assets/mockup-escalonador.jpg";
 import { useState, useEffect, useTransition } from "react";
 import ownerPic from "@/assets/foto.jpeg";
@@ -175,12 +175,25 @@ export default function ProjectCard({
 
       <div className="flex flex-col w-full max-[650px]:flex-row max-[650px]:items-start max-[650px]:justify-between max-[650px]:p-[16px_20px] max-[650px]:gap-2.5 max-[650px]:bg-white max-[380px]:p-[14px_12px]">
         <div className="p-[20px_24px_10px_24px] max-[650px]:p-0 max-[650px]:flex-1 max-[650px]:min-w-0 max-[650px]:mr-3">
-          <h3
-            className="text-[18px] font-bold text-[#1a202c] m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
-            max-[650px]:text-[1.1rem] max-[650px]:whitespace-normal max-[650px]:max-w-full max-[380px]:text-[0.95rem]"
-          >
-            {project.title}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3
+              className="text-[18px] font-bold text-[#1a202c] m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
+              max-[650px]:text-[1.1rem] max-[650px]:whitespace-normal max-[650px]:max-w-full max-[380px]:text-[0.95rem]"
+            >
+              {project.title}
+            </h3>
+            {isOwner && project.visibility === "private" && (
+              <div
+                className="flex items-center gap-1 px-2 py-0.5 bg-[#f3f3f3] rounded-full shrink-0"
+                title={dict.project.create_panel.visibility_options.private}
+              >
+                <Lock size={12} className="text-[#6b7c7a]" />
+                <span className="text-[10px] font-semibold text-[#6b7c7a] tracking-wide">
+                  {dict.project.create_panel.visibility_options.private}
+                </span>
+              </div>
+            )}
+          </div>
           <p className="text-[#718096] text-[14px] mt-1 max-[650px]:hidden break-words whitespace-pre-wrap">
             {project.description && project.description.length > 80
               ? `${project.description.slice(0, 80)}...`

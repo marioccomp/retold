@@ -9,6 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +27,7 @@ import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-pro
 import { deleteProjectImageAction } from "@/src/domains/user/actions/delete-project-image.action";
 import { useQueryClient } from "@tanstack/react-query";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
+import { cn } from "@/lib/utils";
 
 type ProjectSettingsProps = {
   project: {
@@ -28,6 +36,7 @@ type ProjectSettingsProps = {
     description: string | null;
     images?: string[];
     ownerUsername?: string;
+    visibility?: string;
   };
   onUpdate?: () => void;
   onDelete?: () => void;
@@ -49,6 +58,9 @@ export const ProjectSettings = ({
 
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description || "");
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    (project.visibility as "public" | "private") || "public"
+  );
 
   // Local state for batch editing
   type LocalImage = {
@@ -85,6 +97,7 @@ export const ProjectSettings = ({
       setImagesToDelete([]);
       setTitle(project.title);
       setDescription(project.description || "");
+      setVisibility((project.visibility as "public" | "private") || "public");
     }
   }, [isEditOpen, project]);
 
@@ -131,6 +144,7 @@ export const ProjectSettings = ({
   const hasChanges =
     title !== project.title ||
     description !== (project.description || "") ||
+    visibility !== (project.visibility || "public") ||
     imagesToDelete.length > 0 ||
     localImages.some((img) => !img.isOriginal);
 
@@ -169,6 +183,7 @@ export const ProjectSettings = ({
         id: project.id,
         title,
         description,
+        visibility,
       });
 
       toast.success(t.toast.success);
@@ -335,6 +350,7 @@ export const ProjectSettings = ({
                     className="text-slate-900 bg-white border-slate-300 focus:border-[#05dc7f] focus:ring-[#05dc7f] font-medium"
                   />
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="edit-description" className="text-slate-950 font-semibold">
                     {t.labels.description}
@@ -348,6 +364,36 @@ export const ProjectSettings = ({
                     maxLength={280}
                     className="resize-none text-slate-900 bg-white border-slate-300 focus:border-[#05dc7f] focus:ring-[#05dc7f] font-medium"
                   />
+                </div>
+
+                {/* Visibility */}
+                <div className="space-y-2">
+                  <Label htmlFor="edit-visibility" className="text-[#152e2b] font-semibold">
+                    {t.labels.visibility}
+                  </Label>
+                  <Select
+                    value={visibility}
+                    onValueChange={(val) => setVisibility(val as "public" | "private")}
+                  >
+                    <SelectTrigger
+                      id="edit-visibility"
+                      className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-sm focus:ring-[#05dc7f]/30 focus:border-[#05dc7f]"
+                    >
+                      <SelectValue
+                        placeholder={
+                          (t.placeholders as any).visibility || t.placeholders.description
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-[1100]" position="popper">
+                      <SelectItem value="public" className="cursor-pointer">
+                        {t.visibility_options.public}
+                      </SelectItem>
+                      <SelectItem value="private" className="cursor-pointer">
+                        {t.visibility_options.private}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="flex items-center justify-end gap-3 p-4 bg-gray-50 border-t">
