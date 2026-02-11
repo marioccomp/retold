@@ -43,7 +43,7 @@ export function ComboboxInput({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between h-9 font-medium px-3 text-left overflow-hidden bg-white hover:bg-white text-[#152e2b]"
+            "w-full justify-between h-9 font-medium px-3 text-left overflow-hidden bg-white hover:bg-white text-[#152e2b] cursor-pointer"
           )}
         >
           {value ? (
@@ -68,7 +68,7 @@ export function ComboboxInput({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start h-auto py-1.5 px-2 font-normal whitespace-normal text-left"
+                  className="w-full justify-start h-auto py-1.5 px-2 font-normal whitespace-normal text-left cursor-pointer"
                   onClick={() => {
                     if (inputValue.trim()) {
                       onChange(inputValue);

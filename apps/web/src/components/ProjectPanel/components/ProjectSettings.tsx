@@ -9,6 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +27,7 @@ import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-pro
 import { deleteProjectImageAction } from "@/src/domains/user/actions/delete-project-image.action";
 import { useQueryClient } from "@tanstack/react-query";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
+import { cn } from "@/lib/utils";
 
 type ProjectSettingsProps = {
   project: {
@@ -360,20 +368,32 @@ export const ProjectSettings = ({
 
                 {/* Visibility */}
                 <div className="space-y-2">
-                  <Label htmlFor="edit-visibility" className="text-slate-950 font-semibold">
+                  <Label htmlFor="edit-visibility" className="text-[#152e2b] font-semibold">
                     {t.labels.visibility}
                   </Label>
-                  <div className="relative">
-                    <select
+                  <Select
+                    value={visibility}
+                    onValueChange={(val) => setVisibility(val as "public" | "private")}
+                  >
+                    <SelectTrigger
                       id="edit-visibility"
-                      value={visibility}
-                      onChange={(e) => setVisibility(e.target.value as "public" | "private")}
-                      className="w-full flex h-10 items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#05dc7f] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-sm focus:ring-[#05dc7f]/30 focus:border-[#05dc7f]"
                     >
-                      <option value="public">{t.visibility_options.public}</option>
-                      <option value="private">{t.visibility_options.private}</option>
-                    </select>
-                  </div>
+                      <SelectValue
+                        placeholder={
+                          (t.placeholders as any).visibility || t.placeholders.description
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-[1100]" position="popper">
+                      <SelectItem value="public" className="cursor-pointer">
+                        {t.visibility_options.public}
+                      </SelectItem>
+                      <SelectItem value="private" className="cursor-pointer">
+                        {t.visibility_options.private}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="flex items-center justify-end gap-3 p-4 bg-gray-50 border-t">

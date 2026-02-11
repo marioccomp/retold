@@ -8,18 +8,50 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useTranslation } from "@/src/i18n/client";
 import { updateProfileDetails } from "../../../_actions/edit-profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { ptBR, enUS } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ComboboxInput } from "@/components/ui/combobox-input";
 import { INSTITUTIONS, getCourses } from "@/src/lib/education-options";
 import { useParams } from "next/navigation";
+
+const years = Array.from({ length: 60 }, (_, i) => new Date().getFullYear() + 5 - i);
+const monthsPt = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+const monthsEn = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 type Props = {
   isOpen: boolean;
@@ -30,7 +62,6 @@ type Props = {
 export default function EditEducationModal({ isOpen, onClose, profile }: Props) {
   const { dict, lang } = useTranslation();
   const courses = getCourses(lang);
-  const dateLocale = lang === "pt" ? ptBR : enUS;
 
   const queryClient = useQueryClient();
   const [educations, setEducations] = useState<Partial<EducationDTO>[]>(
@@ -253,88 +284,109 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.start_label}
                     </Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-9 font-medium px-3",
-                            !edu.startDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {edu.startDate ? (
-                            format(new Date(edu.startDate), "PPP", { locale: dateLocale })
-                          ) : (
-                            <span>{dict.profile.edit_section_modal.select_date}</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={edu.startDate ? new Date(edu.startDate) : undefined}
-                          onSelect={(date) =>
-                            handleUpdateEducation(
-                              idx,
-                              "startDate",
-                              date ? date.toISOString() : undefined
-                            )
-                          }
-                          initialFocus
-                          locale={dateLocale}
-                          captionLayout="dropdown"
-                          fromYear={1970}
-                          toYear={new Date().getFullYear() + 5}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <div className="flex gap-2">
+                      <Select
+                        value={edu.startDate ? new Date(edu.startDate).getMonth().toString() : ""}
+                        onValueChange={(val) => {
+                          const date = edu.startDate ? new Date(edu.startDate) : new Date();
+                          date.setMonth(parseInt(val));
+                          handleUpdateEducation(idx, "startDate", date.toISOString());
+                        }}
+                      >
+                        <SelectTrigger className="flex-1 h-10 rounded-[10px] border-[#e7eae9] focus:ring-[#05dc7f]/30">
+                          <SelectValue placeholder={dict.profile.edit_section_modal.month} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white" position="popper">
+                          {(lang === "pt" ? monthsPt : monthsEn).map((m, i) => (
+                            <SelectItem key={i} value={i.toString()} className="cursor-pointer">
+                              {m}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Select
+                        value={
+                          edu.startDate ? new Date(edu.startDate).getFullYear().toString() : ""
+                        }
+                        onValueChange={(val) => {
+                          const date = edu.startDate ? new Date(edu.startDate) : new Date();
+                          date.setFullYear(parseInt(val));
+                          handleUpdateEducation(idx, "startDate", date.toISOString());
+                        }}
+                      >
+                        <SelectTrigger className="w-[100px] h-10 rounded-[10px] border-[#e7eae9] focus:ring-[#05dc7f]/30">
+                          <SelectValue placeholder={dict.profile.edit_section_modal.year} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white" position="popper">
+                          {years.map((y) => (
+                            <SelectItem key={y} value={y.toString()} className="cursor-pointer">
+                              {y}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.end_label}
                     </Label>
                     <div className="space-y-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            disabled={!edu.endDate}
+                      <div className="flex gap-2">
+                        <Select
+                          disabled={!edu.endDate}
+                          value={edu.endDate ? new Date(edu.endDate).getMonth().toString() : ""}
+                          onValueChange={(val) => {
+                            const date = edu.endDate ? new Date(edu.endDate) : new Date();
+                            date.setMonth(parseInt(val));
+                            handleUpdateEducation(idx, "endDate", date.toISOString());
+                          }}
+                        >
+                          <SelectTrigger
                             className={cn(
-                              "w-full justify-start text-left font-normal h-9 font-medium px-3",
-                              !edu.endDate && "text-muted-foreground"
+                              "flex-1 h-10 rounded-[10px] border-[#e7eae9] focus:ring-[#05dc7f]/30",
+                              !edu.endDate && "opacity-50 bg-[#f9fafa]"
                             )}
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {edu.endDate ? (
-                              format(new Date(edu.endDate), "PPP", { locale: dateLocale })
-                            ) : (
-                              <span>{dict.profile.edit_section_modal.select_date}</span>
+                            <SelectValue placeholder={dict.profile.edit_section_modal.month} />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white" position="popper">
+                            {(lang === "pt" ? monthsPt : monthsEn).map((m, i) => (
+                              <SelectItem key={i} value={i.toString()} className="cursor-pointer">
+                                {m}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Select
+                          disabled={!edu.endDate}
+                          value={edu.endDate ? new Date(edu.endDate).getFullYear().toString() : ""}
+                          onValueChange={(val) => {
+                            const date = edu.endDate ? new Date(edu.endDate) : new Date();
+                            date.setFullYear(parseInt(val));
+                            handleUpdateEducation(idx, "endDate", date.toISOString());
+                          }}
+                        >
+                          <SelectTrigger
+                            className={cn(
+                              "w-[100px] h-10 rounded-[10px] border-[#e7eae9] focus:ring-[#05dc7f]/30",
+                              !edu.endDate && "opacity-50 bg-[#f9fafa]"
                             )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={edu.endDate ? new Date(edu.endDate) : undefined}
-                            onSelect={(date) =>
-                              handleUpdateEducation(
-                                idx,
-                                "endDate",
-                                date ? date.toISOString() : undefined
-                              )
-                            }
-                            disabled={(date) =>
-                              edu.startDate ? date < new Date(edu.startDate) : false
-                            }
-                            initialFocus
-                            locale={dateLocale}
-                            captionLayout="dropdown"
-                            fromYear={1970}
-                            toYear={new Date().getFullYear() + 5}
-                          />
-                        </PopoverContent>
-                      </Popover>
+                          >
+                            <SelectValue placeholder={dict.profile.edit_section_modal.year} />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white" position="popper">
+                            {years.map((y) => (
+                              <SelectItem key={y} value={y.toString()} className="cursor-pointer">
+                                {y}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
                       <div className="flex items-center gap-2 px-1">
                         <Checkbox
                           id={`current-${idx}`}

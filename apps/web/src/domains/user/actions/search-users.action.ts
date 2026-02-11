@@ -2,13 +2,32 @@
 
 import { auth } from "@/src/domains/auth/auth";
 import { userRepository } from "../repositories/user.repository";
+import { unstable_cache } from "next/cache";
 
-export async function searchUsersAction(query: string, page: number = 1, limit: number = 12) {
+// Cached scoring for active users — rankings stay stable for 5 minutes
+const getCachedActiveUsers = unstable_cache(
+  async (currentUserId: number | undefined, page: number, limit: number) => {
+    return userRepository.searchUsers("", currentUserId, page, limit, "active");
+  },
+  ["feed-active-users-scoring"],
+  { revalidate: 300 } // 5 minutes
+);
+
+export async function searchUsersAction(
+  query: string,
+  page: number = 1,
+  limit: number = 12,
+  sort: "active" | "newest" | "oldest" | "name" = "active"
+) {
   try {
     const session = await auth();
     const currentUserId = session?.user?.id ? Number(session.user.id) : undefined;
 
-    const { users, total } = await userRepository.searchUsers(query, currentUserId, page, limit);
+    // Use cached scoring for "active" sort without search query
+    const useCache = sort === "active" && !query;
+    const { users, total } = useCache
+      ? await getCachedActiveUsers(currentUserId, page, limit)
+      : await userRepository.searchUsers(query, currentUserId, page, limit, sort);
 
     const mappedUsers = users.map((u: any) => ({
       ...u,

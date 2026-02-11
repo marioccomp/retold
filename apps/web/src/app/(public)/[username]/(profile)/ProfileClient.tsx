@@ -43,11 +43,12 @@ export default function ProfileClient({ username, ownProfile }: Props) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [projectSort, setProjectSort] = useState<"newest" | "oldest" | "popular">("newest");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", username, page, debouncedSearchQuery],
-    queryFn: () => getProfile(username, page, debouncedSearchQuery),
+    queryKey: ["profile", username, page, debouncedSearchQuery, projectSort],
+    queryFn: () => getProfile(username, page, debouncedSearchQuery, projectSort),
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData, // Garante que o perfil anterior continue visível enquanto carrega a nova busca
@@ -121,6 +122,8 @@ export default function ProfileClient({ username, ownProfile }: Props) {
                     router.push(`${pathname}?${params.toString()}`, { scroll: false });
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
+                  sort={projectSort}
+                  onSortChange={setProjectSort}
                 />
               </TabsContent>
 

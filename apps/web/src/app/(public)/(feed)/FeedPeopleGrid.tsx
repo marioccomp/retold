@@ -9,6 +9,13 @@ import { useSearch } from "@/src/providers/SearchContext";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PaginationControls } from "@/src/components/ui/pagination-controls";
 import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function FeedPeopleGrid() {
   const { debouncedSearchQuery } = useSearch();
@@ -21,11 +28,12 @@ export default function FeedPeopleGrid() {
   // Use a specific param for people pagination to avoid conflict with projects
   const page = Number(searchParams.get("peoplePage")) || 1;
   const limit = 12;
+  const [peopleSort, setPeopleSort] = useState<"active" | "newest" | "oldest" | "name">("active");
 
   const { data: result, isLoading } = useQuery({
-    queryKey: ["users", debouncedSearchQuery, page, limit],
+    queryKey: ["users", debouncedSearchQuery, page, limit, peopleSort],
     queryFn: async () => {
-      const result = await searchUsersAction(debouncedSearchQuery, page, limit);
+      const result = await searchUsersAction(debouncedSearchQuery, page, limit, peopleSort);
       if (!result.success) throw new Error(result.error);
       return result.data;
     },
@@ -77,6 +85,30 @@ export default function FeedPeopleGrid() {
 
   return (
     <div className="flex flex-col gap-8 w-full animate-[fadeIn_0.6s_ease-out_forwards]">
+      <div className="flex w-full">
+        <Select
+          value={peopleSort}
+          onValueChange={(val: "active" | "newest" | "oldest" | "name") => setPeopleSort(val)}
+        >
+          <SelectTrigger className="w-[180px] bg-white border-[#e7eae9] cursor-pointer">
+            <SelectValue placeholder={dict.feed.sort.placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active" className="cursor-pointer">
+              {dict.feed.sort.most_active}
+            </SelectItem>
+            <SelectItem value="newest" className="cursor-pointer">
+              {dict.feed.sort.newest}
+            </SelectItem>
+            <SelectItem value="oldest" className="cursor-pointer">
+              {dict.feed.sort.oldest}
+            </SelectItem>
+            <SelectItem value="name" className="cursor-pointer">
+              {dict.feed.sort.alphabetical}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
         {filteredUsers.map((user: any) => (
           <UserCard key={user.id} user={user} />

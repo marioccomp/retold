@@ -4,7 +4,15 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
+import type { ProjectSortType } from "./actions/get-feed-projects.action";
 import FeedProjectsGrid from "./FeedProjectsGrid";
 import FeedPeopleGrid from "./FeedPeopleGrid";
 import { FiSearch } from "react-icons/fi";
@@ -30,6 +38,7 @@ export default function FeedContent({ initialData }: Props) {
 
   const { searchQuery, debouncedSearchQuery, setSearchQuery, activeTab, setActiveTab } =
     useSearch();
+  const [projectSort, setProjectSort] = useState<ProjectSortType>("recommended");
   const isProjectSelected = !!searchParams.get("project");
 
   // Define tabs using keys that we can map to translations
@@ -52,8 +61,8 @@ export default function FeedContent({ initialData }: Props) {
   const page = Number(searchParams.get("page")) || 1;
 
   const { data: feedData } = useQuery({
-    queryKey: ["feed-projects", page, debouncedSearchQuery],
-    queryFn: () => getFeedProjects(page, 12, debouncedSearchQuery),
+    queryKey: ["feed-projects", page, debouncedSearchQuery, projectSort],
+    queryFn: () => getFeedProjects(page, 12, debouncedSearchQuery, projectSort),
     initialData,
     refetchInterval: (query) => {
       const projects = query.state.data?.projects;
@@ -110,7 +119,11 @@ export default function FeedContent({ initialData }: Props) {
             />
             <Input
               type="text"
-              placeholder={dict.feed.feedcontent.search_placeholder}
+              placeholder={
+                activeTab === "people"
+                  ? dict.feed.feedcontent.search_placeholder_people
+                  : dict.feed.feedcontent.search_placeholder_projects
+              }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-4 pl-14 pr-6 rounded-full text-lg text-[#152e2b] h-auto
@@ -149,6 +162,30 @@ export default function FeedContent({ initialData }: Props) {
             value="projects"
             className="flex flex-col gap-8 m-0 p-0 ring-0 focus-visible:ring-0"
           >
+            <div className="flex w-full">
+              <Select
+                value={projectSort}
+                onValueChange={(val: ProjectSortType) => setProjectSort(val)}
+              >
+                <SelectTrigger className="w-[180px] bg-white border-[#e7eae9] cursor-pointer">
+                  <SelectValue placeholder={dict.feed.sort.placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recommended" className="cursor-pointer">
+                    {dict.feed.sort.recommended}
+                  </SelectItem>
+                  <SelectItem value="newest" className="cursor-pointer">
+                    {dict.feed.sort.newest}
+                  </SelectItem>
+                  <SelectItem value="oldest" className="cursor-pointer">
+                    {dict.feed.sort.oldest}
+                  </SelectItem>
+                  <SelectItem value="popular" className="cursor-pointer">
+                    {dict.feed.sort.popular}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <FeedProjectsGrid
               projects={feedData?.projects || initialData.projects}
               currentPage={feedData?.metadata?.page || 1}

@@ -231,7 +231,8 @@
       },
       "placeholders": {
         "title": "Nome do projeto",
-        "description": "Descrição breve"
+        "description": "Descrição breve",
+        "visibility": "Selecione a visibilidade"
       },
       "cancel": "Cancelar",
       "save": "Salvar alterações",
@@ -279,12 +280,23 @@
       "excellent": "Excelente",
       "clean_code": "Código limpo e otimizado"
     },
+    "sort": {
+      "recommended": "Recomendados",
+      "most_active": "Mais Ativos",
+      "newest": "Mais Recentes",
+      "oldest": "Mais Antigos",
+      "popular": "Populares",
+      "alphabetical": "A-Z",
+      "placeholder": "Ordenar por"
+    },
     "feedcontent": {
       "tabs": {
         "projects": "Projetos",
         "people": "Pessoas"
       },
       "search_placeholder": "Buscar projetos, pessoas, tags...",
+      "search_placeholder_projects": "Buscar projetos, tags...",
+      "search_placeholder_people": "Buscar pessoas, habilidades...",
       "people_coming_soon": {
         "title": "Em breve",
         "description": "A busca de pessoas estará disponível em breve"
@@ -448,6 +460,8 @@
       "course_hint": "Dica: Você pode escrever o nome do seu curso se não estiver na lista.",
       "institution_hint": "Dica: Você pode escrever o nome da instituição se não estiver na lista.",
       "select_date": "Selecione uma data",
+      "month": "Mês",
+      "year": "Ano",
       "use_value": "Usar \"{value}\"",
       "skills_label": "Habilidades",
       "skills_placeholder": "Digite uma habilidade e aperte Enter",
