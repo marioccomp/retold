@@ -29,6 +29,7 @@ type ProjectForOverlay = {
   title: string;
   description: string | null;
   status: string;
+  visibility?: string;
   repository: any;
   images: string[];
   owner?: {
@@ -68,6 +69,7 @@ export default function ProjectsSection({ searchQuery, ownProfile, profile, onPa
         title: projectData.title,
         description: projectData.description,
         status: projectData.status,
+        visibility: projectData.visibility,
         images: projectData.images, // Pass images directly
         repository: projectData.repositoryUrl
           ? {

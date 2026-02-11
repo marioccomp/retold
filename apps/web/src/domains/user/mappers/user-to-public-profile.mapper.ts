@@ -76,6 +76,7 @@ export function mapUserToPublicProfile(
       title: project.title,
       description: project.description,
       status: project.status,
+      visibility: project.visibility,
       images: project.images,
       createdAt: project.createdAt.toISOString(),
 

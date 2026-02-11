@@ -33,7 +33,7 @@ export async function createProjectAction(
   // Check rate limit
   const user = await prisma.user.findUnique({
     where: { id: Number(session.user.id) },
-    select: { rateLimitResetAt: true, dailyAnalysisCount: true, dailyAnalysisDate: true }
+    select: { rateLimitResetAt: true, dailyAnalysisCount: true, dailyAnalysisDate: true },
   });
 
   if (user?.rateLimitResetAt && user.rateLimitResetAt > new Date()) {
@@ -42,7 +42,7 @@ export async function createProjectAction(
     const seconds = Math.floor((diff % 60000) / 1000);
     return {
       success: false,
-      message: `Limite de análises atingido. Tente novamente em ${minutes}m ${seconds}s.`
+      message: `Limite de análises atingido. Tente novamente em ${minutes}m ${seconds}s.`,
     };
   }
 
@@ -61,16 +61,16 @@ export async function createProjectAction(
     const hoursLeft = Math.floor(msUntilReset / 3600000);
     const minutesLeft = Math.floor((msUntilReset % 3600000) / 60000);
 
-    const timeStr = hoursLeft > 0
-      ? dict.project.analysis.retry_time_hours
-        .replace("{hours}", String(hoursLeft))
-        .replace("{minutes}", String(minutesLeft))
-      : dict.project.analysis.retry_time_minutes
-        .replace("{minutes}", String(minutesLeft));
+    const timeStr =
+      hoursLeft > 0
+        ? dict.project.analysis.retry_time_hours
+            .replace("{hours}", String(hoursLeft))
+            .replace("{minutes}", String(minutesLeft))
+        : dict.project.analysis.retry_time_minutes.replace("{minutes}", String(minutesLeft));
 
     return {
       success: false,
-      message: `${dict.project.analysis.limit_reached_description} ${timeStr}`
+      message: `${dict.project.analysis.limit_reached_description} ${timeStr}`,
     };
   }
 
@@ -103,6 +103,7 @@ export async function createProjectAction(
       userId: Number(session.user.id),
       repositoryId: repository.id,
       status: "PENDING",
+      visibility: input.visibility,
     },
   });
 

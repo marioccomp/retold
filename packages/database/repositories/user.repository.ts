@@ -64,15 +64,25 @@ export const userRepository = {
 
     // Filter condition for projects
     const projectsWhereInput: any = {
-      ...(projectsQuery
-        ? {
-            OR: [
-              { title: { contains: projectsQuery, mode: "insensitive" } },
-              { tags: { some: { name: { contains: projectsQuery, mode: "insensitive" } } } },
-            ],
-          }
-        : {}),
+      AND: [
+        {
+          OR: [{ visibility: "public" }, { userId: currentUserId }],
+        },
+      ],
     };
+
+    if (projectsQuery) {
+      projectsWhereInput.AND.push({
+        OR: [
+          { title: { contains: projectsQuery, mode: "insensitive" } },
+          {
+            tags: {
+              some: { name: { contains: projectsQuery, mode: "insensitive" } },
+            },
+          },
+        ],
+      });
+    }
 
     const user = await prisma.user.findUnique({
       where: { username },
@@ -143,8 +153,8 @@ export const userRepository = {
       },
     });
 
-    if (user && projectsQuery) {
-      // If there's a search query, we need to correct the count
+    if (user) {
+      // Correction of the count to always match the filters (visibility, repository, query)
       const filteredCount = await prisma.project.count({
         where: {
           userId: user.id,

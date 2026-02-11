@@ -226,7 +226,8 @@
       "add": "Add",
       "labels": {
         "title": "Title",
-        "description": "Description"
+        "description": "Description",
+        "visibility": "Visibility"
       },
       "placeholders": {
         "title": "Project name",
@@ -253,6 +254,10 @@
         "delete_error": "Error deleting project",
         "title_required": "Title cannot be empty",
         "max_images": "Maximum of 3 images allowed."
+      },
+      "visibility_options": {
+        "public": "Public",
+        "private": "Private"
       }
     }
   },

@@ -15,21 +15,24 @@ export async function getFeedProjects(
   const session = await auth();
   const currentUserId = session?.user?.id ? Number(session.user.id) : null;
 
-  const where = query
-    ? {
-        OR: [
-          { title: { contains: query, mode: "insensitive" as const } },
-          { description: { contains: query, mode: "insensitive" as const } },
-          {
-            tags: {
-              some: {
-                name: { contains: query, mode: "insensitive" as const },
+  const where = {
+    visibility: "public",
+    ...(query
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" as const } },
+            { description: { contains: query, mode: "insensitive" as const } },
+            {
+              tags: {
+                some: {
+                  name: { contains: query, mode: "insensitive" as const },
+                },
               },
             },
-          },
-        ],
-      }
-    : {};
+          ],
+        }
+      : {}),
+  };
 
   const [total, projects] = await Promise.all([
     prisma.project.count({ where }),
@@ -98,6 +101,7 @@ export async function getFeedProjects(
     title: project.title,
     description: project.description,
     status: project.status,
+    visibility: project.visibility,
     images: project.images,
     likes: project._count.likes,
     views: project.views,

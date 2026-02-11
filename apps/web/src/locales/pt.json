@@ -226,7 +226,8 @@
       "add": "Adicionar",
       "labels": {
         "title": "Título",
-        "description": "Descrição"
+        "description": "Descrição",
+        "visibility": "Visibilidade"
       },
       "placeholders": {
         "title": "Nome do projeto",
@@ -253,6 +254,10 @@
         "delete_error": "Erro ao excluir projeto",
         "title_required": "O título não pode estar vazio",
         "max_images": "Máximo de 3 imagens permitido."
+      },
+      "visibility_options": {
+        "public": "Público",
+        "private": "Privado"
       }
     }
   },

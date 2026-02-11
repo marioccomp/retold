@@ -11,6 +11,7 @@ const getCachedHighlightedId = unstable_cache(
     const bestProjects = await prisma.$queryRaw<[{ id: number }]>`
         SELECT p.id
         FROM "Project" p
+        LEFT JOIN "Repository" r ON p."repositoryId" = r.id
         LEFT JOIN (
             SELECT "projectId", COUNT(*)::int as like_count 
             FROM "Like" 
@@ -18,6 +19,8 @@ const getCachedHighlightedId = unstable_cache(
         ) l ON p.id = l."projectId"
         WHERE p.status = 'DONE' 
           AND array_length(p.images, 1) > 0
+          AND p.visibility = 'public'
+          AND r.private = false
         ORDER BY (COALESCE(l.like_count, 0) * 5) + p.views DESC
         LIMIT 1
     `;

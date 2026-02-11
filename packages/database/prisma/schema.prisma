@@ -217,6 +217,8 @@ model Project {
 
   isPinned Boolean @default(false)
 
+  visibility String @default("public") // "public" | "private"
+
   status   ProjectStatus       @default(PENDING)
   analysis RepositoryAnalysis?
 

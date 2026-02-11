@@ -28,6 +28,7 @@ type ProjectSettingsProps = {
     description: string | null;
     images?: string[];
     ownerUsername?: string;
+    visibility?: string;
   };
   onUpdate?: () => void;
   onDelete?: () => void;
@@ -49,6 +50,9 @@ export const ProjectSettings = ({
 
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description || "");
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    (project.visibility as "public" | "private") || "public"
+  );
 
   // Local state for batch editing
   type LocalImage = {
@@ -85,6 +89,7 @@ export const ProjectSettings = ({
       setImagesToDelete([]);
       setTitle(project.title);
       setDescription(project.description || "");
+      setVisibility((project.visibility as "public" | "private") || "public");
     }
   }, [isEditOpen, project]);
 
@@ -131,6 +136,7 @@ export const ProjectSettings = ({
   const hasChanges =
     title !== project.title ||
     description !== (project.description || "") ||
+    visibility !== (project.visibility || "public") ||
     imagesToDelete.length > 0 ||
     localImages.some((img) => !img.isOriginal);
 
@@ -169,6 +175,7 @@ export const ProjectSettings = ({
         id: project.id,
         title,
         description,
+        visibility,
       });
 
       toast.success(t.toast.success);
@@ -335,6 +342,7 @@ export const ProjectSettings = ({
                     className="text-slate-900 bg-white border-slate-300 focus:border-[#05dc7f] focus:ring-[#05dc7f] font-medium"
                   />
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="edit-description" className="text-slate-950 font-semibold">
                     {t.labels.description}
@@ -348,6 +356,24 @@ export const ProjectSettings = ({
                     maxLength={280}
                     className="resize-none text-slate-900 bg-white border-slate-300 focus:border-[#05dc7f] focus:ring-[#05dc7f] font-medium"
                   />
+                </div>
+
+                {/* Visibility */}
+                <div className="space-y-2">
+                  <Label htmlFor="edit-visibility" className="text-slate-950 font-semibold">
+                    {t.labels.visibility}
+                  </Label>
+                  <div className="relative">
+                    <select
+                      id="edit-visibility"
+                      value={visibility}
+                      onChange={(e) => setVisibility(e.target.value as "public" | "private")}
+                      className="w-full flex h-10 items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#05dc7f] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="public">{t.visibility_options.public}</option>
+                      <option value="private">{t.visibility_options.private}</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center justify-end gap-3 p-4 bg-gray-50 border-t">
