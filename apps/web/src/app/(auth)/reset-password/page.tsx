@@ -60,11 +60,11 @@ function ResetPasswordForm() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white p-6">
         <div className="max-w-md w-full text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">{dict.auth.reset_password.invalid_link_title}</h1>
-          <p className="text-gray-500">
-            {dict.auth.reset_password.invalid_link_desc}
-          </p>
-          <Button asChild className="mt-4 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
+            {dict.auth.reset_password.invalid_link_title}
+          </h1>
+          <p className="text-muted-foreground">{dict.auth.reset_password.invalid_link_desc}</p>
+          <Button asChild className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground">
             <Link href="/login">{dict.auth.reset_password.back_to_login}</Link>
           </Button>
         </div>
@@ -74,20 +74,20 @@ function ResetPasswordForm() {
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-[#05dc7f] via-[#a7f3d0] to-white p-12 overflow-hidden">
+      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-primary via-primary/30 to-background p-12 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#047857" strokeWidth="1" />
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
           </svg>
         </div>
 
-        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-[#05dc7f]/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-white/40 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-background/40 rounded-full blur-3xl" />
 
         <div className="relative z-10 text-center">
           <Image
@@ -97,33 +97,33 @@ function ResetPasswordForm() {
             className="w-32 h-auto mx-auto mb-12"
           />
 
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+          <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight">
             {dict.auth.reset_password.welcome_title}
           </h1>
-          <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
             {dict.auth.reset_password.welcome_subtitle}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-white">
+      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-background">
         <div className="w-full max-w-[400px]">
           <div className="flex justify-center mb-8 lg:hidden">
             <Image src={retoldImg} alt="Retold Logo" priority className="w-50 h-auto" />
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2 text-center">
               {dict.auth.reset_password.title}
             </h2>
-            <p className="text-gray-500 text-center">{dict.auth.reset_password.subtitle}</p>
+            <p className="text-muted-foreground text-center">{dict.auth.reset_password.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input type="hidden" name="token" value={token} />
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium">
                 {dict.auth.reset_password.password_label}
               </Label>
               <div className="relative">
@@ -133,14 +133,18 @@ function ResetPasswordForm() {
                   type={isPasswordVisible ? "text" : "password"}
                   placeholder="••••••••"
                   required
-                  className="h-11 pr-11 focus:ring-2 focus:ring-[#05dc7f]/20 focus:border-[#05dc7f] transition-all"
+                  className="h-11 pr-11 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   disabled={resetMutation.isPending}
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisible}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                  aria-label={isPasswordVisible ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                  aria-label={
+                    isPasswordVisible
+                      ? dict.profile.edit_modal.saving
+                      : dict.profile.edit_modal.save
+                  }
                 >
                   {isPasswordVisible ? (
                     <FaEye className="text-lg" />
@@ -150,14 +154,14 @@ function ResetPasswordForm() {
                 </button>
               </div>
               {fieldErrors?.password && (
-                <p className="text-red-500 text-xs mt-1">{fieldErrors.password[0]}</p>
+                <p className="text-destructive text-xs mt-1">{fieldErrors.password[0]}</p>
               )}
             </div>
 
             <Button
               type="submit"
               disabled={resetMutation.isPending}
-              className="w-full h-11 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
             >
               {resetMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -185,9 +189,9 @@ function ResetPasswordForm() {
             </Button>
           </form>
 
-          <p className="text-center text-gray-500 text-sm mt-8">
+          <p className="text-center text-muted-foreground text-sm mt-8">
             {dict.auth.forgot_password.remember_password}{" "}
-            <Link href="/login" className="text-[#05dc7f] font-semibold hover:underline">
+            <Link href="/login" className="text-primary font-semibold hover:underline">
               {dict.auth.forgot_password.sign_in}
             </Link>
           </p>
@@ -202,10 +206,10 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#05dc7f]"></div>
-            <p className="text-gray-500">{dict.auth.reset_password.loading}</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="text-muted-foreground">{dict.auth.reset_password.loading}</p>
           </div>
         </div>
       }

@@ -25,7 +25,7 @@ export default function ProfileTabsHeader({ activeTab, searchQuery, setSearchQue
           <TabsTrigger
             key={tab.value}
             value={tab.value}
-            className="bg-transparent border-0 border-b-[3px] border-solid border-b-transparent py-1 px-0 text-base font-bold text-[#6b7c7a] cursor-pointer transition-all duration-300 hover:text-[#152e2b] data-[state=active]:!text-[#152e2b] data-[state=active]:!border-b-[#05dc7f] data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap"
+            className="bg-transparent border-0 border-b-[3px] border-solid border-b-transparent py-1 px-0 text-base font-bold text-muted-foreground cursor-pointer transition-all duration-300 hover:text-foreground data-[state=active]:!text-foreground data-[state=active]:!border-b-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap"
           >
             {tab.label}
           </TabsTrigger>
@@ -38,7 +38,7 @@ export default function ProfileTabsHeader({ activeTab, searchQuery, setSearchQue
           placeholder={dict.profile.search_placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 py-2 px-4 border-[#e7eae9] rounded-xl text-[0.9rem] text-[#152e2b] sm:order-none order-first focus-visible:ring-[#05dc7f]/30 focus-visible:border-[#05dc7f] h-10 shadow-sm font-medium animate-[fadeIn_0.3s_ease-out]"
+          className="flex-1 py-2 px-4 border-border rounded-xl text-[0.9rem] text-foreground sm:order-none order-first focus-visible:ring-primary/30 focus-visible:border-primary h-10 shadow-sm font-medium animate-[fadeIn_0.3s_ease-out]"
         />
       )}
     </div>

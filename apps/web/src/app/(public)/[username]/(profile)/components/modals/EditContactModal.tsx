@@ -85,7 +85,7 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
       <div className="bg-white w-full max-w-[500px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
-          <h2 className="text-xl font-semibold text-[#152e2b]">
+          <h2 className="text-xl font-semibold text-foreground">
             {dict.profile.contact_section.title}
           </h2>
           <button
@@ -107,7 +107,7 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={dict.profile.contact_section.email_placeholder}
-                className="pl-9 bg-white"
+                className="pl-9 bg-background"
               />
             </div>
           </div>
@@ -122,25 +122,25 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder={dict.profile.contact_section.phone_placeholder}
-                className="pl-9 bg-white"
+                className="pl-9 bg-background"
               />
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-4 border-t border-border/60 flex justify-end gap-3 bg-[#fafafa]">
+        <div className="p-6 pt-4 border-t border-border/60 flex justify-end gap-3 bg-muted/40">
           <Button
             variant="ghost"
             onClick={onClose}
-            className="text-muted-foreground hover:text-[#152e2b] font-bold cursor-pointer"
+            className="text-muted-foreground hover:text-foreground font-bold cursor-pointer"
           >
             {dict.profile.contact_section.cancel}
           </Button>
           <Button
             onClick={onSave}
             disabled={realMutation.isPending || !hasChanges}
-            className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] px-8 font-bold transition-all shadow-lg shadow-[#05dc7f]/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 font-bold transition-all shadow-lg shadow-primary/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {realMutation.isPending ? dict.profile.saving : dict.profile.contact_section.save}
           </Button>

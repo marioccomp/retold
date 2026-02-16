@@ -63,7 +63,7 @@ function Calendar({
         ),
         dropdown_root: cn(
           "relative border shadow-xs rounded-md",
-          "border-[#e7eae9] has-focus:border-[#05dc7f] has-focus:ring-[#05dc7f]/30 has-focus:ring-[3px]",
+          "border-border has-focus:border-primary has-focus:ring-primary/30 has-focus:ring-[3px]",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn("absolute bg-popover inset-0 opacity-0", defaultClassNames.dropdown),
@@ -170,7 +170,7 @@ function CalendarDayButton({
       data-range-middle={modifiers.range_middle}
       className={cn(
         "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70",
-        "group-data-[focused=true]/day:border-[#05dc7f] group-data-[focused=true]/day:ring-[#05dc7f]/30",
+        "group-data-[focused=true]/day:border-primary group-data-[focused=true]/day:ring-primary/30",
         defaultClassNames.day,
         className
       )}

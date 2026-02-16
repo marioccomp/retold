@@ -29,7 +29,7 @@ export default function ProfileEducation({ educations, ownProfile, onEditClick }
       <CardHeader className="pb-3 border-b border-border/40 bg-white">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg text-foreground font-bold">
-            <FiBriefcase className="text-[#05dc7f]" />
+            <FiBriefcase className="text-primary" />
             {dict.profile.education_section}
           </CardTitle>
 
@@ -38,7 +38,7 @@ export default function ProfileEducation({ educations, ownProfile, onEditClick }
               variant="ghost"
               size="icon"
               onClick={onEditClick}
-              className="w-8 h-8 rounded-lg hover:bg-[#05dc7f]/10 text-muted-foreground hover:text-[#05dc7f] transition-all cursor-pointer"
+              className="w-8 h-8 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
               title={dict.profile.edit_details}
             >
               <FiEdit2 size={14} />
@@ -50,11 +50,11 @@ export default function ProfileEducation({ educations, ownProfile, onEditClick }
         {educations && educations.length > 0 ? (
           educations.map((edu, idx) => (
             <div key={idx} className="flex gap-4 last:mb-0 mb-6 font-sans">
-              <div className="w-10 h-10 rounded-lg bg-[#05dc7f]/10 flex items-center justify-center shrink-0 border border-[#05dc7f]/20">
-                <FiBriefcase className="text-[#05dc7f] w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                <FiBriefcase className="text-primary w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-[#152e2b] text-[1.05rem] leading-tight">
+                <span className="font-bold text-foreground text-[1.05rem] leading-tight">
                   {edu.degree}
                 </span>
                 <span className="text-muted-foreground font-medium">{edu.institution}</span>

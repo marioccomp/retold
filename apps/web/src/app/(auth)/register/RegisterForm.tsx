@@ -110,13 +110,19 @@ export default function RegisterForm() {
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
       {/* Branding Column - Desktop Only */}
-      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-[#05dc7f] via-[#a7f3d0] to-white p-12 overflow-hidden">
+      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-primary via-primary/30 to-background p-12 overflow-hidden">
         {/* Abstract pattern overlay */}
         <div className="absolute inset-0 opacity-[0.03]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#047857" strokeWidth="1" />
+                <path
+                  d="M 40 0 L 0 0 0 40"
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-primary-foreground/20"
+                  strokeWidth="1"
+                />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -124,8 +130,8 @@ export default function RegisterForm() {
         </div>
 
         {/* Gradient orbs for visual interest */}
-        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-[#05dc7f]/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-white/40 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-background/40 rounded-full blur-3xl" />
 
         {/* Content */}
         <div className="relative z-10 text-center">
@@ -136,25 +142,25 @@ export default function RegisterForm() {
             className="w-32 h-auto mx-auto mb-12"
           />
 
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+          <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight">
             {dict.auth.register.welcome_title}
           </h1>
-          <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
             {dict.auth.register.welcome_subtitle}
           </p>
 
           {/* Feature highlights */}
           <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
-            <div className="flex items-center gap-3 text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
+            <div className="flex items-center gap-3 text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary" />
               <span>{dict.auth.login.feature_journey}</span>
             </div>
-            <div className="flex items-center gap-3 text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
+            <div className="flex items-center gap-3 text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary" />
               <span>{dict.auth.login.feature_leaders}</span>
             </div>
-            <div className="flex items-center gap-3 text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
+            <div className="flex items-center gap-3 text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary" />
               <span>{dict.auth.login.feature_opportunities}</span>
             </div>
           </div>
@@ -162,7 +168,7 @@ export default function RegisterForm() {
       </div>
 
       {/* Form Column */}
-      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-white">
+      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-background">
         <div className="w-full max-w-[400px]">
           {/* Mobile logo */}
           <div className="flex justify-center mb-8 lg:hidden">
@@ -171,16 +177,16 @@ export default function RegisterForm() {
 
           {/* Form header */}
           <div className="mb-4">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2 text-center">
               {dict.auth.register.title}
             </h2>
-            <p className="text-gray-500 text-center">{dict.auth.register.subtitle}</p>
+            <p className="text-muted-foreground text-center">{dict.auth.register.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name Input */}
             <div className="space-y-1">
-              <Label htmlFor="name" className="text-gray-700 font-medium">
+              <Label htmlFor="name" className="text-foreground font-medium">
                 {dict.auth.register.name_label}
               </Label>
               <Input
@@ -209,7 +215,7 @@ export default function RegisterForm() {
 
             {/* Username Input */}
             <div className="space-y-1">
-              <Label htmlFor="username" className="text-gray-700 font-medium">
+              <Label htmlFor="username" className="text-foreground font-medium">
                 {dict.auth.register.username_label}
               </Label>
               <Input
@@ -259,7 +265,7 @@ export default function RegisterForm() {
 
             {/* Email Input */}
             <div className="space-y-1">
-              <Label htmlFor="email" className="text-gray-700 font-medium">
+              <Label htmlFor="email" className="text-foreground font-medium">
                 {dict.auth.register.email_label}
               </Label>
               <Input
@@ -297,7 +303,7 @@ export default function RegisterForm() {
 
             {/* Password Input */}
             <div className="space-y-1">
-              <Label htmlFor="password" className="text-gray-700 font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium">
                 {dict.auth.register.password_label}
               </Label>
               <div className="relative">
@@ -322,7 +328,7 @@ export default function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 cursor-pointer"
                   aria-label={
                     showPassword ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save
                   }
@@ -344,7 +350,7 @@ export default function RegisterForm() {
 
             {/* Confirm Password Input */}
             <div className="space-y-1">
-              <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
+              <Label htmlFor="confirmPassword" className="text-foreground font-medium">
                 {dict.auth.register.confirm_password_label}
               </Label>
               <div className="relative">
@@ -368,7 +374,7 @@ export default function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 cursor-pointer"
                   aria-label={
                     showConfirmPassword
                       ? dict.profile.edit_modal.saving
@@ -402,7 +408,7 @@ export default function RegisterForm() {
                 passwordHelpVisible ||
                 confirmPasswordHelpVisible
               }
-              className="w-full h-11 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -431,16 +437,16 @@ export default function RegisterForm() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center mt-8 mb-5 text-gray-400 text-sm">
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex items-center mt-8 mb-5 text-muted-foreground text-sm">
+            <div className="flex-1 h-px bg-border" />
             <span className="px-4">{dict.auth.login.social_divider}</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-border" />
           </div>
 
           {/* Social accounts */}
           <div className="flex justify-center gap-4">
             <button
-              className="flex items-center justify-center w-full h-12 rounded-lg border border-gray-200 text-gray-600 transition-all hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
+              className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
               onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
               type="button"
             >
@@ -450,9 +456,9 @@ export default function RegisterForm() {
           </div>
 
           {/* Login link */}
-          <p className="text-center text-gray-500 text-sm mt-4">
+          <p className="text-center text-muted-foreground text-sm mt-4">
             {dict.auth.register.has_account}{" "}
-            <Link href="/login" className="text-[#05dc7f] font-semibold hover:underline">
+            <Link href="/login" className="text-primary font-semibold hover:underline">
               {dict.auth.register.sign_in}
             </Link>
           </p>

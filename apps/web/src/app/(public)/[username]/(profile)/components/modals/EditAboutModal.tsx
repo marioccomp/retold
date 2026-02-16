@@ -64,7 +64,7 @@ export default function EditAboutModal({ isOpen, onClose, profile }: Props) {
       <div className="bg-white w-full max-w-[600px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
-          <h2 className="text-xl font-semibold text-[#152e2b]">{dict.profile.about_section}</h2>
+          <h2 className="text-xl font-semibold text-foreground">{dict.profile.about_section}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
@@ -85,18 +85,18 @@ export default function EditAboutModal({ isOpen, onClose, profile }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-4 border-t border-border/60 flex justify-end gap-3 bg-[#fafafa]">
+        <div className="p-6 pt-4 border-t border-border/60 flex justify-end gap-3 bg-muted/40">
           <Button
             variant="ghost"
             onClick={onClose}
-            className="text-muted-foreground hover:text-[#152e2b] font-bold cursor-pointer"
+            className="text-muted-foreground hover:text-foreground font-bold cursor-pointer"
           >
             {dict.profile.edit_modal.cancel}
           </Button>
           <Button
             onClick={handleSave}
             disabled={mutation.isPending}
-            className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] px-8 font-bold transition-all shadow-lg shadow-[#05dc7f]/20 cursor-pointer"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 font-bold transition-all shadow-lg shadow-primary/20 cursor-pointer"
           >
             {mutation.isPending ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
           </Button>

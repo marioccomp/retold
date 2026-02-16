@@ -62,13 +62,19 @@ export default function LoginForm() {
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
       {/* Branding Column - Desktop Only */}
-      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-[#05dc7f] via-[#a7f3d0] to-white p-12 overflow-hidden">
+      <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-primary via-primary/30 to-background p-12 overflow-hidden">
         {/* Abstract pattern overlay */}
         <div className="absolute inset-0 opacity-[0.03]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#047857" strokeWidth="1" />
+                <path
+                  d="M 40 0 L 0 0 0 40"
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-primary-foreground/20"
+                  strokeWidth="1"
+                />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -76,8 +82,8 @@ export default function LoginForm() {
         </div>
 
         {/* Gradient orbs for visual interest */}
-        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-[#05dc7f]/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-white/40 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-background/40 rounded-full blur-3xl" />
 
         {/* Content */}
         <div className="relative z-10 text-center">
@@ -88,25 +94,25 @@ export default function LoginForm() {
             className="w-32 h-auto mx-auto mb-12"
           />
 
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+          <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight">
             {dict.auth.login.welcome_title}
           </h1>
-          <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
             {dict.auth.login.welcome_subtitle}
           </p>
 
           {/* Feature highlights */}
           <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
-            <div className="flex items-center gap-3 text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
+            <div className="flex items-center gap-3 text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary" />
               <span>{dict.auth.login.feature_journey}</span>
             </div>
-            <div className="flex items-center gap-3 text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
+            <div className="flex items-center gap-3 text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary" />
               <span>{dict.auth.login.feature_leaders}</span>
             </div>
-            <div className="flex items-center gap-3 text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-[#05dc7f]" />
+            <div className="flex items-center gap-3 text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary" />
               <span>{dict.auth.login.feature_opportunities}</span>
             </div>
           </div>
@@ -114,7 +120,7 @@ export default function LoginForm() {
       </div>
 
       {/* Form Column */}
-      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-white">
+      <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-background">
         <div className="w-full max-w-[400px]">
           {/* Mobile logo */}
           <div className="flex justify-center mb-8 lg:hidden">
@@ -123,15 +129,15 @@ export default function LoginForm() {
 
           {/* Form header */}
           <div className="mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2 text-center">
               {dict.auth.login.title}
             </h2>
-            <p className="text-gray-500 text-center">{dict.auth.login.subtitle}</p>
+            <p className="text-muted-foreground text-center">{dict.auth.login.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="identifier" className="text-gray-700 font-medium">
+              <Label htmlFor="identifier" className="text-foreground font-medium">
                 {dict.auth.login.identifier_label}
               </Label>
               <Input
@@ -145,7 +151,7 @@ export default function LoginForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium">
                 {dict.auth.login.password_label}
               </Label>
               <div className="relative">
@@ -160,7 +166,7 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={togglePasswordVisible}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   aria-label={
                     isPasswordVisible
                       ? dict.profile.edit_modal.saving
@@ -180,15 +186,15 @@ export default function LoginForm() {
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="remember"
-                  className="data-[state=checked]:bg-[#05dc7f] data-[state=checked]:border-[#05dc7f] cursor-pointer"
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary cursor-pointer"
                 />
-                <Label htmlFor="remember" className="text-gray-500 text-sm cursor-pointer">
+                <Label htmlFor="remember" className="text-muted-foreground text-sm cursor-pointer">
                   {dict.auth.login.remember_me}
                 </Label>
               </div>
               <Link
                 href="/forgot-password"
-                className="text-[#05dc7f] text-sm font-semibold hover:underline hover:opacity-80 transition-opacity"
+                className="text-primary text-sm font-semibold hover:underline hover:opacity-80 transition-opacity"
               >
                 {dict.auth.login.forgot_password}
               </Link>
@@ -197,7 +203,7 @@ export default function LoginForm() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full h-11 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -226,16 +232,16 @@ export default function LoginForm() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-8 text-gray-400 text-sm">
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex items-center my-8 text-muted-foreground text-sm">
+            <div className="flex-1 h-px bg-border" />
             <span className="px-4">{dict.auth.login.social_divider}</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-border" />
           </div>
 
           {/* Social accounts */}
           <div className="flex justify-center gap-4">
             <button
-              className="flex items-center justify-center w-full h-12 rounded-lg border border-gray-200 text-gray-600 transition-all hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
+              className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
               onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
               type="button"
             >
@@ -245,9 +251,9 @@ export default function LoginForm() {
           </div>
 
           {/* Create account */}
-          <p className="text-center text-gray-500 text-sm mt-8">
+          <p className="text-center text-muted-foreground text-sm mt-8">
             {dict.auth.login.no_account}{" "}
-            <Link href="/register" className="text-[#05dc7f] font-semibold hover:underline">
+            <Link href="/register" className="text-primary font-semibold hover:underline">
               {dict.auth.login.create_one}
             </Link>
           </p>

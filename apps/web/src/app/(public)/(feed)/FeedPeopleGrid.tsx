@@ -61,8 +61,8 @@ export default function FeedPeopleGrid() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] py-20 w-full col-span-full">
-        <div className="w-8 h-8 border-2 border-[#05dc7f] border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-[#6b7c7a] font-medium">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-muted-foreground font-medium">
           {dict.feed.feedpeoplegrid?.loading || "Finding people..."}
         </p>
       </div>
@@ -72,10 +72,10 @@ export default function FeedPeopleGrid() {
   if (!filteredUsers || filteredUsers.length === 0) {
     return (
       <div className="col-span-full flex flex-col items-center justify-center min-h-[500px] py-16 text-center">
-        <p className="text-[#6b7c7a] text-lg font-medium">
+        <p className="text-muted-foreground text-lg font-medium">
           {dict.feed.feedpeoplegrid?.no_users?.title || "No people found"}
         </p>
-        <p className="text-[#a0aaa8] text-sm mt-1">
+        <p className="text-muted-foreground/80 text-sm mt-1">
           {dict.feed.feedpeoplegrid?.no_users?.description ||
             "Try searching for a name or username"}
         </p>
@@ -90,7 +90,7 @@ export default function FeedPeopleGrid() {
           value={peopleSort}
           onValueChange={(val: "active" | "newest" | "oldest" | "name") => setPeopleSort(val)}
         >
-          <SelectTrigger className="w-[180px] bg-white border-[#e7eae9] cursor-pointer">
+          <SelectTrigger className="w-[180px] bg-background border-border cursor-pointer">
             <SelectValue placeholder={dict.feed.sort.placeholder} />
           </SelectTrigger>
           <SelectContent>

@@ -75,14 +75,14 @@ export default function AuthModal() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-white w-full max-w-[420px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4 relative">
+      <div className="bg-card w-full max-w-[420px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4 relative border border-border">
         {/* Close Button */}
         <button
           onClick={closeLoginModal}
-          className="cursor-pointer absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors cursor-pointer z-10"
+          className="cursor-pointer absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer z-10"
         >
           <FiX size={20} />
         </button>
@@ -95,13 +95,13 @@ export default function AuthModal() {
 
           {/* Header */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{dict.auth.login.title}</h2>
-            <p className="text-gray-500 text-sm">{dict.auth.login.subtitle}</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">{dict.auth.login.title}</h2>
+            <p className="text-muted-foreground text-sm">{dict.auth.login.subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="identifier" className="text-gray-700 font-medium">
+              <Label htmlFor="identifier" className="text-foreground font-medium">
                 {dict.auth.login.identifier_label}
               </Label>
               <Input
@@ -115,7 +115,7 @@ export default function AuthModal() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium">
                 {dict.auth.login.password_label}
               </Label>
               <div className="relative">
@@ -125,12 +125,12 @@ export default function AuthModal() {
                   name="password"
                   required
                   placeholder="••••••••"
-                  className="h-11 pr-11 shadow-none"
+                  className="h-11 pr-11 shadow-none bg-background"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisible}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                 >
                   {isPasswordVisible ? (
                     <FaEye className="text-lg" />
@@ -145,16 +145,16 @@ export default function AuthModal() {
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="remember"
-                  className="data-[state=checked]:bg-[#05dc7f] data-[state=checked]:border-[#05dc7f] cursor-pointer"
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary cursor-pointer"
                 />
-                <Label htmlFor="remember" className="text-gray-500 text-sm cursor-pointer">
+                <Label htmlFor="remember" className="text-muted-foreground text-sm cursor-pointer">
                   {dict.auth.login.remember_me}
                 </Label>
               </div>
               <Link
                 href="/forgot-password"
                 onClick={closeLoginModal}
-                className="text-[#05dc7f] text-sm font-semibold hover:underline hover:opacity-80 transition-opacity"
+                className="text-primary text-sm font-semibold hover:underline hover:opacity-80 transition-opacity"
               >
                 {dict.auth.login.forgot_password}
               </Link>
@@ -163,7 +163,7 @@ export default function AuthModal() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full h-11 bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -192,16 +192,16 @@ export default function AuthModal() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-6 text-gray-400 text-sm">
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex items-center my-6 text-muted-foreground text-sm">
+            <div className="flex-1 h-px bg-border" />
             <span className="px-4">{dict.auth.login.social_divider}</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-border" />
           </div>
 
           {/* Social accounts */}
           <div className="flex justify-center gap-4">
             <button
-              className="flex items-center justify-center w-full h-12 rounded-lg border border-gray-200 text-gray-600 transition-all hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
+              className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
               onClick={() => signIn("github", { callbackUrl: window.location.href })}
             >
               <FiGithub className="text-xl" />
@@ -210,12 +210,12 @@ export default function AuthModal() {
           </div>
 
           {/* Create account */}
-          <p className="text-center text-gray-500 text-sm mt-6">
+          <p className="text-center text-muted-foreground text-sm mt-6">
             {dict.auth.login.no_account}{" "}
             <Link
               href="/register"
               onClick={closeLoginModal}
-              className="text-[#05dc7f] font-semibold hover:underline"
+              className="text-primary font-semibold hover:underline"
             >
               {dict.auth.login.create_one}
             </Link>

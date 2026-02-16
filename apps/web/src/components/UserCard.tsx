@@ -32,9 +32,9 @@ export function UserCard({ user }: UserCardProps) {
 
   return (
     <Link href={`/${user.username}`} className="block h-full cursor-pointer">
-      <Card className="group flex flex-col items-center pt-0 bg-white border border-[#d4e5d7] shadow-sm hover:shadow-md transition-all duration-300 hover:border-[#33bd19]/50 h-full cursor-pointer overflow-hidden">
+      <Card className="group flex flex-col items-center pt-0 bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/50 h-full cursor-pointer overflow-hidden">
         {/* Cover Banner - edge to edge, no padding */}
-        <div className="w-full h-20 bg-gradient-to-r from-[#33bd19] to-[#05dc7f] relative rounded-t-xl overflow-hidden">
+        <div className="w-full h-20 bg-gradient-to-r from-primary to-primary/80 relative rounded-t-xl overflow-hidden">
           {user.cover && (
             <img
               src={user.cover}
@@ -46,28 +46,28 @@ export function UserCard({ user }: UserCardProps) {
 
         {/* Content with avatar overlapping - avatar overlaps half into cover */}
         <div className="px-6 pb-6 flex flex-col items-center w-full -mt-16 relative z-10">
-          <Avatar className="w-24 h-24 mb-4 ring-4 ring-white group-hover:ring-[#33bd19]/20 transition-all bg-white shadow-sm">
+          <Avatar className="w-24 h-24 mb-4 ring-4 ring-background group-hover:ring-primary/20 transition-all bg-background shadow-sm">
             <AvatarImage src={user.image || ""} alt={displayName} className="object-cover" />
-            <AvatarFallback className="bg-[#f0fdf4] text-[#152e2b] text-xl font-medium">
+            <AvatarFallback className="bg-secondary text-foreground text-xl font-medium">
               {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
 
           <div className="text-center w-full mb-4 flex-1">
-            <h3 className="text-lg font-bold text-[#152e2b] truncate w-full" title={displayName}>
+            <h3 className="text-lg font-bold text-foreground truncate w-full" title={displayName}>
               {displayName}
             </h3>
             {displayHandle && (
-              <p className="text-sm text-[#6b7c7a] font-medium mt-0.5">{displayHandle}</p>
+              <p className="text-sm text-muted-foreground font-medium mt-0.5">{displayHandle}</p>
             )}
 
             {/* Title */}
-            <p className="text-sm font-semibold text-[#152e2b] mt-3 line-clamp-1">
+            <p className="text-sm font-semibold text-foreground mt-3 line-clamp-1">
               {user.title || dict.feed.usercard?.no_title || "No title defined"}
             </p>
 
             {/* Bio / Headline */}
-            <p className="text-xs text-[#6b7c7a] mt-1 line-clamp-2 min-h-[32px]">
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 min-h-[32px]">
               {user.bio || ""}
             </p>
           </div>
@@ -77,13 +77,13 @@ export function UserCard({ user }: UserCardProps) {
               user.skills.slice(0, 3).map((skill, index) => (
                 <Badge
                   key={index}
-                  className="bg-[#05dc7f]/10 text-[#047857] hover:bg-[#05dc7f]/20 border-none px-2.5 py-1 text-xs"
+                  className="bg-primary/10 text-primary hover:bg-primary/20 border-none px-2.5 py-1 text-xs"
                 >
                   {skill}
                 </Badge>
               ))
             ) : (
-              <span className="text-xs text-[#a0aaa8] italic">
+              <span className="text-xs text-muted-foreground italic">
                 {dict.feed.usercard?.no_skills || "No skills listed"}
               </span>
             )}

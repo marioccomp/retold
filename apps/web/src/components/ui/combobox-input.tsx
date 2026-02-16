@@ -40,7 +40,7 @@ export function ComboboxInput({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between focus-visible:ring-[#05dc7f] h-9 font-medium px-3 text-left"
+          className="w-full justify-between focus-visible:ring-primary h-9 font-medium px-3 text-left"
         >
           {value ? (
             <span className="truncate">{value}</span>

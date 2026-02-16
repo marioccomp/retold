@@ -91,10 +91,10 @@ export default function FeedProjectsGrid({
     return (
       <>
         <div className="col-span-full flex flex-col items-center justify-center min-h-[500px] py-16 text-center">
-          <p className="text-[#6b7c7a] text-lg font-medium">
+          <p className="text-muted-foreground text-lg font-medium">
             {dict.feed.feedprojectsgrid.no_projects.title}
           </p>
-          <p className="text-[#a0aaa8] text-sm mt-1">
+          <p className="text-muted-foreground/80 text-sm mt-1">
             {dict.feed.feedprojectsgrid.no_projects.description}
           </p>
         </div>

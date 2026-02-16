@@ -132,10 +132,10 @@ export default function Header({ session: initialSession }: { session: Session |
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-black/5 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-border/5 ${
         isScrolled
-          ? "bg-white shadow-sm"
-          : "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60"
+          ? "bg-background shadow-sm"
+          : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       }`}
     >
       <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between gap-4">
@@ -154,7 +154,7 @@ export default function Header({ session: initialSession }: { session: Session |
           <nav className="hidden md:flex items-center gap-1">
             <Button
               variant="ghost"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
               onClick={handleExploreClick}
             >
               {dict.header.explore}
@@ -178,7 +178,7 @@ export default function Header({ session: initialSession }: { session: Session |
         >
           {/* Feed Tabs - Only visible on Home/Feed */}
           {pathname === "/" && (
-            <div className="flex items-center gap-1 bg-gray-100/50 p-1 rounded-full border border-black/5">
+            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-full border border-border/5">
               <button
                 onClick={() => {
                   setActiveTab("projects");
@@ -186,8 +186,8 @@ export default function Header({ session: initialSession }: { session: Session |
                 }}
                 className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                   activeTab === "projects"
-                    ? "bg-white text-[#152e2b] shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-background text-foreground shadow-sm ring-1 ring-border/5"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
@@ -199,8 +199,8 @@ export default function Header({ session: initialSession }: { session: Session |
                 }}
                 className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                   activeTab === "people"
-                    ? "bg-white text-[#152e2b] shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-background text-foreground shadow-sm ring-1 ring-border/5"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
@@ -210,7 +210,7 @@ export default function Header({ session: initialSession }: { session: Session |
 
           <div className="relative w-full max-w-xs group">
             <FiSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#05dc7f] transition-colors"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
               size={18}
             />
             <input
@@ -220,7 +220,7 @@ export default function Header({ session: initialSession }: { session: Session |
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className="w-full h-10 pl-10 pr-4 bg-gray-100/50 hover:bg-gray-100 focus:bg-white border border-transparent focus:border-[#05dc7f] focus:ring-4 focus:ring-[#05dc7f]/10 rounded-full text-sm transition-all outline-none placeholder:text-gray-400"
+              className="w-full h-10 pl-10 pr-4 bg-muted/50 hover:bg-muted focus:bg-background border border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-full text-sm transition-all outline-none placeholder:text-muted-foreground/70"
             />
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function Header({ session: initialSession }: { session: Session |
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full hover:bg-gray-100 text-gray-600 h-9 w-9"
+              className="rounded-full hover:bg-muted text-muted-foreground h-9 w-9"
               onClick={() => setIsSearchExpanded(!isSearchExpanded)}
             >
               <FiSearch size={22} />
@@ -249,7 +249,7 @@ export default function Header({ session: initialSession }: { session: Session |
                     {userImage ? (
                       <AvatarImage src={userImage} alt={userName} className="object-cover" />
                     ) : null}
-                    <AvatarFallback className="bg-[#05dc7f]/10 text-[#047857] text-sm font-medium">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
@@ -260,15 +260,15 @@ export default function Header({ session: initialSession }: { session: Session |
                 className="w-56 mt-2"
                 onCloseAutoFocus={(e) => e.preventDefault()}
               >
-                <div className="px-3 py-2 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{userName}</p>
-                  <p className="text-xs text-gray-500 truncate">{userData?.email}</p>
+                <div className="px-3 py-2 border-b border-border/50">
+                  <p className="text-sm font-medium text-foreground">{userName}</p>
+                  <p className="text-xs text-muted-foreground truncate">{userData?.email}</p>
                 </div>
                 <DropdownMenuItem
                   className="cursor-pointer gap-2 py-2"
                   onClick={handleProfileClick}
                 >
-                  <FiUser className="h-4 w-4 text-gray-500" />
+                  <FiUser className="h-4 w-4 text-muted-foreground" />
                   <span>{dict.header.profile}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -276,7 +276,7 @@ export default function Header({ session: initialSession }: { session: Session |
                     href="/settings"
                     className="cursor-pointer gap-2 py-2 w-full flex items-center"
                   >
-                    <FiSettings className="h-4 w-4 text-gray-500" />
+                    <FiSettings className="h-4 w-4 text-muted-foreground" />
                     <span>{dict.header.settings}</span>
                   </Link>
                 </DropdownMenuItem>
@@ -292,7 +292,7 @@ export default function Header({ session: initialSession }: { session: Session |
             </DropdownMenu>
           ) : (
             <Link href="/login">
-              <Button className="bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(5,220,127,0.4)] active:scale-[0.98] cursor-pointer">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(var(--primary),0.4)] active:scale-[0.98] cursor-pointer">
                 {dict.header.login}
               </Button>
             </Link>
@@ -302,7 +302,7 @@ export default function Header({ session: initialSession }: { session: Session |
 
       {/* Mobile Search Overlay */}
       <div
-        className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 p-4 transition-all duration-300 origin-top shadow-xl ${
+        className={`md:hidden absolute top-full left-0 w-full bg-background border-b border-border/50 p-4 transition-all duration-300 origin-top shadow-xl ${
           isSearchExpanded && (showSearch || isSearchFocused)
             ? "opacity-100 scale-y-100"
             : "opacity-0 scale-y-0 pointer-events-none"
@@ -310,14 +310,16 @@ export default function Header({ session: initialSession }: { session: Session |
       >
         <div className="flex flex-col gap-4 w-full">
           {pathname === "/" && (
-            <div className="flex items-center gap-1 bg-gray-100/80 p-1 rounded-xl w-full">
+            <div className="flex items-center gap-1 bg-muted/80 p-1 rounded-xl w-full">
               <button
                 onClick={() => {
                   setActiveTab("projects");
                   scrollToContent();
                 }}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === "projects" ? "bg-white text-[#152e2b] shadow-sm" : "text-gray-500"
+                  activeTab === "projects"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground"
                 }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
@@ -328,7 +330,9 @@ export default function Header({ session: initialSession }: { session: Session |
                   scrollToContent();
                 }}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === "people" ? "bg-white text-[#152e2b] shadow-sm" : "text-gray-500"
+                  activeTab === "people"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground"
                 }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
@@ -338,7 +342,7 @@ export default function Header({ session: initialSession }: { session: Session |
 
           <div className="relative w-full">
             <FiSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               size={18}
             />
             <input
@@ -349,7 +353,7 @@ export default function Header({ session: initialSession }: { session: Session |
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               autoFocus={isSearchExpanded}
-              className="w-full h-12 pl-10 pr-4 bg-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#05dc7f]/50 border-none"
+              className="w-full h-12 pl-10 pr-4 bg-muted rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/50 border-none"
             />
           </div>
         </div>
