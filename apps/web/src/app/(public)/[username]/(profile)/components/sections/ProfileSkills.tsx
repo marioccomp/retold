@@ -20,7 +20,7 @@ export default function ProfileSkills({ skills, ownProfile, onEditClick }: Props
       <CardHeader className="pb-3 border-b border-border/40 bg-white">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg text-foreground font-bold">
-            <FiCode className="text-[#05dc7f]" />
+            <FiCode className="text-primary" />
             {dict.profile.skills_section}
           </CardTitle>
 
@@ -29,7 +29,7 @@ export default function ProfileSkills({ skills, ownProfile, onEditClick }: Props
               variant="ghost"
               size="icon"
               onClick={onEditClick}
-              className="w-8 h-8 rounded-lg hover:bg-[#05dc7f]/10 text-muted-foreground hover:text-[#05dc7f] transition-all cursor-pointer"
+              className="w-8 h-8 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
               title={dict.profile.edit_details}
             >
               <FiEdit2 size={14} />
@@ -44,7 +44,7 @@ export default function ProfileSkills({ skills, ownProfile, onEditClick }: Props
               <Badge
                 key={skill}
                 variant="outline"
-                className="px-4 py-1.5 text-[0.85rem] font-semibold border-[#05dc7f]/20 text-[#047857] bg-[#05dc7f]/5 hover:bg-[#05dc7f]/10 transition-all rounded-full"
+                className="px-4 py-1.5 text-[0.85rem] font-semibold border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 transition-all rounded-full"
               >
                 {skill}
               </Badge>

@@ -58,7 +58,7 @@ const SocialLinkItem = memo(function SocialLinkItem({
           size="icon"
           onClick={onAddClick}
           title={addTooltip}
-          className="w-[42px] h-[42px] border border-dashed border-[#c5cccb] rounded-[10px] bg-white/50 text-[#a0aaa8] opacity-50 hover:opacity-80 hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[rgba(5,220,127,0.06)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(5,220,127,0.15)] transition-all cursor-pointer"
+          className="w-[42px] h-[42px] border border-dashed border-border/60 rounded-[10px] bg-background/50 text-muted-foreground opacity-50 hover:opacity-80 hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 hover:shadow-md transition-all cursor-pointer"
         >
           <Icon size={18} />
         </Button>
@@ -72,7 +72,7 @@ const SocialLinkItem = memo(function SocialLinkItem({
         variant="ghost"
         size="icon"
         asChild
-        className="w-[42px] h-[42px] border border-[#e7eae9] rounded-[10px] bg-white text-[#152e2b] hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[rgba(5,220,127,0.06)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(5,220,127,0.2)] transition-all cursor-pointer"
+        className="w-[42px] h-[42px] border border-border rounded-[10px] bg-card text-foreground hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 hover:shadow-md transition-all cursor-pointer"
       >
         <a
           href={url ?? ""}
@@ -131,13 +131,13 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
           className={`relative group ${ownProfile ? "cursor-pointer" : ""}`}
           onClick={ownProfile ? onEditClick : undefined}
         >
-          <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-white shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.08)] bg-white">
+          <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-background shadow-xl bg-card">
             <AvatarImage
               src={profile.image ?? undefined}
               alt={dict.profile.alt_avatar}
               className="object-cover"
             />
-            <AvatarFallback className="text-4xl font-bold text-[#152e2b]">
+            <AvatarFallback className="text-4xl font-bold text-foreground">
               {(profile.name || profile.username || "U").charAt(0)}
             </AvatarFallback>
           </Avatar>
@@ -153,11 +153,11 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
 
           {!ownProfile && followsMe && (
             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e7eae9] shadow-[0_4px_12px_rgba(0,0,0,0.08)] rounded-full animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <div className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f]">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-card border border-border shadow-sm rounded-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-primary/10 text-primary">
                   <FiCheck size={10} strokeWidth={4} />
                 </div>
-                <span className="text-[10px] font-bold text-[#152e2b] tracking-[0.05em] uppercase whitespace-nowrap">
+                <span className="text-[10px] font-bold text-foreground tracking-[0.05em] uppercase whitespace-nowrap">
                   {dict.profile.follows_you}
                 </span>
               </div>
@@ -165,20 +165,20 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
           )}
         </div>
 
-        <div className="mt-3 text-xl font-bold text-[#152e2b] flex items-center gap-2">
+        <div className="mt-3 text-xl font-bold text-foreground flex items-center gap-2">
           <span>{profile.name}</span>
         </div>
       </div>
 
       <section className="mt-3 w-full max-w-[300px] md:max-w-full flex flex-col gap-4 items-center">
         {/* Title */}
-        <div className="w-full rounded-xl py-4 px-5 text-center border border-[#e7eae9] bg-white shadow-sm">
-          <span className="text-[10px] uppercase tracking-[0.25em] text-[#a0aaa8] font-black block mb-1.5 opacity-80">
+        <div className="w-full rounded-xl py-4 px-5 text-center border border-border bg-card shadow-sm">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-black block mb-1.5 opacity-80">
             {dict.profile.edit_modal.job_label}
           </span>
-          <h3 className="m-0 break-words font-bold text-[1.1rem] text-[#152e2b] tracking-tight leading-tight">
+          <h3 className="m-0 break-words font-bold text-[1.1rem] text-foreground tracking-tight leading-tight">
             {profile.title || (
-              <span className="text-[#a0aaa8] italic font-normal text-sm">
+              <span className="text-muted-foreground italic font-normal text-sm">
                 {dict.profile.no_title}
               </span>
             )}
@@ -186,12 +186,12 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         </div>
 
         {/* Description/Bio */}
-        <div className="w-full rounded-xl p-5 text-center border border-[#e7eae9] bg-[#fafafa]/50 shadow-sm border-dashed">
-          <p className="m-0 text-[1rem] text-[#243b38] leading-relaxed font-medium italic">
+        <div className="w-full rounded-xl p-5 text-center border border-border bg-secondary/50 shadow-sm border-dashed">
+          <p className="m-0 text-[1rem] text-foreground leading-relaxed font-medium italic">
             {profile.bio ? (
               <>"{profile.bio}"</>
             ) : (
-              <span className="text-[#a0aaa8] italic text-sm font-normal">
+              <span className="text-muted-foreground italic text-sm font-normal">
                 {dict.profile.no_description}
               </span>
             )}
@@ -199,33 +199,33 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         </div>
 
         {/* Stats */}
-        <div className="w-full flex border border-[#e7eae9] rounded-xl overflow-hidden bg-white shadow-sm">
-          <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] font-medium">
-            <span className="block text-[1.1rem] font-bold text-[#152e2b]">{stats.views}</span>{" "}
+        <div className="w-full flex border border-border rounded-xl overflow-hidden bg-white shadow-sm">
+          <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground font-medium">
+            <span className="block text-[1.1rem] font-bold text-foreground">{stats.views}</span>{" "}
             {dict.profile.views}
           </p>
-          <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] border-l border-[#e7eae9] font-medium">
-            <span className="block text-[1.1rem] font-bold text-[#152e2b]">{stats.likes}</span>{" "}
+          <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground border-l border-border font-medium">
+            <span className="block text-[1.1rem] font-bold text-foreground">{stats.likes}</span>{" "}
             {dict.profile.likes}
           </p>
         </div>
 
         {/* Followers/Following Stats */}
-        <div className="w-full flex border border-[#e7eae9] rounded-xl overflow-hidden bg-white shadow-sm">
+        <div className="w-full flex border border-border rounded-xl overflow-hidden bg-card shadow-sm">
           <button
             onClick={() => setNetworkModal({ isOpen: true, type: "followers" })}
-            className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] font-medium hover:bg-gray-50 transition-colors bg-transparent cursor-pointer border-none outline-none"
+            className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground font-medium hover:bg-muted transition-colors bg-transparent cursor-pointer border-none outline-none"
           >
-            <span className="block text-[1.1rem] font-bold text-[#152e2b]">
+            <span className="block text-[1.1rem] font-bold text-foreground">
               {profile.followersCount}
             </span>{" "}
             {dict.profile.followers}
           </button>
           <button
             onClick={() => setNetworkModal({ isOpen: true, type: "following" })}
-            className="flex-1 m-0 py-3 text-center text-[0.9rem] text-[#6b7c7a] border-y-0 border-r-0 border-l border-[#e7eae9] font-medium hover:bg-gray-50 transition-colors bg-transparent cursor-pointer outline-none"
+            className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground border-y-0 border-r-0 border-l border-border font-medium hover:bg-muted transition-colors bg-transparent cursor-pointer outline-none"
           >
-            <span className="block text-[1.1rem] font-bold text-[#152e2b]">
+            <span className="block text-[1.1rem] font-bold text-foreground">
               {profile.followingCount}
             </span>{" "}
             {dict.profile.following}
@@ -273,7 +273,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
           {ownProfile && (
             <Button
               onClick={onEditClick}
-              className="w-full h-11 border-none rounded-xl bg-[#05dc7f] text-[#0f2f28] text-base font-bold cursor-pointer transition-all duration-200 hover:bg-[#03c56f] hover:shadow-lg hover:shadow-[#05dc7f]/20 flex items-center justify-center gap-2"
+              className="w-full h-11 border-none rounded-xl bg-primary text-primary-foreground text-base font-bold cursor-pointer transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2"
             >
               {dict.profile.edit_profile}
             </Button>

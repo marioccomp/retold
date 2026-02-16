@@ -97,7 +97,7 @@ export default function ProjectCard({
 
   return (
     <Card
-      className={`group flex flex-col w-full border border-[#f0f0f0] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden bg-white transition-transform duration-200 ease-in-out p-0 ${!disableHover ? "hover:-translate-y-0.5" : ""}`}
+      className={`group flex flex-col w-full border border-border rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden bg-card transition-transform duration-200 ease-in-out p-0 ${!disableHover ? "hover:-translate-y-0.5" : ""}`}
       onClick={handleCardClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
@@ -110,7 +110,7 @@ export default function ProjectCard({
 
         {/* Longer Description Overlay */}
         <div
-          className="absolute left-0 w-full bg-[#152e2b]/95 text-white flex flex-col z-[2] transition-opacity duration-300
+          className="absolute left-0 w-full bg-foreground/95 text-white flex flex-col z-[2] transition-opacity duration-300
           max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border"
         >
@@ -120,17 +120,17 @@ export default function ProjectCard({
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               className="flex items-center gap-2.5 group/creator cursor-pointer"
             >
-              <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20 transition-all duration-200 group-hover/creator:border-[#05dc7f]/50 group-hover/creator:scale-105">
+              <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20 transition-all duration-200 group-hover/creator:border-primary/50 group-hover/creator:scale-105">
                 <AvatarImage
                   src={project.ownerImage || undefined}
                   alt={ownerName}
                   className="object-cover"
                 />
-                <AvatarFallback className="bg-[#05dc7f] text-[#152e2b] font-bold text-xs uppercase">
+                <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xs uppercase">
                   {ownerName.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold group-hover/creator:text-[#05dc7f] transition-colors duration-200">
+              <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold group-hover/creator:text-primary transition-colors duration-200">
                 {ownerName}
               </p>
             </Link>
@@ -164,7 +164,7 @@ export default function ProjectCard({
         {(project.status === "PENDING" || project.status === "ANALYZING") && (
           <div className="absolute inset-0 bg-black/60 z-[20] flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
             <div className="animate-spin mb-3">
-              <FiLoader size={28} className="text-[#05dc7f]" />
+              <FiLoader size={28} className="text-primary" />
             </div>
             <p className="font-semibold text-sm tracking-wide">
               {dict.project.status.ANALYZING}...
@@ -173,28 +173,28 @@ export default function ProjectCard({
         )}
       </div>
 
-      <div className="flex flex-col w-full max-[650px]:flex-row max-[650px]:items-start max-[650px]:justify-between max-[650px]:p-[16px_20px] max-[650px]:gap-2.5 max-[650px]:bg-white max-[380px]:p-[14px_12px]">
+      <div className="flex flex-col w-full max-[650px]:flex-row max-[650px]:items-start max-[650px]:justify-between max-[650px]:p-[16px_20px] max-[650px]:gap-2.5 max-[650px]:bg-card max-[380px]:p-[14px_12px]">
         <div className="p-[20px_24px_10px_24px] max-[650px]:p-0 max-[650px]:flex-1 max-[650px]:min-w-0 max-[650px]:mr-3">
           <div className="flex items-center gap-2">
             <h3
-              className="text-[18px] font-bold text-[#1a202c] m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
+              className="text-[18px] font-bold text-foreground m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
               max-[650px]:text-[1.1rem] max-[650px]:whitespace-normal max-[650px]:max-w-full max-[380px]:text-[0.95rem]"
             >
               {project.title}
             </h3>
             {isOwner && project.visibility === "private" && (
               <div
-                className="flex items-center gap-1 px-2 py-0.5 bg-[#f3f3f3] rounded-full shrink-0"
+                className="flex items-center gap-1 px-2 py-0.5 bg-secondary rounded-full shrink-0"
                 title={dict.project.create_panel.visibility_options.private}
               >
-                <Lock size={12} className="text-[#6b7c7a]" />
-                <span className="text-[10px] font-semibold text-[#6b7c7a] tracking-wide">
+                <Lock size={12} className="text-muted-foreground" />
+                <span className="text-[10px] font-semibold text-muted-foreground tracking-wide">
                   {dict.project.create_panel.visibility_options.private}
                 </span>
               </div>
             )}
           </div>
-          <p className="text-[#718096] text-[14px] mt-1 max-[650px]:hidden break-words whitespace-pre-wrap">
+          <p className="text-muted-foreground text-[14px] mt-1 max-[650px]:hidden break-words whitespace-pre-wrap">
             {project.description && project.description.length > 80
               ? `${project.description.slice(0, 80)}...`
               : project.description}
@@ -204,7 +204,8 @@ export default function ProjectCard({
               {project.tags.slice(0, 4).map((tag) => (
                 <Badge
                   key={tag.id}
-                  className="bg-[#05dc7f]/12 text-[#047857] px-2 py-[3px] rounded text-[11px] font-semibold hover:bg-[#05dc7f]/20 border-none shadow-none"
+                  variant="secondary"
+                  className="px-2 py-[3px] rounded text-[11px] font-semibold border-none shadow-none"
                 >
                   {tag.name}
                 </Badge>
@@ -214,7 +215,7 @@ export default function ProjectCard({
         </div>
 
         <div
-          className="flex p-[10px_24px_20px_24px] gap-4 justify-end text-[#4a5568]
+          className="flex p-[10px_24px_20px_24px] gap-4 justify-end text-muted-foreground
           max-[650px]:p-0 max-[650px]:gap-3 max-[650px]:shrink-0 max-[380px]:gap-2"
         >
           {project.repositoryUrl && !project.repositoryIsPrivate && (
@@ -222,7 +223,7 @@ export default function ProjectCard({
               href={project.repositoryUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer text-[#4a5568] hover:text-[#05dc7f] transition-colors no-underline"
+              className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer text-muted-foreground hover:text-primary transition-colors no-underline"
               onClick={(e) => e.stopPropagation()}
               title={project.repositoryFullName || "View Code"}
             >

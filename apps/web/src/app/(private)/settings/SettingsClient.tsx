@@ -36,7 +36,11 @@ import {
 import { setLanguageAction, setAnalysisLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
 
-export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnalysisLocale?: string }) {
+export function SettingsClient({
+  initialAnalysisLocale = "auto",
+}: {
+  initialAnalysisLocale?: string;
+}) {
   const { data: session, update } = useSession();
   const { dict, lang } = useTranslation();
   const [providers, setProviders] = useState<string[]>([]);
@@ -175,10 +179,12 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
   return (
     <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 md:px-6">
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
           {dict.settings.title}
         </h1>
-        <p className="text-gray-500 mt-2 text-sm md:text-base">{dict.settings.description}</p>
+        <p className="text-muted-foreground mt-2 text-sm md:text-base">
+          {dict.settings.description}
+        </p>
       </div>
 
       <Separator className="mb-8" />
@@ -195,9 +201,9 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
               key={item.id}
               value={item.id}
               className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 w-full text-left rounded-xl border transition-all
-                                border-transparent data-[state=active]:bg-gray-100 data-[state=active]:border-gray-200 data-[state=active]:shadow-sm
-                                hover:bg-gray-50 flex flex-col md:flex-row items-center md:items-center
-                                ${item.id === "danger" ? "text-red-600 data-[state=active]:text-red-700" : "text-gray-700"}
+                                border-transparent data-[state=active]:bg-muted data-[state=active]:border-border data-[state=active]:shadow-sm
+                                hover:bg-muted/50 flex flex-col md:flex-row items-center md:items-center
+                                ${item.id === "danger" ? "text-destructive data-[state=active]:text-destructive" : "text-muted-foreground data-[state=active]:text-foreground"}
                             `}
             >
               <item.icon className="h-4 w-4 shrink-0" />
@@ -212,7 +218,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
         <div className="flex-1 min-w-0">
           {/* General Section (Language) */}
           <TabsContent value="general" className="mt-0 space-y-6">
-            <Card className="border-gray-200 shadow-sm">
+            <Card className="border-border shadow-sm">
               <CardHeader>
                 <CardTitle>{dict.settings.language.title}</CardTitle>
                 <CardDescription>{dict.settings.language.description}</CardDescription>
@@ -235,15 +241,20 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
 
                 <div className="space-y-2">
                   <Label>{dict.settings.language.analysis_language_label}</Label>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {dict.settings.language.analysis_language_description}
                   </p>
-                  <Select defaultValue={initialAnalysisLocale} onValueChange={handleAnalysisLanguageChange}>
+                  <Select
+                    defaultValue={initialAnalysisLocale}
+                    onValueChange={handleAnalysisLanguageChange}
+                  >
                     <SelectTrigger className="w-full sm:w-[220px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="auto">{dict.settings.language.analysis_language_same}</SelectItem>
+                      <SelectItem value="auto">
+                        {dict.settings.language.analysis_language_same}
+                      </SelectItem>
                       <SelectItem value="en">English</SelectItem>
                       <SelectItem value="pt">Português</SelectItem>
                       <SelectItem value="es">Español</SelectItem>
@@ -256,7 +267,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
 
           {/* Security Section */}
           <TabsContent value="security" className="mt-0 space-y-6">
-            <Card className="border-gray-200 shadow-sm">
+            <Card className="border-border shadow-sm">
               <CardHeader>
                 <CardTitle>
                   {session?.user?.hasPassword
@@ -305,7 +316,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
                     <Button
                       type="submit"
                       disabled={pendingPassword}
-                      className="cursor-pointer bg-[#05dc7f] hover:bg-[#04c370] text-gray-900 font-medium"
+                      className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
                     >
                       {pendingPassword
                         ? dict.settings.password.buttonUpdating
@@ -321,7 +332,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
 
           {/* Integrations Section */}
           <TabsContent value="integrations" className="mt-0 space-y-6">
-            <Card className="border-gray-200 shadow-sm">
+            <Card className="border-border shadow-sm">
               <CardHeader>
                 <CardTitle>{dict.settings.connectedAccounts.title}</CardTitle>
                 <CardDescription>{dict.settings.connectedAccounts.description}</CardDescription>
@@ -338,14 +349,14 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
                     </AlertDescription>
                   </Alert>
                 )}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-gray-50/50 gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-muted/30 gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="bg-white p-2 rounded-full border shadow-sm shrink-0">
+                    <div className="bg-card p-2 rounded-full border shadow-sm shrink-0">
                       <FiGithub className="h-6 w-6" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium">GitHub</p>
-                      <p className="text-sm text-gray-500 break-words whitespace-normal leading-tight">
+                      <p className="text-sm text-muted-foreground break-words whitespace-normal leading-tight">
                         {dict.settings.connectedAccounts.github}
                       </p>
                     </div>
@@ -358,7 +369,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
                     ) : isGithubLinked ? (
                       <Badge
                         variant="outline"
-                        className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1 w-full sm:w-auto justify-center"
+                        className="bg-primary/10 text-primary border-primary/20 gap-1 px-3 py-1 w-full sm:w-auto justify-center"
                       >
                         <FiCheckCircle className="h-3 w-3" />{" "}
                         {dict.settings.connectedAccounts.connected}
@@ -381,16 +392,16 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
 
           {/* Danger Zone */}
           <TabsContent value="danger" className="mt-0 space-y-6">
-            <div className="bg-red-50/40 border border-red-100 rounded-xl p-4 md:p-10 flex flex-col items-center text-center gap-6 shadow-sm">
+            <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 md:p-10 flex flex-col items-center text-center gap-6 shadow-sm">
               <div className="flex flex-col items-center gap-4">
-                <div className="bg-white p-3 md:p-4 rounded-2xl border border-red-100 text-red-600 shadow-sm">
+                <div className="bg-card p-3 md:p-4 rounded-2xl border border-destructive/20 text-destructive shadow-sm">
                   <FiAlertTriangle size={24} className="md:w-8 md:h-8" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-red-900 font-black text-xl md:text-2xl tracking-tight">
+                  <h3 className="text-destructive font-black text-xl md:text-2xl tracking-tight">
                     {dict.settings.dangerZone.title}
                   </h3>
-                  <p className="text-sm md:text-base text-red-800/70 leading-relaxed max-w-md mx-auto">
+                  <p className="text-sm md:text-base text-destructive/80 leading-relaxed max-w-md mx-auto">
                     {dict.settings.dangerZone.description}
                   </p>
                 </div>
@@ -399,7 +410,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
                 variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={pendingDelete}
-                className="cursor-pointer bg-red-600 hover:bg-red-700 text-white font-bold h-11 md:h-12 px-8 md:px-10 rounded-xl shadow-lg shadow-red-200 transition-all duration-300 active:scale-95 shrink-0 w-full sm:w-auto"
+                className="cursor-pointer font-bold h-11 md:h-12 px-8 md:px-10 rounded-xl shadow-lg shadow-destructive/20 transition-all duration-300 active:scale-95 shrink-0 w-full sm:w-auto"
               >
                 {pendingDelete
                   ? dict.settings.dangerZone.buttonDeleting
@@ -427,13 +438,13 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 text-center">
-                <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                  <FiAlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="mx-auto w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
+                  <FiAlertTriangle className="w-6 h-6 text-destructive" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   {dict.settings.dangerZone.modal_title}
                 </h3>
-                <p className="text-gray-500 text-sm mb-6">
+                <p className="text-muted-foreground text-sm mb-6">
                   {dict.settings.dangerZone.modal_description}
                 </p>
                 <div className="flex flex-col gap-2">
@@ -449,7 +460,7 @@ export function SettingsClient({ initialAnalysisLocale = "auto" }: { initialAnal
                   </Button>
                   <Button
                     variant="ghost"
-                    className="w-full text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium cursor-pointer"
+                    className="w-full text-muted-foreground hover:text-foreground hover:bg-muted font-medium cursor-pointer"
                     onClick={() => setShowDeleteModal(false)}
                     disabled={pendingDelete}
                   >

@@ -257,7 +257,7 @@ export const ProjectSettings = ({
             <span>{t.edit_project}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
+            className="cursor-pointer gap-2 text-destructive focus:text-destructive focus:bg-destructive/10"
             onClick={(e) => {
               e.stopPropagation();
               setIsDeleteOpen(true);
@@ -285,11 +285,11 @@ export const ProjectSettings = ({
               className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between p-4 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">{t.title}</h3>
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <h3 className="text-lg font-semibold text-foreground">{t.title}</h3>
                 <button
                   onClick={() => setIsEditOpen(false)}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none outline-none focus-visible:ring-0 cursor-pointer"
+                  className="text-muted-foreground hover:text-foreground focus:outline-none outline-none focus-visible:ring-0 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -297,9 +297,9 @@ export const ProjectSettings = ({
               <div className="p-4 space-y-4">
                 {/* Project Images Management */}
                 <div className="space-y-3">
-                  <Label className="text-slate-950 font-semibold flex justify-between items-center">
+                  <Label className="text-foreground font-semibold flex justify-between items-center">
                     {t.images_label}
-                    <span className="text-xs font-normal text-slate-500">
+                    <span className="text-xs font-normal text-muted-foreground">
                       {t.max_images_hint} ({localImages.length}/3)
                     </span>
                   </Label>
@@ -338,7 +338,7 @@ export const ProjectSettings = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-title" className="text-slate-950 font-semibold">
+                  <Label htmlFor="edit-title" className="text-foreground font-semibold">
                     {t.labels.title}
                   </Label>
                   <Input
@@ -347,12 +347,12 @@ export const ProjectSettings = ({
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder={t.placeholders.title}
                     maxLength={100}
-                    className="text-slate-900 bg-white border-slate-300 focus:border-[#05dc7f] focus:ring-[#05dc7f] font-medium"
+                    className="text-foreground bg-background border-border focus:border-primary focus:ring-primary font-medium"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-description" className="text-slate-950 font-semibold">
+                  <Label htmlFor="edit-description" className="text-foreground font-semibold">
                     {t.labels.description}
                   </Label>
                   <Textarea
@@ -362,13 +362,13 @@ export const ProjectSettings = ({
                     placeholder={t.placeholders.description}
                     rows={4}
                     maxLength={280}
-                    className="resize-none text-slate-900 bg-white border-slate-300 focus:border-[#05dc7f] focus:ring-[#05dc7f] font-medium"
+                    className="resize-none text-foreground bg-background border-border focus:border-primary focus:ring-primary font-medium"
                   />
                 </div>
 
                 {/* Visibility */}
                 <div className="space-y-2">
-                  <Label htmlFor="edit-visibility" className="text-[#152e2b] font-semibold">
+                  <Label htmlFor="edit-visibility" className="text-foreground font-semibold">
                     {t.labels.visibility}
                   </Label>
                   <Select
@@ -377,7 +377,7 @@ export const ProjectSettings = ({
                   >
                     <SelectTrigger
                       id="edit-visibility"
-                      className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-sm focus:ring-[#05dc7f]/30 focus:border-[#05dc7f]"
+                      className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-border text-foreground text-sm focus:ring-primary/30 focus:border-primary"
                     >
                       <SelectValue
                         placeholder={
@@ -385,7 +385,7 @@ export const ProjectSettings = ({
                         }
                       />
                     </SelectTrigger>
-                    <SelectContent className="bg-white z-[1100]" position="popper">
+                    <SelectContent className="bg-popover z-[1100]" position="popper">
                       <SelectItem value="public" className="cursor-pointer">
                         {t.visibility_options.public}
                       </SelectItem>
@@ -396,16 +396,16 @@ export const ProjectSettings = ({
                   </Select>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 p-4 bg-gray-50 border-t">
+              <div className="flex items-center justify-end gap-3 p-4 bg-muted/50 border-t border-border">
                 <Button
                   variant="ghost"
                   onClick={() => setIsEditOpen(false)}
-                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-200 cursor-pointer"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
                 >
                   {t.cancel}
                 </Button>
                 <Button
-                  className="bg-[#04a660] hover:bg-[#038c51] text-white font-medium px-6 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleSave}
                   disabled={isSaving || !hasChanges}
                 >
@@ -428,8 +428,10 @@ export const ProjectSettings = ({
                   className="bg-white rounded-lg shadow-xl p-6 max-w-xs w-full animate-in zoom-in-95 duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <h4 className="font-semibold text-gray-900 mb-2">{t.remove_img_modal.title}</h4>
-                  <p className="text-sm text-gray-500 mb-4">{t.remove_img_modal.description}</p>
+                  <h4 className="font-semibold text-foreground mb-2">{t.remove_img_modal.title}</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t.remove_img_modal.description}
+                  </p>
                   <div className="flex justify-end gap-2">
                     <Button size="sm" variant="ghost" onClick={() => setImageToDelete(null)}>
                       {t.cancel}
@@ -462,13 +464,13 @@ export const ProjectSettings = ({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 text-center">
-                <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="mx-auto w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-6 h-6 text-destructive" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   {t.delete_project_modal.title}
                 </h3>
-                <p className="text-gray-500 text-sm mb-6 ">
+                <p className="text-muted-foreground text-sm mb-6 ">
                   {t.delete_project_modal.description.replace("{title}", project.title)}
                 </p>
                 <div className="flex flex-col gap-2">
@@ -482,7 +484,7 @@ export const ProjectSettings = ({
                   </Button>
                   <Button
                     variant="ghost"
-                    className="w-full text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium cursor-pointer"
+                    className="w-full text-muted-foreground hover:text-foreground hover:bg-muted font-medium cursor-pointer"
                     onClick={() => setIsDeleteOpen(false)}
                   >
                     {t.cancel}

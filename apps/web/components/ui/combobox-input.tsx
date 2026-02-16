@@ -43,13 +43,13 @@ export function ComboboxInput({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between h-9 font-medium px-3 text-left overflow-hidden bg-white hover:bg-white text-[#152e2b] cursor-pointer"
+            "w-full justify-between h-9 font-medium px-3 text-left overflow-hidden bg-background hover:bg-background text-foreground cursor-pointer"
           )}
         >
           {value ? (
             <span className="truncate">{value}</span>
           ) : (
-            <span className="text-[#a0aaa8] font-normal truncate">{placeholder}</span>
+            <span className="text-muted-foreground font-normal truncate">{placeholder}</span>
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

@@ -104,7 +104,7 @@ export default function FeedContent({ initialData }: Props) {
       className="w-full max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col items-center relative scroll-mt-4"
     >
       {/* Gradiente sutil para conectar com o hero */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-white/40 to-transparent pointer-events-none -z-10" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/40 to-transparent pointer-events-none -z-10" />
 
       {/* Hero Search Bar - Main Feed Search */}
       {!isProjectSelected && (
@@ -114,7 +114,7 @@ export default function FeedContent({ initialData }: Props) {
         >
           <div className="relative">
             <FiSearch
-              className="absolute left-5 top-1/2 -translate-y-1/2 text-[#9ca3af] pointer-events-none transition-colors duration-300 group-focus-within:text-[#05dc7f]"
+              className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none transition-colors duration-300 group-focus-within:text-primary"
               size={22}
             />
             <Input
@@ -126,11 +126,11 @@ export default function FeedContent({ initialData }: Props) {
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-4 pl-14 pr-6 rounded-full text-lg text-[#152e2b] h-auto
-                                bg-white shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border-[#e7eae9] 
-                                placeholder:text-[#9ca3af] font-medium
-                                hover:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.08)] hover:border-[#d4e5d7]
-                                focus-visible:ring-4 focus-visible:ring-[#05dc7f]/10 focus-visible:border-[#05dc7f] 
+              className="w-full py-4 pl-14 pr-6 rounded-full text-lg text-foreground h-auto
+                                bg-background shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border-border 
+                                placeholder:text-muted-foreground font-medium
+                                hover:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.08)] hover:border-primary/30
+                                focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:border-primary 
                                 focus-visible:shadow-[0_4px_30px_-5px_rgba(5,220,127,0.15)]
                                 transition-all duration-300"
             />
@@ -141,13 +141,13 @@ export default function FeedContent({ initialData }: Props) {
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full relative">
         {/* Minimal Static Tabs Header */}
         {!isProjectSelected && (
-          <div className="mb-8 border-b border-[#e7eae9] flex flex-row justify-center items-center w-full">
+          <div className="mb-8 border-b border-border flex flex-row justify-center items-center w-full">
             <TabsList className="bg-transparent p-0 h-auto gap-8 justify-center shrink-0">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.key}
                   value={tab.key}
-                  className="bg-transparent border-0 py-2 text-sm font-medium text-[#6b7c7a] cursor-pointer transition-all duration-300 hover:text-[#152e2b] data-[state=active]:text-[#152e2b] data-[state=active]:font-semibold data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:bg-[#05dc7f] after:transition-all after:duration-300 data-[state=active]:after:w-full"
+                  className="bg-transparent border-0 py-2 text-sm font-medium text-muted-foreground cursor-pointer transition-all duration-300 hover:text-foreground data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:bg-primary after:transition-all after:duration-300 data-[state=active]:after:w-full"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -167,7 +167,7 @@ export default function FeedContent({ initialData }: Props) {
                 value={projectSort}
                 onValueChange={(val: ProjectSortType) => setProjectSort(val)}
               >
-                <SelectTrigger className="w-[180px] bg-white border-[#e7eae9] cursor-pointer">
+                <SelectTrigger className="w-[180px] bg-background border-border cursor-pointer">
                   <SelectValue placeholder={dict.feed.sort.placeholder} />
                 </SelectTrigger>
                 <SelectContent>

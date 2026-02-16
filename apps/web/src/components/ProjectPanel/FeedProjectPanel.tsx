@@ -124,7 +124,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
     <div
       className={cn(
         "flex flex-col w-full h-auto animate-in fade-in slide-in-from-top-2 duration-300",
-        !isModal && "bg-white rounded-xl border border-gray-200 shadow-2xl"
+        !isModal && "bg-background rounded-xl border border-border shadow-2xl"
       )}
     >
       <style jsx global>{`
@@ -138,7 +138,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
       `}</style>
 
       {/* Modern Glassy Header */}
-      <div className="sticky top-0 left-0 right-0 px-6 py-4 border-b border-gray-100 bg-white z-50 flex items-center justify-between gap-4">
+      <div className="sticky top-0 left-0 right-0 px-6 py-4 border-b border-border/50 bg-background z-50 flex items-center justify-between gap-4">
         {/* Close Button - Left side on mobile, or right side? User asked for "header com X pra fechar" */}
         {/* Based on print, X is on left, title center/left, actions right. But usually X is top-right or top-left. */}
         {/* Let's put X on the top-right for consistency with previous design, or top-left if it's a bottom sheet... */}
@@ -154,13 +154,13 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   ownerUsername: project.owner?.username,
                 }}
                 onDelete={onClose}
-                triggerClassName="p-2 -ml-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer border border-transparent hover:border-gray-200"
+                triggerClassName="p-2 -ml-2 text-muted-foreground/80 hover:text-muted-foreground hover:bg-muted rounded-xl transition-all cursor-pointer border border-transparent hover:border-border"
               />
             )}
           </div>
 
           {/* Title in Header for Sticky context - Centered */}
-          <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-900 truncate max-w-[60%] text-center">
+          <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-foreground truncate max-w-[60%] text-center">
             {t.overlay?.details || "Detalhes do Projeto"}
           </h2>
 
@@ -168,7 +168,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
             {isModal && (
               <button
                 onClick={onClose}
-                className="p-2 -mr-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors z-10 cursor-pointer"
+                className="p-2 -mr-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors z-10 cursor-pointer"
                 aria-label="Close"
               >
                 <XCircle className="w-6 h-6" />
@@ -178,7 +178,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
         </div>
       </div>
 
-      <div className="relative px-6 py-6 border-b border-gray-100 bg-white z-10 w-full">
+      <div className="relative px-6 py-6 border-b border-border/50 bg-background z-10 w-full">
         <div className="flex flex-col md:flex-row gap-6 md:items-start max-w-5xl mx-auto w-full">
           {/* Owner Avatar & Name */}
           <div className="shrink-0 mx-auto md:mx-0">
@@ -189,11 +189,11 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               >
                 <Avatar className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-green-100/50 shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:shadow-md cursor-pointer">
                   <AvatarImage src={project.owner.image || undefined} />
-                  <AvatarFallback className="rounded-full text-xl bg-green-50 text-[#0f2f28] font-bold">
+                  <AvatarFallback className="rounded-full text-xl bg-secondary text-foreground font-bold">
                     {project.owner.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-semibold text-gray-700 group-hover:text-[#05dc7f] transition-colors text-center max-w-[120px] leading-tight break-words">
+                <span className="text-sm font-semibold text-foreground/80 group-hover:text-primary transition-colors text-center max-w-[120px] leading-tight break-words">
                   {project.owner.name}
                 </span>
               </Link>
@@ -202,14 +202,14 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
           {/* Title & Meta */}
           <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left min-w-0">
-            <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-tight break-words w-full">
+            <h2 className="text-xl md:text-3xl font-black text-foreground tracking-tight leading-tight break-words w-full">
               {project.title}
             </h2>
 
             {/* Description & Repo Row */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mt-2 w-full">
               {project.description && (
-                <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-3xl text-justify">
+                <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-3xl text-justify">
                   {project.description}
                 </p>
               )}
@@ -220,7 +220,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden md:inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50 shrink-0"
+                  className="hidden md:inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary font-medium transition-colors px-2 py-1 rounded-full hover:bg-secondary/50 shrink-0"
                 >
                   <Github className="w-3.5 h-3.5 shrink-0" />
                   <span>{repo.fullName}</span>
@@ -235,7 +235,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#05dc7f] font-medium transition-colors px-2 py-1 rounded-full hover:bg-green-50/50 max-w-full"
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary font-medium transition-colors px-2 py-1 rounded-full hover:bg-secondary/50 max-w-full"
                 >
                   <Github className="w-3.5 h-3.5 shrink-0" />
                   <span>{repo.fullName}</span>
@@ -248,15 +248,12 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               {data?.summary && (
                 <>
                   {data.summary.primaryLanguage && (
-                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">
+                    <Badge variant="secondary" className="border-secondary-foreground/20">
                       {data.summary.primaryLanguage}
                     </Badge>
                   )}
                   {data.summary.appType && data.summary.appType !== "Unknown" && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-50 text-purple-700 border-purple-100"
-                    >
+                    <Badge variant="secondary" className="border-secondary-foreground/20">
                       {humanizeEnum(data.summary.appType)}
                     </Badge>
                   )}
@@ -269,7 +266,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
       {/* Project Images Gallery */}
       {project.images && project.images.length > 0 && (
-        <div className="px-4 md:px-8 py-6 bg-white border-b border-gray-100">
+        <div className="px-4 md:px-8 py-6 bg-background border-b border-border/50">
           <div className="max-w-5xl mx-auto">
             <ImageGallery images={project.images} />
           </div>
@@ -277,7 +274,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
       )}
 
       {/* Content */}
-      <div className="bg-gray-50/50 p-4 md:p-8">
+      <div className="bg-muted/50 p-4 md:p-8">
         <div className="max-w-5xl mx-auto space-y-8">
           {/* Stats Cards Row */}
           {status === "DONE" && data?.stats && (
@@ -344,7 +341,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
           {/* Report Content - Unified View */}
           {status === "DONE" && (
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-background rounded-2xl border border-border shadow-sm overflow-hidden">
               {llm ? (
                 <div className="p-6 md:p-10 space-y-10">
                   <div className="space-y-4">
@@ -357,14 +354,14 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                         {llm.summary.paragraphs.map((p, i) => (
                           <p
                             key={i}
-                            className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap text-justify"
+                            className="text-foreground/80 text-lg leading-relaxed whitespace-pre-wrap text-justify"
                           >
                             {p}
                           </p>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap text-justify">
+                      <p className="text-foreground/80 text-lg leading-relaxed whitespace-pre-wrap text-justify">
                         {llm.summary?.description || t.overlay.llm_empty_overview}
                       </p>
                     )}
@@ -383,13 +380,15 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                       {llm.strengths?.slice(0, 4).map((s, i) => (
                         <div
                           key={i}
-                          className="p-4 rounded-xl bg-green-50/30 border border-green-100 hover:border-green-200 transition-colors"
+                          className="p-4 rounded-xl bg-secondary/30 border border-secondary hover:border-secondary/80 transition-colors"
                         >
                           <div className="font-bold text-gray-900 mb-1 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-[#05dc7f]" />
+                            <CheckCircle2 className="w-4 h-4 text-primary" />
                             {s.name}
                           </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">{s.explanation}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {s.explanation}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -404,8 +403,8 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                       icon={Layout}
                       color="purple"
                     />
-                    <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-200/60">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    <div className="mt-4 p-6 bg-muted rounded-2xl border border-border/60">
+                      <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
                         {llm.architecture?.explanation || t.overlay.llm_empty_architecture}
                       </p>
                     </div>
@@ -431,7 +430,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                             <Badge
                               key={i}
                               variant="outline"
-                              className="px-3 py-1.5 text-sm bg-white text-gray-700 border-gray-200"
+                              className="px-3 py-1.5 text-sm bg-background text-foreground/80 border-border"
                             >
                               {tech}
                             </Badge>
@@ -467,7 +466,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                                 <div className="font-bold text-gray-900">{s.name}</div>
 
                                 {s.explanation && (
-                                  <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                                     {s.explanation}
                                   </p>
                                 )}
@@ -480,8 +479,8 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                   )}
                 </div>
               ) : (
-                <div className="p-12 text-center text-gray-500">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-gray-400" />
+                <div className="p-12 text-center text-muted-foreground">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground/80" />
                   <p>{t.overlay.sections.loading_report}</p>
                 </div>
               )}
@@ -509,27 +508,29 @@ const StatCard = ({
   color?: "green" | "blue" | "orange" | "gray";
 }) => {
   const colors = {
-    green: "text-[#05dc7f] bg-green-50",
+    green: "text-primary bg-secondary",
     blue: "text-blue-500 bg-blue-50",
     orange: "text-orange-500 bg-orange-50",
-    gray: "text-gray-500 bg-gray-50",
+    gray: "text-muted-foreground bg-muted",
   };
 
   const c = colors[color];
 
   return (
-    <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow min-w-0">
+    <div className="bg-background p-3 md:p-4 rounded-xl border border-border/50 shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow min-w-0">
       <div className={`p-2.5 rounded-lg ${c} shrink-0`}>
         <Icon className="w-5 h-5" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-xl md:text-2xl font-black text-gray-900 leading-none mb-1 truncate">
+        <div className="text-xl md:text-2xl font-black text-foreground leading-none mb-1 truncate">
           {value}
         </div>
-        <div className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wide truncate">
+        <div className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-wide truncate">
           {label}
         </div>
-        <div className="text-[10px] text-gray-400 mt-1 font-medium truncate">{sublabel}</div>
+        <div className="text-[10px] text-muted-foreground/80 mt-1 font-medium truncate">
+          {sublabel}
+        </div>
       </div>
     </div>
   );
@@ -545,7 +546,7 @@ const SectionHeader = ({
   color?: "green" | "blue" | "orange" | "purple";
 }) => {
   const colorClass = {
-    green: "text-[#05dc7f]",
+    green: "text-primary",
     blue: "text-blue-500",
     orange: "text-orange-500",
     purple: "text-purple-500",
@@ -554,12 +555,12 @@ const SectionHeader = ({
   return (
     <div className="flex items-center gap-2.5">
       {Icon && <Icon className={`w-5 h-5 ${colorClass}`} />}
-      <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">{title}</h3>
+      <h3 className="text-sm font-black text-foreground uppercase tracking-widest">{title}</h3>
     </div>
   );
 };
 
-const Separator = () => <div className="h-px w-full bg-gray-100" />;
+const Separator = () => <div className="h-px w-full bg-border/50" />;
 
 function humanizeEnum(v: string) {
   return String(v)
@@ -578,23 +579,23 @@ const StatusBadge = ({ status, isOwner, t }: { status: string; isOwner: boolean;
     { bg: string; text: string; label: string; animate?: boolean; dotColor?: string }
   > = {
     PENDING: {
-      bg: "bg-gray-100 border-gray-200",
-      text: "text-gray-600",
+      bg: "bg-muted border-border",
+      text: "text-muted-foreground",
       label: t.status.PENDING,
-      dotColor: "bg-gray-400",
+      dotColor: "bg-muted-foreground",
     },
     ANALYZING: {
-      bg: "bg-green-50 border-green-100",
-      text: "text-[#05dc7f]",
+      bg: "bg-secondary border-primary/20",
+      text: "text-primary",
       label: t.status.ANALYZING,
       animate: true,
-      dotColor: "bg-[#05dc7f]",
+      dotColor: "bg-primary",
     },
     DONE: {
-      bg: "bg-green-50 border-green-100",
-      text: "text-[#0f2f28]",
+      bg: "bg-secondary border-primary/20",
+      text: "text-foreground",
       label: t.status.DONE,
-      dotColor: "bg-[#05dc7f]",
+      dotColor: "bg-primary",
     },
     ERROR: {
       bg: "bg-red-50 border-red-100",
@@ -629,29 +630,29 @@ const EmptyStateView = ({
   description: string;
   color?: "gray" | "red";
 }) => (
-  <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-xl border border-gray-100 border-dashed">
+  <div className="flex flex-col items-center justify-center py-16 text-center bg-background rounded-xl border border-border/50 border-dashed">
     <div
-      className={`w-12 h-12 ${color === "red" ? "bg-red-50" : "bg-gray-50"} rounded-full flex items-center justify-center mb-4`}
+      className={`w-12 h-12 ${color === "red" ? "bg-red-50" : "bg-muted"} rounded-full flex items-center justify-center mb-4`}
     >
-      <Icon className={`w-6 h-6 ${color === "red" ? "text-red-500" : "text-gray-400"}`} />
+      <Icon className={`w-6 h-6 ${color === "red" ? "text-red-500" : "text-muted-foreground"}`} />
     </div>
-    <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
-    <p className="text-gray-500 text-sm max-w-sm">{description}</p>
+    <h3 className="text-base font-semibold text-foreground mb-1">{title}</h3>
+    <p className="text-muted-foreground text-sm max-w-sm">{description}</p>
   </div>
 );
 
 const PendingView = ({ onAnalyze, t }: { onAnalyze: () => void; t: any }) => (
-  <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-gray-200 border-dashed shadow-sm">
-    <div className="w-20 h-20 bg-green-50 rounded-3xl flex items-center justify-center mb-6 transform -rotate-6 transition-transform hover:rotate-0 duration-300">
-      <Sparkles className="w-10 h-10 text-[#05dc7f]" />
+  <div className="flex flex-col items-center justify-center py-20 text-center bg-background rounded-2xl border border-border border-dashed shadow-sm">
+    <div className="w-20 h-20 bg-secondary rounded-3xl flex items-center justify-center mb-6 transform -rotate-6 transition-transform hover:rotate-0 duration-300">
+      <Sparkles className="w-10 h-10 text-primary" />
     </div>
-    <h3 className="text-2xl font-black text-gray-900 mb-3">{t.overlay.pending_view.title}</h3>
-    <p className="text-gray-500 text-base mb-10 max-w-md leading-relaxed">
+    <h3 className="text-2xl font-black text-foreground mb-3">{t.overlay.pending_view.title}</h3>
+    <p className="text-muted-foreground text-base mb-10 max-w-md leading-relaxed">
       {t.overlay.pending_view.description}
     </p>
     <button
       onClick={onAnalyze}
-      className="px-10 py-4 bg-[#05dc7f] hover:bg-[#03c56f] text-[#0f2f28] font-black rounded-2xl transition-all shadow-xl shadow-[#05dc7f]/20 cursor-pointer flex items-center gap-3 text-base active:scale-95"
+      className="px-10 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-2xl transition-all shadow-xl shadow-primary/20 cursor-pointer flex items-center gap-3 text-base active:scale-95"
     >
       <Sparkles className="w-5 h-5" />
       {t.overlay.pending_view.button}
@@ -662,13 +663,13 @@ const PendingView = ({ onAnalyze, t }: { onAnalyze: () => void; t: any }) => (
 const AnalyzingView = ({ t }: { t: any }) => (
   <div className="flex flex-col items-center justify-center py-24 text-center">
     <div className="relative mb-8">
-      <div className="w-16 h-16 rounded-full border-4 border-[#05dc7f]/20 border-t-[#05dc7f] animate-spin" />
+      <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
       <div className="absolute inset-0 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-[#05dc7f] animate-pulse" />
+        <Loader2 className="w-6 h-6 text-primary animate-pulse" />
       </div>
     </div>
-    <h3 className="text-xl font-bold text-gray-900 mb-3">{t.overlay.analyzing_view.title}</h3>
-    <p className="text-gray-500 text-base">{t.overlay.analyzing_view.description}</p>
+    <h3 className="text-xl font-bold text-foreground mb-3">{t.overlay.analyzing_view.title}</h3>
+    <p className="text-muted-foreground text-base">{t.overlay.analyzing_view.description}</p>
   </div>
 );
 
@@ -719,7 +720,7 @@ const ImageGallery = ({ images }: { images: string[] }) => {
         {/* Main Featured Image */}
         <div
           className={cn(
-            "relative overflow-hidden rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center group cursor-zoom-in",
+            "relative overflow-hidden rounded-xl bg-muted border border-border flex items-center justify-center group cursor-zoom-in",
             hasMultiple ? "flex-1" : "w-full",
             "min-h-[200px] max-h-[400px]"
           )}
@@ -732,7 +733,7 @@ const ImageGallery = ({ images }: { images: string[] }) => {
           />
           {/* Zoom hint overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <div className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-lg">
+            <div className="bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium text-foreground shadow-lg">
               🔍 Clique para ampliar
             </div>
           </div>
@@ -748,8 +749,8 @@ const ImageGallery = ({ images }: { images: string[] }) => {
                 className={cn(
                   "w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer",
                   activeIndex === idx
-                    ? "border-[#05dc7f] ring-2 ring-[#05dc7f]/20 scale-105"
-                    : "border-gray-200 hover:border-gray-300 opacity-70 hover:opacity-100"
+                    ? "border-primary ring-2 ring-primary/20 scale-105"
+                    : "border-border hover:border-border/80 opacity-70 hover:opacity-100"
                 )}
               >
                 <img

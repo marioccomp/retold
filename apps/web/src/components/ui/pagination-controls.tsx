@@ -62,7 +62,7 @@ export function PaginationControls({
         size="icon"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="rounded-full text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9] cursor-pointer"
+        className="rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary cursor-pointer"
       >
         <FiChevronLeft size={20} />
       </Button>
@@ -70,7 +70,7 @@ export function PaginationControls({
       <div className="flex items-center gap-1">
         {pageNumbers.map((page, index) =>
           page === "..." ? (
-            <span key={`ellipsis-${index}`} className="px-2 text-[#9ca3af]">
+            <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
               ...
             </span>
           ) : (
@@ -82,8 +82,8 @@ export function PaginationControls({
               className={cn(
                 "rounded-full w-9 h-9 p-0 font-medium transition-all duration-300",
                 currentPage === page
-                  ? "bg-[#152e2b] text-white hover:bg-[#152e2b]/90 shadow-md cursor-pointer"
-                  : "text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9] cursor-pointer"
+                  ? "bg-primary text-primary-foreground shadow-md cursor-pointer"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary cursor-pointer"
               )}
             >
               {page}
@@ -97,7 +97,7 @@ export function PaginationControls({
         size="icon"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="rounded-full text-[#6b7c7a] hover:text-[#152e2b] hover:bg-[#e7eae9] cursor-pointer"
+        className="rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary cursor-pointer"
       >
         <FiChevronRight size={20} />
       </Button>

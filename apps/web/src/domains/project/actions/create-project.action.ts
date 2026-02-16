@@ -46,8 +46,8 @@ export async function createProjectAction(
     };
   }
 
-  // Check daily analysis limit (3 per day)
-  const DAILY_ANALYSIS_LIMIT = 3;
+  // Check daily analysis limit (100 per day)
+  const DAILY_ANALYSIS_LIMIT = 100;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const lastDate = user?.dailyAnalysisDate ? new Date(user.dailyAnalysisDate) : null;

@@ -76,7 +76,7 @@ export default function ProfileClient({ username, ownProfile }: Props) {
   if (!profile) return null;
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-muted">
       {/* 1. Header Banner */}
       <ProfileBanner cover={profile.cover} ownProfile={ownProfile} username={username} />
 

@@ -203,7 +203,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     title.trim() && description.trim() && isRepoValid && !mutationIsCreating && !isUploadingImages;
 
   return (
-    <div className="bg-white rounded-[16px] border border-[#e7eae9] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-[fadeIn_0.3s_ease-out]">
+    <div className="bg-background rounded-[16px] border border-border shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-[fadeIn_0.3s_ease-out]">
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -218,9 +218,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
       `}</style>
 
       {/* Header */}
-      <div className="px-7 py-5 border-b border-[#e7eae9] bg-gradient-to-br from-[#fafafa] to-white">
-        <h2 className="m-0 text-[1.4rem] font-semibold text-[#152e2b]">{t.title}</h2>
-        <p className="m-[6px_0_0] text-[0.9rem] text-[#6b7c7a]">{t.subtitle}</p>
+      <div className="px-7 py-5 border-b border-border bg-gradient-to-br from-muted/50 to-background">
+        <h2 className="m-0 text-[1.4rem] font-semibold text-foreground">{t.title}</h2>
+        <p className="m-[6px_0_0] text-[0.9rem] text-muted-foreground">{t.subtitle}</p>
       </div>
 
       {/* Content */}
@@ -229,7 +229,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         <div className="flex flex-col gap-5">
           {/* Title */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="project-title" className="text-[0.875rem] font-medium text-[#152e2b]">
+            <Label htmlFor="project-title" className="text-[0.875rem] font-medium text-foreground">
               {t.labels.title}
             </Label>
             <Input
@@ -239,7 +239,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
-              className="h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-[0.95rem] focus-visible:ring-[#05dc7f]/30 focus-visible:border-[#05dc7f]"
+              className="h-auto p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus-visible:ring-primary/30 focus-visible:border-primary"
             />
           </div>
 
@@ -247,7 +247,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           <div className="flex flex-col gap-2">
             <Label
               htmlFor="project-description"
-              className="text-[0.875rem] font-medium text-[#152e2b]"
+              className="text-[0.875rem] font-medium text-foreground"
             >
               {t.labels.description}
             </Label>
@@ -257,7 +257,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={280}
-              className="min-h-[100px] resize-none p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-[0.95rem] focus-visible:ring-[#05dc7f]/30 focus-visible:border-[#05dc7f]"
+              className="min-h-[100px] resize-none p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus-visible:ring-primary/30 focus-visible:border-primary"
             />
           </div>
 
@@ -265,7 +265,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           <div className="flex flex-col gap-2">
             <Label
               htmlFor="project-visibility"
-              className="text-[0.875rem] font-medium text-[#152e2b]"
+              className="text-[0.875rem] font-medium text-foreground"
             >
               {t.labels.visibility}
             </Label>
@@ -275,11 +275,11 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
             >
               <SelectTrigger
                 id="project-visibility"
-                className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-[#e7eae9] text-[#152e2b] text-[0.95rem] focus:ring-[#05dc7f]/30 focus:border-[#05dc7f]"
+                className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus:ring-primary/30 focus:border-primary"
               >
                 <SelectValue placeholder={t.placeholders.visibility} />
               </SelectTrigger>
-              <SelectContent className="bg-white" position="popper">
+              <SelectContent className="bg-popover" position="popper">
                 <SelectItem value="public" className="cursor-pointer">
                   {t.visibility_options.public}
                 </SelectItem>
@@ -297,12 +297,14 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           <div className="flex flex-col gap-3">
             <div>
               <div className="flex justify-between items-center">
-                <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">
+                <h3 className="m-0 text-[0.95rem] font-semibold text-foreground">
                   {t.labels.images}
                 </h3>
-                <span className="text-[0.8rem] text-[#6b7c7a]">{sortableImages.length}/3</span>
+                <span className="text-[0.8rem] text-muted-foreground">
+                  {sortableImages.length}/3
+                </span>
               </div>
-              <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.images_hint}</p>
+              <p className="m-0 text-[0.85rem] text-muted-foreground">{t.images_hint}</p>
             </div>
 
             <SortableImageGrid
@@ -327,14 +329,14 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           {/* Repositories Section */}
           <div className="flex flex-col gap-3">
             <div>
-              <h3 className="m-0 text-[0.95rem] font-semibold text-[#152e2b]">
+              <h3 className="m-0 text-[0.95rem] font-semibold text-foreground">
                 {t.labels.repository}
               </h3>
-              <p className="m-0 text-[0.85rem] text-[#6b7c7a]">{t.repo_hint}</p>
+              <p className="m-0 text-[0.85rem] text-muted-foreground">{t.repo_hint}</p>
             </div>
 
             {isLoadingRepos ? (
-              <div className="p-[30px] text-center text-[#6b7c7a] text-[0.9rem]">
+              <div className="p-[30px] text-center text-muted-foreground text-[0.9rem]">
                 {t.repo_loading}
               </div>
             ) : repositories.length > 0 ? (
@@ -347,19 +349,19 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                       className={cn(
                         "flex items-center justify-between p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200",
                         isSelected
-                          ? "border-[#05dc7f] bg-[#05dc7f]/6"
-                          : "border-[#e7eae9] hover:border-[#b8bfbd] hover:bg-[#fafafa]"
+                          ? "border-primary bg-primary/6"
+                          : "border-border hover:border-muted-foreground/30 hover:bg-muted"
                       )}
                       onClick={() => setSelectedRepoId(repo.id)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => e.key === "Enter" && setSelectedRepoId(repo.id)}
                     >
-                      <span className="text-[0.9rem] text-[#152e2b] font-medium flex items-center gap-2">
+                      <span className="text-[0.9rem] text-foreground font-medium flex items-center gap-2">
                         <FiGithub />
                         {repo.name}
                       </span>
-                      <span className="text-[0.8rem] font-medium text-[#05dc7f]">
+                      <span className="text-[0.8rem] font-medium text-primary">
                         {isSelected ? (
                           <span className="flex items-center gap-1">
                             <FiCheck /> {t.repo_selected}
@@ -373,7 +375,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                 })}
               </div>
             ) : (
-              <div className="p-6 text-center text-[#6b7c7a] text-[0.9rem] border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa]">
+              <div className="p-6 text-center text-muted-foreground text-[0.9rem] border border-dashed border-border rounded-[10px] bg-muted/30">
                 {t.repo_none}
               </div>
             )}
@@ -381,7 +383,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
             <Button
               variant="ghost"
               onClick={handleAddRepository}
-              className="cursor-pointer w-full mt-1 border border-dashed border-[#e7eae9] rounded-[10px] bg-[#fafafa] text-[#6b7c7a] text-[0.9rem] font-medium hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[#05dc7f]/4 h-auto py-3 gap-2"
+              className="cursor-pointer w-full mt-1 border border-dashed border-border rounded-[10px] bg-muted/30 text-muted-foreground text-[0.9rem] font-medium hover:border-primary hover:text-primary hover:bg-primary/4 h-auto py-3 gap-2"
             >
               <FiPlus size={18} />
               {repositories.length > 0 ? t.repo_manage : t.repo_connect}
@@ -391,18 +393,18 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
       </div>
 
       {/* Footer */}
-      <div className="px-7 py-5 md:py-6 flex gap-3 justify-end border-t border-[#e7eae9] bg-[#fafafa]">
+      <div className="px-7 py-5 md:py-6 flex gap-3 justify-end border-t border-border bg-muted/30">
         <Button
           variant="outline"
           onClick={onClose}
-          className="cursor-pointer border-[#e7eae9] text-[#6b7c7a] hover:text-[#152e2b] hover:border-[#152e2b] hover:bg-white rounded-[10px] h-auto py-3 px-6 font-medium text-[0.95rem]"
+          className="cursor-pointer border-border text-muted-foreground hover:text-foreground hover:border-foreground hover:bg-background rounded-[10px] h-auto py-3 px-6 font-medium text-[0.95rem]"
         >
           {t.cancel}
         </Button>
         <Button
           onClick={handleCreate}
           disabled={!canCreate}
-          className="cursor-pointer bg-[#05dc7f] hover:bg-[#03c56f] text-[#0f2f28] rounded-[10px] h-auto py-3 px-7 font-semibold text-[0.95rem] disabled:opacity-50"
+          className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground rounded-[10px] h-auto py-3 px-7 font-semibold text-[0.95rem] disabled:opacity-50"
         >
           {mutationIsCreating || isUploadingImages ? (
             <>{isUploadingImages ? t.uploading_images : t.submitting}</>

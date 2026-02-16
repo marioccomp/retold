@@ -71,7 +71,7 @@ export default function ProfileBanner({ cover, ownProfile, username }: Props) {
           />
         ) : (
           <div
-            className="w-full h-[160px] sm:h-[200px] md:h-[250px] bg-gradient-to-r from-[#33bd19] to-[#05dc7f]"
+            className="w-full h-[160px] sm:h-[200px] md:h-[250px] bg-gradient-to-r from-primary to-primary/80"
             aria-label={dict.profile.alt_cover}
           />
         )}
@@ -82,13 +82,13 @@ export default function ProfileBanner({ cover, ownProfile, username }: Props) {
             <button
               onClick={() => !isUploading && fileInputRef.current?.click()}
               disabled={isUploading}
-              className={`absolute top-4 right-4 bg-white/90 hover:bg-white text-[#152e2b] p-2 rounded-full shadow-md transition-all duration-200 
+              className={`absolute top-4 right-4 bg-background/90 hover:bg-background text-foreground p-2 rounded-full shadow-md transition-all duration-200 
                                 ${isUploading ? "opacity-70 cursor-not-allowed" : "cursor-pointer hover:scale-105 active:scale-95"}
                             `}
               title="Alterar capa"
             >
               {isUploading ? (
-                <div className="w-5 h-5 border-2 border-[#152e2b] border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
               ) : (
                 <FiEdit2 size={20} />
               )}

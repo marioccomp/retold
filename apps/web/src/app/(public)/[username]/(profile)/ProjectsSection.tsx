@@ -144,7 +144,7 @@ export default function ProjectsSection({
       <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] relative">
         <Button
           variant="ghost"
-          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-[#6b7c7a] hover:bg-[#05dc7f]/5 hover:text-[#05dc7f] w-fit group h-auto transition-all rounded-full md:rounded-none bg-white/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-gray-100 md:border-transparent shadow-sm md:shadow-none"
+          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-muted-foreground hover:bg-primary/5 hover:text-primary w-fit group h-auto transition-all rounded-full md:rounded-none bg-background/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-border/50 md:border-transparent shadow-sm md:shadow-none"
           onClick={handlePanelClose}
         >
           <FiArrowLeft
@@ -167,7 +167,7 @@ export default function ProjectsSection({
             value={sort}
             onValueChange={(val: "newest" | "oldest" | "popular") => onSortChange(val)}
           >
-            <SelectTrigger className="w-[180px] bg-white border-[#e7eae9] cursor-pointer">
+            <SelectTrigger className="w-[180px] bg-white border-border cursor-pointer">
               <SelectValue placeholder={dict.feed.sort.placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +188,7 @@ export default function ProjectsSection({
       {ownProfile && searchQuery === "" && (
         <Button
           variant="ghost"
-          className="w-full min-h-[240px] h-full flex flex-col items-center justify-center gap-4 border-2 border-dashed border-[#e7eae9] rounded-xl bg-[#fafafa] text-[#6b7c7a] cursor-pointer transition-all duration-200 hover:border-[#05dc7f] hover:text-[#05dc7f] hover:bg-[rgba(5,220,127,0.04)] hover:-translate-y-[3px] whitespace-normal"
+          className="w-full min-h-[240px] h-full flex flex-col items-center justify-center gap-4 border-2 border-dashed border-border rounded-xl bg-muted text-muted-foreground cursor-pointer transition-all duration-200 hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-[3px] whitespace-normal"
           onClick={handleNewProject}
         >
           <FiPlus className="w-9 h-9 stroke-[1.5px]" />
@@ -211,17 +211,17 @@ export default function ProjectsSection({
           // e a lista estiver vazia, mostramos o aviso
           !(ownProfile && searchQuery === "") && (
             <div className="col-span-full py-8">
-              <Card className="border-dashed border-2 bg-[#fafafa] border-[#e7eae9]">
+              <Card className="border-dashed border-2 bg-muted border-border">
                 <CardContent className="py-16 flex flex-col items-center justify-center text-center gap-3">
-                  <div className="w-16 h-16 rounded-full bg-[#f3f6f5] flex items-center justify-center mb-2">
-                    <FiPlus className="w-8 h-8 text-[#a0aaa8] rotate-45" />
+                  <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-2">
+                    <FiPlus className="w-8 h-8 text-muted-foreground rotate-45" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#152e2b]">
+                  <h3 className="text-xl font-bold text-foreground">
                     {searchQuery !== ""
                       ? dict.profile.no_search_results.title
                       : dict.profile.no_projects_found.title}
                   </h3>
-                  <p className="text-[#6b7c7a] max-w-[300px] leading-relaxed">
+                  <p className="text-muted-foreground max-w-[300px] leading-relaxed">
                     {searchQuery !== ""
                       ? dict.profile.no_search_results.description
                       : dict.profile.no_projects_found.description}

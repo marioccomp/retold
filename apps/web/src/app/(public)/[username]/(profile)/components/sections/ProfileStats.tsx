@@ -48,73 +48,73 @@ export default function ProfileStats({ stats }: Props) {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2 px-1">
-        <FiActivity className="text-[#05dc7f]" />
+        <FiActivity className="text-primary" />
         <h3 className="text-lg font-bold text-foreground">{dict.profile.stats_section}</h3>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Commits */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-[#05dc7f]/30">
+        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
-            <FiGitCommit className="text-[#05dc7f] w-5 h-5 mb-1" />
-            <span className="text-2xl font-bold text-[#152e2b] dark:text-gray-100">
+            <FiGitCommit className="text-primary w-5 h-5 mb-1" />
+            <span className="text-2xl font-bold text-foreground dark:text-gray-100">
               {formatNumber(stats.commits)}
             </span>
-            <span className="text-xs text-[#6b7c7a] dark:text-gray-400 uppercase tracking-wider font-medium">
+            <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-wider font-medium">
               {dict.profile.stat_commits}
             </span>
           </CardContent>
         </Card>
 
         {/* Lines Code (Impact) */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-[#05dc7f]/30">
+        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
-            <FiCode className="text-[#05dc7f] w-5 h-5 mb-1" />
-            <span className="text-2xl font-bold text-[#152e2b] dark:text-gray-100">
+            <FiCode className="text-primary w-5 h-5 mb-1" />
+            <span className="text-2xl font-bold text-foreground dark:text-gray-100">
               {formatNumber(impact)}
             </span>
-            <span className="text-xs text-[#6b7c7a] dark:text-gray-400 uppercase tracking-wider font-medium">
+            <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-wider font-medium">
               {dict.profile.stat_lines_changed}
             </span>
           </CardContent>
         </Card>
 
         {/* Active Days */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-[#05dc7f]/30">
+        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
-            <FiCalendar className="text-[#05dc7f] w-5 h-5 mb-1" />
-            <span className="text-2xl font-bold text-[#152e2b] dark:text-gray-100">
+            <FiCalendar className="text-primary w-5 h-5 mb-1" />
+            <span className="text-2xl font-bold text-foreground dark:text-gray-100">
               {formatNumber(stats.activeDays)}
             </span>
-            <span className="text-xs text-[#6b7c7a] dark:text-gray-400 uppercase tracking-wider font-medium">
+            <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-wider font-medium">
               {dict.profile.stat_active_days}
             </span>
           </CardContent>
         </Card>
 
         {/* Projects */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-[#05dc7f]/30">
+        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
-            <FiTrendingUp className="text-[#05dc7f] w-5 h-5 mb-1" />
-            <span className="text-2xl font-bold text-[#152e2b] dark:text-gray-100">
+            <FiTrendingUp className="text-primary w-5 h-5 mb-1" />
+            <span className="text-2xl font-bold text-foreground dark:text-gray-100">
               {formatNumber(stats.projectsCount)}
             </span>
-            <span className="text-xs text-[#6b7c7a] dark:text-gray-400 uppercase tracking-wider font-medium">
+            <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-wider font-medium">
               {dict.profile.stat_projects}
             </span>
           </CardContent>
         </Card>
       </div>
       {/* Last Commit */}
-      <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-[#05dc7f]/30">
+      <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
         <CardContent className="p-4 flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
             <div className="mt-0.5 shrink-0">
-              <FiGitCommit className="text-[#05dc7f] w-5 h-5" />
+              <FiGitCommit className="text-primary w-5 h-5" />
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-[#6b7c7a] dark:text-gray-400 uppercase tracking-wider font-medium">
+                <span className="text-xs text-muted-foreground dark:text-gray-400 uppercase tracking-wider font-medium">
                   {dict.profile.stat_last_commit_label}
                 </span>
 
@@ -123,19 +123,19 @@ export default function ProfileStats({ stats }: Props) {
                     href={`https://github.com/${lastCommit.repo}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] px-2 py-0.5 rounded-full bg-[#05dc7f]/10 text-[#05dc7f] border border-[#05dc7f]/20"
+                    className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20"
                   >
                     {lastCommit.repo}
                   </a>
                 ) : null}
               </div>
 
-              <p className="text-sm font-semibold text-[#152e2b] dark:text-gray-100 mt-1">
+              <p className="text-sm font-semibold text-foreground dark:text-gray-100 mt-1">
                 {lastCommit?.message ? lastCommit.message : dict.profile.stat_no_commits}
               </p>
 
               {lastCommit?.date ? (
-                <p className="text-xs text-[#6b7c7a] dark:text-gray-400 mt-1">
+                <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
                   {formatDate(lastCommit.date)} • {formatRelative(lastCommit.date)}
                 </p>
               ) : null}
@@ -145,10 +145,10 @@ export default function ProfileStats({ stats }: Props) {
           {/* Small right-side indicator */}
           {lastCommit?.date ? (
             <div className="shrink-0 text-right">
-              <div className="text-xs text-[#6b7c7a] dark:text-gray-400">
+              <div className="text-xs text-muted-foreground dark:text-gray-400">
                 {dict.profile.stat_updated_label}
               </div>
-              <div className="text-sm font-bold text-[#152e2b] dark:text-gray-100">
+              <div className="text-sm font-bold text-foreground dark:text-gray-100">
                 {formatRelative(lastCommit.date)}
               </div>
             </div>

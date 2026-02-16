@@ -197,11 +197,11 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
     >
       <div className="bg-white w-full max-w-[550px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e7eae9]">
-          <h2 className="text-xl font-semibold text-[#152e2b]">{dict.profile.edit_modal.title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <h2 className="text-xl font-semibold text-foreground">{dict.profile.edit_modal.title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer hover:bg-[#f3f6f5] text-[#6b7c7a] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer hover:bg-muted text-muted-foreground transition-colors"
           >
             <FiX size={20} />
           </button>
@@ -212,7 +212,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
           {/* Avatar Upload */}
           <div
             className={`flex flex-col items-center py-6 rounded-2xl border-2 border-dashed transition-all duration-200 relative group cursor-pointer
-                            ${isDragging ? "border-[#05dc7f] bg-[rgba(5,220,127,0.05)] scale-[1.01]" : "border-[#e7eae9] bg-[#fcfdfd] hover:border-[#05dc7f] hover:bg-[#f3faf8]"}
+                            ${isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-border bg-background hover:border-primary hover:bg-primary/5"}
                             ${isUploadingAvatar ? "pointer-events-none opacity-80" : ""}
                         `}
             onDragOver={onDragOver}
@@ -229,7 +229,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                   alt={dict.profile.alt_avatar}
                   className="object-cover"
                 />
-                <AvatarFallback className="text-3xl font-bold text-[#152e2b] bg-[#f3f6f5]">
+                <AvatarFallback className="text-3xl font-bold text-foreground bg-muted">
                   {(profile.name || username || "U").charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -239,9 +239,9 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 <FiCamera className="text-white" size={24} />
               </div>
 
-              <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-white bg-[#05dc7f] text-[#0f2f28] flex items-center justify-center shadow-sm z-10 transition-transform group-hover:scale-110">
+              <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-2 border-background bg-primary text-primary-foreground flex items-center justify-center shadow-sm z-10 transition-transform group-hover:scale-110">
                 {isUploadingAvatar ? (
-                  <span className="w-4 h-4 border-2 border-[#0f2f28] border-t-transparent rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <FiCamera size={16} />
                 )}
@@ -256,10 +256,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               />
             </div>
             <div className="mt-4 flex flex-col items-center gap-1">
-              <span className="text-sm font-semibold text-[#152e2b]">
+              <span className="text-sm font-semibold text-foreground">
                 {isUploadingAvatar ? dict.profile.edit_modal.saving : dict.profile.change_photo}
               </span>
-              <span className="text-xs text-[#6b7c7a] text-center px-4">
+              <span className="text-xs text-muted-foreground text-center px-4">
                 {isDragging
                   ? "Solte para enviar"
                   : dict.profile.edit_modal.avatar_hint + " ou arraste uma foto"}
@@ -269,8 +269,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
           {/* Name */}
           <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
-              <FiUser className="text-[#05dc7f]" />
+            <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <FiUser className="text-primary" />
               {dict.profile.edit_modal.name_label}
             </Label>
             <Input
@@ -285,8 +285,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
           {/* Title */}
           <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
-              <FiType className="text-[#05dc7f]" />
+            <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <FiType className="text-primary" />
               {dict.profile.edit_modal.job_label}
             </Label>
             <Input
@@ -301,8 +301,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
           {/* Bio / Headline */}
           <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
-              <FiAlignLeft className="text-[#05dc7f]" />
+            <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <FiAlignLeft className="text-primary" />
               {dict.profile.edit_modal.headline_label}
             </Label>
             <Textarea
@@ -313,20 +313,20 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               placeholder={dict.profile.edit_modal.headline_placeholder}
               maxLength={100}
             />
-            <span className="text-xs text-[#6b7c7a] text-right">{bio.length}/100</span>
+            <span className="text-xs text-muted-foreground text-right">{bio.length}/100</span>
           </div>
 
-          <div className="h-px bg-[#e7eae9] my-1" />
+          <div className="h-px bg-border my-1" />
 
           {/* Social Links */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-sm font-semibold text-[#6b7c7a] uppercase tracking-wider">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               {dict.profile.edit_modal.social_title}
             </h3>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
-                <FiGithub className="text-[#05dc7f]" />
+              <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <FiGithub className="text-primary" />
                 {dict.profile.edit_modal.github_label}
               </Label>
               <Input
@@ -339,8 +339,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
-                <FiLinkedin className="text-[#05dc7f]" />
+              <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <FiLinkedin className="text-primary" />
                 {dict.profile.edit_modal.linkedin_label}
               </Label>
               <Input
@@ -353,8 +353,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium text-[#152e2b] flex items-center gap-2">
-                <FiGlobe className="text-[#05dc7f]" />
+              <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <FiGlobe className="text-primary" />
                 {dict.profile.edit_modal.website_label}
               </Label>
               <Input
@@ -369,11 +369,11 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-4 border-t border-[#e7eae9] flex justify-end gap-3 bg-[#fafafa]">
+        <div className="p-6 pt-4 border-t border-border flex justify-end gap-3 bg-muted/40">
           <Button
             onClick={onClose}
             variant="ghost"
-            className="text-[#6b7c7a] hover:bg-[#e7eae9] cursor-pointer hover:text-[#152e2b]"
+            className="text-muted-foreground hover:bg-muted cursor-pointer hover:text-foreground"
           >
             {dict.profile.edit_modal.cancel}
           </Button>
@@ -404,7 +404,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 websiteUrl === (profile.websiteUrl ?? "") &&
                 !pendingAvatarFile)
             }
-            className="bg-[#05dc7f] text-[#0f2f28] hover:bg-[#03c56f] transition-all cursor-pointer hover:scale-[1.02] shadow-[0_4px_12px_rgba(5,220,127,0.2)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer hover:scale-[1.02] shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {updateProfileMutation.isPending
               ? dict.profile.edit_modal.saving

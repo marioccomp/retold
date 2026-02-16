@@ -77,7 +77,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
     <section className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <FiStar className="text-[#05dc7f] fill-[#05dc7f]/20" />
+          <FiStar className="text-primary fill-primary/20" />
           <h3 className="text-lg font-bold text-foreground">
             {dict.profile.pinned_projects_section}
           </h3>
@@ -95,7 +95,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
             />
             {ownProfile && (
               <button
-                className="absolute top-3 right-3 p-2 bg-[#05dc7f] hover:bg-[#04c573] text-[#0f2f28] rounded-xl shadow-lg shadow-[#05dc7f]/20 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 cursor-pointer z-10 transform hover:scale-105 focus:outline-none outline-none"
+                className="absolute top-3 right-3 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg shadow-primary/20 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 cursor-pointer z-10 transform hover:scale-105 focus:outline-none outline-none"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -111,11 +111,11 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
 
         {ownProfile && pinnedProjects.length < 3 && (
           <Card
-            className="bg-muted/10 border-dashed border-2 border-border/50 hover:bg-muted/20 hover:border-[#05dc7f]/50 transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[300px]"
+            className="bg-muted/10 border-dashed border-2 border-border/50 hover:bg-muted/20 hover:border-primary/50 transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[300px]"
             onClick={() => setIsSelectModalOpen(true)}
           >
-            <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-muted-foreground group-hover:text-[#05dc7f]">
-              <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center group-hover:bg-[#05dc7f]/10 transition-colors">
+            <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-muted-foreground group-hover:text-primary">
+              <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                 <FiPlus className="w-6 h-6" />
               </div>
               <span className="font-medium">{dict.profile.add_pinned_project}</span>
