@@ -8,7 +8,9 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { FiUser, FiSettings, FiLogOut, FiSearch } from "react-icons/fi";
+import { Switch } from "@/components/ui/switch";
+import { FiUser, FiSettings, FiLogOut, FiSearch, FiMoon, FiSun } from "react-icons/fi";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +37,12 @@ export default function Header({ session: initialSession }: { session: Session |
   const [showSearch, setShowSearch] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const scrollToContent = () => {
     const element = document.getElementById("feed-content");
@@ -154,14 +162,14 @@ export default function Header({ session: initialSession }: { session: Session |
           <nav className="hidden md:flex items-center gap-1">
             <Button
               variant="ghost"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+              className="text-sm font-bold text-foreground/90 hover:text-primary hover:bg-primary/5 cursor-pointer transition-all rounded-full"
               onClick={handleExploreClick}
             >
               {dict.header.explore}
             </Button>
             <Button
               variant="ghost"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 cursor-pointer"
+              className="text-sm font-bold text-foreground/90 hover:text-primary hover:bg-primary/5 cursor-pointer transition-all rounded-full"
             >
               {dict.header.about}
             </Button>
@@ -257,7 +265,7 @@ export default function Header({ session: initialSession }: { session: Session |
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 mt-2"
+                className="w-56 mt-2 p-1.5 rounded-xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl"
                 onCloseAutoFocus={(e) => e.preventDefault()}
               >
                 <div className="px-3 py-2 border-b border-border/50">
@@ -265,28 +273,47 @@ export default function Header({ session: initialSession }: { session: Session |
                   <p className="text-xs text-muted-foreground truncate">{userData?.email}</p>
                 </div>
                 <DropdownMenuItem
-                  className="cursor-pointer gap-2 py-2"
+                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
                   onClick={handleProfileClick}
                 >
-                  <FiUser className="h-4 w-4 text-muted-foreground" />
-                  <span>{dict.header.profile}</span>
+                  <FiUser className="h-4 w-4 hover:text-primary transition-colors" />
+                  <span className="font-bold text-sm">{dict.header.profile}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
                     href="/settings"
-                    className="cursor-pointer gap-2 py-2 w-full flex items-center"
+                    className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
                   >
-                    <FiSettings className="h-4 w-4 text-muted-foreground" />
-                    <span>{dict.header.settings}</span>
+                    <FiSettings className="h-4 w-4 hover:text-primary transition-colors" />
+                    <span className="font-bold text-sm">{dict.header.settings}</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {mounted && (
+                  <DropdownMenuItem
+                    className="cursor-pointer flex items-center justify-between gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setTheme(theme === "dark" ? "light" : "dark");
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      {theme === "dark" ? (
+                        <FiMoon className="h-4 w-4 hover:text-primary transition-colors" />
+                      ) : (
+                        <FiSun className="h-4 w-4 hover:text-primary transition-colors" />
+                      )}
+                      <span className="font-bold text-sm">Dark Mode</span>
+                    </div>
+                    <Switch checked={theme === "dark"} className="pointer-events-none" />
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator className="opacity-50" />
                 <DropdownMenuItem
-                  className="cursor-pointer gap-2 py-2 text-red-600 focus:text-red-600 focus:bg-red-50"
+                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group mt-1"
                   onClick={() => signOut({ callbackUrl: "/" })}
                 >
-                  <FiLogOut className="h-4 w-4" />
-                  <span>{dict.header.logout}</span>
+                  <FiLogOut className="h-4 w-4 hover:text-primary transition-colors" />
+                  <span className="font-bold text-sm">{dict.header.logout}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

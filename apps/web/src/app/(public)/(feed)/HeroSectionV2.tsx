@@ -173,13 +173,13 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
               <Button
                 variant="outline"
-                className="h-12 px-6 rounded-full border-primary/30 text-foreground bg-background/70 hover:bg-secondary hover:border-primary transition-all cursor-pointer"
+                className="h-12 px-6 rounded-full border-primary/30 text-foreground bg-background/70 hover:bg-background hover:border-primary hover:text-primary hover:shadow-lg hover:shadow-primary/20 transition-all cursor-pointer"
                 onClick={() => {
                   setActiveTab("projects");
                   document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
-                <FiSearch className="mr-2 text-primary" />
+                <FiSearch className="mr-2 text-primary group-hover:text-primary" />
                 {dict.feed.feedhero.explore_projects}
               </Button>
             </div>

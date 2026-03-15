@@ -110,7 +110,7 @@ export default function ProjectCard({
 
         {/* Longer Description Overlay */}
         <div
-          className="absolute left-0 w-full bg-foreground/95 text-white flex flex-col z-[2] transition-opacity duration-300
+          className="absolute left-0 w-full bg-[#0a1413]/95 text-white flex flex-col z-[2] transition-opacity duration-300
           max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border"
         >
@@ -243,7 +243,7 @@ export default function ProjectCard({
               />
             ) : (
               <MdFavoriteBorder
-                className="text-[#4a5568] transition-colors duration-200 group-hover/like:text-[#ff4d4d]"
+                className="text-muted-foreground transition-colors duration-200 group-hover/like:text-[#ff4d4d]"
                 size={22}
               />
             )}

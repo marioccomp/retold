@@ -17,7 +17,7 @@ export default function ProfileSkills({ skills, ownProfile, onEditClick }: Props
 
   return (
     <Card className="border-border/50 shadow-sm h-full">
-      <CardHeader className="pb-3 border-b border-border/40 bg-white">
+      <CardHeader className="pb-3 border-b border-border/40 bg-card">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg text-foreground font-bold">
             <FiCode className="text-primary" />

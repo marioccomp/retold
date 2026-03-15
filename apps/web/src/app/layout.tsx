@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import { AuthModalProvider } from "../providers/AuthModalContext";
 import { SearchProvider } from "../providers/SearchContext";
 import AuthModal from "../components/auth/AuthModal";
+import { ThemeProvider } from "../providers/ThemeProvider";
 
 import "./globals.css";
 import { auth } from "../domains/auth/auth";
@@ -41,32 +42,39 @@ export default async function RootLayout({
         <LanguageProvider lang={lang}>
           <AuthProvider session={session}>
             <AuthModalProvider>
-              <QueryProvider>
-                <SearchProvider>
-                  <Header session={session} />
-                  <main className="flex-grow w-full">{children}</main>
-                  <Footer />
-                  <AuthModal />
-                  <CookieBanner />
-                  <Toaster
-                    richColors
-                    position="top-right"
-                    expand={false}
-                    visibleToasts={1}
-                    gap={0}
-                    offset={80}
-                    duration={2000}
-                    toastOptions={{
-                      className: "sonner-toast",
-                      style: {
-                        background: "var(--background)",
-                        color: "var(--foreground)",
-                        border: "1px solid var(--border)",
-                      },
-                    }}
-                  />
-                </SearchProvider>
-              </QueryProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <QueryProvider>
+                  <SearchProvider>
+                    <Header session={session} />
+                    <main className="flex-grow w-full">{children}</main>
+                    <Footer />
+                    <AuthModal />
+                    <CookieBanner />
+                    <Toaster
+                      richColors
+                      position="top-right"
+                      expand={false}
+                      visibleToasts={1}
+                      gap={0}
+                      offset={80}
+                      duration={2000}
+                      toastOptions={{
+                        className: "sonner-toast",
+                        style: {
+                          background: "var(--background)",
+                          color: "var(--foreground)",
+                          border: "1px solid var(--border)",
+                        },
+                      }}
+                    />
+                  </SearchProvider>
+                </QueryProvider>
+              </ThemeProvider>
             </AuthModalProvider>
           </AuthProvider>
         </LanguageProvider>

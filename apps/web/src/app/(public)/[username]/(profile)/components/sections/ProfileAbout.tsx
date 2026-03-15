@@ -17,7 +17,7 @@ export default function ProfileAbout({ longBio, bio, ownProfile, onEditClick }: 
 
   return (
     <Card className="border-border/50 shadow-sm overflow-hidden">
-      <CardHeader className="pb-3 border-b border-border/40 bg-white">
+      <CardHeader className="pb-3 border-b border-border/40 bg-card">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg text-foreground font-bold">
             <FiBookOpen className="text-primary" />
@@ -40,7 +40,9 @@ export default function ProfileAbout({ longBio, bio, ownProfile, onEditClick }: 
       <CardContent className="pt-5 pb-6">
         <p className="text-foreground/80 leading-relaxed text-[1rem] whitespace-pre-wrap">
           {longBio || (
-            <span className="italic text-muted-foreground/60">{dict.profile.no_description}</span>
+            <span className="text-muted-foreground/60 font-medium">
+              {dict.profile.no_description}
+            </span>
           )}
         </p>
       </CardContent>
