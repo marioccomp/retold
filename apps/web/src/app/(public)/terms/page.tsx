@@ -11,27 +11,27 @@ export default async function TermsPage() {
   const dict = await getDictionary();
 
   return (
-    <div className="bg-white min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+    <div className="bg-background min-h-screen py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl mb-4">
+          <h1 className="text-4xl font-bold text-foreground tracking-tight sm:text-5xl mb-4">
             {dict.legal.terms.title}
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-muted-foreground">
             {dict.legal.updated_at.replace("{date}", new Date().toLocaleDateString("pt-BR"))}
           </p>
         </div>
 
-        <div className="prose prose-lg prose-emerald max-w-none text-gray-600">
+        <div className="prose prose-lg dark:prose-invert prose-emerald max-w-none text-muted-foreground">
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.intro_title}
             </h2>
             <p>{dict.legal.terms.intro_text}</p>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.usage_title}
             </h2>
             <p className="mb-4">{dict.legal.terms.usage_text}</p>
@@ -43,42 +43,42 @@ export default async function TermsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.content_title}
             </h2>
             <p>{dict.legal.terms.content_text}</p>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.termination_title}
             </h2>
             <p>{dict.legal.terms.termination_text}</p>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.liability_title}
             </h2>
             <p>{dict.legal.terms.liability_text}</p>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h3 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.changes_title}
-            </h2>
+            </h3>
             <p>{dict.legal.terms.changes_text}</p>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.ai_disclaimer_title}
             </h2>
             <p>{dict.legal.terms.ai_disclaimer_text}</p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {dict.legal.terms.repo_authority_title}
             </h2>
             <p>{dict.legal.terms.repo_authority_text}</p>

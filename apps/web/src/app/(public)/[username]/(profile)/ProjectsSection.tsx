@@ -167,7 +167,7 @@ export default function ProjectsSection({
             value={sort}
             onValueChange={(val: "newest" | "oldest" | "popular") => onSortChange(val)}
           >
-            <SelectTrigger className="w-[180px] bg-white border-border cursor-pointer">
+            <SelectTrigger className="w-[180px] bg-background border-border cursor-pointer">
               <SelectValue placeholder={dict.feed.sort.placeholder} />
             </SelectTrigger>
             <SelectContent>

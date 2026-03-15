@@ -35,7 +35,7 @@ export default function ProfileContact({ profile, ownProfile, onEditClick }: Pro
 
   return (
     <Card className="border-border/50 shadow-sm">
-      <CardHeader className="pb-3 border-b border-border/40 bg-white">
+      <CardHeader className="pb-3 border-b border-border/40 bg-card">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg text-foreground font-bold">
             <FiMail className="text-primary" />

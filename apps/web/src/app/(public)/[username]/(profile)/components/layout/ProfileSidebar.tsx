@@ -178,7 +178,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
           </span>
           <h3 className="m-0 break-words font-bold text-[1.1rem] text-foreground tracking-tight leading-tight">
             {profile.title || (
-              <span className="text-muted-foreground italic font-normal text-sm">
+              <span className="text-muted-foreground/60 font-medium text-sm">
                 {dict.profile.no_title}
               </span>
             )}
@@ -186,12 +186,12 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         </div>
 
         {/* Description/Bio */}
-        <div className="w-full rounded-xl p-5 text-center border border-border bg-secondary/50 shadow-sm border-dashed">
-          <p className="m-0 text-[1rem] text-foreground leading-relaxed font-medium italic">
+        <div className="w-full rounded-xl p-5 text-center border border-border/60 bg-muted/20 shadow-sm border-dashed">
+          <p className="m-0 text-[1rem] text-foreground leading-relaxed font-medium">
             {profile.bio ? (
-              <>"{profile.bio}"</>
+              <span className="italic opacity-90">"{profile.bio}"</span>
             ) : (
-              <span className="text-muted-foreground italic text-sm font-normal">
+              <span className="text-muted-foreground/60 font-medium text-sm">
                 {dict.profile.no_description}
               </span>
             )}
@@ -199,7 +199,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         </div>
 
         {/* Stats */}
-        <div className="w-full flex border border-border rounded-xl overflow-hidden bg-white shadow-sm">
+        <div className="w-full flex border border-border rounded-xl overflow-hidden bg-card shadow-sm">
           <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground font-medium">
             <span className="block text-[1.1rem] font-bold text-foreground">{stats.views}</span>{" "}
             {dict.profile.views}
