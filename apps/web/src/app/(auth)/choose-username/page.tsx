@@ -12,7 +12,7 @@ export default async function Page() {
 
     // If user already has username, redirect to dashboard
     if (session.user.username) {
-        redirect("/dashboard");
+        redirect("/");
     }
 
     return <ChooseUsernameForm userName={session.user.name ?? ""} />;

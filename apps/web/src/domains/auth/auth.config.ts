@@ -101,10 +101,6 @@ export const authConfig = {
         return NextResponse.redirect(new URL("/choose-username", nextUrl));
       }
 
-      //  Rotas privadas
-      if (pathname.startsWith("/dashboard")) {
-        return isLoggedIn;
-      }
 
       // Rotas premium
       if (pathname.startsWith("/premium")) {
