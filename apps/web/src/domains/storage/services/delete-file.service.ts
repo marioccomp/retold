@@ -7,13 +7,14 @@ export async function deleteFileByUrlService(fileUrl: string) {
         return;
     }
 
-    const expectdPrefix = `${MINIO_PUBLIC_URL}/${MINIO_BUCKET}`;
+    const isLocalhost = MINIO_PUBLIC_URL.includes("localhost") || MINIO_PUBLIC_URL.includes("127.0.0.1");
+    const expectdPrefix = isLocalhost ? `${MINIO_PUBLIC_URL}/${MINIO_BUCKET}` : MINIO_PUBLIC_URL;
 
     if (!fileUrl.startsWith(expectdPrefix)) {
         return;
     }
 
-    const objectName = fileUrl.replace(expectdPrefix, "");
+    const objectName = fileUrl.replace(`${expectdPrefix}/`, "");
 
     try {
         await minioClient.removeObject(MINIO_BUCKET, objectName);
