@@ -376,7 +376,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
         )}
 
       {/* keyframes */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes float {
           0%,
           100% {
@@ -489,7 +489,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
         .dark .hero-code-text { fill: rgba(34, 211, 238, 0.5); }
 
         .dark .hero-accent-stroke { stroke: rgba(34, 211, 238, 0.25); }
-      `}</style>
+      `}} />
     </section>
   );
 }
