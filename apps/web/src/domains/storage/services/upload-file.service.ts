@@ -79,5 +79,8 @@ export async function uploadFileService({
     "Cache-Control": "public, max-age=31536000, immutable",
   });
 
-  return `${MINIO_PUBLIC_URL}/${MINIO_BUCKET}/${objectName}`;
+  const isLocalhost = MINIO_PUBLIC_URL.includes("localhost") || MINIO_PUBLIC_URL.includes("127.0.0.1");
+  const basePath = isLocalhost ? `${MINIO_PUBLIC_URL}/${MINIO_BUCKET}` : MINIO_PUBLIC_URL;
+
+  return `${basePath}/${objectName}`;
 }
