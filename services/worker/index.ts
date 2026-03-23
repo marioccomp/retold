@@ -95,7 +95,9 @@ const worker = new Worker(
           codeSamples: analysis.codeSamples,
           locale: locale || "en",
         },
-        repoName
+        repoName,
+        projectWithUser.title,
+        projectWithUser.description || undefined
       );
       console.log(`[worker] MAGIA FEITA! A Groq retornou a resposta de IA sem erros.`);
 

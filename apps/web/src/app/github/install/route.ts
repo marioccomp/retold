@@ -18,12 +18,12 @@ export async function GET(req: Request) {
     return popupCloseResponse("NOT_AUTHENTICATED");
   }
 
-  console.log(`[route.ts] Iniciando salvamento da instalacao GitHub ${installationId} para user ${session.user.id}...`);
+
   await saveGithubInstallation({
     installationId,
     userId: Number(session.user.id),
   });
-  console.log(`[route.ts] Salvamento concluido com sucesso!`);
+
 
   // 🔥 sempre avisa que repos mudaram
   return popupCloseResponse("REPOSITORIES_UPDATED");

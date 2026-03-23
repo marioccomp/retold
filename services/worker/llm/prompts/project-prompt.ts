@@ -1,6 +1,6 @@
 import { Heuristic } from "../../types/heuristic";
 
-export function projectPrompt(input: Heuristic, repoName: string) {
+export function projectPrompt(input: Heuristic, repoName: string, title?: string, description?: string) {
   const locale = input.locale?.toLowerCase() ?? "en";
   const outputLanguage = locale.startsWith("pt")
     ? "Portuguese (pt-BR)"
@@ -138,6 +138,8 @@ README POLICY:
     
     Do all of your analysis based on the following information:
     - Repository Name: ${repoName} (This is a strong indicator of intent if README is missing)
+    ${title ? `- User-provided Project Title: ${title} (Hint for context)` : ""}
+    ${description ? `- User-provided Description: ${description} (Hint for intended purpose)` : ""}
     Project Domain: ${domain}
     Project Purpose: ${purpose}
     Project Language Family: ${languageFamily}

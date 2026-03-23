@@ -14,14 +14,14 @@ export async function saveGithubInstallation({ installationId, userId }: SaveIns
 
   if (exists) return;
 
-  console.log(`[save-installation.ts] Criando octokit client usando GITHUB_PRIVATE_KEY...`);
+
   const octokit = githubRepository.getOctokitFromInstallationId(installationId);
 
-  console.log(`[save-installation.ts] Buscando dados da instalacao na API do GitHub...`);
+
   const { data } = await octokit.rest.apps.getInstallation({
     installation_id: Number(installationId),
   });
-  console.log(`[save-installation.ts] Sucesso! API Github autorizada. Preparando para banco...`);
+
 
   const account = data.account;
 
@@ -38,7 +38,7 @@ export async function saveGithubInstallation({ installationId, userId }: SaveIns
     accountType = "Organization";
   }
 
-  console.log(`[save-installation.ts] Inserindo ID ${installationId} no banco de dados Prisma!`);
+
   await prisma.githubAppInstallation.create({
     data: {
       installationId,
@@ -47,5 +47,5 @@ export async function saveGithubInstallation({ installationId, userId }: SaveIns
       userId,
     },
   });
-  console.log(`[save-installation.ts] Instalacao gravada com sucesso!`);
+
 }

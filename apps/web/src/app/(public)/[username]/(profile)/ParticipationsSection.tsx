@@ -25,7 +25,7 @@ export default function ParticipationsSection({ searchQuery, ownProfile, profile
   );
 
   const handleNewParticipation = () => {
-    console.log("Abrir modal de nova participação");
+
   };
 
   return (
