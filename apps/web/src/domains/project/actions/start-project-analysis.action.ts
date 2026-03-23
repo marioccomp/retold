@@ -6,7 +6,7 @@ import { analyzeRepoQueue } from "@repo/queue";
 
 import { getAnalysisLocale } from "@/src/i18n/server";
 
-const DAILY_ANALYSIS_LIMIT = 100;
+import { DAILY_ANALYSIS_LIMIT } from "../constants";
 
 export async function startProjectAnalysisAction(projectId: number) {
   const session = await auth();

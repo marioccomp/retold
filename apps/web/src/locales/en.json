@@ -69,7 +69,7 @@
       "started": "Analysis started",
       "start_error": "Failed to start analysis",
       "limit_reached_title": "Daily limit reached",
-      "limit_reached_description": "You've used all 3 analyses for today.",
+      "limit_reached_description": "You've used all analyses for today.",
       "remaining": "{remaining} of {limit} analyses remaining today",
       "retry_time_hours": "Try again in {hours}h {minutes}min.",
       "retry_time_minutes": "Try again in {minutes} minutes."

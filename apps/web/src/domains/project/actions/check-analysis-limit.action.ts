@@ -2,8 +2,9 @@
 
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
+import { DAILY_ANALYSIS_LIMIT } from "../constants";
 
-const DAILY_ANALYSIS_LIMIT = 100;
+
 
 export async function checkAnalysisLimitAction() {
   const session = await auth();

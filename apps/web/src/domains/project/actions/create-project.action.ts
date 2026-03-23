@@ -4,6 +4,7 @@ import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { getUserRepositories } from "@/src/domains/github/github";
 import { startProjectAnalysisAction } from "./start-project-analysis.action";
+import { DAILY_ANALYSIS_LIMIT } from "../constants";
 import { ActionResponse } from "@/lib/action-response";
 import { Project } from "@prisma/client";
 import { getDictionary } from "@/src/i18n/server";
@@ -46,8 +47,7 @@ export async function createProjectAction(
     };
   }
 
-  // Check daily analysis limit (100 per day)
-  const DAILY_ANALYSIS_LIMIT = 100;
+  // Check daily analysis limit
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const lastDate = user?.dailyAnalysisDate ? new Date(user.dailyAnalysisDate) : null;

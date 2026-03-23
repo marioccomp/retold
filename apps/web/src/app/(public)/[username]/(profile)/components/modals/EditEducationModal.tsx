@@ -213,7 +213,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-white w-full max-w-[650px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full max-w-[650px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <h2 className="text-xl font-semibold text-foreground">

@@ -345,7 +345,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               {llm ? (
                 <div className="p-6 md:p-10 space-y-10">
                   <div className="space-y-4">
-                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                    <h3 className="text-2xl font-black text-foreground tracking-tight">
                       {t.overlay.sections.summary}
                     </h3>
 
@@ -382,7 +382,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                           key={i}
                           className="p-4 rounded-xl bg-secondary/30 border border-secondary hover:border-secondary/80 transition-colors"
                         >
-                          <div className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                          <div className="font-bold text-foreground mb-1 flex items-center gap-2">
                             <CheckCircle2 className="w-4 h-4 text-primary" />
                             {s.name}
                           </div>
@@ -463,7 +463,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                                 </div>
                               </div>
                               <div>
-                                <div className="font-bold text-gray-900">{s.name}</div>
+                                <div className="font-bold text-foreground">{s.name}</div>
 
                                 {s.explanation && (
                                   <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
@@ -680,7 +680,7 @@ const ErrorView = ({ onRetry, t }: { onRetry: () => void; t: any }) => (
     <p className="text-red-600/80 text-base mb-8">{t.overlay.error_view.description}</p>
     <button
       onClick={onRetry}
-      className="px-8 py-3 bg-white border-2 border-red-100 text-red-700 hover:bg-red-50 font-bold rounded-xl transition-all text-base shadow-sm active:scale-95"
+      className="px-8 py-3 bg-background border-2 border-red-100 text-red-700 hover:bg-red-50 font-bold rounded-xl transition-all text-base shadow-sm active:scale-95"
     >
       {t.overlay.error_view.button}
     </button>

@@ -282,7 +282,7 @@ export const ProjectSettings = ({
             }}
           >
             <div
-              className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200"
+              className="bg-background rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-4 border-b border-border">
@@ -425,7 +425,7 @@ export const ProjectSettings = ({
                 }}
               >
                 <div
-                  className="bg-white rounded-lg shadow-xl p-6 max-w-xs w-full animate-in zoom-in-95 duration-200"
+                  className="bg-background rounded-lg shadow-xl p-6 max-w-xs w-full animate-in zoom-in-95 duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <h4 className="font-semibold text-foreground mb-2">{t.remove_img_modal.title}</h4>
@@ -460,7 +460,7 @@ export const ProjectSettings = ({
             }}
           >
             <div
-              className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
+              className="bg-background rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 text-center">

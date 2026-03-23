@@ -33,10 +33,10 @@ export function CookieBanner() {
         isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
       }`}
     >
-      <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 p-6 flex flex-col gap-4 relative">
+      <div className="bg-background rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-border p-6 flex flex-col gap-4 relative">
         <button
           onClick={() => setIsVisible(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           aria-label="Fechar"
         >
           <svg
@@ -77,8 +77,8 @@ export function CookieBanner() {
             </svg>
           </div>
           <div className="space-y-1">
-            <h3 className="font-semibold text-gray-900 leading-tight">Cookies & Privacidade</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <h3 className="font-semibold text-foreground leading-tight">Cookies & Privacidade</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {dict.footer.cookie_banner.message}
             </p>
           </div>
@@ -93,7 +93,7 @@ export function CookieBanner() {
           </button>
           <Link
             href="/privacy"
-            className="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 underline decoration-gray-200 underline-offset-4"
+            className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground underline decoration-border underline-offset-4"
           >
             {dict.footer.cookie_banner.more_info}
           </Link>
