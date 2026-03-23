@@ -15,7 +15,7 @@ export const githubRepository: GithubRepository = {
             authStrategy: createAppAuth,
             auth: {
                 appId: process.env.GITHUB_APP_ID,
-                privateKey: process.env.GITHUB_PRIVATE_KEY,
+                privateKey: process.env.GITHUB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
                 installationId,
             }
         })
@@ -32,7 +32,7 @@ export const githubRepository: GithubRepository = {
             authStrategy: createAppAuth,
             auth: {
                 appId: process.env.GITHUB_APP_ID,
-                privateKey: process.env.GITHUB_PRIVATE_KEY,
+                privateKey: process.env.GITHUB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
                 installationId: installation.installationId,
             }
         })
@@ -62,7 +62,7 @@ export const githubRepository: GithubRepository = {
             authStrategy: createAppAuth,
             auth: {
                 appId: process.env.GITHUB_APP_ID,
-                privateKey: process.env.GITHUB_PRIVATE_KEY,
+                privateKey: process.env.GITHUB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
                 installationId: installationId,
             }
         })
