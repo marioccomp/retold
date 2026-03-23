@@ -61,7 +61,9 @@ const worker = new Worker(
         throw new Error("Project or User not found");
       }
 
+      console.log(`[worker] Clonando repositorio ID ${projectId}...`);
       await cloneRepository(repoUrl, tmpPath, token);
+      console.log(`[worker] Repositorio clonado. Lendo Readme...`);
       const readmeContent = readRepositoryReadme(tmpPath);
 
       // Extract username from repo URL (e.g., https://github.com/username/repo -> username)
@@ -70,7 +72,9 @@ const worker = new Worker(
         repoUrl.split("github.com:")[1]?.split("/")[0] ||
         projectWithUser.user.username;
 
+      console.log(`[worker] Analisando dependencias e estrutura inicial...`);
       const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
+      console.log(`[worker] Analise previa terminada. Enviando dados via API para a GROQ...`);
 
       const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
 
@@ -93,6 +97,7 @@ const worker = new Worker(
         },
         repoName
       );
+      console.log(`[worker] MAGIA FEITA! A Groq retornou a resposta de IA sem erros.`);
 
       const llmInsightsJson = JSON.stringify(llmInsights);
 

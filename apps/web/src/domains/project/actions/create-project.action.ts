@@ -94,6 +94,7 @@ export async function createProjectAction(
     return { success: false, message: t.already_exists };
   }
 
+  console.log(`[create-project] Salvando projeto do repositorio ${input.repositoryId} no banco Prisma...`);
   const project = await prisma.project.create({
     data: {
       title: input.title,
@@ -106,6 +107,7 @@ export async function createProjectAction(
       visibility: input.visibility,
     },
   });
+  console.log(`[create-project] Projeto ${project.id} gravado no banco de dados!`);
 
   const projectId = project.id;
 
@@ -123,7 +125,9 @@ export async function createProjectAction(
     }
   );
 
+  console.log(`[create-project] Enviando ID ${projectId} para a fila do Worker de analise...`);
   await startProjectAnalysisAction(projectId);
+  console.log(`[create-project] Job enfileirado com sucesso.`);
 
   // Calculate remaining analyses for notification
   const remaining = DAILY_ANALYSIS_LIMIT - currentCount - 1;
