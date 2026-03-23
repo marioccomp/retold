@@ -65,7 +65,7 @@ export default function CropImageModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-white w-[90vw] h-[90vh] max-w-[1200px] rounded-2xl shadow-2xl overflow-hidden m-4 animate-in zoom-in-95 flex flex-col">
+      <div className="bg-background w-[90vw] h-[90vh] max-w-[1200px] rounded-2xl shadow-2xl overflow-hidden m-4 animate-in zoom-in-95 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <h2 className="text-xl font-semibold text-foreground">{dict.profile.crop_modal.title}</h2>

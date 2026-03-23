@@ -1,15 +1,24 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/logo-full.svg";
+import logoDark from "@/assets/logo-full-dark.svg";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/src/i18n/client";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 
 export default function Footer() {
   const { dict } = useTranslation();
   const currentYear = new Date().getFullYear();
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <footer className="w-full border-t border-border bg-background backdrop-blur-sm mt-auto">
@@ -22,7 +31,7 @@ export default function Footer() {
               className="flex items-center opacity-80 hover:opacity-100 transition-opacity"
             >
               <Image
-                src={logo}
+                src={mounted && resolvedTheme === "dark" ? logoDark : logo}
                 alt="Retold Logo"
                 className="h-20 w-auto transition-all duration-300"
               />

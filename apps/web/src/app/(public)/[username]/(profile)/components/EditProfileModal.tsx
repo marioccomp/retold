@@ -195,7 +195,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-white w-full max-w-[550px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full max-w-[550px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="text-xl font-semibold text-foreground">{dict.profile.edit_modal.title}</h2>
@@ -277,7 +277,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-white"
+              className="bg-muted"
               placeholder={dict.profile.edit_modal.name_placeholder}
               maxLength={20}
             />
@@ -293,7 +293,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="bg-white"
+              className="bg-muted"
               placeholder={dict.profile.edit_modal.job_placeholder}
               maxLength={50}
             />
@@ -309,7 +309,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={2}
-              className="bg-white resize-none min-h-[60px]"
+              className="bg-muted resize-none min-h-[60px]"
               placeholder={dict.profile.edit_modal.headline_placeholder}
               maxLength={100}
             />
@@ -333,7 +333,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 type="text"
                 value={githubUrl}
                 onChange={(e) => setGithubUrl(e.target.value)}
-                className="bg-white"
+                className="bg-muted"
                 placeholder={dict.profile.edit_modal.github_placeholder}
               />
             </div>
@@ -347,7 +347,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 type="text"
                 value={linkedinUrl}
                 onChange={(e) => setLinkedinUrl(e.target.value)}
-                className="bg-white"
+                className="bg-muted"
                 placeholder={dict.profile.edit_modal.linkedin_placeholder}
               />
             </div>
@@ -361,7 +361,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
                 type="text"
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                className="bg-white"
+                className="bg-muted"
                 placeholder={dict.profile.edit_modal.website_placeholder}
               />
             </div>

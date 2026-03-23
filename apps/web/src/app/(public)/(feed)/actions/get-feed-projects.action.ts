@@ -155,7 +155,7 @@ export async function getFeedProjects(
 // engagement = (recent_likes_7d × 5) + (recent_views_7d × 0.5) + (total_likes × 2) + (total_views × 0.1)
 // gravity = 1.5
 
-// Cached scoring function — rankings stay stable for 5 minutes
+// Cached scoring function — rankings stay stable for 30 seconds
 const getCachedScoredIds = unstable_cache(
   async (page: number, limit: number) => {
     const offset = (page - 1) * limit;
@@ -197,7 +197,7 @@ const getCachedScoredIds = unstable_cache(
     return { total: Number(total), ids: scoredIds.map((r) => r.id) };
   },
   ["feed-recommended-scoring"],
-  { revalidate: 300 } // 5 minutes
+  { revalidate: 30 } // 30 seconds
 );
 
 async function getRecommendedFeed(

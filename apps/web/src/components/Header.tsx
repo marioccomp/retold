@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/logo-full.svg";
+import logoDark from "@/assets/logo-full-dark.svg";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -37,7 +38,7 @@ export default function Header({ session: initialSession }: { session: Session |
   const [showSearch, setShowSearch] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -151,7 +152,7 @@ export default function Header({ session: initialSession }: { session: Session |
           {/* Logo */}
           <Link href="/" className="flex items-center cursor-pointer shrink-0">
             <Image
-              src={logo}
+              src={mounted && resolvedTheme === "dark" ? logoDark : logo}
               alt="Retold Logo"
               className="h-30 md:h-30 w-auto cursor-pointer"
               priority
@@ -293,18 +294,18 @@ export default function Header({ session: initialSession }: { session: Session |
                     className="cursor-pointer flex items-center justify-between gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
                     onSelect={(e) => {
                       e.preventDefault();
-                      setTheme(theme === "dark" ? "light" : "dark");
+                      setTheme(resolvedTheme === "dark" ? "light" : "dark");
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      {theme === "dark" ? (
+                      {resolvedTheme === "dark" ? (
                         <FiMoon className="h-4 w-4 hover:text-primary transition-colors" />
                       ) : (
                         <FiSun className="h-4 w-4 hover:text-primary transition-colors" />
                       )}
                       <span className="font-bold text-sm">Dark Mode</span>
                     </div>
-                    <Switch checked={theme === "dark"} className="pointer-events-none" />
+                    <Switch checked={resolvedTheme === "dark"} className="pointer-events-none" />
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator className="opacity-50" />

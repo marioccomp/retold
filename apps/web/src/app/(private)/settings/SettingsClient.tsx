@@ -201,9 +201,9 @@ export function SettingsClient({
               key={item.id}
               value={item.id}
               className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 w-full text-left rounded-xl border transition-all
-                                border-transparent data-[state=active]:bg-muted data-[state=active]:border-border data-[state=active]:shadow-sm
+                                border-primary/20 data-[state=active]:bg-primary/10 data-[state=active]:border-primary data-[state=active]:shadow-sm
                                 hover:bg-muted/50 flex flex-col md:flex-row items-center md:items-center
-                                ${item.id === "danger" ? "text-destructive data-[state=active]:text-destructive" : "text-muted-foreground data-[state=active]:text-foreground"}
+                                ${item.id === "danger" ? "border-destructive/20 text-destructive data-[state=active]:text-destructive data-[state=active]:bg-destructive/10 data-[state=active]:border-destructive" : "text-muted-foreground data-[state=active]:text-foreground"}
                             `}
             >
               <item.icon className="h-4 w-4 shrink-0" />
@@ -218,7 +218,7 @@ export function SettingsClient({
         <div className="flex-1 min-w-0">
           {/* General Section (Language) */}
           <TabsContent value="general" className="mt-0 space-y-6">
-            <Card className="border-border shadow-sm">
+            <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>{dict.settings.language.title}</CardTitle>
                 <CardDescription>{dict.settings.language.description}</CardDescription>
@@ -227,12 +227,16 @@ export function SettingsClient({
                 <div className="space-y-2">
                   <Label>{dict.settings.language.label}</Label>
                   <Select defaultValue={lang} onValueChange={handleLanguageChange}>
-                    <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px] cursor-pointer">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="pt">Português</SelectItem>
+                      <SelectItem value="en" className="cursor-pointer">
+                        English
+                      </SelectItem>
+                      <SelectItem value="pt" className="cursor-pointer">
+                        Português
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -248,16 +252,22 @@ export function SettingsClient({
                     defaultValue={initialAnalysisLocale}
                     onValueChange={handleAnalysisLanguageChange}
                   >
-                    <SelectTrigger className="w-full sm:w-[220px]">
+                    <SelectTrigger className="w-full sm:w-[220px] cursor-pointer">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="auto">
+                      <SelectItem value="auto" className="cursor-pointer">
                         {dict.settings.language.analysis_language_same}
                       </SelectItem>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="pt">Português</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="en" className="cursor-pointer">
+                        English
+                      </SelectItem>
+                      <SelectItem value="pt" className="cursor-pointer">
+                        Português
+                      </SelectItem>
+                      <SelectItem value="es" className="cursor-pointer">
+                        Español
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -267,7 +277,7 @@ export function SettingsClient({
 
           {/* Security Section */}
           <TabsContent value="security" className="mt-0 space-y-6">
-            <Card className="border-border shadow-sm">
+            <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>
                   {session?.user?.hasPassword
@@ -332,7 +342,7 @@ export function SettingsClient({
 
           {/* Integrations Section */}
           <TabsContent value="integrations" className="mt-0 space-y-6">
-            <Card className="border-border shadow-sm">
+            <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>{dict.settings.connectedAccounts.title}</CardTitle>
                 <CardDescription>{dict.settings.connectedAccounts.description}</CardDescription>
@@ -434,7 +444,7 @@ export function SettingsClient({
             }}
           >
             <div
-              className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
+              className="bg-background rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 text-center">
