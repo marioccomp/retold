@@ -1,0 +1,65 @@
+services:
+  database:
+    image: pgvector/pgvector:0.8.1-pg18
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      # Expõe a porta do banco APENAS para a própria máquina (localhost)
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    deploy:
+      resources:
+        limits: # IMPORTANTÍSSIMO para a sua VPS de 1GB!
+          memory: 256M 
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: retold-redis
+    restart: unless-stopped
+    ports:
+      # Expõe o Redis APENAS para a própria máquina (localhost)
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redisdata:/data
+    command: redis-server --appendonly yes
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  minio:
+    # Use uma versão específica ao invés de 'latest' em produção
+    image: minio/minio:RELEASE.2024-03-30T09-41-56Z
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      # API e Console do Minio restritos ao localhost para evitar acessos externos indesejados
+      - "127.0.0.1:9000:9000" # API
+      - "127.0.0.1:9001:9001" # console web
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 400M # Minio é um devorador de memória.
+
+volumes:
+  pgdata:
+  redisdata:
+  minio_data:
