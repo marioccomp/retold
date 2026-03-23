@@ -111,7 +111,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
 
         {ownProfile && pinnedProjects.length < 3 && (
           <Card
-            className="bg-muted/10 border-dashed border-2 border-border/50 hover:bg-muted/20 hover:border-primary/50 transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[300px]"
+            className="bg-muted/10 border-dashed border-2 border-border/50 dark:border-border hover:bg-muted/20 hover:border-primary/50 transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[300px]"
             onClick={() => setIsSelectModalOpen(true)}
           >
             <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-muted-foreground group-hover:text-primary">
@@ -125,7 +125,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
       </div>
 
       {!pinnedProjects.length && !ownProfile && (
-        <Card className="border-dashed border-2 bg-muted/20 border-border/50">
+        <Card className="border-dashed border-2 bg-muted/20 border-border/50 dark:border-border">
           <CardContent className="py-10 text-center text-muted-foreground italic">
             {dict.profile.pinned_projects_empty}
           </CardContent>

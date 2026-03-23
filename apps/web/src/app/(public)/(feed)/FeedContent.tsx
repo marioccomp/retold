@@ -127,7 +127,7 @@ export default function FeedContent({ initialData }: Props) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-4 pl-14 pr-6 rounded-full text-lg text-foreground h-auto
-                                bg-background shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border-border 
+                                bg-background dark:bg-muted/20 shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border border-border 
                                 placeholder:text-muted-foreground font-medium
                                 hover:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.08)] hover:border-primary/30
                                 focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:border-primary 
@@ -167,7 +167,7 @@ export default function FeedContent({ initialData }: Props) {
                 value={projectSort}
                 onValueChange={(val: ProjectSortType) => setProjectSort(val)}
               >
-                <SelectTrigger className="w-[180px] bg-background border-border cursor-pointer">
+                <SelectTrigger className="w-[180px] bg-background dark:bg-muted/20 border-border cursor-pointer">
                   <SelectValue placeholder={dict.feed.sort.placeholder} />
                 </SelectTrigger>
                 <SelectContent>

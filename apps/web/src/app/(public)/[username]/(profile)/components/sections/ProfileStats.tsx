@@ -53,7 +53,7 @@ export default function ProfileStats({ stats }: Props) {
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Commits */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+        <Card className="border-border/50 dark:border-border shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
             <FiGitCommit className="text-primary w-5 h-5 mb-1" />
             <span className="text-2xl font-bold text-foreground dark:text-gray-100">
@@ -66,7 +66,7 @@ export default function ProfileStats({ stats }: Props) {
         </Card>
 
         {/* Lines Code (Impact) */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+        <Card className="border-border/50 dark:border-border shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
             <FiCode className="text-primary w-5 h-5 mb-1" />
             <span className="text-2xl font-bold text-foreground dark:text-gray-100">
@@ -79,7 +79,7 @@ export default function ProfileStats({ stats }: Props) {
         </Card>
 
         {/* Active Days */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+        <Card className="border-border/50 dark:border-border shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
             <FiCalendar className="text-primary w-5 h-5 mb-1" />
             <span className="text-2xl font-bold text-foreground dark:text-gray-100">
@@ -92,7 +92,7 @@ export default function ProfileStats({ stats }: Props) {
         </Card>
 
         {/* Projects */}
-        <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+        <Card className="border-border/50 dark:border-border shadow-sm transition-all hover:shadow-md hover:border-primary/30">
           <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-1">
             <FiTrendingUp className="text-primary w-5 h-5 mb-1" />
             <span className="text-2xl font-bold text-foreground dark:text-gray-100">
@@ -105,7 +105,7 @@ export default function ProfileStats({ stats }: Props) {
         </Card>
       </div>
       {/* Last Commit */}
-      <Card className="border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+      <Card className="border-border/50 dark:border-border shadow-sm transition-all hover:shadow-md hover:border-primary/30">
         <CardContent className="p-4 flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
             <div className="mt-0.5 shrink-0">

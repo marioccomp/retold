@@ -16,8 +16,8 @@ export default function ProfileSkills({ skills, ownProfile, onEditClick }: Props
   const { dict } = useTranslation();
 
   return (
-    <Card className="border-border/50 shadow-sm h-full">
-      <CardHeader className="pb-3 border-b border-border/40 bg-card">
+    <Card className="border-border/50 dark:border-border shadow-sm h-full">
+      <CardHeader className="pb-3 border-b border-border/40 dark:border-border bg-card">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg text-foreground font-bold">
             <FiCode className="text-primary" />

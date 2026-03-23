@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { uploadCoverAction } from "@/src/domains/user/actions/upload-cover.actions";
 import { toast } from "sonner";
 import CropImageModal from "../CropImageModal";
+import defaultCover from "@/assets/defaultCover.png";
 
 type Props = {
   cover?: string | null;
@@ -63,18 +64,11 @@ export default function ProfileBanner({ cover, ownProfile, username }: Props) {
   return (
     <section className="py-6 px-5 sm:px-8 md:px-8 lg:px-8 xl:px-16 relative">
       <div className="relative group rounded-xl overflow-hidden shadow-sm">
-        {cover ? (
-          <img
-            src={cover}
-            className="w-full h-[160px] sm:h-[200px] md:h-[250px] object-cover block"
-            alt={dict.profile.alt_cover}
-          />
-        ) : (
-          <div
-            className="w-full h-[160px] sm:h-[200px] md:h-[250px] bg-gradient-to-r from-primary to-primary/80"
-            aria-label={dict.profile.alt_cover}
-          />
-        )}
+        <img
+          src={cover || defaultCover.src}
+          className="w-full h-[160px] sm:h-[200px] md:h-[250px] object-cover block"
+          alt={dict.profile.alt_cover}
+        />
 
         {/* Edit Button */}
         {ownProfile && (
