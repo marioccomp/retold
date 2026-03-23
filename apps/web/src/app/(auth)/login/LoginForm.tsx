@@ -43,7 +43,7 @@ export default function LoginForm() {
 
       toast.success(dict.auth.login.success);
       await update();
-      router.push("/dashboard");
+      router.push("/");
     },
 
     onError: () => {
@@ -246,7 +246,7 @@ export default function LoginForm() {
           <div className="flex justify-center gap-4">
             <button
               className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
-              onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
+              onClick={() => signIn("github", { callbackUrl: "/" })}
               type="button"
             >
               <FiGithub className="text-xl" />
