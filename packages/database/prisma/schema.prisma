@@ -355,6 +355,7 @@ model ProjectView {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   ipAddress String? // Para usuários não logados
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 
   @@index([projectId, userId])
   @@index([projectId, ipAddress])

@@ -17,45 +17,64 @@ export async function incrementView(projectId: number) {
         const COOLDOWN_SECONDS = 20 * 60; // 20 minutos
         const cooldownAgo = new Date(Date.now() - COOLDOWN_SECONDS * 1000)
 
-        // Lógica refinada: Logados não bloqueiam Anônimos e vice-versa no mesmo IP
-        const where: any = {
-            projectId,
-            createdAt: { gt: cooldownAgo }
+        const baseWhere: any = {
+            projectId
         }
 
         if (userId) {
-            where.userId = userId // Se estou logado, o cooldown é pela minha conta
+            baseWhere.userId = userId 
         } else if (ipAddress) {
-            where.ipAddress = ipAddress
-            where.userId = null // Se sou anônimo, o cooldown é pelo meu IP e afeta apenas outros anônimos
+            baseWhere.ipAddress = ipAddress
+            baseWhere.userId = null 
         } else {
             return { success: false, message: "Could not identify user" }
         }
 
-        const existingView = await prisma.projectView.findFirst({ where })
+        const existingView = await prisma.projectView.findFirst({ where: baseWhere })
 
         if (existingView) {
-            return { success: true, message: "Cooldown active" }
-        }
+            // Verifica se está no cooldown usando a nova coluna updatedAt
+            if (existingView.updatedAt > cooldownAgo) {
+                return { success: true, message: "Cooldown active" }
+            }
 
-        // Se não houver view recente, incrementa e registra
-        await prisma.$transaction([
-            prisma.project.update({
-                where: { id: projectId },
-                data: {
-                    views: {
-                        increment: 1,
+            // Fora de cooldown: Atualiza a visitade sem criar nova linha
+            await prisma.$transaction([
+                prisma.project.update({
+                    where: { id: projectId },
+                    data: {
+                        views: {
+                            increment: 1,
+                        },
                     },
-                },
-            }),
-            prisma.projectView.create({
-                data: {
-                    projectId,
-                    userId,
-                    ipAddress
-                }
-            })
-        ])
+                }),
+                prisma.projectView.update({
+                    where: { id: existingView.id },
+                    data: {
+                        updatedAt: new Date()
+                    }
+                })
+            ])
+        } else {
+            // Se não houver view nunca antes, incrementa e registra primeira viagem
+            await prisma.$transaction([
+                prisma.project.update({
+                    where: { id: projectId },
+                    data: {
+                        views: {
+                            increment: 1,
+                        },
+                    },
+                }),
+                prisma.projectView.create({
+                    data: {
+                        projectId,
+                        userId,
+                        ipAddress
+                    }
+                })
+            ])
+        }
 
         revalidatePath("/")
         revalidatePath("/[username]", "layout")

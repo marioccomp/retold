@@ -6,7 +6,7 @@ export const projectRepository = {
     const session = await auth();
     const currentUserId = Number(session?.user.id);
 
-    return prisma.project.findUnique({
+    const project = await prisma.project.findUnique({
       where: {
         id,
       },
@@ -63,6 +63,12 @@ export const projectRepository = {
           : {}),
       },
     });
+
+    if (project && project.visibility === "private" && project.userId !== currentUserId) {
+      throw new Error("Unauthorized: Project is private");
+    }
+
+    return project;
   },
   async getFollowsMe(anotherUserId: number) {
     const session = await auth();

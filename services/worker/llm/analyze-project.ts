@@ -4,7 +4,7 @@ import { groq } from "./groq-client.js";
 import { projectOverviewPrompt } from "./prompts/project-overview.js";
 import { projectPrompt } from "./prompts/project-prompt.js";
 
-export async function analyzeProjectWithLLM(analysis: Heuristic, repoName: string) {
+export async function analyzeProjectWithLLM(analysis: Heuristic, repoName: string, title?: string, description?: string) {
   // === DETAILED LOGGING: What data arrives at the LLM ===
   console.log("\n========== [LLM INPUT DEBUG] ==========");
   console.log("[LLM INPUT] Stack:", JSON.stringify(analysis.stack, null, 2));
@@ -21,7 +21,7 @@ export async function analyzeProjectWithLLM(analysis: Heuristic, repoName: strin
   console.log("repo name: ", repoName);
 
   const prompt = projectOverviewPrompt(analysis, analysis.locale);
-  const prompt2 = projectPrompt(analysis, repoName);
+  const prompt2 = projectPrompt(analysis, repoName, title, description);
 
   const system =
     "You are an elite Senior Software Architecture Consultant. " +
