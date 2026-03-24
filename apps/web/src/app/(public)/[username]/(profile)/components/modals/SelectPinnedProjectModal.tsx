@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { toggleProjectPin } from "@/src/app/(public)/[username]/actions/pin-project";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import placeholderImage from "@/assets/empty_file.png";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 type Props = {
   isOpen: boolean;
@@ -16,6 +18,9 @@ type Props = {
 
 export default function SelectPinnedProjectModal({ isOpen, onClose, unpinnedProjects }: Props) {
   const { dict } = useTranslation();
+  const params = useParams();
+  const username = params?.username as string;
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({});
 
@@ -28,6 +33,7 @@ export default function SelectPinnedProjectModal({ isOpen, onClose, unpinnedProj
     try {
       await toggleProjectPin(projectId);
       toast.success(dict.profile.success);
+      queryClient.invalidateQueries({ queryKey: ["profile", username] });
       onClose();
     } catch (error: any) {
       const message =

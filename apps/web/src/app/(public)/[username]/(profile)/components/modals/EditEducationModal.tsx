@@ -117,7 +117,17 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
   ) => {
     const newEdus = [...educations];
     if (field === "isCurrent") {
-      newEdus[index].endDate = value ? null : new Date().toISOString();
+      // If we're setting it to current, we keep the end date if it exists
+      // but if it doesn't exist, we don't necessarily need to set it to something
+      // The user wants to be able to set a "previsão"
+      if (!value) {
+        // If unchecking "Currently", and there was no end date, set a default
+        if (!newEdus[index].endDate) {
+          newEdus[index].endDate = new Date().toISOString();
+        }
+      }
+      // We don't nullify anymore when checking "Currently"
+      // Instead, we'll use a virtual isCurrent in the UI
     } else {
       newEdus[index] = { ...newEdus[index], [field]: value };
     }
@@ -213,7 +223,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-background w-full max-w-[650px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full sm:max-w-[650px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <h2 className="text-xl font-semibold text-foreground">
@@ -332,12 +342,13 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                      {dict.profile.edit_section_modal.end_label}
+                      {!edu.endDate || new Date(edu.endDate) > new Date()
+                        ? dict.profile.edit_section_modal.expected_end_label
+                        : dict.profile.edit_section_modal.end_label}
                     </Label>
                     <div className="space-y-2">
                       <div className="flex gap-2">
                         <Select
-                          disabled={!edu.endDate}
                           value={edu.endDate ? new Date(edu.endDate).getMonth().toString() : ""}
                           onValueChange={(val) => {
                             const date = edu.endDate ? new Date(edu.endDate) : new Date();
@@ -347,8 +358,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                         >
                           <SelectTrigger
                             className={cn(
-                              "flex-1 h-10 rounded-[10px] border-border focus:ring-primary/30",
-                              !edu.endDate && "opacity-50 bg-muted/30"
+                              "flex-1 h-10 rounded-[10px] border-border focus:ring-primary/30"
                             )}
                           >
                             <SelectValue placeholder={dict.profile.edit_section_modal.month} />
@@ -361,9 +371,8 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                             ))}
                           </SelectContent>
                         </Select>
-
+ 
                         <Select
-                          disabled={!edu.endDate}
                           value={edu.endDate ? new Date(edu.endDate).getFullYear().toString() : ""}
                           onValueChange={(val) => {
                             const date = edu.endDate ? new Date(edu.endDate) : new Date();
@@ -373,8 +382,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                         >
                           <SelectTrigger
                             className={cn(
-                              "w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30",
-                              !edu.endDate && "opacity-50 bg-muted/30"
+                              "w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30"
                             )}
                           >
                             <SelectValue placeholder={dict.profile.edit_section_modal.year} />
@@ -388,14 +396,22 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                           </SelectContent>
                         </Select>
                       </div>
-
+ 
                       <div className="flex items-center gap-2 px-1">
                         <Checkbox
                           id={`current-${idx}`}
-                          checked={!edu.endDate}
-                          onCheckedChange={(checked) =>
-                            handleUpdateEducation(idx, "isCurrent", !!checked)
-                          }
+                          checked={!edu.endDate || new Date(edu.endDate) > new Date()}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              // If checking "Currently", we can keep the date but mark it as current
+                              // Since we don't have a separate field, we just don't nullify
+                            } else {
+                              // If unchecking, and date is in future, maybe set to now
+                              if (edu.endDate && new Date(edu.endDate) > new Date()) {
+                                handleUpdateEducation(idx, "endDate", new Date().toISOString());
+                              }
+                            }
+                          }}
                           className="cursor-pointer"
                         />
                         <label
@@ -407,6 +423,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                       </div>
                     </div>
                   </div>
+
                 </div>
               </div>
             ))}

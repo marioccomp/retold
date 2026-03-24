@@ -141,7 +141,7 @@ export default function Header({ session: initialSession }: { session: Session |
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-border/40 dark:border-border ${isScrolled
+      className={`sticky top-0 z-50 w-full transition-[background-color,box-shadow,border-color] duration-300 border-b border-border/40 dark:border-border ${isScrolled
           ? "bg-background shadow-sm"
           : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
         }`}

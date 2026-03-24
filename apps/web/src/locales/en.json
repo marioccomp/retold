@@ -456,6 +456,7 @@
       "institution_placeholder": "Ex: MIT, Stanford, etc.",
       "start_label": "Start",
       "end_label": "End",
+      "expected_end_label": "Expected Graduation",
       "currently_label": "Currently",
       "course_hint": "Tip: You can type your course name if it's not in the list.",
       "institution_hint": "Tip: You can type the institution name if it's not in the list.",

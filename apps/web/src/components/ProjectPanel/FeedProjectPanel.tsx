@@ -16,6 +16,7 @@ import {
   Settings,
   Layout,
   Code2,
+  X,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -138,7 +139,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
       `}</style>
 
       {/* Modern Glassy Header */}
-      <div className="sticky top-0 left-0 right-0 px-6 py-4 border-b border-border/50 bg-background z-50 flex items-center justify-between gap-4">
+      <div className="sticky top-0 left-0 right-0 px-6 py-3 md:py-4 border-b border-border/50 bg-background/95 backdrop-blur-md z-50 flex items-center justify-between gap-4">
         {/* Close Button - Left side on mobile, or right side? User asked for "header com X pra fechar" */}
         {/* Based on print, X is on left, title center/left, actions right. But usually X is top-right or top-left. */}
         {/* Let's put X on the top-right for consistency with previous design, or top-left if it's a bottom sheet... */}
@@ -171,14 +172,14 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                 className="p-2 -mr-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors z-10 cursor-pointer"
                 aria-label="Close"
               >
-                <XCircle className="w-6 h-6" />
+                <X className="w-6 h-6" />
               </button>
             )}
           </div>
         </div>
       </div>
 
-      <div className="relative px-6 py-6 border-b border-border/50 bg-background z-10 w-full">
+      <div className="relative px-6 py-4 md:py-6 border-b border-border/50 bg-background z-10 w-full">
         <div className="flex flex-col md:flex-row gap-6 md:items-start max-w-5xl mx-auto w-full">
           {/* Owner Avatar & Name */}
           <div className="shrink-0 mx-auto md:mx-0">

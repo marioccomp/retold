@@ -13,6 +13,8 @@ import { toggleProjectPin } from "@/src/app/(public)/[username]/actions/pin-proj
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 import { useProjectModal } from "@/src/hooks/useProjectModal";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 type Props = {
   allProjects: ProjectCardDTO[];
@@ -21,6 +23,9 @@ type Props = {
 
 export default function ProfilePinnedProject({ allProjects, ownProfile }: Props) {
   const { dict } = useTranslation();
+  const params = useParams();
+  const username = params?.username as string;
+  const queryClient = useQueryClient();
   const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
   const { projectId, openProject, closeProject } = useProjectModal();
 
@@ -31,6 +36,7 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
     try {
       await toggleProjectPin(projectId);
       toast.success(dict.profile.success);
+      queryClient.invalidateQueries({ queryKey: ["profile", username] });
     } catch (error) {
       toast.error(dict.profile.unexpected_error);
     }

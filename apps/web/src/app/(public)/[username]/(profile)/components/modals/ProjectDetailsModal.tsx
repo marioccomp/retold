@@ -36,7 +36,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, project }: Props)
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-7xl h-[96vh] md:h-auto md:max-h-[90vh] bg-background rounded-t-3xl md:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-7xl h-[96dvh] md:h-auto md:max-h-[90dvh] bg-background rounded-t-[2rem] md:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 flex flex-col overflow-hidden">
         {/* Scrollable Content Area - Mobile: Full height bottom sheet style */}
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-background">
           <div className="min-h-full">
