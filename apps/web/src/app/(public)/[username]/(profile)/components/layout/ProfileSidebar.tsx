@@ -28,6 +28,7 @@ import { useState } from "react";
 import { followsMeAction } from "../../../_actions/follows-me.action";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
+import { Quote } from "lucide-react";
 
 const SocialLinkItem = memo(function SocialLinkItem({
   type,
@@ -172,13 +173,15 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
 
       <section className="mt-3 w-full max-w-[300px] md:max-w-full flex flex-col gap-4 items-center">
         {/* Title */}
-        <div className="w-full rounded-xl py-4 px-5 text-center border border-border bg-card shadow-sm">
-          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-black block mb-1.5 opacity-80">
-            {dict.profile.edit_modal.job_label}
-          </span>
-          <h3 className="m-0 break-words font-bold text-[1.1rem] text-foreground tracking-tight leading-tight">
+        <div className="w-full rounded-2xl py-5 px-6 text-center border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-md">
+          <div className="inline-block px-2 pb-1 border-b-2 border-primary/20 mb-3">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black opacity-80">
+              {dict.profile.edit_modal.job_label}
+            </span>
+          </div>
+          <h3 className="m-0 break-words font-black text-[1.15rem] text-foreground tracking-tight leading-tight uppercase">
             {profile.title || (
-              <span className="text-muted-foreground/60 font-medium text-sm">
+              <span className="text-muted-foreground/60 font-medium text-sm normal-case">
                 {dict.profile.no_title}
               </span>
             )}
@@ -186,46 +189,48 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         </div>
 
         {/* Description/Bio */}
-        <div className="w-full rounded-xl p-5 text-center border border-border/60 bg-muted/20 shadow-sm border-dashed">
-          <p className="m-0 text-[1rem] text-foreground leading-relaxed font-medium">
+        <div className="w-full rounded-2xl p-6 text-center border border-primary/10 bg-gradient-to-br from-card via-card to-primary/[0.05] shadow-sm relative overflow-hidden group/bio transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:shadow-primary/[0.02]">
+          <Quote className="absolute -top-1 -left-1 text-primary/10 w-12 h-12 -rotate-12 transition-transform group-hover/bio:scale-110 duration-500" />
+          <p className="m-0 text-[0.95rem] text-foreground/90 leading-relaxed font-semibold antialiased relative z-10">
             {profile.bio ? (
-              <span className="italic opacity-90">"{profile.bio}"</span>
+              <span>{profile.bio}</span>
             ) : (
-              <span className="text-muted-foreground/60 font-medium text-sm">
+              <span className="text-muted-foreground/50 font-medium text-sm">
                 {dict.profile.no_description}
               </span>
             )}
           </p>
+          <Quote className="absolute -bottom-1 -right-1 text-primary/10 w-12 h-12 rotate-[168deg] transition-transform group-hover/bio:scale-110 duration-500" />
         </div>
 
         {/* Stats */}
-        <div className="w-full flex border border-border rounded-xl overflow-hidden bg-card shadow-sm">
-          <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground font-medium">
-            <span className="block text-[1.1rem] font-bold text-foreground">{stats.views}</span>{" "}
+        <div className="w-full flex border border-border rounded-2xl overflow-hidden bg-card shadow-sm transition-all duration-300 hover:shadow-md">
+          <p className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground font-medium uppercase tracking-tight">
+            <span className="block text-[1.2rem] font-black text-foreground">{stats.views}</span>{" "}
             {dict.profile.views}
           </p>
-          <p className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground border-l border-border font-medium">
-            <span className="block text-[1.1rem] font-bold text-foreground">{stats.likes}</span>{" "}
+          <p className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground border-l border-border font-medium uppercase tracking-tight">
+            <span className="block text-[1.2rem] font-black text-foreground">{stats.likes}</span>{" "}
             {dict.profile.likes}
           </p>
         </div>
 
         {/* Followers/Following Stats */}
-        <div className="w-full flex border border-border rounded-xl overflow-hidden bg-card shadow-sm">
+        <div className="w-full flex border border-border rounded-2xl overflow-hidden bg-card shadow-sm transition-all duration-300 hover:shadow-md">
           <button
             onClick={() => setNetworkModal({ isOpen: true, type: "followers" })}
-            className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground font-medium hover:bg-muted transition-colors bg-transparent cursor-pointer border-none outline-none"
+            className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground font-medium hover:bg-muted/50 transition-colors bg-transparent cursor-pointer border-none outline-none uppercase tracking-tight"
           >
-            <span className="block text-[1.1rem] font-bold text-foreground">
+            <span className="block text-[1.2rem] font-black text-foreground">
               {profile.followersCount}
             </span>{" "}
             {dict.profile.followers}
           </button>
           <button
             onClick={() => setNetworkModal({ isOpen: true, type: "following" })}
-            className="flex-1 m-0 py-3 text-center text-[0.9rem] text-muted-foreground border-y-0 border-r-0 border-l border-border font-medium hover:bg-muted transition-colors bg-transparent cursor-pointer outline-none"
+            className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground border-y-0 border-r-0 border-l border-border font-medium hover:bg-muted/50 transition-colors bg-transparent cursor-pointer outline-none uppercase tracking-tight"
           >
-            <span className="block text-[1.1rem] font-bold text-foreground">
+            <span className="block text-[1.2rem] font-black text-foreground">
               {profile.followingCount}
             </span>{" "}
             {dict.profile.following}

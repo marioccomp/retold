@@ -330,6 +330,27 @@
     "settings": "Settings",
     "logout": "Log out"
   },
+  "about": {
+    "title": "About Retold",
+    "subtitle": "Where your technical story comes to life.",
+    "description": "Retold was born from the need to showcase more than just repositories. We wanted to create a space where developers could tell the story behind every line of code, highlighting their technical, architectural, and creative vision.",
+    "creators": {
+      "title": "The Creators",
+      "subtitle": "Meet the team behind the platform.",
+      "mario": {
+        "role": "Lead Full-stack Engineer & Architect",
+        "bio": "The architect and technical lead who kickstarted Retold. As a Full-stack Engineer, he merged product vision with flawless technical execution, defining the platform's foundation. Critical architectural decisions and leadership during the project's early miles were his focus, ensuring Retold went beyond an MVP to deliver a premium experience from day one."
+      },
+      "lucas": {
+        "role": "Full-stack Engineer",
+        "bio": "The engine that powered Retold's development. Working across the entire stack, he transformed complex logic into fluid features. In perfect sync with Mario, he was a key player in scaling the platform, ensuring backend robustness and a reactive interface that delights the user."
+      },
+      "joao": {
+        "role": "UI/UX, Product & Marketing",
+        "bio": "The soul of Retold. His product vision and UI/UX expertise defined the platform's identity. Working closely with marketing, he ensures Retold isn't just an amazing tool, but a product people love and use, shaping the user journey from the first to the last click."
+      }
+    }
+  },
   "profile": {
     "alt_cover": "Profile cover",
     "alt_avatar": "Profile picture",

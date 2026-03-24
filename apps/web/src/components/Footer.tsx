@@ -49,6 +49,14 @@ export default function Footer() {
               size="sm"
               className="text-muted-foreground hover:text-primary hover:bg-primary/5 cursor-pointer transition-colors"
             >
+              <Link href="/about">{dict.header.about}</Link>
+            </Button>
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-primary hover:bg-primary/5 cursor-pointer transition-colors"
+            >
               <Link href="/terms">{dict.footer.terms}</Link>
             </Button>
             <Button
