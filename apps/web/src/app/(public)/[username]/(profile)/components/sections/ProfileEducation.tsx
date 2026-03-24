@@ -15,13 +15,19 @@ type Props = {
 export default function ProfileEducation({ educations, ownProfile, onEditClick }: Props) {
   const { dict, lang } = useTranslation();
 
-  const formatDate = (dateStr: string | null) => {
+  const formatDate = (dateStr: string | null, isStartDate = false) => {
     if (!dateStr) return dict.profile.currently;
     const date = new Date(dateStr);
-    return date.toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
+    const formatted = date.toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
       month: "long",
       year: "numeric",
     });
+
+    if (!isStartDate && date > new Date()) {
+      return `${lang === "pt" ? "Previsão:" : "Expected:"} ${formatted}`;
+    }
+
+    return formatted;
   };
 
   return (
@@ -60,7 +66,7 @@ export default function ProfileEducation({ educations, ownProfile, onEditClick }
                 <span className="text-muted-foreground font-medium">{edu.institution}</span>
                 <span className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5 px-2 py-0.5 bg-muted rounded-md w-fit font-medium">
                   <FiCalendar className="w-3 h-3" />
-                  {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
+                  {formatDate(edu.startDate, true)} — {formatDate(edu.endDate)}
                 </span>
               </div>
             </div>

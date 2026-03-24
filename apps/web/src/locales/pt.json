@@ -456,6 +456,7 @@
       "institution_placeholder": "Ex: USP, UFRJ, etc.",
       "start_label": "Início",
       "end_label": "Término",
+      "expected_end_label": "Previsão de Formação",
       "currently_label": "Em andamento",
       "course_hint": "Dica: Você pode escrever o nome do seu curso se não estiver na lista.",
       "institution_hint": "Dica: Você pode escrever o nome da instituição se não estiver na lista.",
