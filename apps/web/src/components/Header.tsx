@@ -141,11 +141,10 @@ export default function Header({ session: initialSession }: { session: Session |
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-border/40 dark:border-border ${
-        isScrolled
+      className={`sticky top-0 z-50 w-full transition-all duration-300 border-b border-border/40 dark:border-border ${isScrolled
           ? "bg-background shadow-sm"
           : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
@@ -168,22 +167,15 @@ export default function Header({ session: initialSession }: { session: Session |
             >
               {dict.header.explore}
             </Button>
-            <Button
-              variant="ghost"
-              className="text-sm font-bold text-foreground/90 hover:text-primary hover:bg-primary/5 cursor-pointer transition-all rounded-full"
-            >
-              {dict.header.about}
-            </Button>
           </nav>
         </div>
 
         {/* Center Search Bar (Desktop) */}
         <div
-          className={`hidden md:flex flex-1 max-w-2xl items-center gap-6 transition-all duration-500 ease-in-out transform ${
-            showSearch || isSearchFocused
+          className={`hidden md:flex flex-1 max-w-2xl items-center gap-6 transition-all duration-500 ease-in-out transform ${showSearch || isSearchFocused
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-4 pointer-events-none"
-          }`}
+            }`}
         >
           {/* Feed Tabs - Only visible on Home/Feed */}
           {pathname === "/" && (
@@ -193,11 +185,10 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("projects");
                   scrollToContent();
                 }}
-                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                  activeTab === "projects"
+                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === "projects"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/5"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
               </button>
@@ -206,11 +197,10 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("people");
                   scrollToContent();
                 }}
-                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                  activeTab === "people"
+                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === "people"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/5"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
               </button>
@@ -330,11 +320,10 @@ export default function Header({ session: initialSession }: { session: Session |
 
       {/* Mobile Search Overlay */}
       <div
-        className={`md:hidden absolute top-full left-0 w-full bg-background border-b border-border/50 p-4 transition-all duration-300 origin-top shadow-xl ${
-          isSearchExpanded && (showSearch || isSearchFocused)
+        className={`md:hidden absolute top-full left-0 w-full bg-background border-b border-border/50 p-4 transition-all duration-300 origin-top shadow-xl ${isSearchExpanded && (showSearch || isSearchFocused)
             ? "opacity-100 scale-y-100"
             : "opacity-0 scale-y-0 pointer-events-none"
-        }`}
+          }`}
       >
         <div className="flex flex-col gap-4 w-full">
           {pathname === "/" && (
@@ -344,11 +333,10 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("projects");
                   scrollToContent();
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === "projects"
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "projects"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground"
-                }`}
+                  }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
               </button>
@@ -357,11 +345,10 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("people");
                   scrollToContent();
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === "people"
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "people"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground"
-                }`}
+                  }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
               </button>

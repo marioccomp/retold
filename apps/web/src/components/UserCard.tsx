@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslation } from "@/src/i18n/client";
+import defaultCover from "@/assets/defaultCover.png";
 import { FollowButton } from "./FollowButton";
 import { useSession } from "next-auth/react";
 
@@ -34,14 +35,12 @@ export function UserCard({ user }: UserCardProps) {
     <Link href={`/${user.username}`} className="block h-full cursor-pointer">
       <Card className="group flex flex-col items-center pt-0 bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/50 h-full cursor-pointer overflow-hidden">
         {/* Cover Banner - edge to edge, no padding */}
-        <div className="w-full h-20 bg-gradient-to-r from-primary to-primary/80 relative rounded-t-xl overflow-hidden">
-          {user.cover && (
-            <img
-              src={user.cover}
-              alt={`${displayName}'s cover`}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          )}
+        <div className="w-full h-20 relative rounded-t-xl overflow-hidden bg-primary/10">
+          <img
+            src={user.cover || defaultCover.src}
+            alt={`${displayName}'s cover`}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
 
         {/* Content with avatar overlapping - avatar overlaps half into cover */}
