@@ -382,6 +382,8 @@
     "search_projects_placeholder": "Buscar projetos...",
     "success": "Sucesso",
     "error": "Erro",
+    "error_self_follow": "Você não pode seguir a si mesmo.",
+    "error_process": "Falha ao processar solicitação.",
     "unexpected_error": "Ocorreu um erro inesperado.",
     "saving": "Salvando...",
     "currently": "Atualmente",

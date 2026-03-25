@@ -30,7 +30,8 @@ export function FollowButton({
   const { dict } = useTranslation();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
+  const currentUserId = Number(session?.user?.id);
   const { openLoginModal } = useAuthModal();
   const [isPending, startTransition] = useTransition();
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
@@ -39,6 +40,8 @@ export function FollowButton({
   useEffect(() => {
     setIsFollowing(initialIsFollowing);
   }, [initialIsFollowing]);
+
+  if (currentUserId === targetUserId) return null;
 
   const handleToggleFollow = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -102,7 +105,16 @@ export function FollowButton({
       } else {
         // Rollback em caso de erro
         setIsFollowing(previousState);
-        toast.error(result.error || "Failed to process request");
+
+        // Mapeia erro em inglês para português
+        let errorMessage = dict.profile.error_process;
+        if (result.error === "You cannot follow yourself") {
+          errorMessage = dict.profile.error_self_follow;
+        } else if (result.error === "Unauthorized") {
+          errorMessage = dict.auth.errors.unauthorized;
+        }
+
+        toast.error(errorMessage);
 
         // Reverte o cache
         queryClient.invalidateQueries({ queryKey: ["users"] });
