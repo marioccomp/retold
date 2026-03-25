@@ -179,7 +179,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
               {dict.profile.edit_modal.job_label}
             </span>
           </div>
-          <h3 className="m-0 break-words font-black text-[1.15rem] text-foreground tracking-tight leading-tight uppercase">
+          <h3 className="m-0 break-words font-black text-[1.15rem] text-foreground tracking-tight leading-tight">
             {profile.title || (
               <span className="text-muted-foreground/60 font-medium text-sm normal-case">
                 {dict.profile.no_title}
@@ -205,11 +205,11 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
 
         {/* Stats */}
         <div className="w-full flex border border-border rounded-2xl overflow-hidden bg-card shadow-sm transition-all duration-300 hover:shadow-md">
-          <p className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground font-medium uppercase tracking-tight">
+          <p className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground font-medium tracking-tight">
             <span className="block text-[1.2rem] font-black text-foreground">{stats.views}</span>{" "}
             {dict.profile.views}
           </p>
-          <p className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground border-l border-border font-medium uppercase tracking-tight">
+          <p className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground border-l border-border font-medium tracking-tight">
             <span className="block text-[1.2rem] font-black text-foreground">{stats.likes}</span>{" "}
             {dict.profile.likes}
           </p>
@@ -219,7 +219,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         <div className="w-full flex border border-border rounded-2xl overflow-hidden bg-card shadow-sm transition-all duration-300 hover:shadow-md">
           <button
             onClick={() => setNetworkModal({ isOpen: true, type: "followers" })}
-            className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground font-medium hover:bg-muted/50 transition-colors bg-transparent cursor-pointer border-none outline-none uppercase tracking-tight"
+            className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground font-medium hover:bg-muted/50 transition-colors bg-transparent cursor-pointer border-none outline-none tracking-tight"
           >
             <span className="block text-[1.2rem] font-black text-foreground">
               {profile.followersCount}
@@ -228,7 +228,7 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
           </button>
           <button
             onClick={() => setNetworkModal({ isOpen: true, type: "following" })}
-            className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground border-y-0 border-r-0 border-l border-border font-medium hover:bg-muted/50 transition-colors bg-transparent cursor-pointer outline-none uppercase tracking-tight"
+            className="flex-1 m-0 py-4 text-center text-[0.85rem] text-muted-foreground border-y-0 border-r-0 border-l border-border font-medium hover:bg-muted/50 transition-colors bg-transparent cursor-pointer outline-none tracking-tight"
           >
             <span className="block text-[1.2rem] font-black text-foreground">
               {profile.followingCount}
