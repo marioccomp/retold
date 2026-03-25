@@ -23,6 +23,7 @@ export function CommentSection({ projectId }: CommentSectionProps) {
     const { data: session } = useSession()
     const [comments, setComments] = useState<any[]>([])
     const [newComment, setNewComment] = useState("")
+    const MAX_CHARS = 500
     const [submittingId, setSubmittingId] = useState<number | null>(null) // null for idle, 0 for main, id for reply
     const [replyTo, setReplyTo] = useState<number | null>(null)
     const [replyToContent, setReplyToContent] = useState("")
@@ -58,7 +59,7 @@ export function CommentSection({ projectId }: CommentSectionProps) {
             const data = await getProjectComments(projectId)
             setComments(data)
         } else {
-            toast.error(t.error_create)
+            toast.error(result.message || t.error_create)
         }
     }
 
@@ -91,13 +92,18 @@ export function CommentSection({ projectId }: CommentSectionProps) {
                             <AvatarFallback>{session.user?.name?.charAt(0)}</AvatarFallback>
                         </Avatar>
                     </div>
-                    <div className="flex-1 space-y-3">
-                        <Textarea
-                            placeholder={t.placeholder}
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            className="min-h-[100px] resize-none focus-visible:ring-primary shadow-sm bg-background/50"
-                        />
+                    <div className="flex-1 space-y-3 min-w-0">
+                        <div className="relative">
+                            <Textarea
+                                placeholder={t.placeholder}
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value.slice(0, MAX_CHARS))}
+                                className="min-h-[100px] w-full resize-none focus-visible:ring-primary shadow-sm bg-background/50 pr-4 pb-8"
+                            />
+                            <div className={`absolute bottom-2 right-3 text-[10px] font-bold transition-colors ${newComment.length >= MAX_CHARS ? 'text-destructive' : 'text-muted-foreground/50'}`}>
+                                {newComment.length}/{MAX_CHARS}
+                            </div>
+                        </div>
                         <div className="flex justify-end">
                             <Button
                                 disabled={submittingId !== null || !newComment.trim()}
@@ -150,6 +156,7 @@ export function CommentSection({ projectId }: CommentSectionProps) {
                                 dateLocale={dateLocale}
                                 t={t}
                                 isSubmitting={submittingId === comment.id}
+                                MAX_CHARS={MAX_CHARS}
                             />
                             {comment.replies && comment.replies.length > 0 && (
                                 <div className="ml-5 mt-4 space-y-4 border-l-2 border-muted pl-3">
@@ -163,6 +170,7 @@ export function CommentSection({ projectId }: CommentSectionProps) {
                                             t={t}
                                             isReply
                                             isSubmitting={submittingId === reply.id}
+                                            MAX_CHARS={MAX_CHARS}
                                         />
                                     ))}
                                 </div>
@@ -188,7 +196,8 @@ function CommentItem({
     dateLocale,
     t,
     isReply,
-    isSubmitting
+    isSubmitting,
+    MAX_CHARS
 }: any) {
     const [isUserHovered, setIsUserHovered] = useState(false)
 
@@ -205,7 +214,7 @@ function CommentItem({
                     <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
             </Link>
-            <div className="flex-1 space-y-0">
+            <div className="flex-1 space-y-0 min-w-0">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Link 
@@ -228,14 +237,14 @@ function CommentItem({
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all rounded-full cursor-pointer"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 lg:opacity-0 group-hover:opacity-100 transition-all rounded-full cursor-pointer"
                             onClick={onDelete}
                         >
                             <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                     )}
                 </div>
-                <div className="text-sm leading-relaxed text-foreground/90 break-words">
+                <div className="text-sm leading-relaxed text-foreground/90 break-all whitespace-pre-wrap overflow-hidden max-w-full pr-4">
                     {comment.content}
                 </div>
                 
@@ -253,13 +262,18 @@ function CommentItem({
 
                 {isReplying && (
                     <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <Textarea
-                            placeholder={t.placeholder}
-                            value={replyToContent}
-                            onChange={(e) => setReplyToContent(e.target.value)}
-                            className="min-h-[80px] resize-none focus-visible:ring-primary bg-background/50 rounded-xl"
-                            autoFocus
-                        />
+                        <div className="relative">
+                            <Textarea
+                                placeholder={t.placeholder}
+                                value={replyToContent}
+                                onChange={(e) => setReplyToContent(e.target.value.slice(0, MAX_CHARS))}
+                                className="min-h-[80px] w-full resize-none focus-visible:ring-primary bg-background/50 rounded-xl pr-4 pb-8"
+                                autoFocus
+                            />
+                            <div className={`absolute bottom-2 right-3 text-[10px] font-bold transition-colors ${replyToContent.length >= MAX_CHARS ? 'text-destructive' : 'text-muted-foreground/50'}`}>
+                                {replyToContent.length}/{MAX_CHARS}
+                            </div>
+                        </div>
                         <div className="flex justify-end gap-2">
                             <Button
                                 size="sm"

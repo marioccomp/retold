@@ -9,6 +9,10 @@ export async function createComment(projectId: number, content: string, parentId
     const session = await auth()
     if (!session?.user?.id) return { success: false, message: "Unauthorized" }
 
+    if (content.length > 500) {
+        return { success: false, message: "Comment too long (max 500 characters)" }
+    }
+
     const userId = Number(session.user.id)
 
     try {

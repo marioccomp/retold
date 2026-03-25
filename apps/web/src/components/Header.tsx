@@ -10,7 +10,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { FiUser, FiSettings, FiLogOut, FiSearch, FiMoon, FiSun } from "react-icons/fi";
+import { FiUser, FiSettings, FiLogOut, FiSearch, FiMoon, FiSun, FiMenu } from "react-icons/fi";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -245,6 +245,40 @@ export default function Header({ session: initialSession }: { session: Session |
             >
               <FiSearch size={22} />
             </Button>
+          </div>
+
+          {/* Mobile Menu (About/Explore) */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-muted text-muted-foreground h-9 w-9 cursor-pointer"
+                >
+                  <FiMenu size={22} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-48 mt-2 p-1.5 rounded-xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl"
+              >
+                <DropdownMenuItem
+                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary transition-all duration-200"
+                  onClick={handleExploreClick}
+                >
+                  <span className="font-bold text-sm">{dict.header.explore}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary transition-all duration-200"
+                >
+                  <Link href="/about" className="w-full h-full flex items-center">
+                    <span className="font-bold text-sm">{dict.header.about}</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {status === "authenticated" ? (
