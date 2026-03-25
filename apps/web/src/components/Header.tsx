@@ -167,6 +167,13 @@ export default function Header({ session: initialSession }: { session: Session |
             >
               {dict.header.explore}
             </Button>
+            <Button
+              asChild
+              variant="ghost"
+              className="text-sm font-bold text-foreground/90 hover:text-primary hover:bg-primary/5 cursor-pointer transition-all rounded-full"
+            >
+              <Link href="/about">{dict.header.about}</Link>
+            </Button>
           </nav>
         </div>
 
