@@ -72,6 +72,7 @@ model User {
 
   githubStats GithubStats?
   userStats   UserProjectStats[]
+  comments    Comment[]
 
   @@index([email])
   @@index([username])
@@ -232,6 +233,7 @@ model Project {
   projectViews ProjectView[]
 
   userStats UserProjectStats[]
+  comments  Comment[]
 }
 
 model Like {
@@ -359,4 +361,24 @@ model ProjectView {
 
   @@index([projectId, userId])
   @@index([projectId, ipAddress])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  parentId Int?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([projectId])
+  @@index([userId])
 }

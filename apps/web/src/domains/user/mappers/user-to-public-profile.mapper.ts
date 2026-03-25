@@ -82,6 +82,7 @@ export function mapUserToPublicProfile(
 
       likes: project._count?.likes ?? 0,
       views: project.views ?? 0,
+      commentsCount: project._count?.comments ?? 0,
       hasLiked: project.likes && project.likes.length > 0,
 
       tags: project.tags.map((tag: any) => ({

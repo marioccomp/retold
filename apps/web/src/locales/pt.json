@@ -260,6 +260,22 @@
         "public": "Público",
         "private": "Privado"
       }
+    },
+    "comments": {
+      "title": "Comentários",
+      "placeholder": "Escreva um comentário...",
+      "submit": "Publicar",
+      "submitting": "Publicando...",
+      "delete": "Excluir",
+      "empty": "Nenhum comentário ainda. Seja o primeiro a comentar!",
+      "count": "{count} comentários",
+      "count_singular": "1 comentário",
+      "reply": "Responder",
+      "cancel": "Cancelar",
+      "success_create": "Comentário publicado!",
+      "success_delete": "Comentário excluído!",
+      "error_create": "Falha ao publicar comentário",
+      "error_delete": "Falha ao excluir comentário"
     }
   },
   "feed": {

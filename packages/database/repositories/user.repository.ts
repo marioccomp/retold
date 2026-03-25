@@ -105,6 +105,7 @@ export const userRepository = {
             _count: {
               select: {
                 likes: true,
+                comments: true,
               },
             },
             ...(currentUserId
@@ -212,6 +213,12 @@ export const userRepository = {
             url: true,
             name: true,
             isActive: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
           },
         },
       },
