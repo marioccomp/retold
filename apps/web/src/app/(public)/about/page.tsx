@@ -21,7 +21,7 @@ export default async function AboutPage() {
       username: "mariojr",
       name: users[0]?.name || "Mario Jr",
       role: dict.about.creators.mario.role,
-      bio: users[0]?.bio || dict.about.creators.mario.bio,
+      bio: dict.about.creators.mario.bio,
       avatarUrl: users[0]?.image || marioPhoto.src,
       links: {
         github: users[0]?.githubUrl || "https://github.com/marioccomp",
@@ -33,7 +33,7 @@ export default async function AboutPage() {
       username: "lucas",
       name: users[1]?.name || "Lucas",
       role: dict.about.creators.lucas.role,
-      bio: users[1]?.bio || dict.about.creators.lucas.bio,
+      bio: dict.about.creators.lucas.bio,
       avatarUrl: users[1]?.image || lucasPhoto.src,
       links: {
         github: users[1]?.githubUrl || "https://github.com/LucasSSantiago",
@@ -44,7 +44,7 @@ export default async function AboutPage() {
       username: "joaofranca",
       name: users[2]?.name || "João França",
       role: dict.about.creators.joao.role,
-      bio: users[2]?.bio || dict.about.creators.joao.bio,
+      bio: dict.about.creators.joao.bio,
       avatarUrl: users[2]?.image || francaPhoto.src,
       links: {
         github: users[2]?.githubUrl || "https://github.com/M4C4BU",
