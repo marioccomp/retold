@@ -37,6 +37,22 @@ export async function toggleLike(projectId: number): Promise<ActionResponse> {
                 projectId
             }
         })
+
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            select: { userId: true }
+        })
+
+        if (project && project.userId !== userId) {
+            await prisma.notification.create({
+                data: {
+                    userId: project.userId,
+                    sourceUserId: userId,
+                    type: "LIKE",
+                    projectId
+                }
+            })
+        }
     }
 
     revalidatePath(`/projects/${projectId}`)

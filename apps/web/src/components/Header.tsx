@@ -24,6 +24,7 @@ import { useTranslation } from "../i18n/client";
 import { useQuery } from "@tanstack/react-query";
 import { getMeAction } from "@/src/domains/user/actions/get-me";
 import { useSearch } from "../providers/SearchContext";
+import { NotificationBell } from "./NotificationBell";
 
 export default function Header({ session: initialSession }: { session: Session | null }) {
   const router = useRouter();
@@ -282,8 +283,10 @@ export default function Header({ session: initialSession }: { session: Session |
           </div>
 
           {status === "authenticated" ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                 <button className="relative rounded-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 cursor-pointer border-none bg-transparent p-0 shadow-none">
                   <Avatar className="h-9 w-9 cursor-pointer hover:opacity-80 transition-opacity shadow-none">
                     {userImage ? (
@@ -349,6 +352,7 @@ export default function Header({ session: initialSession }: { session: Session |
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           ) : (
             <Link href="/login">
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(var(--primary),0.4)] active:scale-[0.98] cursor-pointer">
