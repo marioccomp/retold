@@ -47,6 +47,7 @@ export const projectRepository = {
         _count: {
           select: {
             likes: true,
+            comments: true,
           },
         },
         ...(currentUserId

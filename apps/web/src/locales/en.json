@@ -260,6 +260,22 @@
         "public": "Public",
         "private": "Private"
       }
+    },
+    "comments": {
+      "title": "Comments",
+      "placeholder": "Write a comment...",
+      "submit": "Post",
+      "submitting": "Posting...",
+      "delete": "Delete",
+      "empty": "No comments yet. Be the first to comment!",
+      "count": "{count} comments",
+      "count_singular": "1 comment",
+      "reply": "Reply",
+      "cancel": "Cancel",
+      "success_create": "Comment posted!",
+      "success_delete": "Comment deleted!",
+      "error_create": "Failed to post comment",
+      "error_delete": "Failed to delete comment"
     }
   },
   "feed": {

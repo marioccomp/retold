@@ -62,6 +62,7 @@ export async function getHighlightedProject() {
     })),
     likes: project._count.likes,
     views: project.views,
+    commentsCount: project._count.comments,
     hasLiked: project.likes && project.likes.length > 0,
     isFollowingOwner: (project.user as any).followers?.length > 0,
   });

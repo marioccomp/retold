@@ -28,6 +28,7 @@ import { useProjectAnalysis } from "./hooks/useProjectAnalysis";
 import { ProjectSettings } from "./components/ProjectSettings";
 import { useTranslation } from "@/src/i18n/client";
 import { incrementView } from "@/src/domains/project/actions/increment-view.action";
+import { CommentSection } from "./CommentSection";
 import { cn } from "@/lib/utils";
 
 type FeedProjectPanelProps = {
@@ -344,141 +345,146 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
           {status === "DONE" && (
             <div className="bg-background rounded-2xl border border-border shadow-sm overflow-hidden">
               {llm ? (
-                <div className="p-6 md:p-10 space-y-10">
-                  <div className="space-y-4">
-                    <h3 className="text-2xl font-black text-foreground tracking-tight">
-                      {t.overlay.sections.summary}
-                    </h3>
+                <>
+                  <div className="p-6 md:p-10 space-y-10">
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-black text-foreground tracking-tight">
+                        {t.overlay.sections.summary}
+                      </h3>
 
-                    {llm.summary?.paragraphs && llm.summary.paragraphs.length > 0 ? (
-                      <div className="space-y-4">
-                        {llm.summary.paragraphs.map((p, i) => (
-                          <p
+                      {llm.summary?.paragraphs && llm.summary.paragraphs.length > 0 ? (
+                        <div className="space-y-4">
+                          {llm.summary.paragraphs.map((p, i) => (
+                            <p
+                              key={i}
+                              className="text-foreground/80 text-lg leading-relaxed whitespace-pre-wrap text-justify"
+                            >
+                              {p}
+                            </p>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-foreground/80 text-lg leading-relaxed whitespace-pre-wrap text-justify">
+                          {llm.summary?.description || t.overlay.llm_empty_overview}
+                        </p>
+                      )}
+                    </div>
+
+                    <Separator />
+
+                    {/* Key Strengths */}
+                    <div>
+                      <SectionHeader
+                        title={t.overlay.sections.strengths}
+                        icon={Sparkles}
+                        color="green"
+                      />
+                      <div className="grid md:grid-cols-2 gap-4 mt-4">
+                        {llm.strengths?.slice(0, 4).map((s, i) => (
+                          <div
                             key={i}
-                            className="text-foreground/80 text-lg leading-relaxed whitespace-pre-wrap text-justify"
+                            className="p-4 rounded-xl bg-secondary/30 border border-secondary hover:border-secondary/80 transition-colors"
                           >
-                            {p}
-                          </p>
+                            <div className="font-bold text-foreground mb-1 flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-primary" />
+                              {s.name}
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {s.explanation}
+                            </p>
+                          </div>
                         ))}
                       </div>
-                    ) : (
-                      <p className="text-foreground/80 text-lg leading-relaxed whitespace-pre-wrap text-justify">
-                        {llm.summary?.description || t.overlay.llm_empty_overview}
-                      </p>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Key Strengths */}
-                  <div>
-                    <SectionHeader
-                      title={t.overlay.sections.strengths}
-                      icon={Sparkles}
-                      color="green"
-                    />
-                    <div className="grid md:grid-cols-2 gap-4 mt-4">
-                      {llm.strengths?.slice(0, 4).map((s, i) => (
-                        <div
-                          key={i}
-                          className="p-4 rounded-xl bg-secondary/30 border border-secondary hover:border-secondary/80 transition-colors"
-                        >
-                          <div className="font-bold text-foreground mb-1 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-primary" />
-                            {s.name}
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {s.explanation}
-                          </p>
-                        </div>
-                      ))}
                     </div>
-                  </div>
 
-                  <Separator />
+                    <Separator />
 
-                  {/* Architecture Section */}
-                  <div>
-                    <SectionHeader
-                      title={t.overlay.sections.architecture}
-                      icon={Layout}
-                      color="purple"
-                    />
-                    <div className="mt-4 p-6 bg-muted rounded-2xl border border-border/60">
-                      <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                        {llm.architecture?.explanation || t.overlay.llm_empty_architecture}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Tech Stack */}
-                  {data?.stack && (
-                    <>
-                      <Separator />
-                      <div>
-                        <SectionHeader
-                          title={t.overlay.sections.tech_stack}
-                          icon={Code2}
-                          color="blue"
-                        />
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {[
-                            ...(data.stack.languages || []),
-                            ...(data.stack.frameworks || []),
-                            ...(data.stack.tools || []),
-                            ...(data.infra?.ciProviders || []),
-                          ].map((tech, i) => (
-                            <Badge
-                              key={i}
-                              variant="outline"
-                              className="px-3 py-1.5 text-sm bg-background text-foreground/80 border-border"
-                            >
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
+                    {/* Architecture Section */}
+                    <div>
+                      <SectionHeader
+                        title={t.overlay.sections.architecture}
+                        icon={Layout}
+                        color="purple"
+                      />
+                      <div className="mt-4 p-6 bg-muted rounded-2xl border border-border/60">
+                        <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                          {llm.architecture?.explanation || t.overlay.llm_empty_architecture}
+                        </p>
                       </div>
-                    </>
-                  )}
+                    </div>
 
-                  {/* Suggestions Section - Only visible to the project owner */}
-                  {isOwner && llm.suggestions && llm.suggestions.length > 0 && (
-                    <>
-                      <Separator />
-                      <div>
-                        <SectionHeader
-                          title={t.overlay.sections.suggestions}
-                          icon={Lightbulb}
-                          color="blue"
-                        />
+                    {/* Tech Stack */}
+                    {data?.stack && (
+                      <>
+                        <Separator />
+                        <div>
+                          <SectionHeader
+                            title={t.overlay.sections.tech_stack}
+                            icon={Code2}
+                            color="blue"
+                          />
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {[
+                              ...(data.stack.languages || []),
+                              ...(data.stack.frameworks || []),
+                              ...(data.stack.tools || []),
+                              ...(data.infra?.ciProviders || []),
+                            ].map((tech, i) => (
+                              <Badge
+                                key={i}
+                                variant="outline"
+                                className="px-3 py-1.5 text-sm bg-background text-foreground/80 border-border"
+                              >
+                                {tech}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
 
-                        <div className="mt-6 space-y-4">
-                          {llm.suggestions?.map((s, i) => (
-                            <div
-                              key={`suggestion-${i}`}
-                              className="flex gap-4 p-4 rounded-xl bg-blue-50/30 border border-blue-100/50 hover:border-blue-200 transition-colors"
-                            >
-                              <div className="flex flex-col items-center gap-2 shrink-0">
-                                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-                                  <Lightbulb className="w-4 h-4" />
+                    {/* Suggestions Section - Only visible to the project owner */}
+                    {isOwner && llm.suggestions && llm.suggestions.length > 0 && (
+                      <>
+                        <Separator />
+                        <div>
+                          <SectionHeader
+                            title={t.overlay.sections.suggestions}
+                            icon={Lightbulb}
+                            color="blue"
+                          />
+
+                          <div className="mt-6 space-y-4">
+                            {llm.suggestions?.map((s, i) => (
+                              <div
+                                key={`suggestion-${i}`}
+                                className="flex gap-4 p-4 rounded-xl bg-blue-50/30 border border-blue-100/50 hover:border-blue-200 transition-colors"
+                              >
+                                <div className="flex flex-col items-center gap-2 shrink-0">
+                                  <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                                    <Lightbulb className="w-4 h-4" />
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-foreground">{s.name}</div>
+
+                                  {s.explanation && (
+                                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                                      {s.explanation}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
-                              <div>
-                                <div className="font-bold text-foreground">{s.name}</div>
-
-                                {s.explanation && (
-                                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                                    {s.explanation}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="px-6 md:px-10 pb-10 border-t border-border/30 mt-6 pt-10">
+                    <CommentSection projectId={project.id} />
+                  </div>
+                </>
               ) : (
                 <div className="p-12 text-center text-muted-foreground">
                   <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground/80" />

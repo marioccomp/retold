@@ -1,11 +1,10 @@
 "use client";
 
 // import styles from "./ProjectCard.module.css";
-import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
-import { MdOutlineVisibility } from "react-icons/md";
+import { MdFavoriteBorder, MdFavorite, MdOutlineVisibility, MdModeComment } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
-import { ExternalLink, Lock } from "lucide-react";
+import { ExternalLink, Lock, MessageCircle } from "lucide-react";
 import placeholderImage from "@/assets/mockup-escalonador.jpg";
 import { useState, useEffect, useTransition } from "react";
 import ownerPic from "@/assets/foto.jpeg";
@@ -252,6 +251,10 @@ export default function ProjectCard({
             >
               {likesCount}
             </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2">
+            <MessageCircle size={18} className="text-muted-foreground/80 -translate-y-[1px]" />
+            <p>{project.commentsCount}</p>
           </div>
           <div className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2">
             <MdOutlineVisibility size={22} />

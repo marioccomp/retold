@@ -96,6 +96,7 @@ export async function getFeedProjects(
         _count: {
           select: {
             likes: true,
+            comments: true,
           },
         },
         ...(currentUserId
@@ -123,6 +124,7 @@ export async function getFeedProjects(
     images: project.images,
     likes: project._count.likes,
     views: project.views,
+    commentsCount: project._count.comments,
     hasLiked: project.likes && project.likes.length > 0,
     tags: project.tags.map((tag: any) => ({
       id: tag.id,
@@ -245,7 +247,7 @@ async function getRecommendedFeed(
         select: { url: true, fullName: true, private: true },
       },
       _count: {
-        select: { likes: true },
+        select: { likes: true, comments: true },
       },
       ...(currentUserId
         ? {
@@ -271,6 +273,7 @@ async function getRecommendedFeed(
     images: project.images,
     likes: project._count.likes,
     views: project.views,
+    commentsCount: project._count.comments,
     hasLiked: project.likes && project.likes.length > 0,
     tags: project.tags.map((tag: any) => ({
       id: tag.id,

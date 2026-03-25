@@ -13,6 +13,7 @@ export interface ProjectCardDTO {
 
   likes: number;
   views: number;
+  commentsCount: number;
   hasLiked?: boolean;
 
   tags: ProjectCardTagDTO[];
