@@ -139,7 +139,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
       `}</style>
 
       {/* Modern Glassy Header */}
-      <div className="sticky top-0 left-0 right-0 px-6 py-3 md:py-4 border-b border-border/50 bg-background/95 backdrop-blur-md z-50 flex items-center justify-between gap-4">
+      <div className="sticky top-0 left-0 right-0 px-6 py-3 md:py-4 border-b border-border/50 bg-background/95 backdrop-blur-md z-50 flex items-center justify-between gap-4 will-change-transform">
         {/* Close Button - Left side on mobile, or right side? User asked for "header com X pra fechar" */}
         {/* Based on print, X is on left, title center/left, actions right. But usually X is top-right or top-left. */}
         {/* Let's put X on the top-right for consistency with previous design, or top-left if it's a bottom sheet... */}
@@ -710,6 +710,13 @@ const ImageGallery = ({ images }: { images: string[] }) => {
       document.body.style.overflow = "";
     };
   }, [isZoomed]);
+
+  // Reset active index if images change or current index becomes invalid
+  useEffect(() => {
+    if (activeIndex >= images.length) {
+      setActiveIndex(0);
+    }
+  }, [images.length, activeIndex]);
 
   if (!images || images.length === 0) return null;
 

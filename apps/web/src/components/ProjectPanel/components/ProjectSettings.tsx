@@ -432,14 +432,24 @@ export const ProjectSettings = ({
                   <p className="text-sm text-muted-foreground mb-4">
                     {t.remove_img_modal.description}
                   </p>
-                  <div className="flex justify-end gap-2">
-                    <Button size="sm" variant="ghost" onClick={() => setImageToDelete(null)}>
-                      {t.cancel}
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={confirmDeleteImage}>
-                      {t.remove_img_modal.confirm}
-                    </Button>
-                  </div>
+                   <div className="flex justify-end gap-2">
+                     <Button
+                       size="sm"
+                       variant="ghost"
+                       onClick={() => setImageToDelete(null)}
+                       className="cursor-pointer"
+                     >
+                       {t.cancel}
+                     </Button>
+                     <Button
+                       size="sm"
+                       variant="destructive"
+                       onClick={confirmDeleteImage}
+                       className="cursor-pointer"
+                     >
+                       {t.remove_img_modal.confirm}
+                     </Button>
+                   </div>
                 </div>
               </div>
             )}

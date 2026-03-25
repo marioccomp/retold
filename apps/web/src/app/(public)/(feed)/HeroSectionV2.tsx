@@ -106,7 +106,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
         {/* ── Layer 2: Main decorative SVG ── */}
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full will-change-transform"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMidYMid slice"
           viewBox="0 0 1440 800"
@@ -138,9 +138,9 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
           </defs>
 
           {/* Gradient orb fills - right side weighted */}
-          <ellipse cx="1080" cy="200" rx="520" ry="420" fill={`url(#orb1-${uid})`} className="animate-[float_14s_ease-in-out_infinite]" />
-          <ellipse cx="1250" cy="560" rx="400" ry="340" fill={`url(#orb2-${uid})`} className="animate-[float_18s_ease-in-out_infinite_reverse]" />
-          <ellipse cx="280" cy="620" rx="300" ry="260" fill={`url(#orb3-${uid})`} className="animate-[float_16s_ease-in-out_infinite]" />
+          <ellipse cx="1080" cy="200" rx="520" ry="420" fill={`url(#orb1-${uid})`} className="animate-[float_14s_ease-in-out_infinite] will-change-transform" />
+          <ellipse cx="1250" cy="560" rx="400" ry="340" fill={`url(#orb2-${uid})`} className="animate-[float_18s_ease-in-out_infinite_reverse] will-change-transform" />
+          <ellipse cx="280" cy="620" rx="300" ry="260" fill={`url(#orb3-${uid})`} className="animate-[float_16s_ease-in-out_infinite] will-change-transform" />
 
           {/* Top-right glow cone */}
           <rect x="0" y="0" width="1440" height="800" fill={`url(#glow-${uid})`} />

@@ -141,18 +141,20 @@ export default function ProjectsSection({
   // Se está criando, mostrar apenas o painel de criação
   if (isCreating) {
     return (
-      <div className="col-span-full flex flex-col gap-6 animate-[slideIn_0.3s_ease-out] relative">
-        <Button
-          variant="ghost"
-          className="sticky top-[72px] md:top-[80px] z-50 cursor-pointer inline-flex items-center gap-2 py-1.5 px-3 md:py-2 md:px-0 text-[0.85rem] md:text-[0.95rem] font-bold text-muted-foreground hover:bg-primary/5 hover:text-primary w-fit group h-auto transition-all rounded-full md:rounded-none bg-background/60 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border border-border/50 md:border-transparent shadow-sm md:shadow-none"
-          onClick={handlePanelClose}
-        >
-          <FiArrowLeft
-            size={16}
-            className=" transition-transform duration-200 group-hover:-translate-x-[3px]"
-          />
-          <span>{dict.profile.back_to_projects}</span>
-        </Button>
+      <div className="col-span-full animate-[fadeIn_0.3s_ease-out]">
+        <div className="py-4 mb-4">
+          <Button
+            variant="ghost"
+            className="cursor-pointer inline-flex items-center gap-2 text-[0.85rem] md:text-[0.95rem] font-bold text-muted-foreground hover:text-primary hover:bg-primary/5 w-fit group h-auto transition-all p-0"
+            onClick={handlePanelClose}
+          >
+            <FiArrowLeft
+              size={16}
+              className="transition-transform duration-200 group-hover:-translate-x-[3px]"
+            />
+            <span>{dict.profile.back_to_projects}</span>
+          </Button>
+        </div>
         <CreateProjectPanel onClose={handlePanelClose} onSuccess={handleProjectCreated} />
       </div>
     );
