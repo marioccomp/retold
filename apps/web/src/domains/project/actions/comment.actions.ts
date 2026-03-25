@@ -16,7 +16,7 @@ export async function createComment(projectId: number, content: string, parentId
     const userId = Number(session.user.id)
 
     try {
-        await prisma.comment.create({
+        const comment = await prisma.comment.create({
             data: {
                 content,
                 projectId,
@@ -24,6 +24,23 @@ export async function createComment(projectId: number, content: string, parentId
                 parentId
             }
         })
+
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            select: { userId: true }
+        })
+
+        if (project && project.userId !== userId) {
+            await prisma.notification.create({
+                data: {
+                    userId: project.userId,
+                    sourceUserId: userId,
+                    type: "COMMENT",
+                    projectId,
+                    commentId: comment.id
+                }
+            })
+        }
 
         revalidatePath(`/projects/${projectId}`)
         return { success: true }

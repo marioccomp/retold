@@ -43,6 +43,14 @@ export async function toggleFollowAction(targetUserId: number) {
                     followingId: targetUserId,
                 },
             });
+
+            await prisma.notification.create({
+                data: {
+                    userId: targetUserId,
+                    sourceUserId: currentUserId,
+                    type: "FOLLOW",
+                }
+            });
         }
 
         revalidatePath(`/[username]`, "layout");

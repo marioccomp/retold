@@ -1,4 +1,18 @@
 {
+  "notifications": {
+    "title": "Notificações",
+    "markAllAsRead": "Marcar todas como lidas",
+    "clearAll": "Limpar notificações",
+    "empty": "Nenhuma notificação.",
+    "follow": "{{user}} começou a seguir você",
+    "like": "{{user}} curtiu seu projeto {{project}}",
+    "comment": "{{user}} comentou no seu projeto {{project}}",
+    "types": {
+      "follow": "começou a seguir você",
+      "like": "curtiu seu projeto",
+      "comment": "comentou no seu projeto"
+    }
+  },
   "settings": {
     "title": "Configurações",
     "description": "Gerencie as configurações e preferências da sua conta.",
