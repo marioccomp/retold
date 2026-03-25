@@ -117,7 +117,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
   };
 
   // GitHub App install URL
-  const appSlug = "retold-inc";
+  const appSlug = process.env.NODE_ENV === "production" ? "retold-inc" : "retolddev";
   const installUrl = `https://github.com/apps/${appSlug}/installations/new`;
 
   function openCenteredPopup(url: string, title = "GitHub", w = 600, h = 700) {

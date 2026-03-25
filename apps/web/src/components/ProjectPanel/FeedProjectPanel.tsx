@@ -441,8 +441,8 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                     </>
                   )}
 
-                  {/* Suggestions Section */}
-                  {llm.suggestions && llm.suggestions.length > 0 && (
+                  {/* Suggestions Section - Only visible to the project owner */}
+                  {isOwner && llm.suggestions && llm.suggestions.length > 0 && (
                     <>
                       <Separator />
                       <div>
