@@ -1,8 +1,10 @@
 {
   "notifications": {
     "title": "Notificações",
+    "markAsRead": "Marcar como lida",
     "markAllAsRead": "Marcar todas como lidas",
     "clearAll": "Limpar notificações",
+    "delete": "Excluir",
     "empty": "Nenhuma notificação.",
     "follow": "{{user}} começou a seguir você",
     "like": "{{user}} curtiu seu projeto {{project}}",
@@ -290,19 +292,6 @@
       "success_delete": "Comentário excluído!",
       "error_create": "Falha ao publicar comentário",
       "error_delete": "Falha ao excluir comentário"
-    },
-    "notifications": {
-      "title": "Notificações",
-      "empty": "Nenhuma notificação ainda.",
-      "markAsRead": "Marcar como lida",
-      "markAllAsRead": "Marcar todas como lidas",
-      "clearAll": "Limpar todas",
-      "delete": "Excluir",
-      "types": {
-        "follow": "começou a seguir você",
-        "like": "curtiu seu projeto",
-        "comment": "comentou em seu projeto"
-      }
     }
   },
   "feed": {
