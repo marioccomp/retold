@@ -44,13 +44,24 @@ export async function toggleFollowAction(targetUserId: number) {
                 },
             });
 
-            await prisma.notification.create({
-                data: {
+            // Evitar flood de notificações: só cria se não houver uma não lida do mesmo tipo/origem
+            const lastNotification = await prisma.notification.findFirst({
+                where: {
                     userId: targetUserId,
                     sourceUserId: currentUserId,
                     type: "FOLLOW",
                 }
             });
+
+            if (!lastNotification) {
+                await prisma.notification.create({
+                    data: {
+                        userId: targetUserId,
+                        sourceUserId: currentUserId,
+                        type: "FOLLOW",
+                    }
+                });
+            }
         }
 
         revalidatePath(`/[username]`, "layout");

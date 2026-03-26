@@ -283,7 +283,7 @@ export default function Header({ session: initialSession }: { session: Session |
           </div>
 
           {status === "authenticated" ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

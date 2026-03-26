@@ -44,14 +44,26 @@ export async function toggleLike(projectId: number): Promise<ActionResponse> {
         })
 
         if (project && project.userId !== userId) {
-            await prisma.notification.create({
-                data: {
+            // Evitar flood de notificações: só cria se não houver uma não lida do mesmo tipo/origem
+            const lastNotification = await prisma.notification.findFirst({
+                where: {
                     userId: project.userId,
                     sourceUserId: userId,
                     type: "LIKE",
                     projectId
                 }
-            })
+            });
+
+            if (!lastNotification) {
+                await prisma.notification.create({
+                    data: {
+                        userId: project.userId,
+                        sourceUserId: userId,
+                        type: "LIKE",
+                        projectId
+                    }
+                })
+            }
         }
     }
 
