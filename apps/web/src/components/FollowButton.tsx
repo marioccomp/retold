@@ -3,6 +3,7 @@
 import { useTransition, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toggleFollowAction } from "@/src/domains/user/actions/toggle-follow.action";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -134,20 +135,23 @@ export function FollowButton({
         // Overlay variant (for ProjectCard images, etc)
         variant === "ghost"
           ? !isFollowing
-            ? "bg-primary text-primary-foreground hover:bg-primary/90 border-none shadow-lg shadow-primary/20"
-            : "bg-black/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 shadow-none font-medium"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-none shadow-lg shadow-[0_4px_15px_rgba(5,220,127,0.3)]"
+            : "bg-primary/10 backdrop-blur-md border border-primary/30 text-primary hover:bg-primary/20 hover:border-primary/50 hover:text-primary shadow-none font-bold"
           : // Default brand styles
             !className?.includes("bg-") &&
               (!isFollowing
                 ? "bg-primary text-primary-foreground hover:bg-primary/90 border-none shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
-                : "bg-transparent border border-primary text-primary hover:bg-primary/10 shadow-none"),
+                : "bg-transparent border border-primary text-primary hover:bg-primary/10 shadow-none font-bold"),
         className
       )}
     >
       {isPending ? (
         <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : isFollowing ? (
-        dict.profile.unfollow
+        <span className="flex items-center gap-1.5 leading-none">
+          <Check size={14} className="stroke-[3]" />
+          {dict.profile.unfollow}
+        </span>
       ) : (
         dict.profile.follow
       )}

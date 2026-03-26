@@ -72,33 +72,34 @@
 }
 
 .dark {
-  --background: oklch(0 0 0); /* Pure black #000000 */
-  --foreground: oklch(0.95 0 0); /* Soft white */
+  --background: oklch(0.14 0.015 155); /* 14% L - Deep charcoal-green for a premium "not-pure-black" feel */
+  --foreground: oklch(0.99 0.005 155); /* 99% L - High-contrast crisp white */
 
-  --card: oklch(0.14 0 0); /* Clear elevation from pure black */
-  --card-foreground: oklch(0.95 0 0);
+  /* Surface Elevation System */
+  --card: oklch(0.20 0.02 155); /* 20% L - Clearly distinct elevated surface */
+  --card-foreground: oklch(0.99 0.01 155);
 
-  --popover: oklch(0.14 0 0);
-  --popover-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.22 0.02 155); /* Slightly more elevated for dropdowns */
+  --popover-foreground: oklch(0.99 0.01 155);
 
-  --primary: oklch(0.79 0.17 150); /* Brand Green — untouched */
-  --primary-foreground: oklch(0.10 0 0); /* Deep black for button text */
+  --primary: oklch(0.79 0.17 150); /* Retention of Brand Green */
+  --primary-foreground: oklch(0.14 0.01 155); /* Background color for high legibility on green */
 
-  --secondary: oklch(0.18 0.02 150); /* Subtle green-tinted surface for tags/badges */
-  --secondary-foreground: oklch(0.79 0.17 150); /* Brand green text on secondary */
+  --secondary: oklch(0.26 0.03 155); /* Enhanced surface for badges and profile tags */
+  --secondary-foreground: oklch(0.88 0.12 150); /* Vibrant green on secondary surfaces */
 
-  --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.85 0 0); /* Increased contrast for readability */
+  --muted: oklch(0.24 0.02 155); /* Passive elements surface */
+  --muted-foreground: oklch(0.80 0.02 155); /* Maximum readability for secondary text */
 
-  --accent: oklch(0.16 0 0); /* Hover bg */
-  --accent-foreground: oklch(0.95 0 0);
+  --accent: oklch(0.30 0.03 155); /* Interactive hover/focus highlights */
+  --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.6368 0.2078 25.3313);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.20 0 0); /* Visible neutral divider */
-  --input: oklch(0.20 0 0);
-  --ring: oklch(0.79 0.17 150); /* Brand Green */
+  --border: oklch(0.35 0.02 155); /* 35% L - Sharp, clearly visible structural dividers */
+  --input: oklch(0.30 0.02 155);
+  --ring: oklch(0.79 0.17 150); /* Brand Green focus ring */
 
   --chart-1: oklch(0.79 0.17 150);
   --chart-2: oklch(0.6056 0.2189 292.7172);
@@ -106,13 +107,13 @@
   --chart-4: oklch(0.4907 0.2412 292.5809);
   --chart-5: oklch(0.432 0.2106 292.7591);
 
-  --sidebar: oklch(0 0 0); /* Same as background */
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.79 0.17 150); /* Brand Green */
-  --sidebar-primary-foreground: oklch(0.95 0 0);
-  --sidebar-accent: oklch(0.14 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.20 0 0);
+  --sidebar: oklch(0.16 0.015 155); /* Distinct from main background */
+  --sidebar-foreground: oklch(0.99 0.01 155);
+  --sidebar-primary: oklch(0.79 0.17 150);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.24 0.02 155);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.35 0.02 155);
   --sidebar-ring: oklch(0.79 0.17 150);
 }
 

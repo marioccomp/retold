@@ -128,7 +128,7 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative rounded-full hover:bg-muted text-muted-foreground h-9 w-9 cursor-pointer"
+          className="relative rounded-full hover:bg-muted text-muted-foreground h-9 w-9 cursor-pointer focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 border-none select-none"
         >
           <FiBell size={20} />
           {unreadCount > 0 && (
@@ -199,7 +199,7 @@ export function NotificationBell() {
               return (
                 <DropdownMenuItem
                   key={notification.id}
-                  className={`group/item cursor-pointer px-4 py-3 rounded-none border-b border-border/20 last:border-0 focus:bg-muted transition-colors ${
+                  className={`group/item cursor-pointer px-4 py-3 rounded-none border-b border-border/20 last:border-0 focus:bg-muted focus:text-inherit transition-colors focus:ring-0 focus-visible:ring-0 outline-none ${
                     !notification.read ? "bg-primary/5" : ""
                   }`}
                   onClick={() => handleNotificationClick(notification, linkHref)}
@@ -234,16 +234,31 @@ export function NotificationBell() {
                         })}
                       </span>
                     </div>
-                    {/* Delete single notification button */}
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity flex items-center">
+                    {/* Action buttons */}
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity flex items-center gap-0.5">
+                      {!notification.read && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer rounded-full focus:ring-0 focus:outline-none"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markAsRead(notification.id);
+                          }}
+                          title={dict.notifications?.markAsRead || "Mark as read"}
+                        >
+                          <FiCheck size={14} />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-full"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-full focus:ring-0 focus:outline-none"
                         onClick={(e) => {
                           e.stopPropagation();
                           deleteSingle(notification.id);
                         }}
+                        title={dict.notifications?.delete || "Delete"}
                       >
                         <FiX size={14} />
                       </Button>

@@ -167,7 +167,7 @@ export default function FeedContent({ initialData }: Props) {
                 value={projectSort}
                 onValueChange={(val: ProjectSortType) => setProjectSort(val)}
               >
-                <SelectTrigger className="w-[180px] bg-background dark:bg-muted/20 border-border cursor-pointer">
+                <SelectTrigger className="w-[180px] bg-background dark:bg-muted border-border cursor-pointer">
                   <SelectValue placeholder={dict.feed.sort.placeholder} />
                 </SelectTrigger>
                 <SelectContent>

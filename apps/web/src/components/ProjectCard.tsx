@@ -109,9 +109,9 @@ export default function ProjectCard({
 
         {/* Longer Description Overlay */}
         <div
-          className="absolute left-0 w-full bg-[#0a1413]/95 text-white flex flex-col z-[2] transition-opacity duration-300
+          className="absolute inset-0 bg-background/90 dark:bg-card/95 text-foreground dark:text-foreground flex flex-col z-[2] transition-opacity duration-300
           max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
-          min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border"
+          min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border border-b border-border/10"
         >
           <div className="flex items-center gap-2.5 mb-3 max-[650px]:mb-2 max-[650px]:gap-2">
             <Link
@@ -119,7 +119,7 @@ export default function ProjectCard({
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               className="flex items-center gap-2.5 group/creator cursor-pointer"
             >
-              <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20 transition-all duration-200 group-hover/creator:border-primary/50 group-hover/creator:scale-105">
+              <Avatar className="w-[35px] h-[35px] max-[650px]:w-[30px] max-[650px]:h-[30px] border border-white/20 dark:border-primary/20 transition-all duration-200 group-hover/creator:border-primary/50 group-hover/creator:scale-105">
                 <AvatarImage
                   src={project.ownerImage || undefined}
                   alt={ownerName}
@@ -138,13 +138,13 @@ export default function ProjectCard({
                 targetUserId={project.ownerId}
                 initialIsFollowing={project.isFollowingOwner ?? false}
                 variant="ghost"
-                className="h-8 px-4 text-[11px] uppercase tracking-wider"
+                className="h-8 px-4 text-[11px] font-bold uppercase tracking-[0.1em] shadow-sm active:scale-95 transition-all"
               />
             )}
           </div>
           <div
-            className="text-[15px] leading-relaxed text-[#f0fdf4] mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
-            max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:text-[#e2e8f0] max-[650px]:line-clamp-3"
+            className="text-[15px] leading-relaxed text-muted-foreground mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
+            max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:line-clamp-3"
           >
             <p className="whitespace-pre-wrap">{project.description}</p>
           </div>

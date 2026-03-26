@@ -1,8 +1,10 @@
 {
   "notifications": {
     "title": "Notifications",
+    "markAsRead": "Mark as read",
     "markAllAsRead": "Mark all as read",
     "clearAll": "Clear notifications",
+    "delete": "Delete",
     "empty": "No notifications yet.",
     "follow": "{{user}} started following you",
     "like": "{{user}} liked your project {{project}}",

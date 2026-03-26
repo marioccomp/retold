@@ -97,6 +97,8 @@ export default function ProfileClient({ username, ownProfile }: Props) {
               activeTab={activeTab}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              projectSort={projectSort}
+              setProjectSort={setProjectSort}
             />
 
             {/* 6. Tabs Content */}
@@ -123,7 +125,6 @@ export default function ProfileClient({ username, ownProfile }: Props) {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   sort={projectSort}
-                  onSortChange={setProjectSort}
                 />
               </TabsContent>
 

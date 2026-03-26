@@ -132,13 +132,13 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
           className={`relative group ${ownProfile ? "cursor-pointer" : ""}`}
           onClick={ownProfile ? onEditClick : undefined}
         >
-          <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-4 border-background shadow-xl bg-card">
+          <Avatar className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[190px] md:h-[190px] lg:w-[230px] lg:h-[230px] border-[3px] border-background dark:ring-1 dark:ring-white/10 shadow-2xl bg-card">
             <AvatarImage
               src={profile.image ?? undefined}
               alt={dict.profile.alt_avatar}
               className="object-cover"
             />
-            <AvatarFallback className="text-4xl font-bold text-foreground">
+            <AvatarFallback className="text-4xl font-bold text-foreground bg-muted">
               {(profile.name || profile.username || "U").charAt(0)}
             </AvatarFallback>
           </Avatar>

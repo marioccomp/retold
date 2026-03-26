@@ -28,7 +28,6 @@ type Props = {
   searchQuery: string;
   onPageChange?: (page: number) => void;
   sort?: "newest" | "oldest" | "popular";
-  onSortChange?: (sort: "newest" | "oldest" | "popular") => void;
 };
 
 // Tipo adaptado para o overlay (campos mínimos necessários)
@@ -54,7 +53,6 @@ export default function ProjectsSection({
   profile,
   onPageChange,
   sort,
-  onSortChange,
 }: Props) {
   const { dict } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
@@ -162,30 +160,7 @@ export default function ProjectsSection({
 
   return (
     <>
-      {/* Sorting Control */}
-      {onSortChange && filteredProjects.length > 0 && (
-        <div className="col-span-full flex">
-          <Select
-            value={sort}
-            onValueChange={(val: "newest" | "oldest" | "popular") => onSortChange(val)}
-          >
-            <SelectTrigger className="w-[180px] bg-background border-border cursor-pointer">
-              <SelectValue placeholder={dict.feed.sort.placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest" className="cursor-pointer">
-                {dict.feed.sort.newest}
-              </SelectItem>
-              <SelectItem value="oldest" className="cursor-pointer">
-                {dict.feed.sort.oldest}
-              </SelectItem>
-              <SelectItem value="popular" className="cursor-pointer">
-                {dict.feed.sort.popular}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {/* Projects Grid */}
 
       {ownProfile && searchQuery === "" && (
         <Button
