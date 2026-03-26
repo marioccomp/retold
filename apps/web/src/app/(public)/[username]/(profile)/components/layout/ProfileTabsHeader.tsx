@@ -36,7 +36,7 @@ export default function ProfileTabsHeader({
   return (
     <div className="w-full flex flex-col animate-[fadeIn_0.5s_ease-out]">
       {/* Upper Row: Tabs & Search Bar with generous spacing */}
-      <div className="flex flex-col md:flex-row gap-8 lg:gap-16 items-stretch md:items-center w-full min-h-[44px] mb-8">
+      <div className="flex flex-col md:flex-row gap-12 lg:gap-24 items-stretch md:items-center w-full min-h-[44px] mb-8">
         <TabsList className="bg-transparent p-0 h-auto gap-8 justify-start flex-shrink-0 overflow-x-auto custom-scrollbar-hide">
           {tabItems.map((tab) => (
             <TabsTrigger
@@ -65,7 +65,7 @@ export default function ProfileTabsHeader({
 
       {/* Lower Row: Sorting Option - Positioned closer to the content below */}
       <div
-        className={`w-full flex flex-col sm:flex-row items-center gap-4 transition-all duration-300 mb-6 ${activeTab === "projects" ? "opacity-100 h-auto visible" : "opacity-0 h-0 invisible overflow-hidden"}`}
+        className={`w-full flex flex-col sm:flex-row items-center gap-4 transition-all duration-300 mb-2 ${activeTab === "projects" ? "opacity-100 h-auto visible" : "opacity-0 h-0 invisible overflow-hidden"}`}
       >
         {/* Mobile Search */}
         <div className="md:hidden w-full mb-2">
