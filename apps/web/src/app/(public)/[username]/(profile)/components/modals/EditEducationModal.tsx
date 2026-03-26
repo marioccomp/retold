@@ -23,7 +23,9 @@ import { ComboboxInput } from "@/components/ui/combobox-input";
 import { INSTITUTIONS, getCourses } from "@/src/lib/education-options";
 import { useParams } from "next/navigation";
 
-const years = Array.from({ length: 60 }, (_, i) => new Date().getFullYear() + 5 - i);
+const currentYear = new Date().getFullYear();
+const pastYears = Array.from({ length: 60 }, (_, i) => currentYear - i);
+const futureYears = Array.from({ length: 15 }, (_, i) => (currentYear + 14) - i);
 const monthsPt = [
   "Janeiro",
   "Fevereiro",
@@ -64,15 +66,19 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
   const courses = getCourses(lang);
 
   const queryClient = useQueryClient();
-  const [educations, setEducations] = useState<Partial<EducationDTO>[]>(
+  const [educations, setEducations] = useState<(Partial<EducationDTO> & { isCurrent?: boolean })[]>(
     profile.educations?.length > 0
-      ? profile.educations
+      ? profile.educations.map((edu) => ({
+          ...edu,
+          isCurrent: !edu.endDate || new Date(edu.endDate) > new Date(),
+        }))
       : [
           {
             degree: "",
             institution: "",
             startDate: new Date().toISOString(),
             endDate: null,
+            isCurrent: true,
           },
         ]
   );
@@ -81,13 +87,17 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
     if (isOpen) {
       setEducations(
         profile.educations?.length > 0
-          ? profile.educations
+          ? profile.educations.map((edu) => ({
+              ...edu,
+              isCurrent: !edu.endDate || new Date(edu.endDate) > new Date(),
+            }))
           : [
               {
                 degree: "",
                 institution: "",
                 startDate: new Date().toISOString(),
                 endDate: null,
+                isCurrent: true,
               },
             ]
       );
@@ -116,21 +126,32 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
     value: any
   ) => {
     const newEdus = [...educations];
+    const currentEdu = { ...newEdus[index] };
+
     if (field === "isCurrent") {
-      // If we're setting it to current, we keep the end date if it exists
-      // but if it doesn't exist, we don't necessarily need to set it to something
-      // The user wants to be able to set a "previsão"
-      if (!value) {
-        // If unchecking "Currently", and there was no end date, set a default
-        if (!newEdus[index].endDate) {
-          newEdus[index].endDate = new Date().toISOString();
+      currentEdu.isCurrent = value;
+      if (value) {
+        // Se mudou para "Atualmente", e a data de término era passada ou nula, 
+        // definimos para uma data futura (ex: daqui a 1 ano) para manter a lógica de "previsão"
+        const now = new Date();
+        if (!currentEdu.endDate || new Date(currentEdu.endDate) <= now) {
+          const futureDate = new Date();
+          futureDate.setFullYear(now.getFullYear() + 1);
+          currentEdu.endDate = futureDate.toISOString();
+        }
+      } else {
+        // Se desmarcou "Atualmente", e a data de término era futura ou nula,
+        // definimos para a data atual
+        const now = new Date();
+        if (!currentEdu.endDate || new Date(currentEdu.endDate) > now) {
+          currentEdu.endDate = now.toISOString();
         }
       }
-      // We don't nullify anymore when checking "Currently"
-      // Instead, we'll use a virtual isCurrent in the UI
     } else {
-      newEdus[index] = { ...newEdus[index], [field]: value };
+      (currentEdu as any)[field] = value;
     }
+
+    newEdus[index] = currentEdu;
     setEducations(newEdus);
   };
 
@@ -142,6 +163,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
         institution: "",
         startDate: new Date().toISOString(),
         endDate: null,
+        isCurrent: true,
       },
     ]);
   };
@@ -154,6 +176,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
           institution: "",
           startDate: new Date().toISOString(),
           endDate: null,
+          isCurrent: true,
         },
       ]);
     } else {
@@ -305,7 +328,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                           handleUpdateEducation(idx, "startDate", date.toISOString());
                         }}
                       >
-                        <SelectTrigger className="flex-1 h-10 rounded-[10px] border-border focus:ring-primary/30">
+                        <SelectTrigger className="flex-1 h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer">
                           <SelectValue placeholder={dict.profile.edit_section_modal.month} />
                         </SelectTrigger>
                         <SelectContent className="bg-popover" position="popper">
@@ -327,11 +350,11 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                           handleUpdateEducation(idx, "startDate", date.toISOString());
                         }}
                       >
-                        <SelectTrigger className="w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30">
+                        <SelectTrigger className="w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer">
                           <SelectValue placeholder={dict.profile.edit_section_modal.year} />
                         </SelectTrigger>
                         <SelectContent className="bg-popover" position="popper">
-                          {years.map((y) => (
+                          {pastYears.map((y) => (
                             <SelectItem key={y} value={y.toString()} className="cursor-pointer">
                               {y}
                             </SelectItem>
@@ -342,7 +365,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                      {!edu.endDate || new Date(edu.endDate) > new Date()
+                      {edu.isCurrent
                         ? dict.profile.edit_section_modal.expected_end_label
                         : dict.profile.edit_section_modal.end_label}
                     </Label>
@@ -358,7 +381,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                         >
                           <SelectTrigger
                             className={cn(
-                              "flex-1 h-10 rounded-[10px] border-border focus:ring-primary/30"
+                              "flex-1 h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer"
                             )}
                           >
                             <SelectValue placeholder={dict.profile.edit_section_modal.month} />
@@ -382,13 +405,13 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                         >
                           <SelectTrigger
                             className={cn(
-                              "w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30"
+                              "w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer"
                             )}
                           >
                             <SelectValue placeholder={dict.profile.edit_section_modal.year} />
                           </SelectTrigger>
                           <SelectContent className="bg-popover" position="popper">
-                            {years.map((y) => (
+                            {(edu.isCurrent ? futureYears : pastYears).map((y) => (
                               <SelectItem key={y} value={y.toString()} className="cursor-pointer">
                                 {y}
                               </SelectItem>
@@ -400,18 +423,8 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                       <div className="flex items-center gap-2 px-1">
                         <Checkbox
                           id={`current-${idx}`}
-                          checked={!edu.endDate || new Date(edu.endDate) > new Date()}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              // If checking "Currently", we can keep the date but mark it as current
-                              // Since we don't have a separate field, we just don't nullify
-                            } else {
-                              // If unchecking, and date is in future, maybe set to now
-                              if (edu.endDate && new Date(edu.endDate) > new Date()) {
-                                handleUpdateEducation(idx, "endDate", new Date().toISOString());
-                              }
-                            }
-                          }}
+                          checked={edu.isCurrent}
+                          onCheckedChange={(checked) => handleUpdateEducation(idx, "isCurrent", checked)}
                           className="cursor-pointer"
                         />
                         <label
