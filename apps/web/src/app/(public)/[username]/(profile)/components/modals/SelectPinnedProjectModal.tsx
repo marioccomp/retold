@@ -94,7 +94,6 @@ export default function SelectPinnedProjectModal({ isOpen, onClose, unpinnedProj
               className="bg-muted/30 border-border pl-11 py-7 text-lg rounded-2xl focus-visible:ring-primary focus-visible:ring-offset-0 transition-all placeholder:text-muted-foreground/50"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              autoFocus
             />
           </div>
         </div>
