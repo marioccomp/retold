@@ -109,7 +109,7 @@ export default function ProjectCard({
 
         {/* Longer Description Overlay */}
         <div
-          className="absolute inset-0 bg-background/90 dark:bg-card/95 text-foreground dark:text-foreground flex flex-col z-[2] transition-opacity duration-300
+          className="absolute inset-0 bg-neutral-950/90 dark:bg-card/95 text-white flex flex-col z-[2] transition-opacity duration-300
           max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border border-b border-border/10"
         >
@@ -129,7 +129,7 @@ export default function ProjectCard({
                   {ownerName.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <p className="max-[650px]:text-[0.9rem] max-[650px]:font-semibold group-hover/creator:text-primary transition-colors duration-200">
+              <p className="text-white dark:text-foreground max-[650px]:text-[0.9rem] max-[650px]:font-semibold group-hover/creator:text-primary transition-colors duration-200">
                 {ownerName}
               </p>
             </Link>
@@ -143,7 +143,7 @@ export default function ProjectCard({
             )}
           </div>
           <div
-            className="text-[15px] leading-relaxed text-muted-foreground mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
+            className="text-[15px] leading-relaxed text-white/70 dark:text-muted-foreground mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
             max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:line-clamp-3"
           >
             <p className="whitespace-pre-wrap">{project.description}</p>
