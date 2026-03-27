@@ -4,47 +4,19 @@ import { ipRateLimit, bruteForceRateLimit, protectionRateLimit } from "@/lib/red
 import { getClientIp } from "@/lib/get-client-ip";
 import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
 
-export async function loginUser(identifier: string, password: string) {
+export async function checkLoginRateLimit(identifier: string) {
   const login = identifier.toLowerCase().trim();
   const ip = await getClientIp();
 
   const bruteForceKey = `${ip}:${login}`;
 
-  const ipResult = await ipRateLimit.limit(ip);
+  const [ipResult, bruteResult, protectionResult] = await Promise.all([
+    ipRateLimit.limit(ip),
+    bruteForceRateLimit.limit(bruteForceKey),
+    protectionRateLimit.limit(login),
+  ]);
 
-  if (!ipResult.success) {
+  if (!ipResult.success || !bruteResult.success || !protectionResult.success) {
     throw new TooManyLoginAttemptsError();
   }
-
-  const bruteResult = await bruteForceRateLimit.limit(bruteForceKey);
-  if (!bruteResult.success) {
-    throw new TooManyLoginAttemptsError();
-  }
-
-  const protectionResult = await protectionRateLimit.limit(login);
-
-  if (!protectionResult.success) {
-    throw new TooManyLoginAttemptsError();
-  }
-
-  const user = await userRepository.findByEmailOrUsername(login, login);
-
-  if (!user || !user.password) {
-    throw new InvalidCredentialsError();
-  }
-
-  const isPasswordCorrect = await bcrypt.compare(password.trim(), user.password);
-
-  if (!isPasswordCorrect) {
-    throw new InvalidCredentialsError();
-  }
-
-  return {
-    id: String(user.id),
-    role: user.role,
-    plan: user.plan,
-    name: user.name,
-    image: user.image,
-    username: user.username,
-  };
 }

@@ -141,7 +141,7 @@ export function NotificationBell() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-80 mt-2 p-0 rounded-xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl overflow-hidden"
+        className="w-[calc(100vw-2rem)] sm:w-[380px] mt-2 p-0 rounded-xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl overflow-hidden"
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
           <span className="font-semibold text-sm">
@@ -211,8 +211,8 @@ export function NotificationBell() {
                         {sourceUser.name?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col gap-1 min-w-0 flex-1 pr-8">
-                      <p className="text-sm text-foreground leading-tight">
+                    <div className="flex flex-col gap-1 min-w-0 flex-1 pr-16">
+                      <p className="text-sm text-foreground leading-tight break-words">
                         <span className="font-medium mr-1">{sourceUser.name}</span>
                         <span className="text-muted-foreground mr-1">
                           {type === "FOLLOW" 
@@ -222,7 +222,7 @@ export function NotificationBell() {
                               : (dict.notifications?.types?.comment || "commented on your project")}
                         </span>
                         {project && type !== "FOLLOW" && (
-                          <span className="font-medium truncate break-words">
+                          <span className="font-medium break-words">
                             {project.title}
                           </span>
                         )}
@@ -235,7 +235,7 @@ export function NotificationBell() {
                       </span>
                     </div>
                     {/* Action buttons */}
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity flex items-center gap-0.5">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity flex items-center gap-1">
                       {!notification.read && (
                         <Button
                           variant="ghost"

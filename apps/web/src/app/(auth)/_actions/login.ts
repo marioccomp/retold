@@ -1,10 +1,11 @@
 "use server";
 
 import { z } from "zod";
+import { AuthError } from "next-auth";
 import { signIn } from "@/src/domains/auth/auth";
 import type { ActionResponse } from "@/lib/action-response";
 import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
-import { loginUser } from "@/src/domains/auth/services/login.service";
+import { checkLoginRateLimit } from "@/src/domains/auth/services/login.service";
 import { getDictionary } from "@/src/i18n/server";
 
 export async function login(formData: FormData): Promise<ActionResponse> {
@@ -27,8 +28,10 @@ export async function login(formData: FormData): Promise<ActionResponse> {
   }
 
   try {
-    await loginUser(parsed.data.identifier, parsed.data.password); // Atualmente duplica a busca no banco com o signIn abaixo, mas fazemos isso para tratar os erros corretamente (ANOTADO NO NOTION)
+    // Step 1: Redis Rate Limiting ONLY
+    await checkLoginRateLimit(parsed.data.identifier);
 
+    // Step 2: NextAuth Session Creation (DB + Bcrypt happen here ONLY)
     await signIn("credentials", {
       ...parsed.data,
       redirect: false,
@@ -36,7 +39,6 @@ export async function login(formData: FormData): Promise<ActionResponse> {
 
     return { success: true };
   } catch (error: unknown) {
-    console.log(error);
     if (error instanceof TooManyLoginAttemptsError) {
       return {
         success: false,
@@ -51,7 +53,15 @@ export async function login(formData: FormData): Promise<ActionResponse> {
       };
     }
 
-    console.error("Login error:", error);
+    // Se o NextAuth (CredentialsSignin) falhar no authorize, ele cai aqui como AuthError.
+    if (error instanceof AuthError) {
+      return {
+        success: false,
+        message: dict.auth.errors.incorrect_credentials,
+      };
+    }
+
+    console.error("Login error (Unknown):", error);
 
     return {
       success: false,
