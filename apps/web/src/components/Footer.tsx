@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import logo from "@/assets/logo-full.svg";
 import logoDark from "@/assets/logo-full-dark.svg";
 import { Button } from "@/components/ui/button";
@@ -13,15 +14,23 @@ import { useTheme } from "next-themes";
 export default function Footer() {
   const { dict } = useTranslation();
   const currentYear = new Date().getFullYear();
-  const { theme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const isAuthRoute = ["/login", "/register", "/forgot-password", "/reset-password"].includes(
+    pathname
+  );
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return (
-    <footer className="w-full border-t border-border bg-background backdrop-blur-sm mt-32 md:mt-48">
+    <footer
+      className={`w-full border-t border-border bg-background backdrop-blur-sm ${
+        isAuthRoute ? "mt-0" : "mt-32 md:mt-48"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 py-8 md:py-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           {/* Logo and Copyright */}

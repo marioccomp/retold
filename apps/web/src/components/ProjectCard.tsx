@@ -138,7 +138,7 @@ export default function ProjectCard({
                 targetUserId={project.ownerId}
                 initialIsFollowing={project.isFollowingOwner ?? false}
                 variant="ghost"
-                className="h-8 px-4 text-[11px] font-bold uppercase tracking-[0.1em] shadow-sm active:scale-95 transition-all"
+                className="h-8 px-4 text-[11px] font-bold uppercase tracking-[0.1em] active:scale-95 transition-all"
               />
             )}
           </div>

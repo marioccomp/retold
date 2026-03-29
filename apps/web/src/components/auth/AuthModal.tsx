@@ -19,7 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
-import retoldImg from "@/assets/retold-login.png";
+import logoFull from "@/assets/logo-full.svg";
+import logoFullDark from "@/assets/logo-full-dark.svg";
+import { useTheme } from "next-themes";
 
 export default function AuthModal() {
   const { isOpen, closeLoginModal } = useAuthModal();
@@ -27,6 +29,7 @@ export default function AuthModal() {
   const router = useRouter();
   const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   // Reset state when opening? Not strictly necessary if unmounted, but good practice.
   // Actually, Dialog unmounts content by default usually, but my custom implementation might not.
@@ -89,8 +92,12 @@ export default function AuthModal() {
 
         <div className="p-8 pb-10">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <Image src={retoldImg} alt="Retold Logo" className="w-40 h-auto" />
+          <div className="flex justify-center mb-2">
+            <Image
+              src={resolvedTheme === "dark" ? logoFullDark : logoFull}
+              alt="Retold Logo"
+              className="w-48 h-auto -mt-10 -mb-14"
+            />
           </div>
 
           {/* Header */}
