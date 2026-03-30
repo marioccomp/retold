@@ -110,7 +110,7 @@ export default function ProjectCard({
         {/* Longer Description Overlay */}
         <div
           className="absolute inset-0 bg-neutral-950/90 dark:bg-card/95 text-white flex flex-col z-[2] transition-opacity duration-300
-          max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
+          max-[650px]:h-auto max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:px-4 max-[650px]:pt-3 max-[650px]:pb-2
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border border-b border-border/10"
         >
           <div className="flex items-center gap-2.5 mb-3 max-[650px]:mb-2 max-[650px]:gap-2">
@@ -144,7 +144,7 @@ export default function ProjectCard({
           </div>
           <div
             className="text-[15px] leading-relaxed text-white/70 dark:text-muted-foreground mb-3 line-clamp-[7] overflow-hidden text-ellipsis break-words
-            max-[650px]:text-[14px] max-[650px]:leading-snug max-[650px]:line-clamp-3"
+            max-[650px]:text-[13px] max-[650px]:leading-snug max-[650px]:line-clamp-4 max-[650px]:mb-1"
           >
             <p className="whitespace-pre-wrap">{project.description}</p>
           </div>
@@ -226,7 +226,7 @@ export default function ProjectCard({
               onClick={(e) => e.stopPropagation()}
               title={project.repositoryFullName || "View Code"}
             >
-              <FaGithub size={20} />
+              <FaGithub size={18} />
             </a>
           )}
 
@@ -237,13 +237,13 @@ export default function ProjectCard({
             {isLiked ? (
               <MdFavorite
                 className={`text-[#ff4d4d] ${animateLike ? "animate-[heartPop_0.45s_cubic-bezier(0.175,0.885,0.32,1.275)]" : ""}`}
-                size={22}
+                size={20}
                 onAnimationEnd={() => setAnimateLike(false)}
               />
             ) : (
               <MdFavoriteBorder
                 className="text-muted-foreground transition-colors duration-200 group-hover/like:text-[#ff4d4d]"
-                size={22}
+                size={20}
               />
             )}
             <p
@@ -253,11 +253,11 @@ export default function ProjectCard({
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2">
-            <MessageCircle size={18} className="text-muted-foreground/80 -translate-y-[1px]" />
+            <MessageCircle size={18} strokeWidth={2} className="text-muted-foreground" />
             <p>{project.commentsCount}</p>
           </div>
           <div className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2">
-            <MdOutlineVisibility size={22} />
+            <MdOutlineVisibility size={20} />
             <p>{viewsCount}</p>
           </div>
         </div>

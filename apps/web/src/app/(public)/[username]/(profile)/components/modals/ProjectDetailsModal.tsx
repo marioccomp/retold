@@ -37,7 +37,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, project }: Props)
       }}
     >
       <div 
-        className="relative w-full max-w-7xl h-[96dvh] md:h-auto md:max-h-[90dvh] bg-background rounded-t-[2.5rem] md:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 flex flex-col overflow-hidden"
+        className="relative w-full max-w-7xl h-[96dvh] md:h-auto md:max-h-[90dvh] bg-background rounded-t-[2.5rem] md:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 flex flex-col overflow-hidden dark:border-t-2 dark:border-t-primary dark:md:border-t-0 dark:md:border dark:md:border-border"
         style={{ isolation: 'isolate', transform: 'translateZ(0)' }}
       >
         {/* Scrollable Content Area - Mobile: Full height bottom sheet style */}
