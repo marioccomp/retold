@@ -1,0 +1,206 @@
+/* ── Onboarding Animations & Effects ── */
+
+/* Slide container */
+.onboarding-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Glassmorphism card */
+.onboarding-glass {
+  background: oklch(1 0 0 / 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid oklch(0.92 0.01 155 / 0.5);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 20px 60px -15px rgba(0, 0, 0, 0.12),
+    0 4px 20px -5px rgba(0, 0, 0, 0.06);
+}
+
+.dark .onboarding-glass {
+  background: oklch(0.20 0.02 155 / 0.6);
+  border-color: oklch(0.35 0.02 155 / 0.4);
+  box-shadow:
+    0 20px 60px -15px rgba(0, 0, 0, 0.4),
+    0 4px 20px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Mesh gradient background */
+.onboarding-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.onboarding-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 50% at 70% 20%, oklch(0.79 0.17 150 / 0.15), transparent 60%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, oklch(0.79 0.17 150 / 0.08), transparent 50%),
+    radial-gradient(ellipse 60% 30% at 90% 70%, oklch(0.60 0.22 145 / 0.06), transparent 50%);
+}
+
+.dark .onboarding-bg::before {
+  background:
+    radial-gradient(ellipse 50% 50% at 70% 20%, oklch(0.40 0.12 150 / 0.20), transparent 60%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, oklch(0.35 0.10 180 / 0.12), transparent 50%),
+    radial-gradient(ellipse 60% 30% at 90% 70%, oklch(0.35 0.15 145 / 0.08), transparent 50%);
+}
+
+/* Pulsing hotspot for profile features */
+@keyframes hotspot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.79 0.17 150 / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px oklch(0.79 0.17 150 / 0);
+  }
+}
+
+.onboarding-hotspot {
+  animation: hotspot-pulse 2s ease-in-out infinite;
+  border: 2px solid oklch(0.79 0.17 150 / 0.6);
+  border-radius: 9999px;
+}
+
+/* Count-up number animation */
+@keyframes count-glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 20px oklch(0.79 0.17 150 / 0.5);
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+
+.onboarding-count {
+  animation: count-glow 1.5s ease-in-out;
+}
+
+/* CTA glow button */
+@keyframes cta-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px oklch(0.79 0.17 150 / 0.3),
+      0 0 40px oklch(0.79 0.17 150 / 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 30px oklch(0.79 0.17 150 / 0.5),
+      0 0 60px oklch(0.79 0.17 150 / 0.2);
+  }
+}
+
+.onboarding-cta-glow {
+  animation: cta-glow 2.5s ease-in-out infinite;
+}
+
+/* Step checkmark animation */
+@keyframes check-appear {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.onboarding-check {
+  animation: check-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Heart bounce for community slide */
+@keyframes heart-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.25);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+}
+
+.onboarding-heart {
+  animation: heart-bounce 1.2s ease-in-out infinite;
+}
+
+/* Comment bubble slide-in */
+@keyframes bubble-in {
+  0% {
+    transform: translateY(10px) scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.onboarding-bubble {
+  animation: bubble-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Progress bar transition */
+.onboarding-progress {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dot grid pattern */
+.onboarding-dots {
+  background-image: radial-gradient(circle, oklch(0.79 0.17 150 / 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.dark .onboarding-dots {
+  background-image: radial-gradient(circle, oklch(0.79 0.17 150 / 0.04) 1px, transparent 1px);
+}
+
+/* Browser frame */
+.onboarding-browser-frame {
+  border-radius: 12px;
+  border: 1px solid oklch(0.92 0.01 155 / 0.6);
+  overflow: hidden;
+  box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.15);
+}
+
+.dark .onboarding-browser-frame {
+  border-color: oklch(0.35 0.02 155 / 0.5);
+  box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating animation for visual elements */
+@keyframes onboarding-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.onboarding-float {
+  animation: onboarding-float 4s ease-in-out infinite;
+}

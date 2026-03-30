@@ -100,7 +100,7 @@ export default function ProjectCard({
       onClick={handleCardClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      <div className="w-full h-[320px] min-[650px]:h-[260px] relative overflow-hidden">
+      <div className="w-full h-[220px] min-[650px]:h-[180px] relative overflow-hidden">
         <img
           src={project.images?.[0] || emptyImage.src}
           alt="Imagem do projeto"
@@ -172,8 +172,8 @@ export default function ProjectCard({
         )}
       </div>
 
-      <div className="flex flex-col w-full max-[650px]:flex-row max-[650px]:items-start max-[650px]:justify-between max-[650px]:p-[16px_20px] max-[650px]:gap-2.5 max-[650px]:bg-card max-[380px]:p-[14px_12px]">
-        <div className="p-[20px_24px_10px_24px] max-[650px]:p-0 max-[650px]:flex-1 max-[650px]:min-w-0 max-[650px]:mr-3">
+      <div className="flex flex-col w-full flex-1 max-[650px]:flex-row max-[650px]:items-start max-[650px]:justify-between max-[650px]:p-[16px_20px] max-[650px]:gap-2.5 max-[650px]:bg-card max-[380px]:p-[14px_12px]">
+        <div className="p-[20px_24px_10px_24px] flex-1 max-[650px]:p-0 max-[650px]:flex-1 max-[650px]:min-w-0 max-[650px]:mr-3">
           <div className="flex items-center gap-2">
             <h3
               className="text-[18px] font-bold text-foreground m-0 line-clamp-2 overflow-hidden text-ellipsis whitespace-normal
@@ -193,10 +193,8 @@ export default function ProjectCard({
               </div>
             )}
           </div>
-          <p className="text-muted-foreground text-[14px] mt-1 max-[650px]:hidden break-words whitespace-pre-wrap">
-            {project.description && project.description.length > 80
-              ? `${project.description.slice(0, 80)}...`
-              : project.description}
+          <p className="text-muted-foreground text-[14px] mt-1 max-[650px]:hidden break-words whitespace-pre-wrap line-clamp-2 overflow-hidden text-ellipsis">
+            {project.description}
           </p>
           {project.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
