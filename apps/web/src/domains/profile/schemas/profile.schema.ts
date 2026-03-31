@@ -38,7 +38,7 @@ export const getProfileSchema = (dict: any) => z.object({
             .refine(
                 (val) => {
                     if (!val || val === "") return true;
-                    const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
+                    const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_\-%À-ÿ]+\/?$/;
                     return linkedinRegex.test(val);
                 },
                 { message: dict.validation.linkedin_invalid }

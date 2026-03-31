@@ -16,35 +16,50 @@ export const authConfig = {
         token.name = user.name;
         token.image = user.image;
         token.username = (user as any).username;
+        token.hasCompletedOnboarding = (user as any).hasCompletedOnboarding;
         token.hasPassword =
           "hasPassword" in user ? (user as any).hasPassword : !!(user as any).password;
       }
 
-      // When session.update() is called, fetch fresh user data from DB
+      // When session.update() is called
       if (trigger === "update" && token.id) {
+        // Handle explicit updates passed to update()
+        if (session?.user?.hasCompletedOnboarding !== undefined) {
+          token.hasCompletedOnboarding = session.user.hasCompletedOnboarding;
+        }
         if (session?.user?.username) {
           token.username = session.user.username;
-        } else {
-          const { prisma } = await import("@repo/database");
-          const freshUser = await prisma.user.findUnique({
-            where: { id: Number(token.id) },
-            select: {
-              username: true,
-              name: true,
-              image: true,
-              role: true,
-              plan: true,
-              password: true,
-            },
-          });
-          if (freshUser) {
-            token.username = freshUser.username;
-            token.name = freshUser.name;
-            token.image = freshUser.image;
-            token.role = freshUser.role;
-            token.plan = freshUser.plan;
-            token.hasPassword =
-              session?.hasPassword !== undefined ? session.hasPassword : !!freshUser.password;
+        }
+
+        // If no explicit data was passed, or if we want to sync with DB
+        // We only do this if we haven't already updated the relevant flags
+        if (session?.user?.hasCompletedOnboarding === undefined && !session?.user?.username) {
+          try {
+            const { prisma } = await import("@repo/database");
+            const freshUser = await prisma.user.findUnique({
+              where: { id: Number(token.id) },
+              select: {
+                username: true,
+                name: true,
+                image: true,
+                role: true,
+                plan: true,
+                password: true,
+                hasCompletedOnboarding: true,
+              },
+            });
+            if (freshUser) {
+              token.username = freshUser.username;
+              token.name = freshUser.name;
+              token.image = freshUser.image;
+              token.role = freshUser.role;
+              token.plan = freshUser.plan;
+              token.hasCompletedOnboarding = freshUser.hasCompletedOnboarding;
+              token.hasPassword =
+                session?.hasPassword !== undefined ? session.hasPassword : !!freshUser.password;
+            }
+          } catch (error) {
+            console.error("JWT Update Error:", error);
           }
         }
       }
@@ -63,6 +78,7 @@ export const authConfig = {
         session.user.name = token.name as string;
         session.user.image = token.image as string;
         session.user.username = token.username as string;
+        session.user.hasCompletedOnboarding = token.hasCompletedOnboarding as boolean;
         session.user.hasPassword = token.hasPassword as boolean;
       }
 
@@ -77,6 +93,7 @@ export const authConfig = {
       const role = auth?.user?.role;
       const plan = auth?.user?.plan;
       const username = auth?.user?.username;
+      const hasCompletedOnboarding = auth?.user?.hasCompletedOnboarding;
 
       const pathname = nextUrl.pathname;
 
@@ -99,6 +116,11 @@ export const authConfig = {
       // Redireciona apenas se NÃO for rota pública e NÃO for rota de perfil
       if (isLoggedIn && !username && !isPublicRoute) {
         return NextResponse.redirect(new URL("/choose-username", nextUrl));
+      }
+
+      // Mandatory redirection to onboarding for newcomers
+      if (isLoggedIn && username && hasCompletedOnboarding === false && !isPublicRoute && pathname !== "/onboarding") {
+        return NextResponse.redirect(new URL("/onboarding", nextUrl));
       }
 
 
@@ -132,6 +154,7 @@ declare module "next-auth" {
     plan?: string;
     username?: string | null;
     hasPassword?: boolean;
+    hasCompletedOnboarding?: boolean;
   }
 
   interface Session {

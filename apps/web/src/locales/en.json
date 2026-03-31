@@ -360,7 +360,8 @@
     "login": "Login",
     "profile": "Profile",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "tour": "Guided Tour"
   },
   "about": {
     "title": "About Retold",
@@ -570,7 +571,7 @@
     "name_max": "Name must have at most 20 characters",
     "username_min": "Username must have at least 3 characters",
     "username_max": "Username must have at most 20 characters",
-    "username_regex": "Username can only contain letters, numbers, underscores, and hyphens",
+    "username_regex": "Username can only contain lowercase letters, numbers, underscores, and hyphens",
     "current_password_required": "Current password is required",
     "confirm_password_required": "Confirm password is required",
     "title_max": "Title must have at most 50 characters",
@@ -690,7 +691,7 @@
       "continue": "Continue",
       "setting_up": "Setting up...",
       "preview_label": "Your profile will be available at:",
-      "help_text": "3–20 characters, letters, numbers, underscores, and hyphens only",
+      "help_text": "3–20 characters, lowercase letters, numbers, underscores, and hyphens only",
       "checking": "Checking username...",
       "available": "Username available"
     }
@@ -782,6 +783,122 @@
       "lgpd_rights_text": "Depending on your location, you have the right to: (a) Access your personal data; (b) Correct inaccuracies; (c) Request deletion; (d) Withdraw consent at any time via your account settings.",
       "cookies_title": "9. Cookie Usage",
       "cookies_text": "We use essential cookies for Retold's operation, including: (a) Authentication and Security; (b) Language Preferences; and (c) Session Processing. These cookies are necessary to protect your account and provide the requested service."
+    }
+  },
+  "onboarding": {
+    "nav": {
+      "next": "Next",
+      "prev": "Back",
+      "skip": "Skip",
+      "start": "Get Started"
+    },
+    "welcome": {
+      "title": "Welcome to Retold",
+      "subtitle": "More than code, show impact. The platform where developers build authority through real projects.",
+      "badge_portfolio": "Free Portfolio",
+      "badge_feedback": "Community Feedback",
+      "badge_ai": "AI-Powered Analysis"
+    },
+    "feed": {
+      "badge": "Discover",
+      "title": "Explore real projects",
+      "subtitle": "Discover projects from other developers, filter by tags, search by interest, and find inspiration for your next creation.",
+      "feature_search": "Search projects by name or technology",
+      "feature_filter": "Filter by category and sort results",
+      "feature_tags": "Explore tags like React, Node, Python...",
+      "search_placeholder": "Search projects, tags...",
+      "tab_projects": "Projects",
+      "tab_people": "People"
+    },
+    "project": {
+      "badge": "Powered by AI",
+      "title": "Smart code analysis",
+      "subtitle": "Retold analyzes your GitHub repository and generates a complete technical report: executive summary, detected tech stack, architecture, and improvement suggestions.",
+      "stat_files": "Files",
+      "stat_code": "Code",
+      "stat_config": "Config",
+      "stat_tests": "Tests",
+      "mock_title": "Project Analysis",
+      "mock_repo": "github.com/user/project",
+      "summary_title": "Executive Summary",
+      "mock_tabs": {
+        "analysis": "Analysis (AI)",
+        "comments": "Comments",
+        "commits": "Commits"
+      },
+      "mock_stats": {
+        "languages": "Languages",
+        "files": "Files",
+        "dependencies": "Dependencies",
+        "health": "Health",
+        "production": "Production Ready",
+        "sub_languages": "JavaScript, CSS, HTML",
+        "sub_files": "28 KB",
+        "sub_dependencies": "Next.js"
+      },
+      "mock_content": {
+        "what_it_does": "What does this project do?",
+        "what_it_does_text": "The project is a pedagogical simulator designed to demonstrate processor scheduling algorithms (FIFO, SJF, and Round-Robin) in an interactive web interface.",
+        "strengths": "Key Strengths",
+        "strength_1_title": "Clear Visualization",
+        "strength_1_text": "Transforms abstract theory into intuitive visual diagrams.",
+        "strength_2_title": "Classic Algorithms",
+        "strength_2_text": "Contains solid implementations of core schedulers.",
+        "architecture": "Project Architecture",
+        "architecture_text": "React-based frontend application (Next.js) running entirely client-side. Separate components handle process queues and the Gantt chart."
+      }
+    },
+    "profile": {
+      "badge": "Your Portfolio",
+      "title": "Your profile, your story",
+      "subtitle": "Add a photo, bio, skills, education, and social links. Your profile works as a complete professional portfolio.",
+      "feature_photo": "Profile photo & custom cover",
+      "feature_skills": "Skills & technologies you master",
+      "feature_education": "Academic background & certifications",
+      "feature_social": "GitHub, LinkedIn & personal website",
+      "mock_bio": "Focused on building scalable solutions from zero to deploy",
+      "mock_long_bio": "Computer Science student at UFRRJ. Fullstack Developer with hands-on experience in React, Next.js, Node, and databases. Focused on scalable architectures and real-world products.",
+      "stat_views": "views",
+      "stat_likes": "likes",
+      "stat_followers": "followers",
+      "stat_following": "following",
+      "mock_role": "Fullstack Developer",
+      "mock_date": "Jan 22, 2026",
+      "mock_pr": "Merge pull request #1 from mariocomp/mariocomp-patch-1 Add instructions for running the main file"
+    },
+    "create": {
+      "badge": "Quick & Easy",
+      "title": "Publish your first project",
+      "subtitle": "Connect your GitHub, choose a repository, add images and a description. In less than 2 minutes, your project is live.",
+      "step_1": "Fill in the title and description of your project",
+      "step_2": "Select a GitHub repository and add images",
+      "step_3": "Click publish — AI takes care of the rest",
+      "step1_title": "Connect GitHub",
+      "step1_desc": "Link your GitHub account to import your repositories.",
+      "step2_title": "Choose a repository",
+      "step2_desc": "Select the project you want to showcase on your portfolio.",
+      "step3_title": "Publish",
+      "step3_desc": "Add images, a description, and your project goes live instantly.",
+      "mock_description": "Interactive process scheduling algorithm simulator with real-time visualization.",
+      "cta_text": "It's fast, easy, and completely free.",
+      "mock_title_input": "Scheduling Simulator",
+      "mock_repo": "mariojr/scheduler"
+    },
+    "final": {
+      "title": "Join the community",
+      "subtitle": "Like projects, leave constructive feedback, follow developers, and receive notifications. Build your network.",
+      "feature_like": "Like projects",
+      "feature_comment": "Comment & feedback",
+      "feature_follow": "Follow developers",
+      "cta_hint": "Click 'Get Started' to begin your journey",
+      "mock_comment_user": "John Smith",
+      "mock_comment_username": "johnsmith",
+      "mock_comment_text": "Sensational! The architecture is very clean.",
+      "mock_comment_time": "2 hours ago",
+      "mock_reply_user": "Mario",
+      "mock_reply_username": "mariojr",
+      "mock_reply_text": "Thanks John! I focused a lot on SOLID in this one.",
+      "mock_reply_time": "1 hour ago"
     }
   }
 }

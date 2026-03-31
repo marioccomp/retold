@@ -2,7 +2,8 @@
 
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { FEED_RECOMMENDED_TAG } from "@/src/app/(public)/(feed)/actions/constants";
 import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 import { lastCommitQueue } from "@repo/queue";
 
@@ -46,5 +47,8 @@ export async function deleteProjectAction(projectId: number) {
   }
 
   revalidatePath(`/${session.user.username}`);
+  // @ts-ignore
+  revalidateTag(FEED_RECOMMENDED_TAG);
+  revalidatePath("/");
   return { success: true };
 }

@@ -3,6 +3,7 @@
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { FEED_RECOMMENDED_TAG } from "@/src/app/(public)/(feed)/actions/constants";
 
 type UpdateProjectInput = {
   id: number;
@@ -45,6 +46,8 @@ export async function updateProjectAction(input: UpdateProjectInput) {
   });
 
   revalidatePath(`/${session.user.username}`);
+  // @ts-ignore
+  revalidateTag(FEED_RECOMMENDED_TAG);
   revalidatePath("/");
   return updatedProject;
 }

@@ -100,7 +100,7 @@ export default function ProjectCard({
       onClick={handleCardClick}
       style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      <div className="w-full h-[320px] min-[650px]:h-[260px] relative overflow-hidden">
+      <div className="w-full h-[320px] min-[650px]:aspect-video relative overflow-hidden">
         <img
           src={project.images?.[0] || emptyImage.src}
           alt="Imagem do projeto"
@@ -110,7 +110,7 @@ export default function ProjectCard({
         {/* Longer Description Overlay */}
         <div
           className="absolute inset-0 bg-neutral-950/90 dark:bg-card/95 text-white flex flex-col z-[2] transition-opacity duration-300
-          max-[650px]:h-auto max-[650px]:max-h-[80%] max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
+          max-[650px]:h-auto max-[650px]:top-auto max-[650px]:bottom-0 max-[650px]:opacity-100 max-[650px]:p-5
           min-[650px]:top-0 min-[650px]:h-full min-[650px]:p-6 min-[650px]:opacity-0 min-[650px]:group-hover:opacity-100 box-border border-b border-border/10"
         >
           <div className="flex items-center gap-2.5 mb-3 max-[650px]:mb-2 max-[650px]:gap-2">

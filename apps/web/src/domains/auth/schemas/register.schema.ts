@@ -23,6 +23,7 @@ export const getRegisterSchema = (dict: any) =>
         .min(3, dict.validation.username_min)
         .max(20, dict.validation.username_max)
         .regex(USERNAME_REGEX, dict.validation.username_regex)
+        .transform((u) => u.toLowerCase())
     ),
 
     email: z.preprocess(

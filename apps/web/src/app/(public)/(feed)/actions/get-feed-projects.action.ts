@@ -5,7 +5,7 @@ import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { auth } from "@/src/domains/auth/auth";
 import { unstable_cache } from "next/cache";
 
-export type ProjectSortType = "recommended" | "newest" | "oldest" | "popular";
+import { FEED_RECOMMENDED_TAG, ProjectSortType } from "./constants";
 
 export async function getFeedProjects(
   page: number = 1,
@@ -165,7 +165,7 @@ const getCachedScoredIds = unstable_cache(
     const [{ count: total }] = await prisma.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(*)::bigint as count
       FROM "Project" p
-      WHERE p.visibility = 'public' AND p.status = 'DONE'
+      WHERE p.visibility = 'public' AND p.status IN ('DONE', 'PENDING', 'ANALYZING')
     `;
 
     const scoredIds = await prisma.$queryRaw<{ id: number }[]>`
@@ -185,7 +185,7 @@ const getCachedScoredIds = unstable_cache(
         SELECT "projectId", COUNT(*)::int as cnt
         FROM "Like" GROUP BY "projectId"
       ) total_likes ON p.id = total_likes."projectId"
-      WHERE p.visibility = 'public' AND p.status = 'DONE'
+      WHERE p.visibility = 'public' AND p.status IN ('DONE', 'PENDING', 'ANALYZING')
       ORDER BY (
         (COALESCE(recent_likes.cnt, 0) * 5) +
         (COALESCE(recent_views.cnt, 0) * 0.5) +
@@ -198,7 +198,7 @@ const getCachedScoredIds = unstable_cache(
 
     return { total: Number(total), ids: scoredIds.map((r) => r.id) };
   },
-  ["feed-recommended-scoring"],
+  [FEED_RECOMMENDED_TAG],
   { revalidate: 30 } // 30 seconds
 );
 

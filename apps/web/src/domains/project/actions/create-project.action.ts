@@ -10,6 +10,8 @@ import { Project } from "@prisma/client";
 import { getDictionary } from "@/src/i18n/server";
 import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 import { lastCommitQueue } from "@repo/queue";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { FEED_RECOMMENDED_TAG } from "@/src/app/(public)/(feed)/actions/constants";
 // import { analyzeRepoQueue } from "@repo/queue";
 type CreateProjectInput = {
   title: string;
@@ -131,6 +133,10 @@ export async function createProjectAction(
 
   // Calculate remaining analyses for notification
   const remaining = DAILY_ANALYSIS_LIMIT - currentCount - 1;
+
+  // @ts-ignore - documentation says single arg, but types seem to differ in this version
+  revalidateTag(FEED_RECOMMENDED_TAG);
+  revalidatePath("/");
 
   return {
     success: true,

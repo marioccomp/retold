@@ -360,7 +360,8 @@
     "login": "Entrar",
     "profile": "Perfil",
     "settings": "Configurações",
-    "logout": "Sair"
+    "logout": "Sair",
+    "tour": "Tour Guiado"
   },
   "about": {
     "title": "Sobre o Retold",
@@ -570,7 +571,7 @@
     "name_max": "Nome deve ter no máximo 20 caracteres",
     "username_min": "Usuário deve ter pelo menos 3 caracteres",
     "username_max": "Usuário deve ter no máximo 20 caracteres",
-    "username_regex": "Usuário deve conter apenas letras, números, sublinhados e hífens",
+    "username_regex": "Usuário deve conter apenas letras minúsculas, números, sublinhados e hífens",
     "current_password_required": "Senha atual é obrigatória",
     "confirm_password_required": "Confirmação de senha é obrigatória",
     "title_max": "Título deve ter no máximo 50 caracteres",
@@ -690,7 +691,7 @@
       "continue": "Continuar",
       "setting_up": "Configurando...",
       "preview_label": "Seu perfil estará disponível em:",
-      "help_text": "3–20 caracteres, apenas letras, números, sublinhados e hífens",
+      "help_text": "3–20 caracteres, apenas letras minúsculas, números, sublinhados e hífens",
       "checking": "Verificando nome de usuário...",
       "available": "Nome de usuário disponível"
     }
@@ -778,6 +779,122 @@
       "lgpd_rights_text": "Conforme a Lei Geral de Proteção de Dados (LGPD), você tem o direito de: (a) Confirmar a existência de tratamento; (b) Acessar seus dados; (c) Corrigir dados incompletos; (d) Solicitar a anonimização ou exclusão; (e) Revogar este consentimento a qualquer momento através das configurações da conta.",
       "cookies_title": "9. Uso de Cookies",
       "cookies_text": "Utilizamos cookies essenciais para o funcionamento da Retold, incluindo: (a) Autenticação e Segurança; (b) Preferências de Idioma; e (c) Processamento de Sessões. Estes cookies são necessários para proteger sua conta e fornecer o serviço solicitado."
+    }
+  },
+  "onboarding": {
+    "nav": {
+      "next": "Próximo",
+      "prev": "Voltar",
+      "skip": "Pular",
+      "start": "Começar agora"
+    },
+    "welcome": {
+      "title": "Bem-vindo à Retold",
+      "subtitle": "Mais que código, mostre impacto. A plataforma onde desenvolvedores constroem autoridade através de projetos reais.",
+      "badge_portfolio": "Portfólio Grátis",
+      "badge_feedback": "Feedback da Comunidade",
+      "badge_ai": "Análise com IA"
+    },
+    "feed": {
+      "badge": "Descobrir",
+      "title": "Explore projetos reais",
+      "subtitle": "Descubra projetos de outros devs, filtre por tags, pesquise por interesse e encontre inspiração para sua próxima criação.",
+      "feature_search": "Busque projetos por nome ou tecnologia",
+      "feature_filter": "Filtre por categoria e ordene resultados",
+      "feature_tags": "Explore tags como React, Node, Python...",
+      "search_placeholder": "Buscar projetos, tags...",
+      "tab_projects": "Projetos",
+      "tab_people": "Pessoas"
+    },
+    "project": {
+      "badge": "Powered by AI",
+      "title": "Análise inteligente do seu código",
+      "subtitle": "A Retold analisa seu repositório no GitHub e gera um relatório técnico completo: resumo executivo, tech stack detectada, arquitetura e sugestões de melhoria.",
+      "stat_files": "Arquivos",
+      "stat_code": "Código",
+      "stat_config": "Config",
+      "stat_tests": "Testes",
+      "mock_title": "Análise do Projeto",
+      "mock_repo": "github.com/usuario/projeto",
+      "summary_title": "Resumo Executivo",
+      "mock_tabs": {
+        "analysis": "Análise (AI)",
+        "comments": "Comentários",
+        "commits": "Commits"
+      },
+      "mock_stats": {
+        "languages": "Linguagens",
+        "files": "Arquivos",
+        "dependencies": "Dependências",
+        "health": "Saúde",
+        "production": "Pronto p/ Produção",
+        "sub_languages": "JavaScript, CSS, HTML",
+        "sub_files": "28 KB",
+        "sub_dependencies": "Next.js"
+      },
+      "mock_content": {
+        "what_it_does": "O que este projeto faz?",
+        "what_it_does_text": "O projeto é um simulador pedagógico projetado para demonstrar os algoritmos de escalonamento do processador (FIFO, SJF e Round-Robin) em uma interface interativa web.",
+        "strengths": "Principais Forças",
+        "strength_1_title": "Visualização Clara",
+        "strength_1_text": "Transforma a teoria abstrata em diagramas visuais intuitivos.",
+        "strength_2_title": "Algoritmos Clássicos",
+        "strength_2_text": "Contém implementações sólidas dos escalonadores principais.",
+        "architecture": "Arquitetura do Projeto",
+        "architecture_text": "Aplicação frontend baseada em React (Next.js) que roda inteiramente no lado do cliente. Componentes separados lidam com as filas de processos e o gráfico de Gantt."
+      }
+    },
+    "profile": {
+      "badge": "Seu Portfólio",
+      "title": "Seu perfil, sua história",
+      "subtitle": "Adicione foto, bio, skills, formação acadêmica e links sociais. Seu perfil funciona como um portfólio profissional completo.",
+      "feature_photo": "Foto de perfil & capa personalizada",
+      "feature_skills": "Skills & tecnologias que você domina",
+      "feature_education": "Formação acadêmica & certificações",
+      "feature_social": "GitHub, LinkedIn & site pessoal",
+      "mock_bio": "Focado em construir soluções escaláveis do zero ao deploy",
+      "mock_long_bio": "Estudante de Ciência da Computação na UFRRJ. Desenvolvedor Fullstack com experiência prática em React, Next.js, Node e bancos de dados. Focado em arquiteturas escaláveis e produtos reais.",
+      "stat_views": "visualizações",
+      "stat_likes": "curtidas",
+      "stat_followers": "seguidores",
+      "stat_following": "seguindo",
+      "mock_role": "Desenvolvedor Fullstack",
+      "mock_date": "22 de jan. de 2026",
+      "mock_pr": "Merge pull request #1 from mariocomp/mariocomp-patch-1 Add instructions for running the main file"
+    },
+    "create": {
+      "badge": "Rápido & Fácil",
+      "title": "Publique seu primeiro projeto",
+      "subtitle": "Conecte seu GitHub, selecione um repositório, adicione imagens e descrição. Em menos de 2 minutos seu projeto está no ar.",
+      "step_1": "Preencha o título e a descrição do seu projeto",
+      "step_2": "Selecione o repositório do GitHub e adicione imagens",
+      "step_3": "Clique em publicar — a IA faz o resto do trabalho",
+      "step1_title": "Conectar GitHub",
+      "step1_desc": "Vincule sua conta do GitHub para importar seus repositórios.",
+      "step2_title": "Escolher repositório",
+      "step2_desc": "Selecione o projeto que você quer exibir no seu portfólio.",
+      "step3_title": "Publicar",
+      "step3_desc": "Adicione imagens, uma descrição e seu projeto vai ao ar instantaneamente.",
+      "mock_description": "Simulador interativo de algoritmos de escalonamento de processos com visualização em tempo real.",
+      "cta_text": "É rápido, fácil e completamente gratuito.",
+      "mock_title_input": "Simulador de Escalonamento",
+      "mock_repo": "mariojr/escalonador"
+    },
+    "final": {
+      "title": "Faça parte da comunidade",
+      "subtitle": "Curta projetos, comente com feedback construtivo, siga devs e receba notificações. Construa sua rede.",
+      "feature_like": "Curtir projetos",
+      "feature_comment": "Comentar & feedback",
+      "feature_follow": "Seguir desenvolvedores",
+      "cta_hint": "Clique em 'Começar agora' para iniciar sua jornada",
+      "mock_comment_user": "João Silva",
+      "mock_comment_username": "joaosilva",
+      "mock_comment_text": "Sensacional! A arquitetura ficou muito limpa.",
+      "mock_comment_time": "há 2 horas",
+      "mock_reply_user": "Mario",
+      "mock_reply_username": "mariojr",
+      "mock_reply_text": "Valeu João! Foquei bastante em SOLID nesse projeto.",
+      "mock_reply_time": "há 1 hora"
     }
   }
 }

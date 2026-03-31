@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
-import type { ProjectSortType } from "./actions/get-feed-projects.action";
+import type { ProjectSortType } from "./actions/constants";
 import FeedProjectsGrid from "./FeedProjectsGrid";
 import FeedPeopleGrid from "./FeedPeopleGrid";
 import { FiSearch } from "react-icons/fi";
