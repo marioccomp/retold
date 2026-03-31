@@ -17,5 +17,6 @@ export { Prisma } from "@prisma/client";
 export type { User, Project, Tag, Certification, Participation, Repository, RepositoryAnalysis } from "@prisma/client";
 export * from "./repositories/index";
 export { githubRepository } from "./repositories/github.repository";
+export { webhookRepository } from "./repositories/webhook.repository";
 
 
