@@ -64,6 +64,7 @@ export async function toggleFollowAction(targetUserId: number) {
             }
         }
 
+        // @ts-ignore
         revalidateTag("feed-active-users-scoring");
         revalidatePath(`/[username]`, "layout");
         revalidatePath(`/`, "layout");
