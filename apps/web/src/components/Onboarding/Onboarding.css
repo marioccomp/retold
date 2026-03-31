@@ -30,14 +30,25 @@
 
 /* Glassmorphism card */
 .onboarding-glass {
-  background: oklch(1 0 0 / 0.7);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: oklch(1 0 0 / 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid oklch(0.92 0.01 155 / 0.5);
   border-radius: 1.5rem;
   box-shadow:
     0 20px 60px -15px rgba(0, 0, 0, 0.12),
     0 4px 20px -5px rgba(0, 0, 0, 0.06);
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  .onboarding-glass {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: oklch(1 0 0 / 0.85);
+  }
 }
 
 .dark .onboarding-glass {
@@ -46,6 +57,14 @@
   box-shadow:
     0 20px 60px -15px rgba(0, 0, 0, 0.4),
     0 4px 20px -5px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .dark .onboarding-glass {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: oklch(0.15 0.02 155 / 0.85);
+  }
 }
 
 /* Mesh gradient background */
@@ -223,4 +242,10 @@
 
 .onboarding-float {
   animation: onboarding-float 4s ease-in-out infinite;
+}
+
+/* Optimization: hardware acceleration for containers that move */
+.onboarding-slide-container {
+  transform: translate3d(0, 0, 0);
+  -webkit-font-smoothing: antialiased;
 }
