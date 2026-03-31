@@ -156,9 +156,15 @@ export default function Header({ session: initialSession }: { session: Session |
           {/* Logo */}
           <Link href="/" className="flex items-center cursor-pointer shrink-0">
             <Image
-              src={mounted && resolvedTheme === "dark" ? logoDark : logo}
+              src={logo}
               alt="Retold Logo"
-              className="h-30 md:h-30 w-auto cursor-pointer"
+              className="h-30 md:h-30 w-auto cursor-pointer dark:hidden"
+              priority
+            />
+            <Image
+              src={logoDark}
+              alt="Retold Logo"
+              className="h-30 md:h-30 w-auto cursor-pointer hidden dark:block"
               priority
             />
           </Link>

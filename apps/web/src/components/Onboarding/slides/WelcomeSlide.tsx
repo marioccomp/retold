@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/src/i18n/client";
-import { useTheme } from "next-themes";
 import OnboardingSlide from "../OnboardingSlide";
 import Image from "next/image";
 import { FiCheckCircle } from "react-icons/fi";
@@ -10,9 +9,6 @@ import logoDark from "@/assets/logo-full-dark.svg";
 
 export default function WelcomeSlide() {
   const { dict } = useTranslation();
-  const { resolvedTheme } = useTheme();
-
-  const logoSrc = resolvedTheme === "dark" ? logoDark : logo;
 
   return (
     <OnboardingSlide>
@@ -20,12 +16,20 @@ export default function WelcomeSlide() {
         {/* Logo */}
         <div className="onboarding-float">
           <Image
-            src={logoSrc}
+            src={logo}
             alt="Retold"
             width={220}
             height={42}
             priority
-            className="select-none"
+            className="select-none dark:hidden"
+          />
+          <Image
+            src={logoDark}
+            alt="Retold"
+            width={220}
+            height={42}
+            priority
+            className="select-none hidden dark:block"
           />
         </div>
 

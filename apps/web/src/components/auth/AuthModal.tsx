@@ -21,7 +21,6 @@ import { Label } from "@/components/ui/label";
 
 import logoFull from "@/assets/logo-full.svg";
 import logoFullDark from "@/assets/logo-full-dark.svg";
-import { useTheme } from "next-themes";
 
 export default function AuthModal() {
   const { isOpen, closeLoginModal } = useAuthModal();
@@ -29,7 +28,6 @@ export default function AuthModal() {
   const router = useRouter();
   const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const { resolvedTheme } = useTheme();
 
   // Reset state when opening? Not strictly necessary if unmounted, but good practice.
   // Actually, Dialog unmounts content by default usually, but my custom implementation might not.
@@ -94,9 +92,14 @@ export default function AuthModal() {
           {/* Logo */}
           <div className="flex justify-center mb-2">
             <Image
-              src={resolvedTheme === "dark" ? logoFullDark : logoFull}
+              src={logoFull}
               alt="Retold Logo"
-              className="w-48 h-auto -mt-10 -mb-14"
+              className="w-48 h-auto -mt-10 -mb-14 dark:hidden"
+            />
+            <Image
+              src={logoFullDark}
+              alt="Retold Logo"
+              className="w-48 h-auto -mt-10 -mb-14 hidden dark:block"
             />
           </div>
 

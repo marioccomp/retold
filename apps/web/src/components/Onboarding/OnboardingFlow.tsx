@@ -84,8 +84,12 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
         
         // Hide only after transition
         slideRefs.current.forEach((ref, i) => {
-          if (ref && i !== to) {
-             gsap.set(ref, { display: "none", willChange: "auto" });
+          if (ref) {
+             if (i !== to) {
+               gsap.set(ref, { display: "none", willChange: "auto" });
+             } else {
+               gsap.set(ref, { willChange: "auto" });
+             }
           }
         });
       },

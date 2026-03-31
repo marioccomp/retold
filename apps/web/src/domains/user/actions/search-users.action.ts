@@ -4,13 +4,12 @@ import { auth } from "@/src/domains/auth/auth";
 import { userRepository } from "../repositories/user.repository";
 import { unstable_cache } from "next/cache";
 
-// Cached scoring for active users — rankings stay stable for 5 minutes
 const getCachedActiveUsers = unstable_cache(
   async (currentUserId: number | undefined, page: number, limit: number) => {
     return userRepository.searchUsers("", currentUserId, page, limit, "active");
   },
   ["feed-active-users-scoring"],
-  { revalidate: 300 } // 5 minutes
+  { revalidate: 300, tags: ["feed-active-users-scoring"] } // 5 minutes
 );
 
 export async function searchUsersAction(

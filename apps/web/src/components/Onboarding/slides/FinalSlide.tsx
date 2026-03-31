@@ -13,7 +13,7 @@ export default function FinalSlide() {
       <div className="flex flex-col items-center text-center gap-4 sm:gap-8 max-w-2xl mx-auto px-4">
         {/* Interaction icons cluster */}
         <div className="relative w-20 h-20 sm:w-24 sm:h-24 mt-2 sm:mt-0">
-          <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl animate-pulse" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(var(--primary)/0.3)_0%,transparent_70%)] rounded-full animate-pulse" />
           <div className="relative w-full h-full rounded-full bg-secondary/50 border border-border/20 flex items-center justify-center">
             <FiMessageCircle className="text-primary" size={32} />
           </div>
@@ -100,8 +100,8 @@ export default function FinalSlide() {
         </div>
 
         {/* Decorative orbs */}
-        <div className="absolute -top-10 left-[20%] w-[150px] sm:w-[200px] h-[150px] sm:h-[200px] rounded-full bg-[#ff4d4d]/5 blur-[60px] pointer-events-none" />
-        <div className="absolute bottom-0 right-[15%] w-[180px] sm:w-[250px] h-[180px] sm:h-[250px] rounded-full bg-primary/8 blur-[80px] pointer-events-none" />
+        <div className="absolute -top-10 left-[20%] w-[150px] sm:w-[200px] h-[150px] sm:h-[200px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,77,77,0.08)_0%,transparent_70%)] pointer-events-none" />
+        <div className="absolute bottom-0 right-[15%] w-[180px] sm:w-[250px] h-[180px] sm:h-[250px] rounded-full bg-[radial-gradient(circle_at_center,oklch(var(--primary)/0.12)_0%,transparent_70%)] pointer-events-none" />
       </div>
     </OnboardingSlide>
   );

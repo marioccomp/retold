@@ -198,8 +198,8 @@ export default function ProjectSlide() {
           }
         }
         @keyframes pulseGlow {
-          0%, 100% { box-shadow: 0 0 0 0 oklch(0.72 0.19 150 / 0.15); }
-          50% { box-shadow: 0 0 12px 4px oklch(0.72 0.19 150 / 0.08); }
+          0%, 100% { background-color: oklch(var(--primary) / 0.04); border-color: oklch(var(--primary) / 0.1); }
+          50% { background-color: oklch(var(--primary) / 0.12); border-color: oklch(var(--primary) / 0.3); }
         }
       `}</style>
 
@@ -415,7 +415,7 @@ export default function ProjectSlide() {
             </div>
           </div>
 
-          <div className="absolute -inset-4 rounded-3xl bg-[radial-gradient(circle_at_50%_50%,oklch(0.79_0.17_150_/_0.10),transparent_60%)] blur-xl -z-10" />
+          <div className="absolute -inset-4 rounded-3xl bg-[radial-gradient(circle_at_50%_50%,oklch(0.79_0.17_150_/_0.10),transparent_60%)] -z-10" />
         </div>
       </div>
     </OnboardingSlide>

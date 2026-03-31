@@ -9,22 +9,15 @@ import logoDark from "@/assets/logo-full-dark.svg";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/src/i18n/client";
 import { toast } from "sonner";
-import { useTheme } from "next-themes";
 
 export default function Footer() {
   const { dict } = useTranslation();
   const currentYear = new Date().getFullYear();
-  const { resolvedTheme } = useTheme();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
 
   const isAuthRoute = ["/login", "/register", "/forgot-password", "/reset-password"].includes(
     pathname
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Do not render Footer on onboarding page
   if (pathname === "/onboarding") return null;
@@ -44,9 +37,14 @@ export default function Footer() {
               className="flex items-center opacity-80 hover:opacity-100 transition-opacity"
             >
               <Image
-                src={mounted && resolvedTheme === "dark" ? logoDark : logo}
+                src={logo}
                 alt="Retold Logo"
-                className="h-20 w-auto transition-all duration-300"
+                className="h-20 w-auto transition-all duration-300 dark:hidden"
+              />
+              <Image
+                src={logoDark}
+                alt="Retold Logo"
+                className="h-20 w-auto transition-all duration-300 hidden dark:block"
               />
             </Link>
             <p className="text-sm text-muted-foreground mt-2">
