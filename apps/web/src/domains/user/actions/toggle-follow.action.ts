@@ -2,7 +2,7 @@
 
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function toggleFollowAction(targetUserId: number) {
     const session = await auth();
@@ -64,7 +64,9 @@ export async function toggleFollowAction(targetUserId: number) {
             }
         }
 
+        revalidateTag("feed-active-users-scoring");
         revalidatePath(`/[username]`, "layout");
+        revalidatePath(`/`, "layout");
         return { success: true };
     } catch (error) {
         console.error("Error toggling follow:", error);

@@ -62,10 +62,22 @@ export function FollowButton({
       // Optimistic Update no Cache do React Query
       // Atualiza todas as queries de "users" (feed de pessoas)
       queryClient.setQueriesData({ queryKey: ["users"] }, (old: any) => {
+        if (!old) return old;
+
+        // Check if structure matches FeedPeopleGrid: { users: [...], metadata: {...} }
+        if (old.users && Array.isArray(old.users)) {
+          return {
+            ...old,
+            users: old.users.map((u: any) =>
+              u.id === targetUserId ? { ...u, isFollowing: newState } : u
+            ),
+          };
+        }
+
         if (Array.isArray(old)) {
           return old.map((u: any) => (u.id === targetUserId ? { ...u, isFollowing: newState } : u));
         }
-        if (old?.data && Array.isArray(old.data)) {
+        if (old.data && Array.isArray(old.data)) {
           return {
             ...old,
             data: old.data.map((u: any) =>

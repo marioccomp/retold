@@ -351,7 +351,7 @@ export default function ProfileSlide() {
           </div>
 
           {/* Glow */}
-          <div className="absolute -inset-4 rounded-3xl bg-[radial-gradient(circle_at_30%_40%,oklch(0.79_0.17_150_/_0.10),transparent_60%)] blur-xl -z-10" />
+          <div className="absolute -inset-4 rounded-3xl bg-[radial-gradient(circle_at_30%_40%,oklch(0.79_0.17_150_/_0.10),transparent_60%)] -z-10" />
         </div>
       </div>
     </OnboardingSlide>

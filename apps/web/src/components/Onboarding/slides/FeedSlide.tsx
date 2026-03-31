@@ -241,7 +241,7 @@ export default function FeedSlide() {
           </div>
 
           {/* Glow */}
-          <div className="absolute -inset-6 rounded-3xl bg-[radial-gradient(circle_at_60%_40%,oklch(0.79_0.17_150_/_0.08),transparent_60%)] blur-2xl -z-20" />
+          <div className="absolute -inset-6 rounded-3xl bg-[radial-gradient(circle_at_60%_40%,oklch(0.79_0.17_150_/_0.08),transparent_60%)] -z-20" />
         </div>
       </div>
     </OnboardingSlide>
