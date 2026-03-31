@@ -58,44 +58,67 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
       return;
     }
 
+    const isMobile = window.innerWidth < 768;
+
+    // Reset will-change for others
+    slideRefs.current.forEach(ref => {
+      if (ref) ref.style.willChange = "auto";
+    });
+
+    // Prepare active slides
+    currentEl.style.willChange = "transform, opacity";
+    nextEl.style.willChange = "transform, opacity";
+
     // Position next slide off-screen
     gsap.set(nextEl, {
       xPercent: direction * 100,
       opacity: 0,
       display: "flex",
+      force3D: true,
     });
 
     const tl = gsap.timeline({
       onComplete: () => {
         isAnimating.current = false;
         setCurrentSlide(to);
+        
+        // Hide only after transition
+        slideRefs.current.forEach((ref, i) => {
+          if (ref && i !== to) {
+             gsap.set(ref, { display: "none", willChange: "auto" });
+          }
+        });
       },
     });
 
     tl.to(currentEl, {
       xPercent: -direction * 30,
       opacity: 0,
-      duration: 0.5,
-      ease: "power3.inOut",
+      duration: isMobile ? 0.45 : 0.5,
+      ease: "power2.inOut",
+      force3D: true,
     }, 0);
 
     tl.to(nextEl, {
       xPercent: 0,
       opacity: 1,
-      duration: 0.5,
-      ease: "power3.inOut",
-    }, 0.1);
+      duration: isMobile ? 0.45 : 0.5,
+      ease: "power2.inOut",
+      force3D: true,
+    }, isMobile ? 0.05 : 0.1);
 
     // Stagger children of next slide for entrance
     const children = nextEl.querySelectorAll("[data-animate]");
     if (children.length > 0) {
       tl.from(children, {
-        y: 25,
+        y: isMobile ? 15 : 25,
         opacity: 0,
-        duration: 0.4,
-        stagger: 0.08,
+        duration: isMobile ? 0.35 : 0.4,
+        stagger: isMobile ? 0.05 : 0.08,
         ease: "power2.out",
-      }, 0.3);
+        force3D: true,
+        clearProps: "all"
+      }, isMobile ? 0.3 : 0.3);
     }
   }, []);
 
@@ -213,7 +236,6 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
           key={i}
           ref={(el) => { slideRefs.current[i] = el; }}
           className="onboarding-slide-container absolute inset-0"
-          style={{ willChange: "transform, opacity" }}
         >
           <SlideComponent />
         </div>
