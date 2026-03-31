@@ -17,6 +17,7 @@ export default function Footer() {
   const { resolvedTheme } = useTheme();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+
   const isAuthRoute = ["/login", "/register", "/forgot-password", "/reset-password"].includes(
     pathname
   );
@@ -24,6 +25,9 @@ export default function Footer() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Do not render Footer on onboarding page
+  if (pathname === "/onboarding") return null;
 
   return (
     <footer

@@ -25,70 +25,69 @@ export default function CreateSlide() {
     <OnboardingSlide>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-10 lg:gap-16 items-center">
         {/* Left — Text */}
-        <div className="flex flex-col gap-2 sm:gap-5 text-center lg:text-left order-1 px-4">
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:py-1.5 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-widest w-fit mx-auto lg:mx-0">
-            <FiPlus size={14} />
+        <div className="flex flex-col gap-1.5 sm:gap-5 text-center lg:text-left order-1 px-4">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-0.5 sm:py-1.5 rounded-full bg-primary/10 text-primary text-[9px] sm:text-xs font-bold uppercase tracking-widest w-fit mx-auto lg:mx-0">
+            <FiPlus size={12} className="sm:w-[14px]" />
             {dict.onboarding.create.badge}
           </div>
 
-          <h2 className="text-[1.1rem] sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight leading-tight">
+          <h2 className="text-[1rem] sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight leading-tight mt-0.5 sm:mt-0">
             {dict.onboarding.create.title}
           </h2>
-          <p className="text-[13px] sm:text-lg text-muted-foreground leading-snug max-w-lg mx-auto lg:mx-0 mb-2 sm:mb-0">
+          <p className="text-[12px] sm:text-lg text-muted-foreground leading-snug max-w-lg mx-auto lg:mx-0 mb-0.5 sm:mb-0">
             {dict.onboarding.create.subtitle}
           </p>
 
-          <ul className="hidden sm:flex flex-col gap-4 pt-2">
+          <ul className="flex flex-col gap-1.5 sm:gap-4 pt-1 sm:pt-2">
             {[
               dict.onboarding.create.step_1,
               dict.onboarding.create.step_2,
               dict.onboarding.create.step_3,
             ].map((step, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center shrink-0">
+              <li key={i} className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-sm text-muted-foreground text-left">
+                <div className="w-4 h-4 sm:w-7 sm:h-7 rounded-full bg-primary/10 text-primary font-bold text-[9px] sm:text-xs flex items-center justify-center shrink-0 border border-primary/20">
                   {i + 1}
                 </div>
-                <span>{step}</span>
+                <span className="leading-tight sm:leading-snug">{step}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Right — CreateProjectPanel replica (Desktop) or Simplified (Mobile) */}
-        <div className="relative order-2 w-full max-w-[800px] mx-auto pointer-events-none select-none">
+        {/* Right — CreateProjectPanel replica */}
+        <div className="relative order-2 w-full max-w-[800px] mx-auto pointer-events-none select-none px-2 sm:px-0 scale-[0.9] sm:scale-100 origin-top">
           
-          {/* Desktop Replica */}
-          <div className="hidden lg:block bg-background rounded-[16px] border border-border shadow-2xl overflow-hidden custom-scrollbar">
+          <div className="bg-background rounded-xl sm:rounded-[16px] border border-border shadow-lg sm:shadow-2xl overflow-hidden custom-scrollbar">
             {/* Header */}
-            <div className="px-7 py-5 border-b border-border bg-gradient-to-br from-muted/50 to-background">
-              <h2 className="m-0 text-[1.4rem] font-semibold text-foreground">{t.title}</h2>
-              <p className="m-[6px_0_0] text-[0.9rem] text-muted-foreground">{t.subtitle}</p>
+            <div className="px-4 py-2.5 sm:px-7 sm:py-5 border-b border-border bg-gradient-to-br from-muted/50 to-background flex flex-col items-center sm:items-start text-center sm:text-left">
+              <h2 className="m-0 text-[0.95rem] sm:text-[1.4rem] font-semibold text-foreground">{t.title}</h2>
+              <p className="m-0 sm:m-[6px_0_0] text-[0.7rem] sm:text-[0.9rem] text-muted-foreground">{t.subtitle}</p>
             </div>
 
-            <div className="p-7 grid grid-cols-2 gap-8">
+            <div className="p-3.5 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-8">
               {/* Form Section */}
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <Label className="text-[0.875rem] font-medium text-foreground">
+              <div className="flex flex-col gap-2.5 sm:gap-5">
+                <div className="flex flex-col gap-1 sm:gap-2">
+                  <Label className="text-[0.7rem] sm:text-[0.875rem] font-medium text-foreground">
                     {t.labels.title}
                   </Label>
                   <Input
                     readOnly
                     value={dict.onboarding.create.mock_title_input}
-                    className="h-auto p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] bg-background"
+                    className="h-8 sm:h-auto p-2 sm:p-[12px_14px] rounded-lg sm:rounded-[10px] border-border text-foreground text-[0.8rem] sm:text-[0.95rem] bg-background"
                   />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Label className="text-[0.875rem] font-medium text-foreground">
+                <div className="flex flex-col gap-1 sm:gap-2">
+                  <Label className="text-[0.7rem] sm:text-[0.875rem] font-medium text-foreground">
                     {t.labels.description}
                   </Label>
                   <Textarea
                     readOnly
                     value={dict.onboarding.create.mock_description}
-                    className="min-h-[100px] resize-none p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] bg-background"
+                    className="min-h-[40px] sm:min-h-[100px] resize-none p-2 sm:p-[12px_14px] rounded-lg sm:rounded-[10px] border-border text-foreground text-[0.8rem] sm:text-[0.95rem] bg-background leading-normal sm:leading-relaxed"
                   />
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="hidden sm:flex flex-col gap-2">
                   <Label className="text-[0.875rem] font-medium text-foreground">
                     {t.labels.visibility}
                   </Label>
@@ -101,31 +100,31 @@ export default function CreateSlide() {
               </div>
 
               {/* Right Column */}
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 sm:gap-6">
+                <div className="flex flex-col gap-1.5 sm:gap-3">
                   <div className="flex justify-between items-center">
-                    <h3 className="m-0 text-[0.95rem] font-semibold text-foreground">{t.labels.images}</h3>
-                    <span className="text-[0.8rem] text-muted-foreground">1/3</span>
+                    <h3 className="m-0 text-[0.8rem] sm:text-[0.95rem] font-semibold text-foreground">{t.labels.images}</h3>
+                    <span className="text-[0.7rem] sm:text-[0.8rem] text-muted-foreground">1/3</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="relative aspect-video rounded-lg overflow-hidden border border-border bg-muted/20">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div className="relative aspect-video rounded-md sm:rounded-lg overflow-hidden border border-border bg-muted/20">
                       <Image src={imgEscalonador} alt="Project mock" className="absolute inset-0 w-full h-full object-cover block" />
                     </div>
-                    <div className="relative aspect-video rounded-lg border-2 border-dashed border-border bg-muted/50 flex flex-col items-center justify-center text-muted-foreground">
-                      <FiUpload className="w-6 h-6 mb-1" />
-                      <span className="text-[10px] font-medium uppercase">{dict.project.create_panel.add}</span>
+                    <div className="relative aspect-video rounded-md sm:rounded-lg border border-dashed border-border bg-muted/50 flex flex-col items-center justify-center text-muted-foreground">
+                      <FiUpload className="w-3.5 h-3.5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" />
+                      <span className="text-[8px] sm:text-[10px] font-medium uppercase hidden sm:inline">{dict.project.create_panel.add}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  <h3 className="m-0 text-[0.95rem] font-semibold text-foreground">{t.labels.repository}</h3>
+                <div className="flex flex-col gap-1.5 sm:gap-3">
+                  <h3 className="m-0 text-[0.8rem] sm:text-[0.95rem] font-semibold text-foreground">{t.labels.repository}</h3>
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between p-[14px_16px] border rounded-[10px] border-primary bg-primary/5">
-                      <span className="text-[0.9rem] text-foreground font-medium flex items-center gap-2">
-                        <FiGithub size={16} /> {dict.onboarding.create.mock_repo}
+                    <div className="flex items-center justify-between p-2 sm:p-[14px_16px] border rounded-md sm:rounded-[10px] border-primary bg-primary/5">
+                      <span className="text-[0.8rem] sm:text-[0.9rem] text-foreground font-medium flex items-center gap-1.5 sm:gap-2">
+                        <FiGithub className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="truncate max-w-[120px] sm:max-w-none">{dict.onboarding.create.mock_repo}</span>
                       </span>
-                      <FiCheck className="text-primary" size={14} />
+                      <FiCheck className="text-primary w-3 h-3 sm:w-4 sm:h-4" />
                     </div>
                   </div>
                 </div>
@@ -133,33 +132,9 @@ export default function CreateSlide() {
             </div>
 
             {/* Footer */}
-            <div className="px-7 py-6 flex gap-3 justify-end border-t border-border bg-muted/30">
-              <Button variant="outline" className="border-border rounded-[10px] h-11 px-6">{t.cancel}</Button>
-              <Button className="bg-primary text-primary-foreground rounded-[10px] h-11 px-8 font-bold">{t.submit}</Button>
-            </div>
-          </div>
-
-          {/* Mobile View — Simplified Form */}
-          <div className="lg:hidden flex flex-col gap-6 w-full max-w-[400px] mx-auto pb-32 pt-0 scale-[0.75] origin-top mb-[-120px]">
-            <div className="bg-background border border-border rounded-xl shadow-xl overflow-hidden">
-               <div className="px-5 py-4 border-b border-border bg-muted/30">
-                  <h2 className="text-xs font-bold text-foreground">{t.title}</h2>
-               </div>
-               <div className="p-5 space-y-3">
-                  <div className="space-y-1">
-                    <div className="w-16 h-1.5 bg-muted rounded-full" />
-                    <div className="w-full h-8 bg-muted/5 border border-border rounded-lg" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="w-20 h-1.5 bg-muted rounded-full" />
-                    <div className="w-full h-16 bg-muted/5 border border-border rounded-lg" />
-                  </div>
-                  <div className="pt-1">
-                    <div className="w-full h-8 bg-primary rounded-lg flex items-center justify-center text-[10px] font-bold text-primary-foreground">
-                      {dict.project.create_panel.submit}
-                    </div>
-                  </div>
-               </div>
+            <div className="px-4 py-2.5 sm:px-7 sm:py-6 flex gap-2 sm:gap-3 justify-end border-t border-border bg-muted/30">
+              <Button variant="outline" className="border-border rounded-md sm:rounded-[10px] h-8 sm:h-11 px-3 sm:px-6 text-[10px] sm:text-sm hidden sm:inline-flex">{t.cancel}</Button>
+              <Button className="bg-primary text-primary-foreground rounded-md sm:rounded-[10px] h-8 sm:h-11 px-5 sm:px-8 font-bold text-[10px] sm:text-sm w-full sm:w-auto">{t.submit}</Button>
             </div>
           </div>
 

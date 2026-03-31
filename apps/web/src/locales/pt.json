@@ -360,7 +360,8 @@
     "login": "Entrar",
     "profile": "Perfil",
     "settings": "Configurações",
-    "logout": "Sair"
+    "logout": "Sair",
+    "tour": "Tour Guiado"
   },
   "about": {
     "title": "Sobre o Retold",
@@ -852,6 +853,7 @@
       "feature_education": "Formação acadêmica & certificações",
       "feature_social": "GitHub, LinkedIn & site pessoal",
       "mock_bio": "Focado em construir soluções escaláveis do zero ao deploy",
+      "mock_long_bio": "Estudante de Ciência da Computação na UFRRJ. Desenvolvedor Fullstack com experiência prática em React, Next.js, Node e bancos de dados. Focado em arquiteturas escaláveis e produtos reais.",
       "stat_views": "visualizações",
       "stat_likes": "curtidas",
       "stat_followers": "seguidores",
@@ -884,7 +886,15 @@
       "feature_like": "Curtir projetos",
       "feature_comment": "Comentar & feedback",
       "feature_follow": "Seguir desenvolvedores",
-      "cta_hint": "Clique em 'Começar agora' para iniciar sua jornada"
+      "cta_hint": "Clique em 'Começar agora' para iniciar sua jornada",
+      "mock_comment_user": "João Silva",
+      "mock_comment_username": "joaosilva",
+      "mock_comment_text": "Sensacional! A arquitetura ficou muito limpa.",
+      "mock_comment_time": "há 2 horas",
+      "mock_reply_user": "Mario",
+      "mock_reply_username": "mariojr",
+      "mock_reply_text": "Valeu João! Foquei bastante em SOLID nesse projeto.",
+      "mock_reply_time": "há 1 hora"
     }
   }
 }

@@ -14,7 +14,7 @@ export default function ProfileSlide() {
     <OnboardingSlide>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-10 lg:gap-16 items-center">
         {/* Left — Text */}
-        <div className="flex flex-col gap-2 sm:gap-5 text-center lg:text-left order-1 px-4">
+        <div className="flex flex-col gap-2 sm:gap-5 text-center items-center lg:text-left lg:items-start order-1 px-4">
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:py-1.5 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-widest w-fit mx-auto lg:mx-0">
             <FiUser size={14} />
             {dict.onboarding.profile.badge}
@@ -143,9 +143,7 @@ export default function ProfileSlide() {
                     <FiEdit2 className="text-muted-foreground w-3 h-3" />
                   </div>
                   <div className="p-4 text-[10px] leading-relaxed text-muted-foreground text-justify">
-                    Estudante de Ciência da Computação na UFRRJ. Desenvolvedor Fullstack com
-                    experiência prática em React, Next.js, Node e bancos de dados. Focado em
-                    arquiteturas escaláveis e produtos reais.
+                    {dict.onboarding.profile.mock_long_bio}
                   </div>
                 </div>
 
@@ -222,18 +220,133 @@ export default function ProfileSlide() {
             </div>
           </div>
 
-          {/* Mobile View — Simplified Header */}
-          <div className="lg:hidden flex flex-col items-center bg-background border border-border rounded-xl shadow-xl overflow-hidden max-w-[350px] mx-auto pb-32 pt-0 scale-[0.75] origin-top mb-[-120px]">
-            <div className="h-16 w-full bg-secondary" />
-            <div className="-mt-8 px-6 flex flex-col items-center w-full text-center pb-6">
-              <div className="w-16 h-16 rounded-full border-4 border-background shadow-lg overflow-hidden shrink-0 bg-card">
+          {/* Mobile View — Realistic Profile Mock */}
+          <div className="lg:hidden flex flex-col bg-background border border-border rounded-xl shadow-xl overflow-hidden w-full max-w-[320px] sm:max-w-[380px] mx-auto custom-scrollbar max-h-[60vh] overflow-y-auto pointer-events-auto">
+            {/* Banner */}
+            <div className="h-[80px] w-full shrink-0 relative bg-gradient-to-r from-orange-400/80 via-rose-400/80 to-purple-500/80" />
+            
+            <div className="-mt-10 px-4 sm:px-5 flex flex-col items-center w-full pb-6">
+              <div className="w-[72px] h-[72px] rounded-full border-4 border-background shadow-sm overflow-hidden bg-card shrink-0 relative z-10">
                 <Image src={ownerPic} alt="Mario Junior" className="w-full h-full object-cover" />
               </div>
-              <h1 className="mt-2 text-base font-black text-foreground">Mario Junior</h1>
-              <p className="text-[10px] text-muted-foreground">@mariojr</p>
-              <div className="mt-3 px-3 py-1.5 bg-primary/10 rounded-lg">
-                <span className="text-[10px] font-bold text-primary">{dict.onboarding.profile.mock_role}</span>
+              
+              <h1 className="mt-1.5 text-[15px] font-bold text-foreground">Mario Jr</h1>
+              
+              {/* Job Info */}
+              <div className="mt-2.5 w-full rounded-xl border border-border bg-background p-2.5 flex flex-col items-center shadow-sm">
+                <span className="text-[7.5px] uppercase tracking-widest text-muted-foreground font-bold mb-0.5">
+                  {dict.profile.edit_modal.job_label}
+                </span>
+                <h2 className="text-[10px] font-bold text-foreground text-center line-clamp-1">
+                  {dict.onboarding.profile.mock_role}
+                </h2>
               </div>
+
+              {/* Bio Info */}
+              <div className="mt-2.5 w-full relative p-3 rounded-xl border border-border bg-background shadow-sm">
+                <Quote className="absolute -top-1.5 -left-1 text-primary/10 w-4 h-4 -rotate-12 fill-primary/5" />
+                <p className="relative z-10 text-[9.5px] text-foreground font-medium text-center italic leading-relaxed">
+                  {dict.onboarding.profile.mock_bio}
+                </p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-4 gap-1.5 w-full mt-2.5">
+                <div className="col-span-1 border border-border bg-card/40 rounded-lg py-2 flex flex-col items-center justify-center">
+                  <span className="text-[11px] font-bold text-foreground">27</span>
+                  <span className="text-[6px] uppercase font-bold text-muted-foreground tracking-wide mt-0.5">
+                    {dict.profile.views}
+                  </span>
+                </div>
+                <div className="col-span-1 border border-border bg-card/40 rounded-lg py-2 flex flex-col items-center justify-center">
+                  <span className="text-[11px] font-bold text-foreground">10</span>
+                  <span className="text-[6px] uppercase font-bold text-muted-foreground tracking-wide mt-0.5">
+                    {dict.profile.likes}
+                  </span>
+                </div>
+                <div className="col-span-1 border border-border bg-card/40 rounded-lg py-2 flex flex-col items-center justify-center">
+                  <span className="text-[11px] font-bold text-foreground">4</span>
+                  <span className="text-[6px] uppercase font-bold text-muted-foreground tracking-wide mt-0.5">
+                    {dict.profile.followers}
+                  </span>
+                </div>
+                <div className="col-span-1 border border-border bg-card/40 rounded-lg py-2 flex flex-col items-center justify-center">
+                  <span className="text-[11px] font-bold text-foreground">6</span>
+                  <span className="text-[6px] uppercase font-bold text-muted-foreground tracking-wide mt-0.5">
+                    {dict.profile.following}
+                  </span>
+                </div>
+              </div>
+
+              {/* Social Actions */}
+              <div className="flex bg-card/40 border border-border rounded-lg px-2 py-2 mt-2.5 justify-between w-full items-center">
+                <div className="flex-1 flex items-center justify-center">
+                  <FiGithub size={12} className="text-foreground" />
+                </div>
+                <div className="w-[1px] h-3.5 bg-border" />
+                <div className="flex-1 flex items-center justify-center">
+                  <FiLinkedin size={12} className="text-foreground" />
+                </div>
+                <div className="w-[1px] h-3.5 bg-border" />
+                <div className="flex-1 flex items-center justify-center">
+                  <FiGlobe size={12} className="text-foreground" />
+                </div>
+              </div>
+
+              {/* Tabs */}
+              <div className="w-full flex items-center justify-center gap-6 border-b border-border/60 mt-4">
+                <span className="text-[10px] font-bold text-foreground relative pb-1.5 px-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-primary after:rounded-t-full">
+                  {dict.profile.tabs.profile}
+                </span>
+                <span className="text-[10px] font-medium text-muted-foreground pb-1.5 px-1">
+                  {dict.profile.tabs.projects}
+                </span>
+              </div>
+
+              {/* Sobre Card */}
+              <div className="mt-3.5 w-full rounded-xl border border-border bg-background overflow-hidden shadow-sm">
+                <div className="flex items-center justify-between p-2.5 border-b border-border/40 bg-card/30">
+                  <div className="flex items-center gap-1.5">
+                    <FiBookOpen className="text-primary w-3.5 h-3.5" />
+                    <h3 className="text-[9px] font-bold text-foreground uppercase tracking-wide">
+                      {dict.profile.about_section}
+                    </h3>
+                  </div>
+                </div>
+                <div className="p-3 text-[9.5px] leading-relaxed text-muted-foreground text-justify">
+                  {dict.onboarding.profile.mock_long_bio}
+                </div>
+              </div>
+
+              {/* Estatísticas resumidas (Mobile) */}
+              <div className="mt-3.5 w-full">
+                <div className="flex items-center gap-1.5 mb-2.5 px-1">
+                  <Activity className="text-primary w-3.5 h-3.5" />
+                  <h3 className="text-[9px] font-bold text-foreground uppercase tracking-wide">
+                    {dict.profile.stats_section}
+                  </h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Commits */}
+                  <div className="rounded-xl border border-border bg-card/40 p-2 flex flex-col items-center justify-center shadow-sm">
+                    <GitCommit className="text-primary w-3.5 h-3.5 mb-1.5" />
+                    <span className="text-[12px] font-black text-foreground">77</span>
+                    <span className="text-[6.5px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 text-center">
+                      {dict.profile.stat_commits}
+                    </span>
+                  </div>
+                  {/* Dias */}
+                  <div className="rounded-xl border border-border bg-card/40 p-2 flex flex-col items-center justify-center shadow-sm">
+                    <Calendar className="text-primary w-3.5 h-3.5 mb-1.5" />
+                    <span className="text-[12px] font-black text-foreground">35</span>
+                    <span className="text-[6.5px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 text-center leading-[1.2]">
+                      {dict.profile.stat_active_days}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 

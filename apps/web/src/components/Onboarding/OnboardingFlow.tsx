@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import gsap from "gsap";
 
 import OnboardingNav from "./OnboardingNav";
@@ -29,31 +30,20 @@ interface OnboardingFlowProps {
 }
 
 export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
+  const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isAnimating = useRef(false);
   const router = useRouter();
+  const { update } = useSession();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Touch handling for swipe
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-
-  // Hide header/footer for full-screen experience
-  useEffect(() => {
-    const header = document.querySelector("header");
-    const footer = document.querySelector("footer");
-    const main = document.querySelector("main");
-    
-    if (header) header.style.display = "none";
-    if (footer) footer.style.display = "none";
-    if (main) main.style.padding = "0";
-
-    return () => {
-      if (header) header.style.display = "";
-      if (footer) footer.style.display = "";
-      if (main) main.style.padding = "";
-    };
-  }, []);
 
   const animateToSlide = useCallback((from: number, to: number) => {
     if (isAnimating.current || to < 0 || to >= SLIDES.length) return;
@@ -124,11 +114,21 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
   }, [currentSlide, animateToSlide]);
 
   const handleComplete = useCallback(async () => {
-    if (isLoggedIn) {
-      await completeOnboarding();
+    try {
+      if (isLoggedIn) {
+        await completeOnboarding();
+        await update({
+          user: {
+            hasCompletedOnboarding: true,
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Error completing onboarding:", err);
+    } finally {
+      router.push("/");
     }
-    router.push("/");
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, router, update]);
 
   const handleSkip = useCallback(() => {
     handleComplete();
@@ -202,7 +202,7 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
   return (
     <div
       ref={containerRef}
-      className="onboarding-container bg-background"
+      className={`onboarding-container bg-background transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}
     >
       {/* Background */}
       <div className="onboarding-bg onboarding-dots" />
@@ -212,7 +212,7 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
         <div
           key={i}
           ref={(el) => { slideRefs.current[i] = el; }}
-          className="absolute inset-0"
+          className="onboarding-slide-container absolute inset-0"
           style={{ willChange: "transform, opacity" }}
         >
           <SlideComponent />

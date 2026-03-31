@@ -360,7 +360,8 @@
     "login": "Login",
     "profile": "Profile",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "tour": "Guided Tour"
   },
   "about": {
     "title": "About Retold",
@@ -856,6 +857,7 @@
       "feature_education": "Academic background & certifications",
       "feature_social": "GitHub, LinkedIn & personal website",
       "mock_bio": "Focused on building scalable solutions from zero to deploy",
+      "mock_long_bio": "Computer Science student at UFRRJ. Fullstack Developer with hands-on experience in React, Next.js, Node, and databases. Focused on scalable architectures and real-world products.",
       "stat_views": "views",
       "stat_likes": "likes",
       "stat_followers": "followers",
@@ -888,7 +890,15 @@
       "feature_like": "Like projects",
       "feature_comment": "Comment & feedback",
       "feature_follow": "Follow developers",
-      "cta_hint": "Click 'Get Started' to begin your journey"
+      "cta_hint": "Click 'Get Started' to begin your journey",
+      "mock_comment_user": "John Smith",
+      "mock_comment_username": "johnsmith",
+      "mock_comment_text": "Sensational! The architecture is very clean.",
+      "mock_comment_time": "2 hours ago",
+      "mock_reply_user": "Mario",
+      "mock_reply_username": "mariojr",
+      "mock_reply_text": "Thanks John! I focused a lot on SOLID in this one.",
+      "mock_reply_time": "1 hour ago"
     }
   }
 }

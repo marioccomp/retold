@@ -10,7 +10,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { FiUser, FiSettings, FiLogOut, FiSearch, FiMoon, FiSun, FiMenu } from "react-icons/fi";
+import { FiUser, FiSettings, FiLogOut, FiSearch, FiMoon, FiSun, FiMenu, FiPlayCircle } from "react-icons/fi";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -41,6 +41,7 @@ export default function Header({ session: initialSession }: { session: Session |
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
 
   useEffect(() => {
     setMounted(true);
@@ -139,6 +140,9 @@ export default function Header({ session: initialSession }: { session: Session |
       router.push("/#feed-content");
     }
   };
+
+  // Do not render Header on onboarding page
+  if (pathname === "/onboarding") return null;
 
   return (
     <header
@@ -274,6 +278,14 @@ export default function Header({ session: initialSession }: { session: Session |
                   asChild
                   className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary transition-all duration-200"
                 >
+                  <Link href="/onboarding" className="w-full h-full flex items-center">
+                    <span className="font-bold text-sm">{dict.header.tour}</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary transition-all duration-200"
+                >
                   <Link href="/about" className="w-full h-full flex items-center">
                     <span className="font-bold text-sm">{dict.header.about}</span>
                   </Link>
@@ -313,6 +325,15 @@ export default function Header({ session: initialSession }: { session: Session |
                 >
                   <FiUser className="h-4 w-4 hover:text-primary transition-colors" />
                   <span className="font-bold text-sm">{dict.header.profile}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/onboarding"
+                    className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
+                  >
+                    <FiPlayCircle className="h-4 w-4 hover:text-primary transition-colors" />
+                    <span className="font-bold text-sm">{dict.header.tour}</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
