@@ -1,8 +1,9 @@
-import { prisma } from "../index";
+import { prisma, githubRepository } from "../index";
 
 interface PushWebhookPayload {
+  installation: { id: number };
   sender: { login: string };
-  repository: { id: number; full_name: string };
+  repository: { id: number; full_name: string; name: string; owner: { login: string } };
   ref: string;
   commits: Array<{
     id: string;
@@ -25,31 +26,51 @@ export interface WebhookRepository {
 
 export const webhookRepository: WebhookRepository = {
   async processPushEvent(payload: PushWebhookPayload) {
-    const { sender, repository, commits, ref } = payload;
+    const { sender, repository, commits, installation } = payload;
     const commitsCount = commits?.length || 0;
 
     if (commitsCount === 0) {
       return { processed: false, reason: "No commits in push" };
     }
 
-    // Encontrar o usuário via GithubAppInstallation (accountLogin é o login do GitHub)
-    const installation = await prisma.githubAppInstallation.findFirst({
-      where: { accountLogin: sender.login },
+    // 1. Encontrar o usuário via GithubAppInstallation
+    const dbInstallation = await prisma.githubAppInstallation.findUnique({
+      where: { installationId: String(installation.id) },
       select: { userId: true },
     });
 
-    if (!installation) {
-      return { processed: false, reason: `No installation found for ${sender.login}` };
+    if (!dbInstallation) {
+      return { processed: false, reason: `No installation found for ID ${installation.id}` };
     }
 
-    const userId = installation.userId;
+    const userId = dbInstallation.userId;
 
-    // Calcular linhas adicionadas/removidas a partir dos commits
+    // 2. Buscar estatísticas REAIS de cada commit via API do GitHub
     let linesAdded = 0;
     let linesDeleted = 0;
-    for (const commit of commits) {
-      linesAdded += commit.added?.length || 0;
-      linesDeleted += commit.removed?.length || 0;
+
+    try {
+      const octokit = githubRepository.getOctokitFromInstallationId(String(installation.id));
+      
+      // Processamos em paralelo para ser rápido
+      await Promise.all(
+        commits.map(async (c) => {
+          try {
+            const { data: commitData } = await octokit.rest.repos.getCommit({
+              owner: repository.owner.login,
+              repo: repository.name,
+              ref: c.id,
+            });
+            linesAdded += commitData.stats?.additions || 0;
+            linesDeleted += commitData.stats?.deletions || 0;
+          } catch (err) {
+            console.error(`[Webhook] Erro ao buscar stats do commit ${c.id}:`, err);
+          }
+        })
+      );
+    } catch (err) {
+      console.error("[Webhook] Erro ao inicializar Octokit:", err);
+      // Se falhar a API, mantemos lines como 0 ou usamos o fallback de arquivos se preferir
     }
 
     const lastCommitData = commits[commits.length - 1];
@@ -109,7 +130,6 @@ export const webhookRepository: WebhookRepository = {
           : new Date();
 
         if (existing) {
-          // Calcular activeDays: incrementar se o último commit foi em um dia diferente
           const lastActive = existing.lastCommitDate;
           const isNewDay =
             !lastActive ||
@@ -149,3 +169,4 @@ export const webhookRepository: WebhookRepository = {
     return { processed: true, userId };
   },
 };
+
