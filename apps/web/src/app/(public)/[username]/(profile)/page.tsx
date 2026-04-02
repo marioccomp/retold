@@ -3,8 +3,8 @@ import ProfileClient from "./ProfileClient";
 import { auth } from "@/src/domains/auth/auth";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
 import { getProfile } from "../_actions/get-profile";
-import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { getGithubDatabaseStats } from "../_actions/get-github-database-stats.action";
+import { prisma } from "@repo/database";
 
 type PageProps = {
   params: Promise<{
@@ -17,13 +17,24 @@ export default async function Page({ params, searchParams }: PageProps) {
   const { username } = await params;
   const resolvedSearchParams = await searchParams;
   const page = Number(resolvedSearchParams.page) || 1;
-  const session = await auth();
+  
+  // 1. FAST CHECK: Verifica existência do usuário antes do prefetch pesado
+  // Isso reduz o "Time to First Byte" drasticamente.
+  const userExists = await prisma.user.findUnique({
+    where: { username },
+    select: { id: true }
+  });
 
+  if (!userExists) notFound();
+
+  const session = await auth();
   const queryClient = new QueryClient();
 
+  // 2. Prefetch assíncrono - O Next.js começará a fazer o stream do loading.tsx
+  // enquanto as queries abaixo são resolvidas no servidor.
   await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: ["profile", username, page, ""], // Match ProfileClient key: ["profile", username, page, debouncedSearchQuery]
+      queryKey: ["profile", username, page, ""],
       queryFn: () => getProfile(username, page, ""),
     }),
     queryClient.prefetchQuery({
@@ -32,26 +43,12 @@ export default async function Page({ params, searchParams }: PageProps) {
     }),
   ]);
 
-  const profile: PublicProfileDTO | null | undefined = await queryClient.getQueryData([
-    "profile",
-    username,
-    page,
-    "",
-  ]);
-
-  if (!profile) notFound();
-
-  // const user = await userRepository.findPublicProfileByUsername(username);
-
-  // if (!user) notFound();
-
   const ownProfile: boolean = session?.user.username === username;
-
-  // const profile = mapUserToPublicProfile(user);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProfileClient ownProfile={ownProfile} username={username} />{" "}
+      <ProfileClient ownProfile={ownProfile} username={username} />
     </HydrationBoundary>
   );
 }
+
