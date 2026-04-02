@@ -42,3 +42,6 @@ yarn-error.log*
 
 # Worker temp files
 services/worker/.tmp/
+
+# backup config
+scripts/backup/backup.env
