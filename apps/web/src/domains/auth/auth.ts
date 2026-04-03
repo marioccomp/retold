@@ -22,12 +22,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       allowDangerousEmailAccountLinking: true,
       clientId: process.env.AUTH_GITHUB_ID,
       clientSecret: process.env.AUTH_GITHUB_SECRET,
-      authorization: {
-        params: {
-          scope: "read:user user:email",
+        authorization: {
+          params: {
+            scope: "read:user user:email read:org",
+          },
         },
-      },
-    }),
+      }),
     Credentials({
       name: "credentials",
       credentials: {

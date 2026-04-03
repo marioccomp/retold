@@ -7,9 +7,35 @@ import { ActionResponse } from "@/lib/action-response";
 import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getProfileSchema, getProfileDetailsSchema } from "@/src/domains/profile/schemas/profile.schema";
 import { getDictionary } from "@/src/i18n/server";
+import { requireAuthenticatedUserId, UnauthorizedError } from "@/src/lib/server-auth";
 
-export async function changeTitle(title: string, userId: number): Promise<ActionResponse<string>> {
+type ActionFailure = Extract<ActionResponse, { success: false }>;
+
+async function getAuthorizedProfileUserId(
+  dict: Awaited<ReturnType<typeof getDictionary>>
+): Promise<number | ActionFailure> {
+  try {
+    return await requireAuthenticatedUserId();
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return {
+        success: false,
+        message: dict.auth.errors.unauthorized ?? "Unauthorized",
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function changeTitle(title: string): Promise<ActionResponse<string>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const profileSchema = getProfileSchema(dict);
 
   const checkTitleSchema = profileSchema.pick({
@@ -39,7 +65,7 @@ export async function changeTitle(title: string, userId: number): Promise<Action
       success: true,
       data: user.title,
     };
-  } catch (err) {
+  } catch {
     return {
       success: false,
       message: dict.validation.generic_error,
@@ -47,8 +73,14 @@ export async function changeTitle(title: string, userId: number): Promise<Action
   }
 }
 
-export async function changeBio(bio: string, userId: number): Promise<ActionResponse<string>> {
+export async function changeBio(bio: string): Promise<ActionResponse<string>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const profileSchema = getProfileSchema(dict);
 
   const checkBioSchema = profileSchema.pick({
@@ -78,7 +110,7 @@ export async function changeBio(bio: string, userId: number): Promise<ActionResp
       success: true,
       data: user.bio,
     };
-  } catch (err) {
+  } catch {
     return {
       success: false,
       message: dict.validation.generic_error,
@@ -86,8 +118,14 @@ export async function changeBio(bio: string, userId: number): Promise<ActionResp
   }
 }
 
-export async function changeName(name: string, userId: number): Promise<ActionResponse<string>> {
+export async function changeName(name: string): Promise<ActionResponse<string>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const registerSchema = getRegisterSchema(dict);
 
   const checkNameSchema = registerSchema.pick({
@@ -117,7 +155,7 @@ export async function changeName(name: string, userId: number): Promise<ActionRe
       success: true,
       data: user.name,
     };
-  } catch (err) {
+  } catch {
     return {
       success: false,
       message: dict.validation.generic_error,
@@ -125,8 +163,16 @@ export async function changeName(name: string, userId: number): Promise<ActionRe
   }
 }
 
-export async function changeGithubUrl(githubUrl: string, userId: number): Promise<ActionResponse<string | null>> {
+export async function changeGithubUrl(
+  githubUrl: string
+): Promise<ActionResponse<string | null>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const profileSchema = getProfileSchema(dict);
 
   const checkGithubUrlSchema = profileSchema.pick({
@@ -152,7 +198,7 @@ export async function changeGithubUrl(githubUrl: string, userId: number): Promis
       success: true,
       data: user.githubUrl,
     };
-  } catch (err) {
+  } catch {
     return {
       success: false,
       message: dict.validation.generic_error,
@@ -160,8 +206,16 @@ export async function changeGithubUrl(githubUrl: string, userId: number): Promis
   }
 }
 
-export async function changeLinkedinUrl(linkedinUrl: string, userId: number): Promise<ActionResponse<string | null>> {
+export async function changeLinkedinUrl(
+  linkedinUrl: string
+): Promise<ActionResponse<string | null>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const profileSchema = getProfileSchema(dict);
 
   const checkLinkedinUrlSchema = profileSchema.pick({
@@ -187,7 +241,7 @@ export async function changeLinkedinUrl(linkedinUrl: string, userId: number): Pr
       success: true,
       data: user.linkedinUrl,
     };
-  } catch (err) {
+  } catch {
     return {
       success: false,
       message: dict.validation.generic_error,
@@ -196,10 +250,15 @@ export async function changeLinkedinUrl(linkedinUrl: string, userId: number): Pr
 }
 
 export async function updateProfile(
-  data: any, // Using any here because inferred Zod type depends on dict
-  userId: number
-): Promise<ActionResponse<any>> {
+  data: unknown
+): Promise<ActionResponse<unknown>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const registerSchema = getRegisterSchema(dict);
   const profileSchema = getProfileSchema(dict);
 
@@ -248,7 +307,7 @@ export async function updateProfile(
       success: true,
       data: user,
     };
-  } catch (err) {
+  } catch {
     return {
       success: false,
       message: dict.validation.generic_error,
@@ -257,10 +316,15 @@ export async function updateProfile(
 }
 
 export async function updateProfileDetails(
-  data: any, // Using any because inferred type depends on dict
-  userId: number
-): Promise<ActionResponse<any>> {
+  data: unknown
+): Promise<ActionResponse<unknown>> {
   const dict = await getDictionary();
+  const userId = await getAuthorizedProfileUserId(dict);
+
+  if (typeof userId !== "number") {
+    return userId;
+  }
+
   const profileDetailsSchema = getProfileDetailsSchema(dict);
   const updateProfileDetailsSchema = profileDetailsSchema.partial();
 
@@ -278,7 +342,7 @@ export async function updateProfileDetails(
     const user = await userRepository.updateProfileDetails(userId, {
       longBio: parsed.data.longBio ?? undefined,
       skills: parsed.data.skills ?? undefined,
-      educations: parsed.data.educations?.map((edu: any) => ({
+      educations: parsed.data.educations?.map((edu) => ({
         ...edu,
         startDate: new Date(edu.startDate),
         endDate: edu.endDate ? new Date(edu.endDate) : null,
@@ -289,8 +353,8 @@ export async function updateProfileDetails(
       success: true,
       data: user,
     };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return {
       success: false,
       message: dict.validation.details_update_error,

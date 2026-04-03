@@ -33,7 +33,7 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
 
   const realMutation = useMutation({
     mutationFn: async (data: any) => {
-      return updateProfile(data, profile.id);
+      return updateProfile(data);
     },
     onSuccess: (res) => {
       if (res.success) {

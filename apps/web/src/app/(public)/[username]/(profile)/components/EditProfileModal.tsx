@@ -107,8 +107,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
           githubUrl,
           linkedinUrl,
           websiteUrl,
-        },
-        profile.id
+        }
       );
     },
     onSuccess: (data) => {

@@ -142,7 +142,21 @@ export async function GET(req: NextRequest) {
 
         const githubEmail = (await fetchGithubPrimaryEmail(accessToken)) ?? ghUser.email;
 
-        if (!existing) {
+        if (existing) {
+            await prisma.account.update({
+                where: {
+                    provider_providerAccountId: {
+                        provider: "github",
+                        providerAccountId,
+                    },
+                },
+                data: {
+                    access_token: accessToken,
+                    token_type: token.token_type,
+                    scope: token.scope,
+                },
+            });
+        } else {
             await prisma.account.create({
                 data: {
                     userId: currentUserId,

@@ -1,72 +1,77 @@
 "use server"
 
 import { ActionResponse } from "@/lib/action-response"
-import { auth } from "@/src/domains/auth/auth"
+import { ProjectAccessError, requireProjectAccess } from "@/src/domains/project/lib/project-access"
+import { requireAuthenticatedUserId, UnauthorizedError } from "@/src/lib/server-auth"
 import { prisma } from "@repo/database"
 import { revalidatePath } from "next/cache"
 
 export async function toggleLike(projectId: number): Promise<ActionResponse> {
-    const session = await auth()
-    if (!session?.user?.id) return { success: false, message: "Unauthorized" }
+    try {
+        const userId = await requireAuthenticatedUserId()
+        const project = await requireProjectAccess(projectId, userId)
 
-    const userId = Number(session.user.id)
-
-    const existingLike = await prisma.like.findUnique({
-        where: {
-            userId_projectId: {
-                userId,
-                projectId
-            }
-        }
-    })
-
-    if (existingLike) {
-        await prisma.like.delete({
+        const existingLike = await prisma.like.findUnique({
             where: {
                 userId_projectId: {
                     userId,
-                    projectId
-                }
-            }
-        })
-    }
-    else {
-        await prisma.like.create({
-            data: {
-                userId,
-                projectId
-            }
+                    projectId,
+                },
+            },
         })
 
-        const project = await prisma.project.findUnique({
-            where: { id: projectId },
-            select: { userId: true }
-        })
-
-        if (project && project.userId !== userId) {
-            // Evitar flood de notificações: só cria se não houver uma não lida do mesmo tipo/origem
-            const lastNotification = await prisma.notification.findFirst({
+        if (existingLike) {
+            await prisma.like.delete({
                 where: {
-                    userId: project.userId,
-                    sourceUserId: userId,
-                    type: "LIKE",
-                    projectId
-                }
-            });
+                    userId_projectId: {
+                        userId,
+                        projectId,
+                    },
+                },
+            })
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId,
+                    projectId,
+                },
+            })
 
-            if (!lastNotification) {
-                await prisma.notification.create({
-                    data: {
+            if (project.userId !== userId) {
+                const lastNotification = await prisma.notification.findFirst({
+                    where: {
                         userId: project.userId,
                         sourceUserId: userId,
                         type: "LIKE",
-                        projectId
-                    }
+                        projectId,
+                    },
                 })
+
+                if (!lastNotification) {
+                    await prisma.notification.create({
+                        data: {
+                            userId: project.userId,
+                            sourceUserId: userId,
+                            type: "LIKE",
+                            projectId,
+                        },
+                    })
+                }
             }
         }
-    }
 
-    revalidatePath(`/projects/${projectId}`)
-    return { success: true }
+        revalidatePath(`/projects/${projectId}`)
+        return { success: true }
+    } catch (error) {
+        if (error instanceof UnauthorizedError) {
+            return { success: false, message: "Unauthorized" }
+        }
+
+        if (error instanceof ProjectAccessError) {
+            return { success: false, message: "Project not found" }
+        }
+
+        console.error("Error toggling like:", error)
+        return { success: false, message: "Failed to toggle like" }
+    }
 }

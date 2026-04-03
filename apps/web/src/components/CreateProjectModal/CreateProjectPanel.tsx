@@ -7,7 +7,6 @@ import { FiPlus, FiGithub, FiCheck } from "react-icons/fi";
 import {
   createProjectAction,
   getRepositoriesAction,
-  verifyUserInstallation,
 } from "@/src/domains/project/actions";
 import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
 import { toast } from "sonner";
@@ -73,12 +72,32 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
 
       if (event.data?.type === "GITHUB_APP_REPOSITORIES_UPDATED") {
         queryClient.invalidateQueries({ queryKey: ["repositories"] });
+        return;
+      }
+
+      if (event.data?.type === "GITHUB_APP_NOT_LINKED_GITHUB") {
+        toast.error("Conecte sua conta do GitHub nas configuracoes antes de instalar o app.");
+        return;
+      }
+
+      if (event.data?.type === "GITHUB_APP_INSTALLATION_FORBIDDEN") {
+        toast.error("A instalacao selecionada nao pertence a sua conta GitHub.");
+        return;
+      }
+
+      if (event.data?.type === "GITHUB_APP_NOT_AUTHENTICATED") {
+        toast.error(dict.auth.errors.unauthorized);
+        return;
+      }
+
+      if (event.data?.type === "GITHUB_APP_FLOW_INVALID" || event.data?.type === "GITHUB_APP_ERROR") {
+        toast.error(t.toast.error);
       }
     }
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [queryClient]);
+  }, [dict.auth.errors.unauthorized, queryClient, t.toast.error]);
 
   useEffect(() => {
     sortableImagesRef.current = sortableImages;
@@ -166,8 +185,7 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
   };
 
   // GitHub App install URL
-  const appSlug = process.env.NODE_ENV === "production" ? "retold-inc" : "retolddev";
-  const installUrl = `https://github.com/apps/${appSlug}/installations/new`;
+  const installUrl = "/github/install/start";
 
   function openCenteredPopup(url: string, title = "GitHub", w = 600, h = 700) {
     const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
@@ -183,9 +201,6 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
   }
 
   const handleAddRepository = () => {
-    if (repositories.length === 0) {
-      verifyUserInstallation();
-    }
     openCenteredPopup(installUrl);
   };
 
