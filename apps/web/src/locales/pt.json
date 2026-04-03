@@ -631,7 +631,10 @@
       "social_divider": "Ou continue com",
       "no_account": "Não tem uma conta?",
       "create_one": "Crie uma agora",
-      "success": "Logado com sucesso"
+      "success": "Logado com sucesso",
+      "oauth_account_not_linked": "Essa conta GitHub não pode ser vinculada automaticamente. Entre com sua senha e conecte o GitHub em Configurações.",
+      "reauth_password_updated": "Senha atualizada. Entre novamente para continuar.",
+      "reauth_password_reset": "Senha redefinida com sucesso. Todas as sessões anteriores foram revogadas."
     },
     "register": {
       "welcome_title": "Junte-se ao Retold",

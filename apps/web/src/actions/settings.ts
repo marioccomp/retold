@@ -7,10 +7,16 @@ import bcrypt from "bcryptjs";
 import { getDictionary } from "@/src/i18n/server";
 import { cookies } from "next/headers";
 
+type SettingsPasswordActionResult =
+    | { error: string | Record<string, string[]> }
+    | { success: string; requiresReauth: true };
+
 export async function updatePasswordAction(
-    prevState: any,
+    prevState: unknown,
     formData: FormData
-) {
+): Promise<SettingsPasswordActionResult> {
+    void prevState;
+
     const session = await auth();
     const dict = await getDictionary();
 
@@ -45,7 +51,9 @@ export async function updatePasswordAction(
     // Verify ownership
     if (hasPassword) {
         // Standard flow: Verify current password
-        const { currentPassword } = validatedFields.data as any; // Type assertion since schema varies
+        const currentPassword = "currentPassword" in validatedFields.data
+            ? validatedFields.data.currentPassword
+            : "";
         const isValid = await bcrypt.compare(currentPassword, user.password!);
 
         if (!isValid) {
@@ -53,8 +61,8 @@ export async function updatePasswordAction(
         }
     } else {
         // Create flow: Verify email confirmation
-        const { email } = validatedFields.data as any;
-        if (email !== user.email && email !== user.email?.toLowerCase()) {
+        const email = "email" in validatedFields.data ? validatedFields.data.email : "";
+        if (email.toLowerCase() !== user.email.toLowerCase()) {
             return { error: { email: [dict.settings.password.errors.email_mismatch] } };
         }
     }
@@ -63,7 +71,10 @@ export async function updatePasswordAction(
 
     await userRepository.updatePassword(userId, hashedPassword);
 
-    return { success: dict.settings.password.success_message };
+    return {
+        success: dict.settings.password.success_message,
+        requiresReauth: true,
+    };
 }
 
 export async function deleteAccountAction() {

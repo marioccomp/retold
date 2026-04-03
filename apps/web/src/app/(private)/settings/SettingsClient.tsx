@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { createPortal } from "react-dom";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
   FiGithub,
   FiShield,
   FiAlertTriangle,
   FiCheckCircle,
-  FiSettings,
   FiGlobe,
   FiAlertCircle,
 } from "react-icons/fi";
@@ -41,9 +40,8 @@ export function SettingsClient({
 }: {
   initialAnalysisLocale?: string;
 }) {
-  const { data: session, update } = useSession();
+  const { data: session } = useSession();
   const { dict, lang } = useTranslation();
-  const [providers, setProviders] = useState<string[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(true);
   const [isGithubLinked, setIsGithubLinked] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
@@ -62,7 +60,6 @@ export function SettingsClient({
     async function loadProviders() {
       try {
         const connected = await getConnectedProvidersAction();
-        setProviders(connected);
         setIsGithubLinked(connected.includes("github"));
       } catch (error) {
         console.error("Failed to load providers", error);
@@ -93,7 +90,7 @@ export function SettingsClient({
 
     startPasswordTransition(async () => {
       const result = await updatePasswordAction(null, formData);
-      if (result?.error) {
+      if (result && "error" in result) {
         if (typeof result.error === "string") {
           toast.error(result.error);
         } else {
@@ -128,10 +125,15 @@ export function SettingsClient({
             if (confirmInput) confirmInput.value = "";
           }
         }
-      } else if (result?.success) {
-        toast.success(result.success);
-        await update({ hasPassword: true });
+      } else if (result && "success" in result) {
         form?.reset();
+
+        if ("requiresReauth" in result && result.requiresReauth) {
+          await signOut({ callbackUrl: "/login?reauth=password-updated" });
+          return;
+        }
+
+        toast.success(result.success);
       }
     });
   }
@@ -150,7 +152,7 @@ export function SettingsClient({
         await deleteAccountAction();
         setShowDeleteModal(false);
         await signOut({ callbackUrl: "/" });
-      } catch (error) {
+      } catch {
         toast.error(dict.settings.dangerZone.toast.delete_error);
       }
     });
@@ -351,10 +353,8 @@ export function SettingsClient({
                 {linkError === "already_linked" && (
                   <Alert variant="destructive">
                     <FiAlertCircle className="h-4 w-4" />
-                    {/* @ts-ignore - Key added dynamically */}
                     <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
                     <AlertDescription>
-                      {/* @ts-ignore - Key added dynamically */}
                       {dict.settings.connectedAccounts.already_linked_error}
                     </AlertDescription>
                   </Alert>

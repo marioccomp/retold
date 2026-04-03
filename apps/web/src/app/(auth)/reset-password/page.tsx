@@ -41,7 +41,7 @@ function ResetPasswordForm() {
 
       toast.success(dict.auth.reset_password.success_message);
       setFieldErrors(null);
-      router.push("/login");
+      router.push("/login?reauth=password-reset");
     },
     onError: () => {
       toast.error(dict.validation.generic_error);

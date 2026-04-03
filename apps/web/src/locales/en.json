@@ -631,7 +631,10 @@
       "social_divider": "Or continue with",
       "no_account": "Don't have an account?",
       "create_one": "Create one",
-      "success": "Signed in successfully"
+      "success": "Signed in successfully",
+      "oauth_account_not_linked": "This GitHub account cannot be linked automatically. Sign in with your password and connect GitHub in Settings.",
+      "reauth_password_updated": "Password updated. Please sign in again to continue.",
+      "reauth_password_reset": "Password reset successfully. All previous sessions were revoked."
     },
     "register": {
       "welcome_title": "Join Retold",
