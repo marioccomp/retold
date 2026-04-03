@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -64,13 +64,13 @@ export default function FeedContent({ initialData }: Props) {
     queryKey: ["feed-projects", page, debouncedSearchQuery, projectSort],
     queryFn: () => getFeedProjects(page, 12, debouncedSearchQuery, projectSort),
     initialData,
-    refetchInterval: (query) => {
-      const projects = query.state.data?.projects;
-      const isAnalyzing = projects?.some(
-        (p: any) => p.status === "ANALYZING" || p.status === "PENDING"
-      );
-      return isAnalyzing ? 3000 : false;
-    },
+      refetchInterval: (query) => {
+        const projects = query.state.data?.projects;
+        const isAnalyzing = projects?.some(
+          (project) => project.status === "ANALYZING" || project.status === "PENDING"
+        );
+        return isAnalyzing ? 3000 : false;
+      },
   });
 
   const handleTabChange = (value: string) => {
@@ -103,8 +103,9 @@ export default function FeedContent({ initialData }: Props) {
       id="feed-content"
       className="w-full max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col items-center relative scroll-mt-4"
     >
-      {/* Gradiente sutil para conectar com o hero */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/40 to-transparent pointer-events-none -z-10" />
+      {/* Zona de transição com a hero */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,transparent)_0%,color-mix(in_oklab,var(--background)_58%,transparent)_48%,transparent_100%)] dark:bg-[linear-gradient(180deg,rgba(16,22,19,0.86)_0%,rgba(16,22,19,0.34)_48%,transparent_100%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-16 w-[min(40rem,76vw)] -translate-x-1/2 rounded-[999px] bg-primary/6 blur-[72px] dark:bg-primary/4" />
 
       {/* Hero Search Bar - Main Feed Search */}
       {!isProjectSelected && (

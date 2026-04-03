@@ -1,13 +1,10 @@
 "use client";
 
 // import styles from "./ProjectCard.module.css";
-import { MdFavoriteBorder, MdFavorite, MdOutlineVisibility, MdModeComment } from "react-icons/md";
+import { MdFavoriteBorder, MdFavorite, MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
-import { toast } from "sonner";
-import { ExternalLink, Lock, MessageCircle } from "lucide-react";
-import placeholderImage from "@/assets/mockup-escalonador.jpg";
-import { useState, useEffect, useTransition } from "react";
-import ownerPic from "@/assets/foto.jpeg";
+import { Lock, MessageCircle } from "lucide-react";
+import { useState, useTransition } from "react";
 import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
 import { ProjectSettings } from "./ProjectPanel/components/ProjectSettings";
 import { useSession } from "next-auth/react";
@@ -45,15 +42,7 @@ export default function ProjectCard({
   const queryClient = useQueryClient(); // Access React Query Client
   const [isLiked, setIsLiked] = useState(project.hasLiked ?? false);
   const [likesCount, setLikesCount] = useState(project.likes);
-  const [viewsCount, setViewsCount] = useState(project.views);
   const [animateLike, setAnimateLike] = useState(false);
-
-  // Sincroniza se o prop mudar (importante para refreshes do Next.js)
-  useEffect(() => {
-    setViewsCount(project.views);
-    setIsLiked(project.hasLiked ?? false);
-    setLikesCount(project.likes);
-  }, [project.views, project.likes, project.hasLiked]);
 
   const ownerName: string = project.ownerName || "Mario Junior";
 
@@ -61,6 +50,37 @@ export default function ProjectCard({
   const isOwner = ownProfile || session?.user?.username === project.ownerUsername;
 
   const { openLoginModal } = useAuthModal();
+
+  const updateProjectLikeInCaches = (projectId: number, nextLiked: boolean) => {
+    queryClient.setQueryData<ProjectCardDTO | null>(["highlighted-project"], (current) => {
+      if (!current || current.id !== projectId) return current;
+
+      return {
+        ...current,
+        hasLiked: nextLiked,
+        likes: Math.max(0, current.likes + (nextLiked ? 1 : -1)),
+      };
+    });
+
+    queryClient.setQueriesData<
+      { projects: ProjectCardDTO[]; metadata: { total: number; page: number; limit: number; totalPages: number } } | undefined
+    >({ queryKey: ["feed-projects"] }, (current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        projects: current.projects.map((feedProject) =>
+          feedProject.id === projectId
+            ? {
+                ...feedProject,
+                hasLiked: nextLiked,
+                likes: Math.max(0, feedProject.likes + (nextLiked ? 1 : -1)),
+              }
+            : feedProject
+        ),
+      };
+    });
+  };
 
   const handleToggleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -73,6 +93,7 @@ export default function ProjectCard({
     setIsLiked(newIsLiked);
     setAnimateLike(true);
     setLikesCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
+    updateProjectLikeInCaches(project.id, newIsLiked);
 
     startTransition(async () => {
       const response = await toggleLike(project.id);
@@ -84,6 +105,7 @@ export default function ProjectCard({
         // Rollback se falhar
         setIsLiked(!newIsLiked);
         setLikesCount((prev) => (!newIsLiked ? prev + 1 : prev - 1));
+        updateProjectLikeInCaches(project.id, !newIsLiked);
       }
     });
   };
@@ -258,7 +280,7 @@ export default function ProjectCard({
           </div>
           <div className="flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2">
             <MdOutlineVisibility size={22} />
-            <p>{viewsCount}</p>
+            <p>{project.views}</p>
           </div>
         </div>
       </div>
