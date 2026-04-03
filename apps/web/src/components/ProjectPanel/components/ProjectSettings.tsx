@@ -27,6 +27,7 @@ import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-pro
 import { deleteProjectImageAction } from "@/src/domains/user/actions/delete-project-image.action";
 import { useQueryClient } from "@tanstack/react-query";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
+import CropImageModal from "@/components/CropImageModal";
 
 type ProjectSettingsProps = {
   project: {
@@ -74,6 +75,7 @@ export const ProjectSettings = ({
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]); // URLs of original images to delete
   const [imageToDelete, setImageToDelete] = useState<LocalImage | null>(null); // For confirmation modal
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [editingImageId, setEditingImageId] = useState<string | null>(null);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -123,8 +125,44 @@ export const ProjectSettings = ({
 
     setLocalImages((prev) => [...prev, ...newImages]);
 
+    if (newImages.length > 0) {
+      setEditingImageId(newImages[0].id);
+    }
+
     // Reset input
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleCropComplete = (croppedBlob: Blob) => {
+    const imageToUpdate = localImages.find((img) => img.id === editingImageId);
+    if (!imageToUpdate || imageToUpdate.isOriginal) {
+      setEditingImageId(null);
+      return;
+    }
+
+    const nextPreview = URL.createObjectURL(croppedBlob);
+    const fileBaseName = imageToUpdate.file ? imageToUpdate.file.name.replace(/\.[^.]+$/, "") : "image";
+    const nextFile = new File([croppedBlob], `${fileBaseName}-cropped.webp`, {
+      type: croppedBlob.type || "image/webp",
+    });
+
+    setLocalImages((prev) =>
+      prev.map((img) => {
+        if (img.id !== editingImageId) return img;
+
+        if (!img.isOriginal && img.preview.startsWith("blob:")) {
+          URL.revokeObjectURL(img.preview);
+        }
+
+        return {
+          ...img,
+          preview: nextPreview,
+          file: nextFile,
+        };
+      })
+    );
+
+    setEditingImageId(null);
   };
 
   const confirmDeleteImage = () => {
@@ -395,6 +433,14 @@ export const ProjectSettings = ({
                   </Select>
                 </div>
               </div>
+
+              <CropImageModal
+                isOpen={editingImageId !== null}
+                onClose={() => setEditingImageId(null)}
+                imageSrc={localImages.find((img) => img.id === editingImageId)?.preview ?? ""}
+                aspectRatio={16 / 9}
+                onCropComplete={handleCropComplete}
+              />
               <div className="flex items-center justify-end gap-3 p-4 bg-muted/50 border-t border-border">
                 <Button
                   variant="ghost"

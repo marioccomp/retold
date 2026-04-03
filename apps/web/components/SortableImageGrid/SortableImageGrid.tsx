@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   DndContext,
   closestCenter,
@@ -20,7 +21,7 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { FiX, FiUpload } from "react-icons/fi";
+import { FiEdit2, FiX, FiUpload } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 
 export type SortableImage = {
@@ -33,10 +34,19 @@ export type SortableImage = {
 type SortableImageItemProps = {
   image: SortableImage;
   onRemove: (id: string) => void;
+  isPrimary?: boolean;
+  primaryLabel?: string;
   isDragging?: boolean;
 };
 
-function SortableImageItem({ image, onRemove, isDragging }: SortableImageItemProps) {
+
+function SortableImageItem({
+  image,
+  onRemove,
+  isPrimary,
+  primaryLabel,
+  isDragging,
+}: SortableImageItemProps) {
   const {
     attributes,
     listeners,
@@ -57,18 +67,28 @@ function SortableImageItem({ image, onRemove, isDragging }: SortableImageItemPro
       style={style}
       className={cn(
         "relative aspect-video rounded-lg overflow-hidden border border-border group bg-muted cursor-grab active:cursor-grabbing",
+        isPrimary && "border-primary/40 shadow-[0_0_0_1px_hsl(var(--primary)/0.18)]",
         isSorting && "opacity-50 z-10",
         isDragging && "ring-2 ring-primary ring-offset-2"
       )}
       {...attributes}
       {...listeners}
     >
-      <img
+      <Image
         src={image.preview}
         alt="Project image"
-        className="w-full h-full object-cover pointer-events-none"
+        fill
+        sizes="(max-width: 768px) 33vw, 180px"
+        unoptimized
+        className="object-cover pointer-events-none"
         draggable={false}
       />
+
+      {isPrimary && primaryLabel && (
+        <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+          {primaryLabel}
+        </span>
+      )}
 
       <button
         onClick={(e) => {
@@ -82,8 +102,8 @@ function SortableImageItem({ image, onRemove, isDragging }: SortableImageItemPro
         <FiX className="w-3 h-3" />
       </button>
 
-      {/* Drag hint overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </div>
   );
 }
@@ -95,10 +115,13 @@ type DragOverlayImageProps = {
 function DragOverlayImage({ image }: DragOverlayImageProps) {
   return (
     <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-primary bg-muted shadow-2xl cursor-grabbing w-[150px]">
-      <img
+      <Image
         src={image.preview}
         alt="Dragging"
-        className="w-full h-full object-cover"
+        fill
+        sizes="150px"
+        unoptimized
+        className="object-cover"
         draggable={false}
       />
     </div>
@@ -112,7 +135,9 @@ type SortableImageGridProps = {
   onAddClick: () => void;
   maxImages?: number;
   addLabel?: string;
+  primaryLabel?: string;
 };
+
 
 export default function SortableImageGrid({
   images,
@@ -121,6 +146,7 @@ export default function SortableImageGrid({
   onAddClick,
   maxImages = 3,
   addLabel = "Add",
+  primaryLabel,
 }: SortableImageGridProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -170,6 +196,8 @@ export default function SortableImageGrid({
               key={image.id}
               image={image}
               onRemove={onRemove}
+              isPrimary={image.id === images[0]?.id}
+              primaryLabel={primaryLabel}
               isDragging={activeId === image.id}
             />
           ))}

@@ -10,7 +10,9 @@ type UpdateProjectInput = {
   title: string;
   description: string;
   visibility: "public" | "private";
+  images?: string[];
 };
+
 
 export async function updateProjectAction(input: UpdateProjectInput) {
   const session = await auth();
@@ -42,7 +44,9 @@ export async function updateProjectAction(input: UpdateProjectInput) {
       visibility: input.visibility,
       // If setting to private, automatically unpin
       ...(input.visibility === "private" ? { isPinned: false } : {}),
+      ...(input.images ? { images: input.images } : {}),
     },
+
   });
 
   revalidatePath(`/${session.user.username}`);
