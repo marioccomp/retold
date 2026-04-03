@@ -205,13 +205,17 @@
         "public": "Público",
         "private": "Privado"
       },
-      "images_hint": "Adicione até 3 imagens para destacar seu projeto",
+      "images_hint": "Adicione até 3 imagens para destacar seu projeto.",
+      "images_cover_hint": "A primeira imagem vira a capa do projeto.",
+      "images_crop_hint": "Use Ajustar para reposicionar o enquadramento antes de publicar.",
       "tooltips": {
         "move_left": "Mover para esquerda",
         "move_right": "Mover para direita",
         "remove": "Remover"
       },
       "add": "Adicionar",
+      "adjust": "Ajustar",
+      "cover_label": "Capa",
       "repo_hint": "Selecione um repositório do GitHub",
       "repo_loading": "Carregando repositórios...",
       "repo_selected": "Selecionado",

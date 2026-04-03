@@ -205,13 +205,17 @@
         "public": "Public",
         "private": "Private"
       },
-      "images_hint": "Add up to 3 images to highlight your project",
+      "images_hint": "Add up to 3 images to highlight your project.",
+      "images_cover_hint": "The first image becomes the project cover.",
+      "images_crop_hint": "Use Adjust to reposition the framing before publishing.",
       "tooltips": {
         "move_left": "Move left",
         "move_right": "Move right",
         "remove": "Remove"
       },
       "add": "Add",
+      "adjust": "Adjust",
+      "cover_label": "Cover",
       "repo_hint": "Select a GitHub repository",
       "repo_loading": "Loading repositories...",
       "repo_selected": "Selected",

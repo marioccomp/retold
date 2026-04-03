@@ -12,6 +12,7 @@ import {
 import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
 import { toast } from "sonner";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
+import CropImageModal from "@/components/CropImageModal";
 import { useTranslation } from "@/src/i18n/client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,10 +52,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
   const [selectedRepoId, setSelectedRepoId] = useState<number | null>(null);
   const [sortableImages, setSortableImages] = useState<SortableImage[]>([]);
   const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Track object URLs for cleanup
-  const generatedUrls = useRef<string[]>([]);
+  const sortableImagesRef = useRef<SortableImage[]>([]);
 
   // Fetch repositories
   const { data: repositories = [], isLoading: isLoadingRepos } = useQuery<Repository[]>({
@@ -77,12 +77,19 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     return () => window.removeEventListener("message", handleMessage);
   }, [queryClient]);
 
-  // Cleanup previews on unmount
+  useEffect(() => {
+    sortableImagesRef.current = sortableImages;
+  }, [sortableImages]);
+
   useEffect(() => {
     return () => {
-      sortableImages.forEach((img) => URL.revokeObjectURL(img.preview));
+      sortableImagesRef.current.forEach((img) => {
+        if (img.preview.startsWith("blob:")) {
+          URL.revokeObjectURL(img.preview);
+        }
+      });
     };
-  }, [sortableImages]);
+  }, []);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -101,19 +108,58 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         isNew: true,
       }));
 
-      setSortableImages([...sortableImages, ...newSortableImages]);
+      setSortableImages((prev) => [...prev, ...newSortableImages]);
+
+      if (newSortableImages.length > 0) {
+        setEditingImageId(newSortableImages[0].id);
+      }
 
       // Reset input to allow selecting same file again
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
+  const handleCropComplete = (croppedBlob: Blob) => {
+    const imageToUpdate = sortableImages.find((img) => img.id === editingImageId);
+    if (!imageToUpdate?.file) {
+      setEditingImageId(null);
+      return;
+    }
+
+    const nextPreview = URL.createObjectURL(croppedBlob);
+    const fileBaseName = imageToUpdate.file.name.replace(/\.[^.]+$/, "");
+    const nextFile = new File([croppedBlob], `${fileBaseName}-cropped.webp`, {
+      type: croppedBlob.type || "image/webp",
+    });
+
+    setSortableImages((prev) =>
+      prev.map((img) => {
+        if (img.id !== editingImageId) return img;
+
+        if (img.preview.startsWith("blob:")) {
+          URL.revokeObjectURL(img.preview);
+        }
+
+        return {
+          ...img,
+          preview: nextPreview,
+          file: nextFile,
+          isNew: true,
+        };
+      })
+    );
+
+    setEditingImageId(null);
+  };
+
   const handleRemoveImage = (id: string) => {
     const imageToRemove = sortableImages.find((img) => img.id === id);
     if (imageToRemove) {
-      URL.revokeObjectURL(imageToRemove.preview);
+      if (imageToRemove.preview.startsWith("blob:")) {
+        URL.revokeObjectURL(imageToRemove.preview);
+      }
     }
-    setSortableImages(sortableImages.filter((img) => img.id !== id));
+    setSortableImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   // GitHub App install URL
@@ -187,9 +233,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
       }
       onSuccess();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error(error);
-      toast.error(error.message || t.toast.error);
+      toast.error(error instanceof Error ? error.message : t.toast.error);
     },
   });
 
@@ -305,6 +351,9 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                 </span>
               </div>
               <p className="m-0 text-[0.85rem] text-muted-foreground">{t.images_hint}</p>
+              <p className="mt-1 text-[0.8rem] text-muted-foreground">
+                {t.images_cover_hint}
+              </p>
             </div>
 
             <SortableImageGrid
@@ -314,6 +363,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
               onAddClick={() => fileInputRef.current?.click()}
               maxImages={3}
               addLabel={t.add}
+              primaryLabel={t.cover_label}
             />
 
             <input
@@ -391,6 +441,14 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           </div>
         </div>
       </div>
+
+      <CropImageModal
+        isOpen={editingImageId !== null}
+        onClose={() => setEditingImageId(null)}
+        imageSrc={sortableImages.find((img) => img.id === editingImageId)?.preview ?? ""}
+        aspectRatio={16 / 9}
+        onCropComplete={handleCropComplete}
+      />
 
       {/* Footer */}
       <div className="px-7 py-5 md:py-6 flex gap-3 justify-end border-t border-border bg-muted/30">
