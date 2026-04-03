@@ -26,6 +26,8 @@ export default function CropImageModal({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentAspect, setCurrentAspect] = useState(aspectRatio);
+  const [mediaAspect, setMediaAspect] = useState<number | null>(null);
 
   const onCropChange = useCallback((nextCrop: { x: number; y: number }) => {
     setCrop(nextCrop);
@@ -38,6 +40,14 @@ export default function CropImageModal({
   const onCropAreaChange = useCallback((_: Area, nextCroppedAreaPixels: Area) => {
     setCroppedAreaPixels(nextCroppedAreaPixels);
   }, []);
+
+  const onMediaLoaded = useCallback(
+    (mediaSize: { width: number; height: number; naturalWidth: number; naturalHeight: number }) => {
+      const aspect = mediaSize.naturalWidth / mediaSize.naturalHeight;
+      setMediaAspect(aspect);
+    },
+    []
+  );
 
   const handleConfirm = async () => {
     if (!croppedAreaPixels) return;
@@ -58,6 +68,7 @@ export default function CropImageModal({
     setCrop({ x: 0, y: 0 });
     setZoom(1);
     setCroppedAreaPixels(null);
+    setCurrentAspect(aspectRatio);
     onClose();
   };
 
@@ -65,26 +76,38 @@ export default function CropImageModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-background w-[90vw] h-[90vh] max-w-[1200px] rounded-2xl shadow-2xl overflow-hidden m-4 animate-in zoom-in-95 flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
-          <h2 className="text-xl font-semibold text-foreground">{dict.profile.crop_modal.title}</h2>
+      <div className="bg-background w-[90vw] h-[90vh] max-w-[1200px] sm:rounded-2xl shadow-2xl overflow-hidden sm:m-4 animate-in zoom-in-95 flex flex-col max-sm:w-full max-sm:h-full max-sm:m-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border shrink-0">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground leading-tight">
+              {dict.profile.crop_modal.title}
+            </h2>
+            <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
+              {currentAspect === aspectRatio ? "Formato Banner (16:9)" : "Formato Original"}
+            </p>
+          </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+            className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
           >
-            <FiX size={20} />
+            <FiX size={24} className="sm:hidden" />
+            <FiX size={20} className="max-sm:hidden" />
           </button>
         </div>
 
-        <div className="relative flex-1 bg-[#1a1a1a] overflow-hidden">
+        <div className="relative flex-1 bg-[#121212] overflow-hidden">
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={aspectRatio}
+            minZoom={1}
+            maxZoom={5}
+            restrictPosition={true}
+            aspect={currentAspect}
             onCropChange={onCropChange}
             onZoomChange={onZoomChange}
             onCropComplete={onCropAreaChange}
+            onMediaLoaded={onMediaLoaded}
             showGrid={true}
             objectFit="contain"
             style={{
@@ -93,52 +116,103 @@ export default function CropImageModal({
                 height: "100%",
               },
               cropAreaStyle: {
-                border: "3px solid hsl(var(--primary))",
-                borderRadius: "12px",
+                border: "2px solid hsl(var(--primary))",
+                borderRadius: "8px",
               },
             }}
           />
         </div>
 
-        <div className="flex items-center justify-center gap-4 py-4 bg-muted/30 border-t border-border shrink-0">
-          <button
-            onClick={() => setZoom(Math.max(1, zoom - 0.1))}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
-          >
-            <FiZoomOut size={18} />
-          </button>
-          <input
-            type="range"
-            min={1}
-            max={3}
-            step={0.05}
-            value={zoom}
-            onChange={(e) => setZoom(Number(e.target.value))}
-            className="w-48 h-2 bg-border rounded-full appearance-none cursor-pointer
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4
-              [&::-webkit-slider-thumb]:h-4
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-primary
-              [&::-webkit-slider-thumb]:cursor-pointer
-              [&::-webkit-slider-thumb]:shadow-md
-              [&::-webkit-slider-thumb]:transition-transform
-              [&::-webkit-slider-thumb]:hover:scale-110"
-          />
-          <button
-            onClick={() => setZoom(Math.min(3, zoom + 0.1))}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
-          >
-            <FiZoomIn size={18} />
-          </button>
-          <span className="text-xs text-muted-foreground ml-2 w-12">{Math.round(zoom * 100)}%</span>
+        {/* Aspect Ratio & Zoom Controls */}
+        <div className="flex flex-col bg-muted/30 border-t border-border shrink-0">
+          {/* Zoom Control */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4 py-3 px-4 sm:px-6 border-b border-border/50">
+            <button
+              onClick={() => setZoom(Math.max(1, zoom - 0.1))}
+              className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+            >
+              <FiZoomOut size={20} className="sm:size-[18px]" />
+            </button>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              step={0.05}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className={`flex-1 max-w-[240px] h-1.5 bg-border rounded-full appearance-none cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none
+                [&::-webkit-slider-thumb]:w-5
+                [&::-webkit-slider-thumb]:h-5
+                sm:[&::-webkit-slider-thumb]:w-4
+                sm:[&::-webkit-slider-thumb]:h-4
+                [&::-webkit-slider-thumb]:rounded-full
+                [&::-webkit-slider-thumb]:bg-primary
+                [&::-webkit-slider-thumb]:cursor-pointer
+                [&::-webkit-slider-thumb]:shadow-md
+                [&::-webkit-slider-thumb]:transition-transform
+                [&::-webkit-slider-thumb]:hover:scale-110`}
+            />
+            <button
+              onClick={() => setZoom(Math.min(5, zoom + 0.1))}
+              className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+            >
+              <FiZoomIn size={20} className="sm:size-[18px]" />
+            </button>
+            <span className="text-[11px] font-medium text-muted-foreground ml-1 w-10 tabular-nums">
+              {Math.round(zoom * 100)}%
+            </span>
+          </div>
+
+          {/* Aspect Ratio Controls */}
+          <div className="flex items-center sm:justify-center gap-2 p-3 overflow-x-auto no-scrollbar scroll-smooth">
+            <Button
+              variant={currentAspect === aspectRatio ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => {
+                setCurrentAspect(aspectRatio);
+                setZoom(1);
+              }}
+              className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
+            >
+              <div className="w-4 h-2.5 border border-current opacity-70" />
+              Banner
+            </Button>
+            <Button
+              variant={mediaAspect && currentAspect === mediaAspect ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => {
+                if (mediaAspect) {
+                  setCurrentAspect(mediaAspect);
+                  setZoom(1);
+                }
+              }}
+              disabled={!mediaAspect}
+              className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
+            >
+              <div className="w-3.5 h-3.5 border border-dashed border-current opacity-70" />
+              Original
+            </Button>
+            <Button
+              variant={currentAspect === 1 ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => {
+                setCurrentAspect(1);
+                setZoom(1);
+              }}
+              className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
+            >
+              <div className="w-3.5 h-3.5 border border-current opacity-70" />
+              Quadrado
+            </Button>
+          </div>
         </div>
 
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border bg-background shrink-0">
+        <div className="flex justify-end gap-3 px-4 sm:px-6 py-4 border-t border-border bg-background shrink-0 max-sm:grid max-sm:grid-cols-2">
           <Button
             variant="ghost"
             onClick={handleClose}
-            className="text-muted-foreground hover:bg-muted cursor-pointer"
+            className="text-muted-foreground hover:bg-muted cursor-pointer h-11 sm:h-10 px-5 rounded-xl sm:rounded-lg"
             disabled={isProcessing}
           >
             {dict.profile.crop_modal.cancel}
@@ -146,20 +220,30 @@ export default function CropImageModal({
           <Button
             onClick={handleConfirm}
             disabled={isProcessing}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer shadow-lg shadow-primary/20"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer shadow-lg shadow-primary/20 h-11 sm:h-10 px-6 font-bold sm:font-semibold rounded-xl sm:rounded-lg"
           >
             {isProcessing ? (
-              <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin mr-2" />
+              <span className="w-5 h-5 sm:w-4 sm:h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin mr-2" />
             ) : (
-              <FiCheck className="mr-2" size={16} />
+              <FiCheck className="mr-2 sm:size-4" size={18} />
             )}
             {dict.profile.crop_modal.apply}
           </Button>
         </div>
       </div>
+      <style jsx>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }
+
 
 async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
   const image = await createImage(imageSrc);
@@ -209,3 +293,5 @@ function createImage(url: string): Promise<HTMLImageElement> {
     image.src = url;
   });
 }
+
+
