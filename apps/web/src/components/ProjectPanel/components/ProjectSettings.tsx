@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Settings, Edit3, Trash2, X, AlertTriangle, ImagePlus, Loader2 } from "lucide-react";
+import { Settings, Edit3, Trash2, X, AlertTriangle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,6 @@ import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-pro
 import { deleteProjectImageAction } from "@/src/domains/user/actions/delete-project-image.action";
 import { useQueryClient } from "@tanstack/react-query";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
-import { cn } from "@/lib/utils";
 
 type ProjectSettingsProps = {
   project: {
@@ -196,6 +195,8 @@ export const ProjectSettings = ({
       queryClient.invalidateQueries({ queryKey: ["project-analysis", project.id] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
+
 
       if (project.ownerUsername) {
         queryClient.invalidateQueries({ queryKey: ["github-stats", project.ownerUsername] });
@@ -219,6 +220,8 @@ export const ProjectSettings = ({
       if (onDelete) onDelete();
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
+
 
       if (project.ownerUsername) {
         queryClient.invalidateQueries({ queryKey: ["github-stats", project.ownerUsername] });
@@ -379,11 +382,7 @@ export const ProjectSettings = ({
                       id="edit-visibility"
                       className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-border text-foreground text-sm focus:ring-primary/30 focus:border-primary"
                     >
-                      <SelectValue
-                        placeholder={
-                          (t.placeholders as any).visibility || t.placeholders.description
-                        }
-                      />
+                      <SelectValue placeholder={t.labels.visibility} />
                     </SelectTrigger>
                     <SelectContent className="bg-popover z-[1100]" position="popper">
                       <SelectItem value="public" className="cursor-pointer">

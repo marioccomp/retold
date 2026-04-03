@@ -12,6 +12,7 @@ import { MessageCircle, Trash2, Reply, Send } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR, enUS } from "date-fns/locale"
 import { useSession } from "next-auth/react"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface CommentSectionProps {
     projectId: number
@@ -21,7 +22,9 @@ export function CommentSection({ projectId }: CommentSectionProps) {
     const { dict, lang } = useTranslation()
     const t = dict.project.comments
     const { data: session } = useSession()
+    const queryClient = useQueryClient()
     const [comments, setComments] = useState<any[]>([])
+
     const [newComment, setNewComment] = useState("")
     const MAX_CHARS = 500
     const [submittingId, setSubmittingId] = useState<number | null>(null) // null for idle, 0 for main, id for reply
@@ -58,7 +61,13 @@ export function CommentSection({ projectId }: CommentSectionProps) {
             // Refresh comments
             const data = await getProjectComments(projectId)
             setComments(data)
+            
+            // Invalidate project caches to update comment counts everywhere
+            queryClient.invalidateQueries({ queryKey: ["feed-projects"] })
+            queryClient.invalidateQueries({ queryKey: ["highlighted-project"] })
+            queryClient.invalidateQueries({ queryKey: ["profile"] })
         } else {
+
             toast.error(result.message || t.error_create)
         }
     }
@@ -69,7 +78,13 @@ export function CommentSection({ projectId }: CommentSectionProps) {
             toast.success(t.success_delete)
             const data = await getProjectComments(projectId)
             setComments(data)
+
+            // Invalidate project caches to update comment counts everywhere
+            queryClient.invalidateQueries({ queryKey: ["feed-projects"] })
+            queryClient.invalidateQueries({ queryKey: ["highlighted-project"] })
+            queryClient.invalidateQueries({ queryKey: ["profile"] })
         } else {
+
             toast.error(t.error_delete)
         }
     }

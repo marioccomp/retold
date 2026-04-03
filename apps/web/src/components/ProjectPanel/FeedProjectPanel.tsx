@@ -111,7 +111,9 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
     if (!hasIncremented.current && project.owner?.username !== session?.user?.username) {
       incrementView(project.id).then(() => {
         queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+        queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
       });
+
       hasIncremented.current = true;
     }
   }, [project.id, queryClient]);
