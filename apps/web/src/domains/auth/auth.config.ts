@@ -53,6 +53,7 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user?.id) {
         token.id = String(user.id);
+        token.authenticatedAt = Date.now();
       }
 
       try {
@@ -76,6 +77,8 @@ export const authConfig = {
       session.user.username = typeof token.username === "string" ? token.username : null;
       session.user.hasCompletedOnboarding = Boolean(token.hasCompletedOnboarding);
       session.user.hasPassword = Boolean(token.hasPassword);
+      session.user.authenticatedAt =
+        typeof token.authenticatedAt === "number" ? token.authenticatedAt : undefined;
 
       return session;
     },

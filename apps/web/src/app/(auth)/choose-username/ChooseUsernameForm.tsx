@@ -26,7 +26,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
   const queryClient = useQueryClient();
   const { update, data: session } = useSession();
   const [usernameError, setUsernameError] = useState<string | null>(null);
-  const [usernameAvailable, setUsernameAvailable] = useState(false);
   const [usernameHelpVisible, setUsernameHelpVisible] = useState(true);
   const [lastCheckedUsername, setLastCheckedUsername] = useState<string | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -77,10 +76,8 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
     onSuccess: (data) => {
       if (!data.success) {
         setUsernameError(data.fieldErrors?.username?.[0] ?? data.message);
-        setUsernameAvailable(false);
       } else {
         setUsernameError(null);
-        setUsernameAvailable(true);
       }
     },
   });
@@ -197,7 +194,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                     const value = e.target.value;
 
                     if (usernameError) setUsernameError(null);
-                    if (usernameAvailable) setUsernameAvailable(false);
 
                     if (value.length >= 3 && value.length <= 20) {
                       setUsernameHelpVisible(false);
@@ -243,14 +239,11 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
               {checkUsernameMutation.isPending && (
                 <p className="text-xs text-gray-400 mt-1">{dict.auth.choose_username.checking}</p>
               )}
-              {usernameAvailable && (
-                <p className="text-xs text-primary mt-1">{dict.auth.choose_username.available}</p>
-              )}
               {usernameError && <p className="text-destructive text-xs mt-1">{usernameError}</p>}
             </div>
 
             {/* Preview */}
-            {!usernameHelpVisible && usernameAvailable && (
+            {!usernameHelpVisible && !usernameError && lastCheckedUsername && (
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mt-4">
                 <p className="text-sm text-primary/80">{dict.auth.choose_username.preview_label}</p>
                 <p className="text-sm font-medium text-primary mt-1">
@@ -266,7 +259,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
               disabled={
                 setUsernameMutation.isPending ||
                 !!usernameError ||
-                !usernameAvailable ||
                 usernameHelpVisible
               }
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"

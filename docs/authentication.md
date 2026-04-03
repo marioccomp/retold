@@ -121,6 +121,61 @@ From the user's point of view, a successful password change now ends the current
 
 ---
 
+## Public Auth Abuse Controls
+
+The public-facing auth endpoints now use server-side throttling and less revealing responses.
+
+### Covered flows
+
+- `register`
+- `forgot-password`
+- `check-email`
+- `check-username`
+
+### What changed
+
+- registration now applies rate limiting before attempting account creation
+- duplicate registration attempts no longer tell the caller whether the email or username already exists
+- forgot-password keeps the same neutral success message even when the email does not exist
+- forgot-password also keeps the same neutral success message when the throttle blocks the request
+- availability checks still validate format, but no longer expose whether a username or email is already present in the database
+
+### UX tradeoff
+
+The app intentionally gives up some "live availability" convenience:
+
+- registration no longer depends on a server-side "available" signal to enable submit
+- choosing a username no longer treats the public availability check as proof that the value is free
+
+This reduces the amount of enumeration value exposed to unauthenticated callers.
+
+---
+
+## Destructive Reauthentication
+
+Account deletion is no longer allowed from a mere authenticated session.
+
+### Current behavior
+
+- accounts with a local password must confirm the current password before deletion
+- accounts without a local password must have a recent authentication context
+- OAuth-only accounts are required to reauthenticate with GitHub before deletion if the session is no longer fresh
+- destructive confirmation attempts are rate-limited server-side
+
+### How freshness is tracked
+
+The JWT now carries `authenticatedAt`, which is refreshed on real sign-in.
+
+The server uses that timestamp to decide whether an OAuth-only session is fresh enough for irreversible actions.
+
+### Security outcome
+
+- a stale session alone is no longer enough to delete the account
+- a stolen cookie without password knowledge cannot delete a local-password account
+- OAuth-only users must present recent proof of possession before the destructive action completes
+
+---
+
 ## GitHub OAuth and Linking
 
 ### Current stance
@@ -190,6 +245,8 @@ Business authorization for server actions and domain mutations must still be enf
 - The Prisma migration that adds `sessionVersion` must be applied in every environment.
 - Production rollout should assume users may be asked to reauthenticate after password changes.
 - Support and product teams should be aware that GitHub auto-linking by email is intentionally disabled.
+- `APP_URL` and `ADDITIONAL_ALLOWED_ORIGINS` should reflect the real public hosts used by the app and its reverse proxy chain.
+- Account deletion for OAuth-only users now depends on a fresh GitHub reauthentication path remaining available.
 - The project still uses `next-auth@5.0.0-beta.30`, so release notes should continue to be monitored during future upgrades.
 
 ---
@@ -197,11 +254,9 @@ Business authorization for server actions and domain mutations must still be enf
 ## Known Gaps
 
 - There is no dedicated automated test suite yet for `sessionVersion`-based revocation.
-- The rest of the auth-adjacent anti-abuse controls still need hardening:
-  - registration throttling
-  - forgot-password throttling
-  - neutral account enumeration responses
-  - reauthentication for destructive account actions
+- There is no dedicated automated test suite yet for throttling and destructive reauthentication flows.
+- Forgot-password can still have observable timing differences because real email delivery depends on an external provider.
+- Edge protection still depends on correct reverse-proxy and origin/header forwarding in production.
 
 ---
 

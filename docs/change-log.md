@@ -551,3 +551,280 @@ Resultado:
 2. reautenticacao explicita para acoes destrutivas como exclusao de conta
 3. headers de seguranca e politicas de origem
 4. varredura completa de autorizacao server-side nas demais server actions e rotas
+
+---
+
+## 2026-04-03 - Hardening de abuso, enumeracao e protecao de borda
+
+### Contexto
+
+Este bloco atacou a camada de abuso automatizado e endurecimento de borda da aplicacao:
+
+1. rate limit e respostas neutras em `register`, `forgot-password`, `check-email` e `check-username`
+2. reautenticacao explicita para acoes destrutivas, com foco em exclusao de conta
+3. headers de seguranca e politicas de origem
+4. sweep adicional de autorizacao server-side em actions sensiveis ainda permissivas
+
+O objetivo foi reduzir enumeracao de contas, diminuir valor de automacao hostil e remover a dependencia de sessao "antiga suficiente" para acoes de alto impacto.
+
+---
+
+## 1. Rate limit e respostas neutras nos fluxos publicos
+
+### Problema
+
+Os endpoints publicos de auth e disponibilidade ainda tinham dois problemas:
+
+- comportamento enumeravel por resposta
+- ausencia de limitacao consistente contra automacao
+
+Isso permitia:
+
+- descobrir e-mails e usernames existentes
+- disparar recuperacao de senha em massa
+- automatizar tentativa de cadastro e ver disponibilidade sem muito atrito
+
+### Como foi corrigido
+
+Arquivos:
+
+- `apps/web/lib/redis-rate-limit.ts`
+- `apps/web/lib/get-client-ip.ts`
+- `apps/web/src/domains/auth/services/public-auth-rate-limit.service.ts`
+- `apps/web/src/app/(auth)/_actions/register.ts`
+- `apps/web/src/app/(auth)/_actions/forgot-password.ts`
+- `apps/web/src/app/(auth)/_actions/check-email.ts`
+- `apps/web/src/app/(auth)/_actions/check-username.ts`
+- `apps/web/src/domains/auth/services/forgot-password.service.ts`
+- `apps/web/src/app/(auth)/register/RegisterForm.tsx`
+- `apps/web/src/app/(auth)/choose-username/ChooseUsernameForm.tsx`
+- `apps/web/src/app/(auth)/_actions/set-username.ts`
+
+Foi criada uma camada central de rate limit para:
+
+- cadastro por IP, e-mail e username
+- recuperacao de senha por IP e identidade
+- checks de disponibilidade por IP e identidade
+- acoes destrutivas por IP e usuario
+
+Os endpoints `check-email` e `check-username` agora:
+
+- continuam validando formato
+- continuam sujeitos a rate limit
+- deixaram de revelar se o valor existe no banco
+
+O endpoint `forgot-password` agora:
+
+- continua respondendo com mensagem neutra
+- responde com a mesma mensagem neutra mesmo quando o throttle entra em acao
+
+O endpoint `register` agora:
+
+- aplica throttle antes de criar conta
+- deixou de devolver uma resposta distinguindo `email` ja existente de `username` ja existente
+
+### Ajuste de UX
+
+Como a disponibilidade agora e neutra:
+
+- o formulario de registro deixou de depender de "disponivel" em tempo real para habilitar o submit
+- o fluxo de escolha de username tambem deixou de usar o check publico como selo de disponibilidade
+
+Esse tradeoff foi deliberado: menos conveniencia imediata em troca de menos sinal util para enumeracao.
+
+---
+
+## 2. Reautenticacao explicita para exclusao de conta
+
+### Problema
+
+A exclusao de conta ainda dependia apenas de sessao autenticada.
+
+Na pratica, isso deixava a acao destrutiva vulneravel a:
+
+- uso de sessao roubada ou esquecida
+- contexto fraco para uma operacao irreversivel
+- tentativa repetida de confirmacao sem prova recente de posse
+
+### Como foi corrigido
+
+Arquivos:
+
+- `apps/web/src/domains/auth/auth.config.ts`
+- `apps/web/src/domains/auth/next-auth.d.ts`
+- `apps/web/src/lib/server-auth.ts`
+- `apps/web/src/actions/settings.ts`
+- `apps/web/src/app/(private)/settings/SettingsClient.tsx`
+- `apps/web/src/locales/pt.json`
+- `apps/web/src/locales/en.json`
+
+Foi introduzido `authenticatedAt` no JWT e na sessao para registrar quando houve autenticacao efetiva.
+
+O fluxo de exclusao agora funciona assim:
+
+- contas com senha local precisam informar a senha atual
+- contas sem senha local precisam ter autenticacao recente valida
+- se a conta sem senha estiver "fria", o usuario precisa reautenticar com GitHub antes de excluir
+- tentativas repetidas de confirmacao passam por rate limit server-side
+
+### Efeito pratico
+
+- uma sessao antiga sozinha nao basta mais para excluir a conta
+- sessao roubada sem senha atual nao consegue concluir exclusao em conta local
+- conta OAuth-only agora depende de sign-in recente antes da acao destrutiva
+
+### Tradeoff
+
+Para contas sem senha local, a UX ficou mais rigorosa:
+
+- o usuario precisa voltar pelo fluxo de login GitHub para renovar contexto de autenticacao
+
+Isso foi aceito porque exclusao de conta e uma operacao irreversivel e merece um nivel mais forte de prova de posse.
+
+---
+
+## 3. Endurecimento de headers e politicas de origem
+
+### Problema
+
+O app ainda estava sem uma camada explicita de hardening HTTP no proprio repo.
+
+### Como foi corrigido
+
+Arquivos:
+
+- `apps/web/next.config.ts`
+- `.env.example`
+
+Foi adicionada configuracao central de headers para toda a aplicacao, incluindo:
+
+- `Content-Security-Policy` minima e segura para este contexto
+- `Referrer-Policy`
+- `X-Content-Type-Options`
+- `X-Frame-Options`
+- `Permissions-Policy`
+- `Cross-Origin-Opener-Policy`
+- `Cross-Origin-Resource-Policy`
+- `Origin-Agent-Cluster`
+- `X-DNS-Prefetch-Control`
+- `X-Permitted-Cross-Domain-Policies`
+- `Strict-Transport-Security` em producao
+
+Tambem foi adicionada configuracao de `serverActions.allowedOrigins`, derivada de:
+
+- `APP_URL`
+- `ADDITIONAL_ALLOWED_ORIGINS`
+
+### Impacto esperado
+
+- reduz risco de clickjacking e framing
+- reduz superficie de alguns tipos de abuso de origem e carregamento indevido
+- documenta no repo a expectativa de hosts validos para server actions atras de proxy
+
+### Tradeoff
+
+Se a origem externa real da producao nao bater com `APP_URL` ou com `ADDITIONAL_ALLOWED_ORIGINS`, algumas server actions podem ser bloqueadas.
+
+Esse comportamento e desejado como fail-closed, mas exige configuracao operacional correta no ambiente.
+
+---
+
+## 4. Sweep adicional de autorizacao server-side
+
+### Problema
+
+Ainda havia funcoes mutaveis com contexto excessivamente implicito:
+
+- rotinas que assumiam sessao sem validar
+- funcoes internas que aceitavam alvo externo desnecessariamente
+
+### Como foi corrigido
+
+Arquivos:
+
+- `apps/web/src/domains/github/github.ts`
+- `apps/web/src/domains/project/actions/create-project.action.ts`
+- `apps/web/src/domains/project/actions/delete-project.action.ts`
+- `apps/web/src/app/(public)/[username]/_actions/post-github-stats.action.ts`
+
+Mudancas aplicadas:
+
+- `getUserRepositories()` passou a falhar de forma segura quando nao ha sessao valida
+- `createProjectAction()` deixou de tocar integracao GitHub antes de confirmar autenticacao
+- `postGithubStats()` deixou de aceitar alvo externo por `username` e agora opera no usuario autenticado
+- as chamadas de atualizacao de stats de GitHub foram ajustadas para esse novo contrato
+
+### Efeito pratico
+
+- reduz risco de mutacao cruzada ou execucao com alvo fornecido externamente
+- reforca o padrao de "derivar identidade no servidor"
+
+---
+
+## 5. Validacoes executadas
+
+### Lint direcionado
+
+Executado:
+
+```bash
+pnpm --filter web run lint -- "next.config.ts" "lib/get-client-ip.ts" "lib/redis-rate-limit.ts" "src/actions/settings.ts" "src/app/(auth)/_actions/register.ts" "src/app/(auth)/_actions/forgot-password.ts" "src/app/(auth)/_actions/check-email.ts" "src/app/(auth)/_actions/check-username.ts" "src/app/(auth)/_actions/set-username.ts" "src/app/(auth)/register/RegisterForm.tsx" "src/app/(auth)/choose-username/ChooseUsernameForm.tsx" "src/app/(private)/settings/SettingsClient.tsx" "src/app/(public)/[username]/_actions/post-github-stats.action.ts" "src/domains/auth/auth.config.ts" "src/domains/auth/next-auth.d.ts" "src/domains/auth/services/forgot-password.service.ts" "src/domains/auth/services/public-auth-rate-limit.service.ts" "src/domains/github/github.ts" "src/domains/project/actions/create-project.action.ts" "src/domains/project/actions/delete-project.action.ts"
+```
+
+Resultado:
+
+- sem erros nas areas alteradas deste bloco
+
+### Build de producao
+
+Executado:
+
+```bash
+pnpm --filter web run build
+```
+
+Resultado:
+
+- build de producao concluido com sucesso
+- um erro intermediario de tipagem em `next.config.ts` foi identificado e corrigido durante a validacao
+
+### Testes
+
+Executado:
+
+```bash
+pnpm --filter web run test:run
+```
+
+Resultado:
+
+- `register.service.spec.ts` passou
+- `get-profile.spec.ts` segue falhando em 3 testes preexistentes
+- nao houve evidencia de regressao nova ligada ao bloco de abuso/borda
+
+---
+
+## 6. Pendencias operacionais
+
+- configurar `ADDITIONAL_ALLOWED_ORIGINS` se a producao usar hostnames adicionais, proxy reverso ou dominios canonicos diferentes de `APP_URL`
+- validar no ambiente real se proxy e CDN preservam corretamente `Origin`, `Host`, `x-forwarded-for` e `x-real-ip`
+- garantir HTTPS real na borda para que `Strict-Transport-Security` faca sentido operacionalmente
+- revisar se o provedor OAuth usado para contas sem senha continua disponivel como caminho de reautenticacao para exclusao de conta
+
+---
+
+## 7. Riscos residuais
+
+- `forgot-password` ainda pode ter diferenca de tempo observavel por depender de envio real de e-mail a provedor externo
+- a aplicacao ainda depende de Upstash Redis para enforcement consistente dos novos throttles
+- o restante da suite automatizada continua com cobertura limitada para flows de abuso e reautenticacao destrutiva
+- ainda ha superficie operacional fora do repo, como proxy/Nginx/CDN, que precisa ser validada em ambiente real
+
+---
+
+## 8. Proximo bloco recomendado
+
+1. corrigir exposicao de segredos e placeholders inseguros em `.env.example`, `.env` e documentacao operacional
+2. revisar pipeline de deploy manual, rollback e hardening da VPS
+3. ampliar testes automatizados para auth, abuso, autorizacao e rotas sensiveis
+4. pentest manual complementar em staging com foco em server actions e integracoes GitHub

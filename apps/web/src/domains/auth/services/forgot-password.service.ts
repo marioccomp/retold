@@ -3,7 +3,8 @@ import { userRepository, passwordResetRepository } from "@repo/database";
 import { sendPasswordResetEmail } from "@/lib/mail";
 
 export async function forgotPasswordService(email: string) {
-  const user = await userRepository.findByEmail(email);
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await userRepository.findByEmail(normalizedEmail);
   if (!user) return;
 
   await passwordResetRepository.invalidateAllActiveTokens(user.id);

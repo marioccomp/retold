@@ -32,7 +32,7 @@ export async function deleteProjectAction(projectId: number) {
   });
 
   if (session.user.username) {
-    await postGithubStats(session.user.username);
+    await postGithubStats();
     await lastCommitQueue.add(
       "refresh-last-commit",
       { userId: Number(session.user.id) },
@@ -47,7 +47,7 @@ export async function deleteProjectAction(projectId: number) {
   }
 
   revalidatePath(`/${session.user.username}`);
-  // @ts-ignore
+  // @ts-expect-error - documentation says single arg, but types seem to differ in this version
   revalidateTag(FEED_RECOMMENDED_TAG);
   revalidatePath("/");
   return { success: true };

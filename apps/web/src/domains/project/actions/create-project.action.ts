@@ -27,11 +27,11 @@ export async function createProjectAction(
   const dict = await getDictionary();
   const t = dict.project.create_panel.toast;
 
-  await getUserRepositories();
-
   if (!session?.user?.id) {
     return { success: false, message: dict.auth.errors.unauthorized };
   }
+
+  await getUserRepositories();
 
   // Check rate limit
   const user = await prisma.user.findUnique({
@@ -113,7 +113,7 @@ export async function createProjectAction(
 
   const projectId = project.id;
 
-  await postGithubStats(session.user.username || "");
+  await postGithubStats();
 
   await lastCommitQueue.add(
     "refresh-last-commit",
@@ -134,7 +134,7 @@ export async function createProjectAction(
   // Calculate remaining analyses for notification
   const remaining = DAILY_ANALYSIS_LIMIT - currentCount - 1;
 
-  // @ts-ignore - documentation says single arg, but types seem to differ in this version
+  // @ts-expect-error - documentation says single arg, but types seem to differ in this version
   revalidateTag(FEED_RECOMMENDED_TAG);
   revalidatePath("/");
 

@@ -38,6 +38,19 @@
       "modal_description": "Are you sure? This will permanently delete your account and all your data. This action cannot be undone.",
       "modal_confirm": "Yes, delete my account",
       "modal_cancel": "Cancel",
+      "reauth": {
+        "password_label": "Confirm your current password",
+        "password_placeholder": "Enter your password to confirm",
+        "password_help": "For safety, account deletion requires explicit reauthentication.",
+        "password_required": "Enter your current password to delete the account.",
+        "invalid_password": "Incorrect password. Account deletion could not be confirmed.",
+        "oauth_help": "This account does not have a local password. Reauthenticate with GitHub and then confirm the deletion.",
+        "oauth_button": "Reauthenticate with GitHub",
+        "oauth_required": "Reauthenticate with GitHub before deleting the account.",
+        "oauth_missing_provider": "Connect GitHub or create a password before deleting the account.",
+        "oauth_success": "Reauthentication completed. You can now confirm the account deletion.",
+        "rate_limited": "Too many sensitive attempts in a short period. Please try again in a few minutes."
+      },
       "toast": {
         "update_error": "Failed to update password",
         "delete_error": "Failed to delete account"

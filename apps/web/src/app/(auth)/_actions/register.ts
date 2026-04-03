@@ -1,11 +1,15 @@
 "use server";
 
-import { z } from "zod";
 import { registerUser } from "@/src/domains/auth/services/register.service";
 import type { ActionResponse } from "@/lib/action-response";
-import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/domains/auth/auth.errors";
+import {
+  EmailAlreadyInUseError,
+  TooManyRequestsError,
+  UsernameAlreadyInUseError,
+} from "@/src/domains/auth/auth.errors";
 import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getDictionary } from "@/src/i18n/server";
+import { enforceRegisterRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
 
 type RegisterResponseData = {
   email: string;
@@ -37,6 +41,7 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
   const { name, email, username, password } = parsed.data;
 
   try {
+    await enforceRegisterRateLimit(email, username);
     await registerUser({ name, email, username, password });
     return {
       success: true,
@@ -45,24 +50,18 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
         username,
       },
     };
-  } catch (error: any) {
-    if (error instanceof EmailAlreadyInUseError) {
+  } catch (error: unknown) {
+    if (error instanceof TooManyRequestsError) {
       return {
         success: false,
-        message: dict.auth.errors.email_in_use,
-        fieldErrors: {
-          email: [dict.auth.errors.email_in_use],
-        },
+        message: dict.auth.errors.too_many_attempts,
       };
     }
 
-    if (error instanceof UsernameAlreadyInUseError) {
+    if (error instanceof EmailAlreadyInUseError || error instanceof UsernameAlreadyInUseError) {
       return {
         success: false,
-        message: dict.auth.errors.username_in_use,
-        fieldErrors: {
-          username: [dict.auth.errors.username_in_use],
-        },
+        message: dict.auth.errors.create_account_generic,
       };
     }
 

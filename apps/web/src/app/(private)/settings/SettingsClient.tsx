@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { createPortal } from "react-dom";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
   FiGithub,
@@ -48,6 +48,8 @@ export function SettingsClient({
   const [activeTab, setActiveTab] = useState("general");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [deleteCredential, setDeleteCredential] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [pendingPassword, startPasswordTransition] = useTransition();
   const [pendingDelete, startDeleteTransition] = useTransition();
@@ -73,17 +75,25 @@ export function SettingsClient({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const github = params.get("github");
-    if (!github) return;
+    const reauth = params.get("reauth");
+
+    if (!github && !reauth) return;
 
     if (github === "linked") toast.success("GitHub conectado com sucesso.");
+    if (reauth === "account-delete") {
+      toast.success(dict.settings.dangerZone.reauth.oauth_success);
+      setActiveTab("danger");
+    }
 
-    setActiveTab("integrations");
+    if (github && reauth !== "account-delete") {
+      setActiveTab("integrations");
+    }
 
     if (github === "already_linked") setLinkError("already_linked");
     if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
 
     window.history.replaceState(null, "", "/settings");
-  }, []);
+  }, [dict.settings.dangerZone.reauth.oauth_success]);
 
   async function handleUpdatePassword(formData: FormData) {
     const form = document.getElementById("password-form") as HTMLFormElement;
@@ -143,18 +153,30 @@ export function SettingsClient({
   }
 
   function handleDeleteAccount() {
+    setDeleteCredential("");
+    setDeleteError(null);
     setShowDeleteModal(true);
+  }
+
+  async function handleDeleteGithubReauth() {
+    setDeleteError(null);
+    await signIn("github", { callbackUrl: "/settings?reauth=account-delete" });
   }
 
   function confirmDeleteAccount() {
     startDeleteTransition(async () => {
-      try {
-        await deleteAccountAction();
-        setShowDeleteModal(false);
-        await signOut({ callbackUrl: "/" });
-      } catch {
-        toast.error(dict.settings.dangerZone.toast.delete_error);
+      setDeleteError(null);
+
+      const result = await deleteAccountAction(deleteCredential);
+
+      if (!result.success) {
+        setDeleteError(result.message);
+        toast.error(result.message);
+        return;
       }
+
+      setShowDeleteModal(false);
+      await signOut({ callbackUrl: "/" });
     });
   }
 
@@ -457,12 +479,63 @@ export function SettingsClient({
                 <p className="text-muted-foreground text-sm mb-6">
                   {dict.settings.dangerZone.modal_description}
                 </p>
+                {session?.user?.hasPassword ? (
+                  <div className="text-left mb-4 space-y-2">
+                    <Label htmlFor="delete-account-password">
+                      {dict.settings.dangerZone.reauth.password_label}
+                    </Label>
+                    <Input
+                      id="delete-account-password"
+                      type="password"
+                      value={deleteCredential}
+                      onChange={(e) => {
+                        setDeleteCredential(e.target.value);
+                        if (deleteError) setDeleteError(null);
+                      }}
+                      placeholder={dict.settings.dangerZone.reauth.password_placeholder}
+                      disabled={pendingDelete}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {dict.settings.dangerZone.reauth.password_help}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-left mb-4 space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      {dict.settings.dangerZone.reauth.oauth_help}
+                    </p>
+                    {isGithubLinked ? (
+                      <Button
+                        variant="outline"
+                        className="w-full font-medium cursor-pointer"
+                        onClick={handleDeleteGithubReauth}
+                        disabled={pendingDelete}
+                      >
+                        {dict.settings.dangerZone.reauth.oauth_button}
+                      </Button>
+                    ) : (
+                      <Alert variant="destructive">
+                        <FiAlertCircle className="h-4 w-4" />
+                        <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
+                        <AlertDescription>
+                          {dict.settings.dangerZone.reauth.oauth_missing_provider}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                )}
+                {deleteError && (
+                  <p className="text-destructive text-sm mb-4 text-left">{deleteError}</p>
+                )}
                 <div className="flex flex-col gap-2">
                   <Button
                     variant="destructive"
                     className="w-full font-medium cursor-pointer"
                     onClick={confirmDeleteAccount}
-                    disabled={pendingDelete}
+                    disabled={
+                      pendingDelete ||
+                      (session?.user?.hasPassword ? deleteCredential.trim().length === 0 : !isGithubLinked)
+                    }
                   >
                     {pendingDelete
                       ? dict.settings.dangerZone.buttonDeleting

@@ -9,6 +9,7 @@ declare module "next-auth" {
     hasPassword?: boolean;
     hasCompletedOnboarding?: boolean;
     sessionVersion?: number;
+    authenticatedAt?: number;
   }
 
   interface Session {
@@ -19,6 +20,7 @@ declare module "next-auth" {
       username?: string | null;
       hasPassword: boolean;
       hasCompletedOnboarding?: boolean;
+      authenticatedAt?: number;
     } & DefaultSession["user"];
   }
 }
@@ -33,5 +35,6 @@ declare module "next-auth/jwt" {
     hasCompletedOnboarding?: boolean;
     sessionVersion?: number;
     image?: string | null;
+    authenticatedAt?: number;
   }
 }

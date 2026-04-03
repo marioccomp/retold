@@ -6,10 +6,19 @@ import { prisma, userRepository } from "@repo/database";
 import bcrypt from "bcryptjs";
 import { getDictionary } from "@/src/i18n/server";
 import { cookies } from "next/headers";
+import {
+    hasRecentAuthentication,
+} from "@/src/lib/server-auth";
+import { enforceDestructiveActionRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
+import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
 
 type SettingsPasswordActionResult =
     | { error: string | Record<string, string[]> }
     | { success: string; requiresReauth: true };
+
+type DeleteAccountActionResult =
+    | { success: true }
+    | { success: false; message: string; requiresOAuthReauth?: boolean };
 
 export async function updatePasswordAction(
     prevState: unknown,
@@ -77,14 +86,74 @@ export async function updatePasswordAction(
     };
 }
 
-export async function deleteAccountAction() {
+export async function deleteAccountAction(
+    credential?: string
+): Promise<DeleteAccountActionResult> {
+    const dict = await getDictionary();
     const session = await auth();
 
     if (!session?.user?.id) {
-        throw new Error("Unauthorized");
+        return {
+            success: false,
+            message: dict.auth.errors.unauthorized,
+        };
     }
 
     const userId = parseInt(session.user.id);
+
+    try {
+        await enforceDestructiveActionRateLimit(userId);
+    } catch (error) {
+        if (error instanceof TooManyRequestsError) {
+            return {
+                success: false,
+                message: dict.settings.dangerZone.reauth.rate_limited,
+            };
+        }
+
+        return {
+            success: false,
+            message: dict.settings.dangerZone.toast.delete_error,
+        };
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            password: true,
+        },
+    });
+
+    if (!user) {
+        return {
+            success: false,
+            message: dict.settings.password.errors.user_not_found,
+        };
+    }
+
+    if (user.password) {
+        if (!credential) {
+            return {
+                success: false,
+                message: dict.settings.dangerZone.reauth.password_required,
+            };
+        }
+
+        const isValid = await bcrypt.compare(credential, user.password);
+
+        if (!isValid) {
+            return {
+                success: false,
+                message: dict.settings.dangerZone.reauth.invalid_password,
+            };
+        }
+    } else if (!hasRecentAuthentication(session.user.authenticatedAt)) {
+        return {
+            success: false,
+            message: dict.settings.dangerZone.reauth.oauth_required,
+            requiresOAuthReauth: true,
+        };
+    }
 
     try {
         // Transaction to delete related records first since Cascade might be missing on some relations
@@ -109,7 +178,10 @@ export async function deleteAccountAction() {
         });
     } catch (error) {
         console.error("Error deleting account:", error);
-        throw new Error("Failed to delete account");
+        return {
+            success: false,
+            message: dict.settings.dangerZone.toast.delete_error,
+        };
     }
 
     // Clear language preference cookies so new accounts start fresh
