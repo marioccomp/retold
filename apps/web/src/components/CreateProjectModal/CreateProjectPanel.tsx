@@ -38,9 +38,10 @@ type Repository = {
 type Props = {
   onClose: () => void;
   onSuccess: () => void;
+  isModal?: boolean;
 };
 
-export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
+export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Props) {
   const { dict } = useTranslation();
   const queryClient = useQueryClient();
   const t = dict.project.create_panel;
@@ -55,6 +56,8 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sortableImagesRef = useRef<SortableImage[]>([]);
+
+  const DESCRIPTION_LIMIT = 1500;
 
   // Fetch repositories
   const { data: repositories = [], isLoading: isLoadingRepos } = useQuery<Repository[]>({
@@ -249,7 +252,12 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
     title.trim() && description.trim() && isRepoValid && !mutationIsCreating && !isUploadingImages;
 
   return (
-    <div className="bg-background rounded-[16px] border border-border shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden animate-[fadeIn_0.3s_ease-out]">
+    <div
+      className={cn(
+        "bg-background overflow-hidden animate-[fadeIn_0.3s_ease-out] flex flex-col h-full",
+        !isModal && "rounded-[16px] border border-border shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
+      )}
+    >
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -264,13 +272,25 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
       `}</style>
 
       {/* Header */}
-      <div className="px-7 py-5 border-b border-border bg-gradient-to-br from-muted/50 to-background">
-        <h2 className="m-0 text-[1.4rem] font-semibold text-foreground">{t.title}</h2>
-        <p className="m-[6px_0_0] text-[0.9rem] text-muted-foreground">{t.subtitle}</p>
+      <div className="relative px-5 sm:px-7 py-4 sm:py-5 border-b border-border bg-gradient-to-br from-muted/50 to-background flex flex-col items-center justify-center text-center">
+        <h2 className="m-0 text-xl sm:text-[1.4rem] font-black text-foreground leading-tight">{t.title}</h2>
+        <p className="m-0 mt-0.5 sm:mt-1 text-xs sm:text-[0.9rem] text-muted-foreground">
+          {t.subtitle}
+        </p>
+        
+        {isModal && (
+          <button
+            onClick={onClose}
+            className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <FiPlus size={24} className="rotate-45" />
+          </button>
+        )}
       </div>
 
       {/* Content */}
-      <div className="p-7 grid grid-cols-1 min-[900px]:grid-cols-2 gap-8">
+      <div className="p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 overflow-y-auto flex-1 custom-scrollbar">
         {/* Form Section */}
         <div className="flex flex-col gap-5">
           {/* Title */}
@@ -290,11 +310,8 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           </div>
 
           {/* Description */}
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="project-description"
-              className="text-[0.875rem] font-medium text-foreground"
-            >
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="project-description" className="text-sm font-bold text-foreground">
               {t.labels.description}
             </Label>
             <Textarea
@@ -302,17 +319,24 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
               placeholder={t.placeholders.description}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              maxLength={280}
-              className="min-h-[100px] resize-none p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus-visible:ring-primary/30 focus-visible:border-primary"
+              maxLength={DESCRIPTION_LIMIT}
+              className="min-h-[140px] sm:min-h-[160px] resize-none p-3 sm:p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus-visible:ring-primary/20 focus-visible:border-primary transition-all leading-relaxed"
             />
+            <div className="flex justify-end pr-1">
+              <span
+                className={cn(
+                  "text-[10px] font-black tracking-tight transition-colors",
+                  description.length >= DESCRIPTION_LIMIT ? "text-red-500" : "text-muted-foreground/50"
+                )}
+              >
+                {description.length}/{DESCRIPTION_LIMIT}
+              </span>
+            </div>
           </div>
 
           {/* Visibility */}
           <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="project-visibility"
-              className="text-[0.875rem] font-medium text-foreground"
-            >
+            <Label htmlFor="project-visibility" className="text-sm font-bold text-foreground">
               {t.labels.visibility}
             </Label>
             <Select
@@ -321,7 +345,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
             >
               <SelectTrigger
                 id="project-visibility"
-                className="cursor-pointer h-auto p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus:ring-primary/30 focus:border-primary"
+                className="cursor-pointer h-auto p-3 sm:p-[12px_14px] rounded-[10px] border-border text-foreground text-[0.95rem] focus:ring-primary/20 focus:border-primary"
               >
                 <SelectValue placeholder={t.placeholders.visibility} />
               </SelectTrigger>
@@ -338,20 +362,20 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
         </div>
 
         {/* Right Column: Images & Repo */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 sm:gap-7">
           {/* Images Section */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div>
               <div className="flex justify-between items-center">
-                <h3 className="m-0 text-[0.95rem] font-semibold text-foreground">
+                <h3 className="m-0 text-sm sm:text-[0.95rem] font-bold text-foreground">
                   {t.labels.images}
                 </h3>
-                <span className="text-[0.8rem] text-muted-foreground">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded-full">
                   {sortableImages.length}/3
                 </span>
               </div>
-              <p className="m-0 text-[0.85rem] text-muted-foreground">{t.images_hint}</p>
-              <p className="mt-1 text-[0.8rem] text-muted-foreground">
+              <p className="m-0 mt-1 text-xs text-muted-foreground leading-snug">{t.images_hint}</p>
+              <p className="mt-1 text-[10px] sm:text-[0.8rem] text-primary/70 font-medium">
                 {t.images_cover_hint}
               </p>
             </div>
@@ -377,44 +401,49 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
           </div>
 
           {/* Repositories Section */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div>
-              <h3 className="m-0 text-[0.95rem] font-semibold text-foreground">
+              <h3 className="m-0 text-sm sm:text-[0.95rem] font-bold text-foreground">
                 {t.labels.repository}
               </h3>
-              <p className="m-0 text-[0.85rem] text-muted-foreground">{t.repo_hint}</p>
+              <p className="m-0 mt-1 text-xs text-muted-foreground leading-snug">{t.repo_hint}</p>
             </div>
 
             {isLoadingRepos ? (
-              <div className="p-[30px] text-center text-muted-foreground text-[0.9rem]">
+              <div className="p-10 text-center text-muted-foreground text-sm font-medium animate-pulse">
                 {t.repo_loading}
               </div>
             ) : repositories.length > 0 ? (
-              <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2 max-h-[220px] sm:max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
                 {repositories.map((repo) => {
                   const isSelected = selectedRepoId === repo.id;
                   return (
                     <div
                       key={repo.id}
                       className={cn(
-                        "flex items-center justify-between p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200",
+                        "flex items-center justify-between p-3.5 sm:p-[14px_16px] border rounded-[10px] cursor-pointer transition-all duration-200 group",
                         isSelected
-                          ? "border-primary bg-primary/6"
-                          : "border-border hover:border-muted-foreground/30 hover:bg-muted"
+                          ? "border-primary bg-primary/5 shadow-[0_0_0_1px_rgba(var(--primary),0.1)]"
+                          : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
                       )}
                       onClick={() => setSelectedRepoId(repo.id)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => e.key === "Enter" && setSelectedRepoId(repo.id)}
                     >
-                      <span className="text-[0.9rem] text-foreground font-medium flex items-center gap-2">
-                        <FiGithub />
+                      <span
+                        className={cn(
+                          "text-sm sm:text-[0.9rem] font-semibold flex items-center gap-2.5 transition-colors",
+                          isSelected ? "text-primary" : "text-foreground group-hover:text-primary/80"
+                        )}
+                      >
+                        <FiGithub size={16} />
                         {repo.name}
                       </span>
-                      <span className="text-[0.8rem] font-medium text-primary">
+                      <span className="text-[0.75rem] font-bold text-primary">
                         {isSelected ? (
-                          <span className="flex items-center gap-1">
-                            <FiCheck /> {t.repo_selected}
+                          <span className="flex items-center gap-1 animate-in zoom-in-50">
+                            <FiCheck className="stroke-[3]" /> {t.repo_selected}
                           </span>
                         ) : (
                           ""
@@ -425,7 +454,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
                 })}
               </div>
             ) : (
-              <div className="p-6 text-center text-muted-foreground text-[0.9rem] border border-dashed border-border rounded-[10px] bg-muted/30">
+              <div className="p-8 text-center text-muted-foreground text-sm border border-dashed border-border rounded-[12px] bg-muted/20">
                 {t.repo_none}
               </div>
             )}
@@ -433,7 +462,7 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
             <Button
               variant="ghost"
               onClick={handleAddRepository}
-              className="cursor-pointer w-full mt-1 border border-dashed border-border rounded-[10px] bg-muted/30 text-muted-foreground text-[0.9rem] font-medium hover:border-primary hover:text-primary hover:bg-primary/4 h-auto py-3 gap-2"
+              className="cursor-pointer w-full mt-1 border border-dashed border-border rounded-[10px] bg-muted/30 text-muted-foreground text-[0.85rem] sm:text-[0.9rem] font-semibold hover:border-primary hover:text-primary hover:bg-primary/5 h-auto py-3 gap-2 transition-all"
             >
               <FiPlus size={18} />
               {repositories.length > 0 ? t.repo_manage : t.repo_connect}
@@ -451,21 +480,24 @@ export default function CreateProjectPanel({ onClose, onSuccess }: Props) {
       />
 
       {/* Footer */}
-      <div className="px-7 py-5 md:py-6 flex gap-3 justify-end border-t border-border bg-muted/30">
+      <div className="px-5 sm:px-7 py-4 sm:py-6 flex gap-3 justify-end border-t border-border bg-muted/20">
         <Button
           variant="outline"
           onClick={onClose}
-          className="cursor-pointer border-border text-muted-foreground hover:text-foreground hover:border-foreground hover:bg-background rounded-[10px] h-auto py-3 px-6 font-medium text-[0.95rem]"
+          className="cursor-pointer flex-1 sm:flex-none border-border text-muted-foreground hover:text-foreground hover:border-foreground hover:bg-background rounded-[10px] h-auto py-3 px-6 font-bold text-sm sm:text-[0.95rem] transition-all"
         >
           {t.cancel}
         </Button>
         <Button
           onClick={handleCreate}
           disabled={!canCreate}
-          className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground rounded-[10px] h-auto py-3 px-7 font-semibold text-[0.95rem] disabled:opacity-50"
+          className="cursor-pointer flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-[10px] h-auto py-3 px-8 font-black text-sm sm:text-[0.95rem] disabled:opacity-50 transition-all shadow-lg shadow-primary/10 active:scale-95"
         >
           {mutationIsCreating || isUploadingImages ? (
-            <>{isUploadingImages ? t.uploading_images : t.submitting}</>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              {isUploadingImages ? t.uploading_images : t.submitting}
+            </div>
           ) : (
             t.submit
           )}

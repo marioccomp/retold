@@ -146,35 +146,35 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-background w-full max-w-[650px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full md:max-w-[650px] h-[96dvh] md:h-auto md:max-h-[85dvh] rounded-t-[2rem] md:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 overflow-hidden relative">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-xl font-bold text-foreground tracking-tight">
             {dict.profile.edit_section_modal.title}
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-all cursor-pointer"
           >
             <FiX size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-8 custom-scrollbar">
+        <div className="p-6 overflow-y-auto space-y-8 custom-scrollbar flex-1">
           {/* Detailed About */}
           <div className="space-y-3">
-            <Label className="flex items-center gap-2 text-sm font-bold text-foreground">
-              <FiBookOpen className="text-primary" />
+            <Label className="flex items-center gap-2 text-xs font-black text-muted-foreground uppercase tracking-widest">
+              <FiBookOpen className="text-primary/70" size={14} />
               {dict.profile.edit_section_modal.long_bio_label}
             </Label>
             <Textarea
               value={longBio}
               onChange={(e) => setLongBio(e.target.value)}
-              className="min-h-[140px] resize-none focus-visible:ring-primary border-border/60 font-medium"
+              className="min-h-[160px] resize-none border-border/60 rounded-xl focus-visible:ring-primary/20 font-medium bg-background"
               placeholder={dict.profile.edit_section_modal.long_bio_placeholder}
             />
           </div>
@@ -182,8 +182,8 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
           {/* Education Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2 text-sm font-bold text-foreground">
-                <FiBriefcase className="text-primary" />
+              <Label className="flex items-center gap-2 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                <FiBriefcase className="text-primary/70" size={14} />
                 {dict.profile.edit_section_modal.education_label}
               </Label>
               <Button
@@ -200,7 +200,7 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
               {educations.map((edu, idx) => (
                 <div
                   key={idx}
-                  className="p-4 border border-border/60 rounded-xl bg-muted/5 space-y-4 relative group"
+                  className="p-5 border border-border/60 rounded-2xl bg-muted/5 space-y-4 relative group"
                 >
                   {educations.length > 1 && (
                     <button
@@ -212,32 +212,32 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                      <Label className="text-[10px] text-muted-foreground uppercase font-black tracking-wider opacity-70">
                         {dict.profile.edit_section_modal.course_label}
                       </Label>
                       <Input
                         value={edu.degree}
                         onChange={(e) => handleUpdateEducation(idx, "degree", e.target.value)}
                         placeholder={dict.profile.edit_section_modal.course_placeholder}
-                        className="focus-visible:ring-primary h-9 font-medium"
+                        className="h-10 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20 font-medium"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                      <Label className="text-[10px] text-muted-foreground uppercase font-black tracking-wider opacity-70">
                         {dict.profile.edit_section_modal.institution_label}
                       </Label>
                       <Input
                         value={edu.institution}
                         onChange={(e) => handleUpdateEducation(idx, "institution", e.target.value)}
                         placeholder={dict.profile.edit_section_modal.institution_placeholder}
-                        className="focus-visible:ring-primary h-9 font-medium"
+                        className="h-10 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20 font-medium"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                      <Label className="text-[10px] text-muted-foreground uppercase font-black tracking-wider opacity-70">
                         {dict.profile.edit_section_modal.start_label}
                       </Label>
                       <Input
@@ -250,11 +250,11 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
                             new Date(e.target.value).toISOString()
                           )
                         }
-                        className="focus-visible:ring-primary h-9 font-medium"
+                        className="h-10 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20 font-medium cursor-pointer"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+                      <Label className="text-[10px] text-muted-foreground uppercase font-black tracking-wider opacity-70">
                         {dict.profile.edit_section_modal.end_label}
                       </Label>
                       <div className="space-y-2">
@@ -269,7 +269,7 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
                               new Date(e.target.value).toISOString()
                             )
                           }
-                          className="focus-visible:ring-primary h-9 font-medium"
+                          className="h-10 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20 font-medium cursor-pointer disabled:opacity-30"
                         />
                         <div className="flex items-center gap-2 px-1">
                           <Checkbox
@@ -282,7 +282,7 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
                           />
                           <label
                             htmlFor={`current-${idx}`}
-                            className="text-[11px] text-muted-foreground cursor-pointer font-bold uppercase"
+                            className="text-[10px] text-muted-foreground cursor-pointer font-black uppercase tracking-wider"
                           >
                             {dict.profile.edit_section_modal.currently_label}
                           </label>
@@ -297,8 +297,8 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
 
           {/* Skills Manager */}
           <div className="space-y-4">
-            <Label className="flex items-center gap-2 text-sm font-bold text-foreground">
-              <FiCode className="text-primary" />
+            <Label className="flex items-center gap-2 text-xs font-black text-muted-foreground uppercase tracking-widest">
+              <FiCode className="text-primary/70" size={14} />
               {dict.profile.edit_section_modal.skills_label}
             </Label>
 
@@ -308,24 +308,24 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
                 onChange={(e) => setNewSkill(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSkill())}
                 placeholder={dict.profile.edit_section_modal.skills_placeholder}
-                className="focus-visible:ring-primary flex-1 h-10 font-medium"
+                className="h-11 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20 flex-1 font-medium"
               />
               <Button
                 type="button"
                 size="sm"
                 onClick={handleAddSkill}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 cursor-pointer"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 cursor-pointer rounded-xl"
               >
                 <FiPlus size={18} />
               </Button>
             </div>
 
-            <div className="flex flex-wrap gap-2 p-3 border border-dashed border-border/60 rounded-xl min-h-[70px] bg-muted/5">
+            <div className="flex flex-wrap gap-2.5 p-5 border border-dashed border-border/60 rounded-2xl min-h-[100px] bg-muted/5 items-start content-start">
               {skills.length > 0 ? (
                 skills.map((skill) => (
                   <Badge
                     key={skill}
-                    className="bg-primary/10 text-primary border-primary/30 hover:bg-primary/20 flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all group font-bold"
+                    className="bg-primary/10 text-primary border-primary/30 hover:bg-primary/20 flex items-center gap-2 px-4 py-2 rounded-xl transition-all group font-bold shadow-sm"
                   >
                     {skill}
                     <button
@@ -337,16 +337,19 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
                   </Badge>
                 ))
               ) : (
-                <span className="text-xs text-muted-foreground italic m-auto">
-                  {dict.profile.edit_section_modal.skills_none}
-                </span>
+                <div className="m-auto flex flex-col items-center gap-2 py-4">
+                  <FiCode className="text-muted-foreground/30" size={24} />
+                   <span className="text-xs text-muted-foreground italic">
+                    {dict.profile.edit_section_modal.skills_none}
+                  </span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-4 border-t border-border/60 flex justify-end gap-3 bg-muted/40">
+        <div className="p-6 pt-4 border-t border-border/60 flex justify-end gap-3 bg-muted/40 backdrop-blur-md">
           <Button
             variant="ghost"
             onClick={onClose}
@@ -357,7 +360,7 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
           <Button
             onClick={handleSave}
             disabled={mutation.isPending}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 font-bold transition-all shadow-lg shadow-primary/20 cursor-pointer"
+            className="bg-primary text-primary-foreground hover:bg-primary/95 px-8 font-bold transition-all shadow-lg shadow-primary/20 cursor-pointer disabled:opacity-50"
           >
             {mutation.isPending ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
           </Button>

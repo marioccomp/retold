@@ -5,7 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { FiPlus, FiArrowLeft } from "react-icons/fi";
 import ProjectCard from "@/src/components/ProjectCard";
-import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
+import { CreateProjectPanel, CreateProjectModal } from "@/src/components/CreateProjectModal";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
 import { PaginationControls } from "@/src/components/ui/pagination-controls";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
@@ -136,27 +136,7 @@ export default function ProjectsSection({
   // Se um projeto está selecionado e estamos na aba correta
   // O modal é renderizado no final do componente com isOpen={!!selectedProject}
 
-  // Se está criando, mostrar apenas o painel de criação
-  if (isCreating) {
-    return (
-      <div className="col-span-full animate-[fadeIn_0.3s_ease-out]">
-        <div className="py-4 mb-4">
-          <Button
-            variant="ghost"
-            className="cursor-pointer inline-flex items-center gap-2 text-[0.85rem] md:text-[0.95rem] font-bold text-muted-foreground hover:text-primary hover:bg-primary/5 w-fit group h-auto transition-all p-0"
-            onClick={handlePanelClose}
-          >
-            <FiArrowLeft
-              size={16}
-              className="transition-transform duration-200 group-hover:-translate-x-[3px]"
-            />
-            <span>{dict.profile.back_to_projects}</span>
-          </Button>
-        </div>
-        <CreateProjectPanel onClose={handlePanelClose} onSuccess={handleProjectCreated} />
-      </div>
-    );
-  }
+  // If isCreating, the modal will be rendered below
 
   return (
     <>
@@ -223,6 +203,12 @@ export default function ProjectsSection({
         isOpen={!!selectedProject}
         onClose={handleProjectClose}
         project={selectedProject}
+      />
+
+      <CreateProjectModal
+        isOpen={isCreating}
+        onClose={handlePanelClose}
+        onSuccess={handleProjectCreated}
       />
     </>
   );

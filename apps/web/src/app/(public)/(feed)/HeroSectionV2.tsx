@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Session } from "next-auth";
@@ -13,7 +12,7 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CreateProjectPanel } from "@/src/components/CreateProjectModal";
+import { CreateProjectModal } from "@/src/components/CreateProjectModal";
 import ProjectDetailsModal from "@/src/app/(public)/[username]/(profile)/components/modals/ProjectDetailsModal";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
@@ -95,17 +94,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
   const isLiked = highlightedProject?.hasLiked ?? false;
   const likesCount = highlightedProject?.likes ?? 0;
 
-  useEffect(() => {
-    if (isCreating) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isCreating]);
+  // Modal visibility is handled by isCreating state
 
   const updateProjectLikeInCaches = (projectId: number, nextLiked: boolean) => {
     queryClient.setQueryData<ProjectCardDTO | null>(["highlighted-project"], (current) => {
@@ -182,16 +171,16 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
         <div className="absolute left-1/2 bottom-[-1.5rem] h-20 w-[min(44rem,72vw)] -translate-x-1/2 rounded-[999px] bg-primary/8 blur-[72px] dark:bg-primary/5" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-[1400px] items-center px-4 py-6 pb-12 sm:px-6 sm:py-8 md:px-12 md:py-10 md:pb-14">
-        <div className="grid w-full items-center gap-8 md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
-          <div className="flex max-w-[35rem] flex-col items-center text-center lg:items-start lg:text-left">
+      <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-[1400px] items-center px-4 py-6 pb-12 sm:px-6 sm:py-8 md:px-8 lg:px-12 md:py-10 md:pb-14">
+        <div className="grid w-full items-center gap-8 min-[600px]:gap-7 md:grid-cols-2 md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
+          <div className="flex max-w-[35rem] flex-col items-center text-center min-[600px]:max-w-[40rem] md:items-start md:text-left">
             <div
               className="opacity-0 animate-[heroFadeUp_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards]"
               style={{ animationDelay: "40ms" }}
             ></div>
 
             <h1
-              className="mt-4 max-w-[9ch] text-balance text-[2.65rem] font-semibold leading-[0.94] tracking-[-0.06em] text-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-5 sm:max-w-[10ch] sm:text-[3.45rem] md:max-w-[11ch] md:text-[4.3rem] lg:text-[5.7rem]"
+              className="mt-4 max-w-[9ch] text-balance text-[2.6rem] font-semibold leading-[0.94] tracking-[-0.06em] text-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-5 sm:max-w-[10ch] sm:text-[3.4rem] min-[640px]:max-[760px]:max-w-[11ch] min-[640px]:max-[760px]:text-[3rem] md:max-w-[11ch] md:text-[3rem] lg:text-[4.6rem] xl:text-[5.7rem]"
               style={{ animationDelay: "120ms" }}
             >
               <span className="block">{dict.feed.feedhero.title_prefix}</span>
@@ -206,20 +195,20 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
             </h1>
 
             <p
-              className="mt-4 max-w-[31rem] text-pretty px-1 text-[0.98rem] leading-7 text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-5 sm:px-0 sm:text-lg"
+              className="mt-4 max-w-[31rem] px-1 text-pretty text-[0.98rem] leading-7 text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-5 sm:px-0 sm:text-lg min-[640px]:max-[760px]:max-w-[36rem] min-[640px]:max-[760px]:text-[1rem] min-[640px]:max-[760px]:leading-7"
               style={{ animationDelay: "210ms" }}
             >
               {dict.feed.feedhero.subtitle}
             </p>
 
             <div
-              className="mt-7 flex w-full flex-col gap-3 opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 sm:w-auto sm:flex-row"
+              className="mt-7 flex w-full flex-col gap-3 opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 sm:w-full min-[760px]:w-auto min-[760px]:flex-row min-[760px]:justify-center md:justify-start"
               style={{ animationDelay: "300ms" }}
             >
               {!session ? (
                 <Button
                   asChild
-                  className="group h-12 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer sm:w-auto"
+                  className="group h-12 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer min-[760px]:w-auto"
                 >
                   <Link href="/register">
                     {dict.feed.feedhero.create_profile}
@@ -228,7 +217,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 </Button>
               ) : (
                 <Button
-                  className="group h-12 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer sm:w-auto"
+                  className="group h-12 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer min-[760px]:w-auto"
                   onClick={() => setIsCreating(true)}
                 >
                   <FiPlus className="mr-2" />
@@ -238,7 +227,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
               <Button
                 variant="outline"
-                className="h-12 w-full rounded-full border-border/70 bg-background/75 px-6 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background cursor-pointer sm:w-auto"
+                className="h-12 w-full rounded-full border-border/70 bg-background/75 px-6 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background cursor-pointer min-[760px]:w-auto"
                 onClick={() => {
                   setActiveTab("projects");
                   document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
@@ -250,14 +239,14 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
             </div>
 
             <div
-              className="mt-7 flex flex-col items-center gap-2.5 text-sm text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 sm:flex-row sm:flex-wrap lg:items-start"
+              className="mt-7 flex flex-col items-center gap-2.5 text-sm text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 min-[760px]:flex-row min-[760px]:flex-wrap min-[760px]:justify-center md:justify-start md:items-start"
               style={{ animationDelay: "380ms" }}
             >
               <div className="flex items-center gap-2">
                 <FiCheckCircle className="text-primary" />
                 <span>{dict.feed.feedhero.free_portfolio}</span>
               </div>
-              <span className="hidden text-border sm:inline">/</span>
+              <span className="hidden text-border min-[760px]:inline">/</span>
               <div className="flex items-center gap-2">
                 <FiCheckCircle className="text-primary" />
                 <span>{dict.feed.feedhero.community_feedback}</span>
@@ -266,7 +255,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
           </div>
 
           <div
-            className="relative mx-auto w-full max-w-[34rem] opacity-0 animate-[heroFadeUp_0.9s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:max-w-[38rem] lg:ml-auto lg:max-w-[38rem]"
+            className="relative mx-auto w-full max-w-[33rem] opacity-0 animate-[heroFadeUp_0.9s_cubic-bezier(0.22,1,0.36,1)_forwards] min-[600px]:max-w-[36rem] md:ml-auto md:max-w-[38rem]"
             style={{ animationDelay: "180ms" }}
           >
             <div className="absolute inset-x-[12%] top-[12%] h-[72%] rounded-[2.5rem] bg-primary/15 blur-3xl animate-[heroDrift_20s_ease-in-out_infinite] dark:bg-black/45 dark:blur-[70px] sm:inset-x-[14%] sm:top-[14%] sm:h-[68%]" />
@@ -286,7 +275,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
               <div className="absolute inset-0 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--background)_82%,transparent)_10%,transparent_42%,color-mix(in_oklab,var(--primary)_8%,transparent)_100%)] dark:bg-[linear-gradient(145deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_28%,rgba(5,220,127,0.03)_100%)]" />
               <div className="absolute inset-[1px] rounded-[calc(1.7rem-1px)] border border-white/0 dark:border-white/[0.045] sm:rounded-[calc(2rem-1px)]" />
 
-              <div className="relative flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:flex-nowrap sm:gap-4 sm:px-6">
+              <div className="relative flex flex-wrap items-center justify-between gap-3 px-4 py-4 min-[760px]:flex-nowrap min-[760px]:gap-4 min-[760px]:px-6">
                 <Link
                   href={`/${highlightedProject?.ownerUsername || "retold"}`}
                   onClick={(event) => event.stopPropagation()}
@@ -312,7 +301,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                   </div>
                 </Link>
 
-                <div className="flex w-full justify-start sm:w-auto sm:justify-end">
+                <div className="flex w-full justify-start min-[760px]:w-auto min-[760px]:justify-end">
                   <Badge
                     variant="secondary"
                     className="shrink-0 rounded-full border border-primary/15 bg-background/80 px-3 py-1 text-[0.62rem] uppercase tracking-[0.18em] text-foreground/75 dark:border-white/12 dark:bg-white/[0.04] dark:text-white/78 sm:text-[0.65rem] sm:tracking-[0.22em]"
@@ -324,7 +313,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
               </div>
 
               <div className="relative p-3 sm:p-4">
-                <div className="relative h-[15.5rem] overflow-hidden rounded-[1.25rem] bg-secondary/60 ring-1 ring-black/5 sm:h-[18rem] sm:rounded-[1.55rem] lg:h-[26rem] dark:bg-black/20 dark:ring-white/12 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+                <div className="relative h-[15.5rem] overflow-hidden rounded-[1.25rem] bg-secondary/60 ring-1 ring-black/5 sm:h-[18rem] sm:rounded-[1.55rem] min-[640px]:max-[760px]:h-[16.5rem] lg:h-[26rem] dark:bg-black/20 dark:ring-white/12 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
                   {featuredImage ? (
                     <Image
                       src={featuredImage}
@@ -335,14 +324,14 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.035]"
                     />
                   ) : (
-                    <div className="flex h-[15.5rem] w-full items-center justify-center bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_45%),linear-gradient(135deg,color-mix(in_oklab,var(--foreground)_6%,transparent),transparent_60%)] text-sm uppercase tracking-[0.24em] text-muted-foreground sm:h-[18rem] lg:h-[26rem]">
+                    <div className="flex h-[15.5rem] w-full items-center justify-center bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_45%),linear-gradient(135deg,color-mix(in_oklab,var(--foreground)_6%,transparent),transparent_60%)] text-sm uppercase tracking-[0.24em] text-muted-foreground sm:h-[18rem] min-[640px]:max-[760px]:h-[16.5rem] lg:h-[26rem]">
                       {dict.feed.feedhero.loading_featured}
                     </div>
                   )}
 
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.18)_45%,rgba(0,0,0,0.72)_100%)] dark:bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.16)_36%,rgba(0,0,0,0.82)_100%)]" />
                   <div className="absolute inset-x-0 bottom-0 p-4 sm:p-7">
-                    <h2 className="max-w-[12ch] text-[2.15rem] font-semibold leading-[0.94] tracking-[-0.05em] text-white sm:mt-3 sm:max-w-[14ch] sm:text-[2.8rem] lg:text-[3.4rem]">
+                    <h2 className="max-w-[12ch] text-[2rem] font-semibold leading-[0.94] tracking-[-0.05em] text-white sm:mt-3 sm:max-w-[14ch] sm:text-[2.6rem] min-[640px]:max-[760px]:text-[2.35rem] md:text-[2.2rem] lg:text-[3rem] xl:text-[3.4rem]">
                       {highlightedProject?.title || dict.feed.feedhero.title_highlight}
                     </h2>
                     <p className="mt-3 max-w-[34rem] line-clamp-3 text-sm leading-5 text-white/78 sm:line-clamp-4 sm:text-[0.98rem] sm:leading-6">
@@ -352,7 +341,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 </div>
               </div>
 
-              <div className="relative flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div className="relative flex flex-col gap-3 px-4 py-4 min-[760px]:flex-row min-[760px]:items-center min-[760px]:justify-between min-[760px]:px-6">
                 <div className="min-w-0 flex-1">
                   {featuredRepoHref && featuredRepo ? (
                     <a
@@ -373,7 +362,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/72 dark:text-white/72 sm:flex-nowrap">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/72 dark:text-white/72 min-[760px]:flex-nowrap">
                   <button
                     type="button"
                     onClick={handleLikeClick}
@@ -429,34 +418,19 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
         project={selectedProject}
       />
 
-      {isCreating &&
-        createPortal(
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-y-auto">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-3 top-3 z-10 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
-                onClick={() => setIsCreating(false)}
-                aria-label="Close"
-              >
-                <span className="text-2xl leading-none">x</span>
-              </Button>
+      <CreateProjectModal
+        isOpen={isCreating}
+        onClose={() => setIsCreating(false)}
+        onSuccess={() => {
+          setIsCreating(false);
+          queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
+          queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
+          setTimeout(() => {
+            document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
+          }, 150);
+        }}
+      />
 
-              <CreateProjectPanel
-                onClose={() => setIsCreating(false)}
-                onSuccess={() => {
-                  setIsCreating(false);
-                  queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
-                  setTimeout(() => {
-                    document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
-                  }, 100);
-                }}
-              />
-            </div>
-          </div>,
-          document.body
-        )}
 
       <style
         dangerouslySetInnerHTML={{

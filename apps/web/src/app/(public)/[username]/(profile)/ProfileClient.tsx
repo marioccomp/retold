@@ -16,6 +16,7 @@ import ProjectsSection from "./ProjectsSection";
 import CertificationsSection from "./not-used/CertificationsSection";
 import ParticipationsSection from "./not-used/ParticipationsSection";
 import EditProfileModal from "./components/EditProfileModal";
+import ProfileLoading from "./loading";
 
 type Props = {
   username: string;
@@ -73,7 +74,7 @@ export default function ProfileClient({ username, ownProfile }: Props) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  if (!profile) return null;
+  if (!profile) return <ProfileLoading />;
 
   return (
     <div className="min-h-screen bg-background">

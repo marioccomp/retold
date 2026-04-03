@@ -34,8 +34,8 @@ export default async function Page({ params, searchParams }: PageProps) {
   // enquanto as queries abaixo são resolvidas no servidor.
   await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: ["profile", username, page, ""],
-      queryFn: () => getProfile(username, page, ""),
+      queryKey: ["profile", username, page, "", "newest"],
+      queryFn: () => getProfile(username, page, "", "newest"),
     }),
     queryClient.prefetchQuery({
       queryKey: ["github-stats", username],
