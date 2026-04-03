@@ -58,10 +58,10 @@ export default function EditAboutModal({ isOpen, onClose, profile }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-background w-full max-w-[600px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full md:max-w-[620px] h-[96dvh] md:h-auto md:max-h-[85dvh] rounded-t-[2rem] md:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <h2 className="text-xl font-semibold text-foreground">{dict.profile.about_section}</h2>
@@ -73,12 +73,12 @@ export default function EditAboutModal({ isOpen, onClose, profile }: Props) {
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
           <div className="space-y-3">
             <Textarea
               value={longBio}
               onChange={(e) => setLongBio(e.target.value)}
-              className="min-h-[250px] resize-none font-medium"
+              className="min-h-[250px] md:min-h-[350px] resize-none font-medium border-border/60 rounded-xl focus-visible:ring-primary/20"
               placeholder={dict.profile.edit_section_modal.long_bio_placeholder}
             />
           </div>
@@ -96,7 +96,7 @@ export default function EditAboutModal({ isOpen, onClose, profile }: Props) {
           <Button
             onClick={handleSave}
             disabled={mutation.isPending}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 font-bold transition-all shadow-lg shadow-primary/20 cursor-pointer"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 font-bold transition-all shadow-lg shadow-primary/20 cursor-pointer disabled:opacity-50"
           >
             {mutation.isPending ? dict.profile.edit_modal.saving : dict.profile.edit_modal.save}
           </Button>

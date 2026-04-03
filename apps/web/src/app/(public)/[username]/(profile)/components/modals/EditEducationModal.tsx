@@ -243,10 +243,10 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-background w-full sm:max-w-[650px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full md:max-w-[650px] h-[96dvh] md:h-auto md:max-h-[85dvh] rounded-t-[2rem] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 relative">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <h2 className="text-xl font-semibold text-foreground">
@@ -261,7 +261,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-4 custom-scrollbar">
+        <div className="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-1">
           <div className="flex items-center justify-end mb-2">
             <Button
               variant="ghost"
@@ -314,7 +314,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
                       {dict.profile.edit_section_modal.start_label}
@@ -350,7 +350,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                           handleUpdateEducation(idx, "startDate", date.toISOString());
                         }}
                       >
-                        <SelectTrigger className="w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer">
+                        <SelectTrigger className="w-[85px] sm:w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer">
                           <SelectValue placeholder={dict.profile.edit_section_modal.year} />
                         </SelectTrigger>
                         <SelectContent className="bg-popover" position="popper">
@@ -405,7 +405,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
                         >
                           <SelectTrigger
                             className={cn(
-                              "w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer"
+                              "w-[85px] sm:w-[100px] h-10 rounded-[10px] border-border focus:ring-primary/30 cursor-pointer"
                             )}
                           >
                             <SelectValue placeholder={dict.profile.edit_section_modal.year} />

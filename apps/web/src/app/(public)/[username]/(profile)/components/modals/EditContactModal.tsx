@@ -79,10 +79,10 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-background w-full max-w-[500px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full md:max-w-[500px] h-[96dvh] md:h-auto md:max-h-[85dvh] rounded-t-[2rem] md:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 overflow-hidden relative">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <h2 className="text-xl font-semibold text-foreground">
@@ -96,33 +96,33 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-5 flex-1 overflow-y-auto custom-scrollbar">
           {/* Email */}
           <div className="space-y-3">
-            <Label htmlFor="email">{dict.profile.contact_section.email_label}</Label>
-            <div className="relative">
-              <FiMail className="absolute left-3 top-3 text-muted-foreground" size={16} />
+            <Label htmlFor="email" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{dict.profile.contact_section.email_label}</Label>
+            <div className="relative group">
+              <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" size={16} />
               <Input
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={dict.profile.contact_section.email_placeholder}
-                className="pl-9 bg-background"
+                className="pl-10 h-11 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20"
               />
             </div>
           </div>
 
           {/* Phone */}
           <div className="space-y-3">
-            <Label htmlFor="phone">{dict.profile.contact_section.phone_label}</Label>
-            <div className="relative">
-              <FiPhone className="absolute left-3 top-3 text-muted-foreground" size={16} />
+            <Label htmlFor="phone" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{dict.profile.contact_section.phone_label}</Label>
+            <div className="relative group">
+              <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" size={16} />
               <Input
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder={dict.profile.contact_section.phone_placeholder}
-                className="pl-9 bg-background"
+                className="pl-10 h-11 bg-background border-border/60 rounded-xl focus-visible:ring-primary/20"
               />
             </div>
           </div>

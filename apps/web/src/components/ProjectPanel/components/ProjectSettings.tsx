@@ -392,7 +392,7 @@ export const ProjectSettings = ({
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <Label htmlFor="edit-description" className="text-foreground font-semibold">
                     {t.labels.description}
                   </Label>
@@ -401,10 +401,15 @@ export const ProjectSettings = ({
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={t.placeholders.description}
-                    rows={4}
-                    maxLength={280}
+                    rows={5}
+                    maxLength={1500}
                     className="resize-none text-foreground bg-background border-border focus:border-primary focus:ring-primary font-medium"
                   />
+                  <div className="flex justify-end pr-1">
+                    <span className="text-[10px] font-black tracking-tight text-muted-foreground/50 transition-colors">
+                      {description.length}/1500
+                    </span>
+                  </div>
                 </div>
 
                 {/* Visibility */}

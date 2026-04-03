@@ -80,10 +80,10 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
       onMouseDown={handleOverlayMouseDown}
     >
-      <div className="bg-background w-full max-w-[600px] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 m-4">
+      <div className="bg-background w-full md:max-w-[620px] h-[96dvh] md:h-auto md:max-h-[85dvh] rounded-t-[2rem] md:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom-5 md:zoom-in-95 duration-300 overflow-hidden relative">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border/60">
           <h2 className="text-xl font-semibold text-foreground">{dict.profile.skills_section}</h2>
@@ -96,7 +96,7 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
           <div className="space-y-4">
             <div className="flex gap-2">
               <Input
@@ -104,24 +104,24 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
                 onChange={(e) => setNewSkill(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSkill())}
                 placeholder={dict.profile.edit_section_modal.skills_placeholder}
-                className="flex-1 h-10 font-medium"
+                className="flex-1 h-10 font-medium rounded-xl border-border/60"
               />
               <Button
                 type="button"
                 size="sm"
                 onClick={handleAddSkill}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 cursor-pointer"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 cursor-pointer rounded-xl"
               >
                 <FiPlus size={18} />
               </Button>
             </div>
 
-            <div className="flex flex-wrap gap-2 p-4 border border-dashed border-border/60 rounded-xl min-h-[100px] bg-muted/5">
+            <div className="flex flex-wrap gap-2.5 p-5 border border-dashed border-border/60 rounded-2xl min-h-[140px] bg-muted/5 items-start content-start">
               {skills.length > 0 ? (
                 skills.map((skill) => (
                   <Badge
                     key={skill}
-                    className="bg-primary/10 text-primary border-primary/30 hover:bg-primary/20 flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all group font-bold"
+                    className="bg-primary/10 text-primary border-primary/30 hover:bg-primary/20 flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all group font-bold shadow-sm"
                   >
                     {skill}
                     <button
@@ -133,9 +133,12 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
                   </Badge>
                 ))
               ) : (
-                <span className="text-xs text-muted-foreground italic m-auto">
-                  {dict.profile.edit_section_modal.skills_none}
-                </span>
+                <div className="flex flex-col items-center justify-center gap-2 text-center m-auto p-4">
+                   <FiCode className="text-muted-foreground/30 mb-1" size={24} />
+                   <span className="text-xs text-muted-foreground italic">
+                    {dict.profile.edit_section_modal.skills_none}
+                  </span>
+                </div>
               )}
             </div>
           </div>
