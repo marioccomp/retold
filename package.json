@@ -8,7 +8,6 @@
     "setup": "pnpm postinstall",
     "deploy": "bash scripts/deploy/deploy-production.sh",
     "deploy:preflight": "bash scripts/deploy/preflight.sh",
-    "deploy:verify-env": "node scripts/deploy/validate-production-env.mjs --env-file .env",
     "deploy:status": "bash scripts/deploy/show-last-success.sh",
     "build": "turbo run build",
     "start": "turbo run start",
