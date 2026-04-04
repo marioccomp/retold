@@ -56,6 +56,8 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user?.id) {
         token.id = String(user.id);
+        token.authenticatedAt =
+          typeof user.authenticatedAt === "number" ? user.authenticatedAt : Date.now();
       }
 
       try {
@@ -77,6 +79,8 @@ export const authConfig = {
       session.user.name = typeof token.name === "string" ? token.name : session.user.name;
       session.user.image = typeof token.image === "string" ? token.image : session.user.image;
       session.user.username = typeof token.username === "string" ? token.username : null;
+      session.user.authenticatedAt =
+        typeof token.authenticatedAt === "number" ? token.authenticatedAt : undefined;
 
       return session;
     },

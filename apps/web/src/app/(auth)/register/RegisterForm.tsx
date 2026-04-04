@@ -62,7 +62,7 @@ export default function RegisterForm() {
 
       toast.success(`${dict.auth.register.success}, @${res.data!.username}`);
 
-      router.push(`/${res.data!.username}`);
+      router.push("/onboarding");
     },
 
     onError: () => {
