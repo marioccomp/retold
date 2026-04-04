@@ -13,11 +13,8 @@ import ProfileSlide from "./slides/ProfileSlide";
 import CreateSlide from "./slides/CreateSlide";
 import FinalSlide from "./slides/FinalSlide";
 import { completeOnboarding } from "@/src/actions/complete-onboarding.action";
-import { createLogger } from "@repo/observability";
 
 import "./Onboarding.css";
-
-const logger = createLogger("web.ui.onboarding-flow");
 
 const SLIDES = [
   WelcomeSlide,
@@ -154,9 +151,7 @@ export default function OnboardingFlow({ isLoggedIn }: OnboardingFlowProps) {
         });
       }
     } catch (err) {
-      logger.error("onboarding.complete_failed", err, {
-        isLoggedIn,
-      });
+      console.error("Error completing onboarding:", err);
     } finally {
       router.push("/");
     }

@@ -6,7 +6,7 @@
     "dev": "turbo run dev",
     "dev:full": "pnpm db:start && pnpm dev",
     "setup": "pnpm postinstall",
-    "deploy": "git pull origin main && docker compose -f compose.prod.yaml down && pnpm install && NODE_OPTIONS=\"--max-old-space-size=2560\" pnpm run build --concurrency=1 && docker compose -f compose.prod.yaml up -d && pnpm --filter @repo/database exec prisma migrate deploy && pm2 restart retold",
+    "deploy": "git pull origin main && docker compose -f compose.prod.yaml down && pnpm install && NODE_OPTIONS=\"--max-old-space-size=2560\" pnpm run build && docker compose -f compose.prod.yaml up -d && pnpm --filter @repo/database exec prisma migrate deploy && pm2 restart retold",
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",

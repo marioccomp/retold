@@ -1,21 +1,24 @@
 import { ProjectClassification } from "../analyze/classify-project.js";
 import { Heuristic } from "../types/heuristic.js";
-import { createLogger } from "@repo/observability";
 import { groq } from "./groq-client.js";
 import { projectOverviewPrompt } from "./prompts/project-overview.js";
 import { projectPrompt } from "./prompts/project-prompt.js";
 
-const logger = createLogger("worker.llm-analysis");
-
 export async function analyzeProjectWithLLM(analysis: Heuristic, repoName: string, title?: string, description?: string) {
-  logger.debug("llm.request_prepared", {
-    repoName,
-    readmeLength: analysis.readme?.length ?? 0,
-    codeSamplesCount: analysis.codeSamples?.length ?? 0,
-    frameworkCount: analysis.stack.frameworks.length,
-    languageCount: analysis.stack.languages.length,
-    totalFiles: analysis.stats.totalFiles,
-  });
+  // === DETAILED LOGGING: What data arrives at the LLM ===
+  console.log("\n========== [LLM INPUT DEBUG] ==========");
+  console.log("[LLM INPUT] Stack:", JSON.stringify(analysis.stack, null, 2));
+  console.log("[LLM INPUT] Infra:", JSON.stringify(analysis.infra, null, 2));
+  console.log("[LLM INPUT] Stats:", JSON.stringify(analysis.stats, null, 2));
+  console.log("[LLM INPUT] Structure:", JSON.stringify(analysis.structure, null, 2));
+  console.log("[LLM INPUT] Classification:", JSON.stringify(analysis.classification, null, 2));
+  console.log("[LLM INPUT] README length:", analysis.readme?.length ?? 0, "chars");
+  console.log("[LLM INPUT] README preview:", analysis.readme?.slice(0, 300) ?? "<missing>");
+  console.log("[LLM INPUT] Code samples count:", analysis.codeSamples?.length ?? 0);
+  console.log("========================================\n");
+
+
+  console.log("repo name: ", repoName);
 
   const prompt = projectOverviewPrompt(analysis, analysis.locale);
   const prompt2 = projectPrompt(analysis, repoName, title, description);
@@ -36,18 +39,14 @@ export async function analyzeProjectWithLLM(analysis: Heuristic, repoName: strin
     temperature: 0.05,
   });
 
+  console.log("Aqui esta o retorno da llm: ", completion1);
+
   const raw1 = completion1.choices[0].message.content ?? "";
-  logger.debug("llm.first_response_received", {
-    repoName,
-    rawLength: raw1.length,
-  });
+
+  console.log("[LLM] Raw response (first attempt):", raw1.slice(0, 2000));
 
   const parsed1 = tryParseJson(raw1);
   if (parsed1.ok) return parsed1.value;
-  logger.warn("llm.first_response_invalid_json", {
-    repoName,
-    rawLength: raw1.length,
-  });
 
   // Retry (mais agressivo)
   const completion2 = await groq.chat.completions.create({
@@ -69,11 +68,6 @@ export async function analyzeProjectWithLLM(analysis: Heuristic, repoName: strin
   const raw2 = completion2.choices[0].message.content ?? "";
   const parsed2 = tryParseJson(raw2);
   if (parsed2.ok) return parsed2.value;
-
-  logger.error("llm.second_response_invalid_json", undefined, {
-    repoName,
-    rawLength: raw2.length,
-  });
 
   // fallback: devolve o bruto (ou lança erro)
   return {
@@ -111,5 +105,6 @@ function normalizeLocale(locale?: string): "pt-BR" | "en" | "es" {
   if (l.startsWith("es")) return "es";
   return "en";
 }
+
 
 

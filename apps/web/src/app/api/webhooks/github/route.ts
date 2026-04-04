@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { webhookRepository } from "@repo/database";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.api.github-webhook");
 
 /**
  * Valida a assinatura HMAC-SHA256 enviada pelo GitHub.
@@ -26,20 +23,17 @@ function isSignatureValid(signature: string | null, body: string): boolean {
 export async function POST(req: Request) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-hub-signature-256");
-  const deliveryId = req.headers.get("x-github-delivery");
-  const event = req.headers.get("x-github-event");
 
   if (!isSignatureValid(signature, rawBody)) {
-    logger.warn("webhook.signature_invalid", {
-      deliveryId,
-      event,
-    });
+    console.warn("[Webhook] Assinatura inválida — request rejeitado");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const event = req.headers.get("x-github-event");
+
   // Ping event — GitHub envia ao cadastrar o webhook
   if (event === "ping") {
-    logger.info("webhook.ping_received", { deliveryId });
+    console.log("[Webhook] Ping recebido com sucesso ✓");
     return NextResponse.json({ message: "pong" }, { status: 200 });
   }
 
@@ -48,47 +42,26 @@ export async function POST(req: Request) {
     try {
       const payload = JSON.parse(rawBody);
 
-      logger.info("webhook.push_received", {
-        deliveryId,
-        repositoryId: payload.repository?.id ?? null,
-        installationId: payload.installation?.id ?? null,
-        commitCount: payload.commits?.length ?? 0,
-        ref: payload.ref ?? null,
-      });
+      console.log(
+        `[Webhook] Push recebido: ${payload.repository?.full_name} por ${payload.sender?.login} (${payload.commits?.length || 0} commits)`
+      );
 
       const result = await webhookRepository.processPushEvent(payload);
 
       if (!result.processed) {
-        logger.info("webhook.push_ignored", {
-          deliveryId,
-          repositoryId: payload.repository?.id ?? null,
-          installationId: payload.installation?.id ?? null,
-          reason: result.reason ?? "unknown",
-        });
+        console.log(`[Webhook] Push ignorado: ${result.reason}`);
       } else {
-        logger.info("webhook.push_processed", {
-          deliveryId,
-          repositoryId: payload.repository?.id ?? null,
-          installationId: payload.installation?.id ?? null,
-          userId: result.userId ?? null,
-          commitCount: payload.commits?.length ?? 0,
-        });
+        console.log(`[Webhook] Push processado com sucesso para userId=${result.userId}`);
       }
 
       return NextResponse.json({ success: true, processed: result.processed }, { status: 200 });
     } catch (error) {
-      logger.error("webhook.push_processing_failed", error, {
-        deliveryId,
-        event,
-      });
+      console.error("[Webhook] Erro ao processar push:", error);
       return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
   }
 
   // Qualquer outro evento — aceitar sem processar (evitar reenvios do GitHub)
-  logger.info("webhook.event_ignored", {
-    deliveryId,
-    event,
-  });
+  console.log(`[Webhook] Evento ignorado: ${event}`);
   return NextResponse.json({ message: "Event ignored" }, { status: 200 });
 }

@@ -1,7 +1,4 @@
 import { prisma, githubRepository } from "../index";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("database.webhook-repository");
 
 interface PushWebhookPayload {
   installation: { id: number };
@@ -67,24 +64,12 @@ export const webhookRepository: WebhookRepository = {
             linesAdded += commitData.stats?.additions || 0;
             linesDeleted += commitData.stats?.deletions || 0;
           } catch (err) {
-            logger.warn(
-              "webhook.commit_stats_fetch_failed",
-              {
-                installationId: installation.id,
-                repositoryId: repository.id,
-                commitSha: c.id.slice(0, 8),
-              },
-              err
-            );
+            console.error(`[Webhook] Erro ao buscar stats do commit ${c.id}:`, err);
           }
         })
       );
     } catch (err) {
-      logger.error("webhook.octokit_initialization_failed", err, {
-        installationId: installation.id,
-        repositoryId: repository.id,
-        commitCount: commitsCount,
-      });
+      console.error("[Webhook] Erro ao inicializar Octokit:", err);
       // Se falhar a API, mantemos lines como 0 ou usamos o fallback de arquivos se preferir
     }
 
@@ -184,3 +169,4 @@ export const webhookRepository: WebhookRepository = {
     return { processed: true, userId };
   },
 };
+

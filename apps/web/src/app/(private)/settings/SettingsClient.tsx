@@ -9,6 +9,7 @@ import {
   FiShield,
   FiAlertTriangle,
   FiCheckCircle,
+  FiSettings,
   FiGlobe,
   FiAlertCircle,
 } from "react-icons/fi";
@@ -34,25 +35,21 @@ import {
 } from "@/src/actions/settings";
 import { setLanguageAction, setAnalysisLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.ui.settings-client");
 
 export function SettingsClient({
   initialAnalysisLocale = "auto",
 }: {
   initialAnalysisLocale?: string;
 }) {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const { dict, lang } = useTranslation();
+  const [providers, setProviders] = useState<string[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(true);
   const [isGithubLinked, setIsGithubLinked] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("general");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [deleteCredential, setDeleteCredential] = useState("");
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [pendingPassword, startPasswordTransition] = useTransition();
   const [pendingDelete, startDeleteTransition] = useTransition();
@@ -65,9 +62,10 @@ export function SettingsClient({
     async function loadProviders() {
       try {
         const connected = await getConnectedProvidersAction();
+        setProviders(connected);
         setIsGithubLinked(connected.includes("github"));
       } catch (error) {
-        logger.error("settings.providers_load_failed", error);
+        console.error("Failed to load providers", error);
       } finally {
         setLoadingProviders(false);
       }
@@ -78,32 +76,24 @@ export function SettingsClient({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const github = params.get("github");
-    const reauth = params.get("reauth");
-
-    if (!github && !reauth) return;
+    if (!github) return;
 
     if (github === "linked") toast.success("GitHub conectado com sucesso.");
-    if (reauth === "account-delete") {
-      toast.success(dict.settings.dangerZone.reauth.oauth_success);
-      setActiveTab("danger");
-    }
 
-    if (github && reauth !== "account-delete") {
-      setActiveTab("integrations");
-    }
+    setActiveTab("integrations");
 
     if (github === "already_linked") setLinkError("already_linked");
     if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
 
     window.history.replaceState(null, "", "/settings");
-  }, [dict.settings.dangerZone.reauth.oauth_success]);
+  }, []);
 
   async function handleUpdatePassword(formData: FormData) {
     const form = document.getElementById("password-form") as HTMLFormElement;
 
     startPasswordTransition(async () => {
       const result = await updatePasswordAction(null, formData);
-      if (result && "error" in result) {
+      if (result?.error) {
         if (typeof result.error === "string") {
           toast.error(result.error);
         } else {
@@ -138,15 +128,10 @@ export function SettingsClient({
             if (confirmInput) confirmInput.value = "";
           }
         }
-      } else if (result && "success" in result) {
-        form?.reset();
-
-        if ("requiresReauth" in result && result.requiresReauth) {
-          await signOut({ callbackUrl: "/login?reauth=password-updated" });
-          return;
-        }
-
+      } else if (result?.success) {
         toast.success(result.success);
+        await update({ hasPassword: true });
+        form?.reset();
       }
     });
   }
@@ -156,30 +141,18 @@ export function SettingsClient({
   }
 
   function handleDeleteAccount() {
-    setDeleteCredential("");
-    setDeleteError(null);
     setShowDeleteModal(true);
-  }
-
-  async function handleDeleteGithubReauth() {
-    setDeleteError(null);
-    await signIn("github", { callbackUrl: "/settings?reauth=account-delete" });
   }
 
   function confirmDeleteAccount() {
     startDeleteTransition(async () => {
-      setDeleteError(null);
-
-      const result = await deleteAccountAction(deleteCredential);
-
-      if (!result.success) {
-        setDeleteError(result.message);
-        toast.error(result.message);
-        return;
+      try {
+        await deleteAccountAction();
+        setShowDeleteModal(false);
+        await signOut({ callbackUrl: "/" });
+      } catch (error) {
+        toast.error(dict.settings.dangerZone.toast.delete_error);
       }
-
-      setShowDeleteModal(false);
-      await signOut({ callbackUrl: "/" });
     });
   }
 
@@ -378,8 +351,10 @@ export function SettingsClient({
                 {linkError === "already_linked" && (
                   <Alert variant="destructive">
                     <FiAlertCircle className="h-4 w-4" />
+                    {/* @ts-ignore - Key added dynamically */}
                     <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
                     <AlertDescription>
+                      {/* @ts-ignore - Key added dynamically */}
                       {dict.settings.connectedAccounts.already_linked_error}
                     </AlertDescription>
                   </Alert>
@@ -482,63 +457,12 @@ export function SettingsClient({
                 <p className="text-muted-foreground text-sm mb-6">
                   {dict.settings.dangerZone.modal_description}
                 </p>
-                {session?.user?.hasPassword ? (
-                  <div className="text-left mb-4 space-y-2">
-                    <Label htmlFor="delete-account-password">
-                      {dict.settings.dangerZone.reauth.password_label}
-                    </Label>
-                    <Input
-                      id="delete-account-password"
-                      type="password"
-                      value={deleteCredential}
-                      onChange={(e) => {
-                        setDeleteCredential(e.target.value);
-                        if (deleteError) setDeleteError(null);
-                      }}
-                      placeholder={dict.settings.dangerZone.reauth.password_placeholder}
-                      disabled={pendingDelete}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {dict.settings.dangerZone.reauth.password_help}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-left mb-4 space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      {dict.settings.dangerZone.reauth.oauth_help}
-                    </p>
-                    {isGithubLinked ? (
-                      <Button
-                        variant="outline"
-                        className="w-full font-medium cursor-pointer"
-                        onClick={handleDeleteGithubReauth}
-                        disabled={pendingDelete}
-                      >
-                        {dict.settings.dangerZone.reauth.oauth_button}
-                      </Button>
-                    ) : (
-                      <Alert variant="destructive">
-                        <FiAlertCircle className="h-4 w-4" />
-                        <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
-                        <AlertDescription>
-                          {dict.settings.dangerZone.reauth.oauth_missing_provider}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
-                )}
-                {deleteError && (
-                  <p className="text-destructive text-sm mb-4 text-left">{deleteError}</p>
-                )}
                 <div className="flex flex-col gap-2">
                   <Button
                     variant="destructive"
                     className="w-full font-medium cursor-pointer"
                     onClick={confirmDeleteAccount}
-                    disabled={
-                      pendingDelete ||
-                      (session?.user?.hasPassword ? deleteCredential.trim().length === 0 : !isGithubLinked)
-                    }
+                    disabled={pendingDelete}
                   >
                     {pendingDelete
                       ? dict.settings.dangerZone.buttonDeleting

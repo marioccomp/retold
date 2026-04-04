@@ -38,19 +38,6 @@
       "modal_description": "Tem certeza? Isso irá excluir permanentemente sua conta e todos os seus dados. Esta ação não pode ser desfeita.",
       "modal_confirm": "Sim, excluir minha conta",
       "modal_cancel": "Cancelar",
-      "reauth": {
-        "password_label": "Confirme sua senha atual",
-        "password_placeholder": "Digite sua senha para confirmar",
-        "password_help": "Por seguranÃ§a, a exclusÃ£o da conta exige uma confirmaÃ§Ã£o recente.",
-        "password_required": "Digite sua senha atual para excluir a conta.",
-        "invalid_password": "Senha incorreta. NÃ£o foi possÃ­vel confirmar a exclusÃ£o.",
-        "oauth_help": "Sua conta nÃ£o tem senha local. Reautentique com o GitHub e depois confirme a exclusÃ£o.",
-        "oauth_button": "Reautenticar com GitHub",
-        "oauth_required": "Reautentique com o GitHub para excluir a conta.",
-        "oauth_missing_provider": "Conecte o GitHub ou defina uma senha antes de excluir a conta.",
-        "oauth_success": "ReautenticaÃ§Ã£o concluÃ­da. Agora vocÃª jÃ¡ pode confirmar a exclusÃ£o da conta.",
-        "rate_limited": "Muitas tentativas sensÃ­veis em pouco tempo. Tente novamente em alguns minutos."
-      },
       "toast": {
         "update_error": "Falha ao atualizar senha",
         "delete_error": "Falha ao excluir conta"
@@ -644,10 +631,7 @@
       "social_divider": "Ou continue com",
       "no_account": "Não tem uma conta?",
       "create_one": "Crie uma agora",
-      "success": "Logado com sucesso",
-      "oauth_account_not_linked": "Essa conta GitHub não pode ser vinculada automaticamente. Entre com sua senha e conecte o GitHub em Configurações.",
-      "reauth_password_updated": "Senha atualizada. Entre novamente para continuar.",
-      "reauth_password_reset": "Senha redefinida com sucesso. Todas as sessões anteriores foram revogadas."
+      "success": "Logado com sucesso"
     },
     "register": {
       "welcome_title": "Junte-se ao Retold",

@@ -5,10 +5,8 @@ import { prisma } from "@repo/database";
 import { revalidatePath } from "next/cache";
 import { uploadFileService } from "../../storage/services/upload-file.service";
 import { ActionResponse } from "@/lib/action-response";
+import { deleteFileByUrlService } from "../../storage/services/delete-file.service";
 import { getDictionary } from "@/src/i18n/server";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.action.upload-project-images");
 
 const MAX_IMAGES_PER_UPLOAD = 3;
 
@@ -75,11 +73,7 @@ export async function uploadProjectImagesAction(
 
     return { success: true, data: updated.images };
   } catch (error) {
-    logger.error("project.images_upload_failed", error, {
-      projectId,
-      userId: Number(session.user.id),
-      fileCount: validFiles.length,
-    });
+    console.error(error);
     return { success: false, message: t.upload_failed };
   }
 }

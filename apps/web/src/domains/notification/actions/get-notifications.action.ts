@@ -2,9 +2,6 @@
 
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.action.notifications");
 
 export async function getNotificationsAction() {
   const session = await auth();
@@ -44,9 +41,7 @@ export async function getNotificationsAction() {
 
     return { success: true, data: notifications };
   } catch (error) {
-    logger.error("notification.list_failed", error, {
-      userId,
-    });
+    console.error("Error fetching notifications:", error);
     return { success: false, error: "Failed to fetch notifications", data: [] };
   }
 }

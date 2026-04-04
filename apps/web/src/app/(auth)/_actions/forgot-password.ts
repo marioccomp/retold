@@ -4,13 +4,6 @@ import { getForgotPasswordSchema } from "@/src/domains/auth/schemas/forgot-passw
 import { forgotPasswordService } from "@/src/domains/auth/services/forgot-password.service";
 import type { ActionResponse } from "@/lib/action-response";
 import { getDictionary } from "@/src/i18n/server";
-import {
-  enforceForgotPasswordRateLimit,
-} from "@/src/domains/auth/services/public-auth-rate-limit.service";
-import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.auth-forgot-password");
 
 export async function forgotPassword(formData: FormData): Promise<ActionResponse<string>> {
   const dict = await getDictionary();
@@ -28,7 +21,6 @@ export async function forgotPassword(formData: FormData): Promise<ActionResponse
   }
 
   try {
-    await enforceForgotPasswordRateLimit(parsed.data.email);
     await forgotPasswordService(parsed.data.email);
 
     return {
@@ -36,14 +28,7 @@ export async function forgotPassword(formData: FormData): Promise<ActionResponse
       data: dict.auth.errors.forgot_password_success,
     };
   } catch (error) {
-    if (error instanceof TooManyRequestsError) {
-      return {
-        success: true,
-        data: dict.auth.errors.forgot_password_success,
-      };
-    }
-
-    logger.error("auth.forgot_password_failed", error);
+    console.error("forgot password error: ", error);
     return {
       success: false,
       message: dict.validation.generic_error,

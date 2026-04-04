@@ -10,5 +10,5 @@ export async function resetPasswordService(token: string, newPassword: string) {
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await userRepository.updatePassword(resetToken.userId, passwordHash);
-  await passwordResetRepository.invalidateAllActiveTokens(resetToken.userId);
+  await passwordResetRepository.markAsUsed(resetToken.id);
 }

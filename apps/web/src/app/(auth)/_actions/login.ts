@@ -7,9 +7,6 @@ import type { ActionResponse } from "@/lib/action-response";
 import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
 import { checkLoginRateLimit } from "@/src/domains/auth/services/login.service";
 import { getDictionary } from "@/src/i18n/server";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.auth-login");
 
 export async function login(formData: FormData): Promise<ActionResponse> {
   const dict = await getDictionary();
@@ -64,9 +61,7 @@ export async function login(formData: FormData): Promise<ActionResponse> {
       };
     }
 
-    logger.error("auth.login_unexpected_failure", error, {
-      identifierType: parsed.data.identifier.includes("@") ? "email" : "username",
-    });
+    console.error("Login error (Unknown):", error);
 
     return {
       success: false,

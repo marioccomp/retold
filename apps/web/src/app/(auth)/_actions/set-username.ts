@@ -7,10 +7,6 @@ import { auth } from "@/src/domains/auth/auth";
 import { USERNAME_REGEX } from "@/src/domains/auth/auth.constants";
 import { revalidatePath } from "next/cache";
 import { getDictionary } from "@/src/i18n/server";
-import {
-    enforceAvailabilityCheckRateLimit,
-} from "@/src/domains/auth/services/public-auth-rate-limit.service";
-import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
 
 export async function setUsername(formData: FormData): Promise<ActionResponse<{ username: string }>> {
     const session = await auth();
@@ -51,30 +47,14 @@ export async function setUsername(formData: FormData): Promise<ActionResponse<{ 
 
     const { username } = parsed.data;
 
-    try {
-        await enforceAvailabilityCheckRateLimit("username", username);
-    } catch (error) {
-        if (error instanceof TooManyRequestsError) {
-            return {
-                success: false,
-                message: dict.auth.errors.too_many_attempts,
-            };
-        }
-
-        return {
-            success: false,
-            message: dict.validation.generic_error,
-        };
-    }
-
     const existing = await userRepository.findByUsername(username);
 
     if (existing && existing.id !== userId) {
         return {
             success: false,
-            message: dict.auth.choose_username.error_generic,
+            message: dict.auth.errors.username_in_use,
             fieldErrors: {
-                username: [dict.auth.choose_username.error_generic],
+                username: [dict.auth.errors.username_in_use],
             },
         };
     }

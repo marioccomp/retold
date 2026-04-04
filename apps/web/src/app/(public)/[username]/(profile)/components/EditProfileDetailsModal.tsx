@@ -66,7 +66,7 @@ export default function EditProfileDetailsModal({ isOpen, onClose, profile }: Pr
   }, [isOpen, profile]);
 
   const mutation = useMutation({
-    mutationFn: (data: any) => updateProfileDetails(data),
+    mutationFn: (data: any) => updateProfileDetails(data, profile.id),
     onSuccess: (res) => {
       if (res.success) {
         toast.success(dict.profile.edit_modal.success);
