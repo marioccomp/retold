@@ -2,9 +2,6 @@
 
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.action.mark-notification-read");
 
 export async function markAsReadAction(notificationId: number) {
   const session = await auth();
@@ -31,10 +28,7 @@ export async function markAsReadAction(notificationId: number) {
 
     return { success: true };
   } catch (error) {
-    logger.error("notification.mark_read_failed", error, {
-      userId,
-      notificationId,
-    });
+    console.error("Error marking notification as read:", error);
     return { success: false, error: "Failed to mark notification as read" };
   }
 }

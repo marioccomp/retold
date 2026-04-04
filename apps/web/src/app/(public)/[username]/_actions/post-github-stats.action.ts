@@ -4,24 +4,10 @@ import { githubRepository, prisma, userRepository } from "@repo/database";
 import { Octokit } from "octokit";
 import { projectRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
-import { auth } from "@/src/domains/auth/auth";
-import { createLogger } from "@repo/observability";
 
-const logger = createLogger("web.action.post-github-stats");
-
-export async function postGithubStats(): Promise<ActionResponse> {
-  const session = await auth();
-  const userId = session?.user?.id ? Number(session.user.id) : null;
-
-  if (!userId || Number.isNaN(userId)) {
-    return {
-      success: false,
-      message: "Unauthorized",
-    };
-  }
-
+export async function postGithubStats(username: string): Promise<ActionResponse> {
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { username },
     include: { githubInstallations: true },
   });
 
@@ -39,12 +25,16 @@ export async function postGithubStats(): Promise<ActionResponse> {
 
     const userProjects = await projectRepository.getAllProjects(user.id);
 
+    const projectRepoNames = userProjects.map((p) => p.repository?.fullName).filter(Boolean);
+
+    let repoFilter = "";
+
     const [repoData, prData] = await Promise.all([
       octokit.rest.apps.listReposAccessibleToInstallation({
         per_page: 100,
       }),
       octokit.rest.search.issuesAndPullRequests({
-        q: `author:${githubLogin} type:pr`,
+        q: `${repoFilter} author:${githubLogin} type:pr`,
         per_page: 1,
       }),
     ]);
@@ -87,9 +77,7 @@ export async function postGithubStats(): Promise<ActionResponse> {
         message: "No github installations found",
       };
     }
-    logger.error("github.stats_refresh_failed", error, {
-      userId,
-    });
+    console.error("Error fetching github stats:", error);
     return {
       success: false,
       message: "Error fetching github stats",

@@ -60,6 +60,7 @@ README POLICY:
   const hasPackagesDir = input.structure.hasPackagesDir;
 
   const readmeLength = input.readme?.length ?? 0;
+  console.log("TAMANHO DO README", readmeLength);
   const isReadmeComplete = readmeLength > 25000;
   const dirLimit = isReadmeComplete ? 5 : 40;
 

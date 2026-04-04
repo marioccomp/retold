@@ -1,11 +1,10 @@
 "use server";
 
 import { userRepository } from "@repo/database";
+import { z } from "zod";
 import { ActionResponse } from "@/lib/action-response";
 import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getDictionary } from "@/src/i18n/server";
-import { enforceAvailabilityCheckRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
-import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
 
 export async function checkEmail(email: string): Promise<ActionResponse> {
   const dict = await getDictionary();
@@ -25,20 +24,15 @@ export async function checkEmail(email: string): Promise<ActionResponse> {
     };
   }
 
-  try {
-    await enforceAvailabilityCheckRateLimit("email", parsed.data.email);
-    await userRepository.findByEmail(parsed.data.email);
-  } catch (error) {
-    if (error instanceof TooManyRequestsError) {
-      return {
-        success: false,
-        message: dict.auth.errors.too_many_attempts,
-      };
-    }
+  const user = await userRepository.findByEmail(parsed.data.email);
 
+  if (user) {
     return {
       success: false,
-      message: dict.validation.generic_error,
+      message: dict.auth.errors.email_in_use,
+      fieldErrors: {
+        email: [dict.auth.errors.email_in_use],
+      },
     };
   }
 

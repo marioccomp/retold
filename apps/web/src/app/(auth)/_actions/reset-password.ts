@@ -4,9 +4,6 @@ import { getResetPasswordSchema } from "@/src/domains/auth/schemas/reset-passwor
 import { resetPasswordService } from "@/src/domains/auth/services/reset-password.service";
 import type { ActionResponse } from "@/lib/action-response";
 import { getDictionary } from "@/src/i18n/server";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.auth-reset-password");
 
 export async function resetPassword(formData: FormData): Promise<ActionResponse> {
   const dict = await getDictionary();
@@ -28,7 +25,7 @@ export async function resetPassword(formData: FormData): Promise<ActionResponse>
 
     return { success: true };
   } catch (error) {
-    logger.error("auth.reset_password_failed", error);
+    console.error("Reset password error", error);
 
     return {
       success: false,

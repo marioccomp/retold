@@ -1,18 +1,11 @@
 "use server";
 
+import { z } from "zod";
 import { registerUser } from "@/src/domains/auth/services/register.service";
 import type { ActionResponse } from "@/lib/action-response";
-import {
-  EmailAlreadyInUseError,
-  TooManyRequestsError,
-  UsernameAlreadyInUseError,
-} from "@/src/domains/auth/auth.errors";
+import { EmailAlreadyInUseError, UsernameAlreadyInUseError } from "@/src/domains/auth/auth.errors";
 import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getDictionary } from "@/src/i18n/server";
-import { enforceRegisterRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.auth-register");
 
 type RegisterResponseData = {
   email: string;
@@ -44,7 +37,6 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
   const { name, email, username, password } = parsed.data;
 
   try {
-    await enforceRegisterRateLimit(email, username);
     await registerUser({ name, email, username, password });
     return {
       success: true,
@@ -53,25 +45,28 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
         username,
       },
     };
-  } catch (error: unknown) {
-    if (error instanceof TooManyRequestsError) {
+  } catch (error: any) {
+    if (error instanceof EmailAlreadyInUseError) {
       return {
         success: false,
-        message: dict.auth.errors.too_many_attempts,
+        message: dict.auth.errors.email_in_use,
+        fieldErrors: {
+          email: [dict.auth.errors.email_in_use],
+        },
       };
     }
 
-    if (error instanceof EmailAlreadyInUseError || error instanceof UsernameAlreadyInUseError) {
+    if (error instanceof UsernameAlreadyInUseError) {
       return {
         success: false,
-        message: dict.auth.errors.create_account_generic,
+        message: dict.auth.errors.username_in_use,
+        fieldErrors: {
+          username: [dict.auth.errors.username_in_use],
+        },
       };
     }
 
-    logger.error("auth.register_failed", error, {
-      hasName: Boolean(name),
-      usernameLength: username.length,
-    });
+    console.error("Register error:", error);
     return {
       success: false,
       message: dict.auth.errors.create_account_generic,

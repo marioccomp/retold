@@ -5,8 +5,8 @@ import { useState } from "react";
 import Image from "next/image";
 import retoldImg from "@/assets/retold-login.png";
 import retoldLogo from "@/assets/retold-footer.png";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FiGithub } from "react-icons/fi";
+import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa";
+import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { register } from "../_actions/register";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,9 @@ export default function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]> | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailAvailable, setEmailAvailable] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [usernameAvailable, setUsernameAvailable] = useState(false);
   const [usernameHelpVisible, setUsernameHelpVisible] = useState(true);
   const [lastCheckedUsername, setLastCheckedUsername] = useState<string | null>(null);
   const [lastCheckedEmail, setLastCheckedEmail] = useState<string | null>(null);
@@ -78,6 +80,7 @@ export default function RegisterForm() {
         setEmailError(data.fieldErrors?.email?.[0] ?? data.message);
       } else {
         setEmailError(null);
+        setEmailAvailable(true);
       }
     },
   });
@@ -90,6 +93,7 @@ export default function RegisterForm() {
         setUsernameError(data.fieldErrors?.username?.[0] ?? data.message);
       } else {
         setUsernameError(null);
+        setUsernameAvailable(true);
       }
     },
   });
@@ -228,6 +232,8 @@ export default function RegisterForm() {
                   const value = e.target.value;
 
                   if (usernameError) setUsernameError(null);
+                  if (usernameAvailable) setUsernameAvailable(false);
+
                   if (value.length >= 3 && value.length <= 20) {
                     setUsernameHelpVisible(false);
                   } else {
@@ -251,6 +257,9 @@ export default function RegisterForm() {
               {checkUsernameMutation.isPending && (
                 <p className="text-xs text-gray-400 mt-1">{dict.validation.username_checking}</p>
               )}
+              {usernameAvailable && (
+                <p className="text-xs text-green-500 mt-1">{dict.validation.username_available}</p>
+              )}
               {(usernameError || fieldErrors?.username) && (
                 <p className="text-red-500 text-xs mt-1">
                   {usernameError ?? fieldErrors?.username?.[0]}
@@ -272,6 +281,7 @@ export default function RegisterForm() {
                 className="h-11 shadow-none"
                 onChange={() => {
                   if (emailError) setEmailError(null);
+                  if (emailAvailable) setEmailAvailable(false);
                 }}
                 onBlur={(e) => {
                   const value = e.target.value;
@@ -286,6 +296,9 @@ export default function RegisterForm() {
               />
               {checkEmailMutation.isPending && (
                 <p className="text-xs text-gray-400 mt-1">{dict.validation.email_checking}</p>
+              )}
+              {emailAvailable && (
+                <p className="text-xs text-green-500 mt-1">{dict.validation.email_available}</p>
               )}
               {(emailError || fieldErrors?.email) && (
                 <p className="text-red-500 text-xs mt-1">{emailError ?? fieldErrors?.email?.[0]}</p>
@@ -393,7 +406,8 @@ export default function RegisterForm() {
               disabled={
                 registerMutation.isPending ||
                 !!emailError ||
-                !!usernameError ||
+                !emailAvailable ||
+                !usernameAvailable ||
                 nameHelpVisible ||
                 passwordHelpVisible ||
                 confirmPasswordHelpVisible

@@ -7,6 +7,7 @@ import { FiPlus, FiGithub, FiCheck } from "react-icons/fi";
 import {
   createProjectAction,
   getRepositoriesAction,
+  verifyUserInstallation,
 } from "@/src/domains/project/actions";
 import { uploadProjectImagesAction } from "@/src/domains/user/actions/upload-project-images.action";
 import { toast } from "sonner";
@@ -17,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { createLogger } from "@repo/observability";
 import {
   Select,
   SelectContent,
@@ -26,8 +26,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
-const logger = createLogger("web.ui.create-project-panel");
 
 type Repository = {
   id: number;
@@ -75,32 +73,12 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
 
       if (event.data?.type === "GITHUB_APP_REPOSITORIES_UPDATED") {
         queryClient.invalidateQueries({ queryKey: ["repositories"] });
-        return;
-      }
-
-      if (event.data?.type === "GITHUB_APP_NOT_LINKED_GITHUB") {
-        toast.error("Conecte sua conta do GitHub nas configuracoes antes de instalar o app.");
-        return;
-      }
-
-      if (event.data?.type === "GITHUB_APP_INSTALLATION_FORBIDDEN") {
-        toast.error("A instalacao selecionada nao pertence a sua conta GitHub.");
-        return;
-      }
-
-      if (event.data?.type === "GITHUB_APP_NOT_AUTHENTICATED") {
-        toast.error(dict.auth.errors.unauthorized);
-        return;
-      }
-
-      if (event.data?.type === "GITHUB_APP_FLOW_INVALID" || event.data?.type === "GITHUB_APP_ERROR") {
-        toast.error(t.toast.error);
       }
     }
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [dict.auth.errors.unauthorized, queryClient, t.toast.error]);
+  }, [queryClient]);
 
   useEffect(() => {
     sortableImagesRef.current = sortableImages;
@@ -188,7 +166,8 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
   };
 
   // GitHub App install URL
-  const installUrl = "/github/install/start";
+  const appSlug = process.env.NODE_ENV === "production" ? "retold-inc" : "retolddev";
+  const installUrl = `https://github.com/apps/${appSlug}/installations/new`;
 
   function openCenteredPopup(url: string, title = "GitHub", w = 600, h = 700) {
     const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
@@ -204,6 +183,9 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
   }
 
   const handleAddRepository = () => {
+    if (repositories.length === 0) {
+      verifyUserInstallation();
+    }
     openCenteredPopup(installUrl);
   };
 
@@ -255,10 +237,7 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
       onSuccess();
     },
     onError: (error: unknown) => {
-      logger.error("project.create_failed", error, {
-        hasRepository: Boolean(selectedRepoId),
-        imageCount: sortableImages.length,
-      });
+      console.error(error);
       toast.error(error instanceof Error ? error.message : t.toast.error);
     },
   });

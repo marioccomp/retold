@@ -1,11 +1,10 @@
 "use server";
 
+import { z } from "zod";
 import { userRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getDictionary } from "@/src/i18n/server";
-import { enforceAvailabilityCheckRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
-import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
 
 export async function checkUsername(username: string): Promise<ActionResponse> {
   const dict = await getDictionary();
@@ -21,20 +20,15 @@ export async function checkUsername(username: string): Promise<ActionResponse> {
     };
   }
 
-  try {
-    await enforceAvailabilityCheckRateLimit("username", parsed.data.username);
-    await userRepository.findByUsername(parsed.data.username);
-  } catch (error) {
-    if (error instanceof TooManyRequestsError) {
-      return {
-        success: false,
-        message: dict.auth.errors.too_many_attempts,
-      };
-    }
+  const exists = await userRepository.findByUsername(parsed.data.username);
 
+  if (exists) {
     return {
       success: false,
-      message: dict.validation.generic_error,
+      message: dict.auth.errors.username_in_use,
+      fieldErrors: {
+        username: [dict.auth.errors.username_in_use],
+      },
     };
   }
 

@@ -44,7 +44,6 @@ model User {
   password      String? // null when OAuth
   role          Role      @default(USER)
   plan          Plan      @default(FREE)
-  sessionVersion Int      @default(0)
 
   passwordResetTokens PasswordResetToken[]
   accounts            Account[]

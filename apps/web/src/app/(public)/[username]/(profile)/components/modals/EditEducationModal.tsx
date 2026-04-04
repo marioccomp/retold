@@ -105,7 +105,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
   }, [isOpen, profile]);
 
   const mutation = useMutation({
-    mutationFn: (data: { educations: any[] }) => updateProfileDetails(data),
+    mutationFn: (data: { educations: any[] }) => updateProfileDetails(data, profile.id),
     onSuccess: (res) => {
       if (res.success) {
         toast.success(dict.profile.edit_modal.success);

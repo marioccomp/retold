@@ -1,13 +1,8 @@
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/src/domains/auth/auth";
-import { GithubInstallationAuthorizationError } from "@/src/domains/github/github-installation-authorization";
 import { saveGithubInstallation } from "./save-installation";
-import {
-  GITHUB_APP_INSTALL_USER_COOKIE,
-  popupCloseResponse,
-} from "./install-flow";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const installationId = searchParams.get("installation_id");
@@ -23,33 +18,42 @@ export async function GET(req: NextRequest) {
     return popupCloseResponse("NOT_AUTHENTICATED");
   }
 
-  const currentUserId = Number(session.user.id);
-  const installFlowUser = req.cookies.get(GITHUB_APP_INSTALL_USER_COOKIE)?.value;
 
-  if (installFlowUser !== String(currentUserId)) {
-    return popupCloseResponse("FLOW_INVALID");
-  }
+  await saveGithubInstallation({
+    installationId,
+    userId: Number(session.user.id),
+  });
 
-  try {
-    await saveGithubInstallation({
-      installationId,
-      userId: currentUserId,
-    });
-  } catch (error) {
-    const responseStatus =
-      error instanceof GithubInstallationAuthorizationError
-        ? error.code === "GITHUB_ACCOUNT_NOT_LINKED" ||
-          error.code === "GITHUB_ACCOUNT_TOKEN_INVALID"
-          ? "NOT_LINKED_GITHUB"
-          : "INSTALLATION_FORBIDDEN"
-        : "ERROR";
 
-    const response = popupCloseResponse(responseStatus);
-    response.cookies.delete(GITHUB_APP_INSTALL_USER_COOKIE);
-    return response;
-  }
-
-  const response = popupCloseResponse("REPOSITORIES_UPDATED");
-  response.cookies.delete(GITHUB_APP_INSTALL_USER_COOKIE);
-  return response;
+  // 🔥 sempre avisa que repos mudaram
+  return popupCloseResponse("REPOSITORIES_UPDATED");
+}
+function popupCloseResponse(status: string) {
+  return new NextResponse(
+    `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHub App</title>
+  </head>
+  <body>
+    <script>
+      if (window.opener) {
+        window.opener.postMessage(
+          { type: "GITHUB_APP_${status}" },
+          window.location.origin
+        );
+      }
+      window.close();
+    </script>
+    <p>Finalizando instalação...</p>
+  </body>
+</html>
+    `,
+    {
+      headers: {
+        "Content-Type": "text/html",
+      },
+    }
+  );
 }

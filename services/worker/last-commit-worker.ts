@@ -2,15 +2,12 @@ import { githubRepository, prisma, Prisma } from "@repo/database";
 import { Octokit } from "octokit";
 import { Worker } from "bullmq";
 import { redisConnection } from "@repo/queue";
-import { createLogger } from "@repo/observability";
 
 type JobData = {
   userId: number;
 };
 
-const logger = createLogger("worker.last-commit");
-
-logger.info("worker.started");
+console.log("last-commit-worker starting");
 
 export const lastCommitWorker = new Worker(
   "github-last-commit",
@@ -30,7 +27,7 @@ export const lastCommitWorker = new Worker(
     );
 
     if (!user || user.githubInstallations.length === 0) {
-      logger.info("worker.user_without_installation", { userId });
+      console.log("no installations or user not found");
       return;
     }
 
@@ -45,7 +42,7 @@ export const lastCommitWorker = new Worker(
       .filter(Boolean) as string[];
 
     if (repoFullNames.length === 0) {
-      logger.info("worker.no_public_repositories", { userId });
+      console.log("No repos, saving null lastCommit");
       await prisma.githubStats.upsert({
         where: { userId },
         update: { lastCommit: Prisma.DbNull, lastCommitFetchedAt: new Date() },
@@ -63,7 +60,6 @@ export const lastCommitWorker = new Worker(
     }
 
     let best: { date: string; message: string; repo: string } | null = null;
-    let failedRepos = 0;
 
     for (const fullName of repoFullNames) {
       const [owner, repo] = fullName.split("/");
@@ -87,7 +83,7 @@ export const lastCommitWorker = new Worker(
           best = { date, message, repo: fullName };
         }
       } catch (e) {
-        failedRepos += 1;
+        console.log(`failed repo ${fullName}`);
       }
     }
 
@@ -108,20 +104,8 @@ export const lastCommitWorker = new Worker(
       },
     });
 
-    if (failedRepos > 0) {
-      logger.warn("worker.repository_commit_lookup_partial_failure", {
-        userId,
-        failedRepos,
-        repositoryCount: repoFullNames.length,
-      });
-    }
-
-    logger.info("worker.last_commit_updated", {
-      userId,
-      repositoryCount: repoFullNames.length,
-      hasLastCommit: Boolean(best),
-      lastCommitDate: best?.date ?? null,
-    });
+    console.log("[last-commit-worker] updated lastCommit", best?.repo ?? null);
+    console.log(best || "nada");
   },
   {
     connection: redisConnection,

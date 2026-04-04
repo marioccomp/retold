@@ -2,9 +2,6 @@
 
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.action.delete-notification");
 
 export async function deleteNotificationAction(notificationId: number) {
   const session = await auth();
@@ -32,10 +29,7 @@ export async function deleteNotificationAction(notificationId: number) {
 
     return { success: true };
   } catch (error) {
-    logger.error("notification.delete_failed", error, {
-      userId,
-      notificationId,
-    });
+    console.error("Error deleting notification:", error);
     return { success: false, error: "Failed to delete notification" };
   }
 }

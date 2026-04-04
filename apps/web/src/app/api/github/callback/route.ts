@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
-import { createLogger } from "@repo/observability";
 
 const STATE_COOKIE = "github_link_state";
 const USER_COOKIE = "github_link_user";
-const logger = createLogger("web.api.github-callback");
 
 type GithubUser = {
     id: number;
@@ -144,21 +142,7 @@ export async function GET(req: NextRequest) {
 
         const githubEmail = (await fetchGithubPrimaryEmail(accessToken)) ?? ghUser.email;
 
-        if (existing) {
-            await prisma.account.update({
-                where: {
-                    provider_providerAccountId: {
-                        provider: "github",
-                        providerAccountId,
-                    },
-                },
-                data: {
-                    access_token: accessToken,
-                    token_type: token.token_type,
-                    scope: token.scope,
-                },
-            });
-        } else {
+        if (!existing) {
             await prisma.account.create({
                 data: {
                     userId: currentUserId,
@@ -179,11 +163,7 @@ export async function GET(req: NextRequest) {
 
         return redirectWith("/settings?github=linked");
     } catch (err) {
-        logger.error("github.oauth_link_failed", err, {
-            currentUserId,
-            hasCode: Boolean(code),
-            hasState: Boolean(state),
-        });
+        console.error("GitHub link error:", err);
         return redirectWith("/settings?github=oauth_error");
     }
 }

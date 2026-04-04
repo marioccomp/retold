@@ -2,17 +2,10 @@ import { githubRepository } from "@repo/database";
 import { Octokit } from "octokit";
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.domain.github");
 
 export async function getUserRepositories() {
   const session = await auth();
-  const userId = session?.user?.id ? Number(session.user.id) : null;
-
-  if (!userId || Number.isNaN(userId)) {
-    return [];
-  }
+  const userId = Number(session?.user.id);
 
   try {
     const token = await githubRepository.getTokenByUserId(userId);
@@ -61,9 +54,7 @@ export async function getUserRepositories() {
       },
     });
   } catch (error) {
-    logger.error("github.repositories_sync_failed", error, {
-      userId,
-    });
+    console.error("Erro ao buscar repos: ", error);
     return [];
   }
 }

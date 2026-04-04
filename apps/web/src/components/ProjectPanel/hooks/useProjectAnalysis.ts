@@ -7,9 +7,6 @@ import {
     startProjectAnalysisAction,
 } from "@/src/domains/project/actions";
 import { ProjectForOverlay } from "../types";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.ui.project-analysis");
 
 export function useProjectAnalysis(project: ProjectForOverlay) {
     const { dict } = useTranslation();
@@ -60,9 +57,7 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
                 toast.error(dict.project.analysis.start_error);
             }
         } catch (err) {
-            logger.error("project.analysis_start_failed", err, {
-                projectId: project.id,
-            });
+            console.error(err);
             toast.error(dict.project.analysis.start_error);
         }
     };

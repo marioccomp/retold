@@ -2,13 +2,14 @@
 
 import retoldImg from "@/assets/retold-login.png";
 import retoldLogo from "@/assets/retold-footer.png";
-import { FiGithub } from "react-icons/fi";
+import { FiGithub, FiLinkedin } from "react-icons/fi";
+import { FaGoogle } from "react-icons/fa";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { login } from "../_actions/login";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -22,45 +23,8 @@ import { useTranslation } from "@/src/i18n/client";
 export default function LoginForm() {
   const { dict } = useTranslation();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { update } = useSession();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const handledParamsRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    const error = searchParams.get("error");
-    const reauth = searchParams.get("reauth");
-    const currentStateKey = `${error ?? ""}:${reauth ?? ""}`;
-
-    if (handledParamsRef.current === currentStateKey) {
-      return;
-    }
-
-    handledParamsRef.current = currentStateKey;
-
-    if (error === "OAuthAccountNotLinked") {
-      toast.error(dict.auth.login.oauth_account_not_linked);
-      router.replace("/login");
-      return;
-    }
-
-    if (reauth === "password-updated") {
-      toast.success(dict.auth.login.reauth_password_updated);
-      router.replace("/login");
-      return;
-    }
-
-    if (reauth === "password-reset") {
-      toast.success(dict.auth.login.reauth_password_reset);
-      router.replace("/login");
-    }
-  }, [
-    dict.auth.login.oauth_account_not_linked,
-    dict.auth.login.reauth_password_reset,
-    dict.auth.login.reauth_password_updated,
-    router,
-    searchParams,
-  ]);
 
   const togglePasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);

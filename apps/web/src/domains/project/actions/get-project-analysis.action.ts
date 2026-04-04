@@ -1,13 +1,11 @@
 "use server";
 
-import { getAuthenticatedUserId } from "@/src/lib/server-auth";
+import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
 
-import { requireProjectAccess } from "../lib/project-access";
-
 export async function getProjectAnalysisAction(projectId: number) {
-    const currentUserId = await getAuthenticatedUserId();
-    await requireProjectAccess(projectId, currentUserId);
+    const session = await auth();
+    const currentUserId = Number(session?.user.id);
 
     const project = await prisma.project.findUnique({
         where: { id: projectId },
@@ -17,6 +15,10 @@ export async function getProjectAnalysisAction(projectId: number) {
     });
 
     if (!project) throw new Error("Project not found");
+
+    if (project.visibility === "private" && project.userId !== currentUserId) {
+        throw new Error("Unauthorized: Project is private");
+    }
 
     return {
         status: project.status,

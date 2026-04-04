@@ -25,6 +25,7 @@ export default function CertificationsSection({ searchQuery, ownProfile, profile
   );
 
   const handleNewCertification = () => {
+    console.log("Abrir modal de nova certificação");
   };
 
   return (

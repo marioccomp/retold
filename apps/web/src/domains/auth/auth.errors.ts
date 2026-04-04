@@ -23,10 +23,3 @@ export class TooManyLoginAttemptsError extends Error {
     this.name = "TooManyLoginAttemptsError";
   }
 }
-
-export class TooManyRequestsError extends Error {
-  constructor() {
-    super("Too many requests");
-    this.name = "TooManyRequestsError";
-  }
-}

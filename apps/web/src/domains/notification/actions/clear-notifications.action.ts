@@ -2,9 +2,6 @@
 
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.action.clear-notifications");
 
 export async function clearAllNotificationsAction() {
   const session = await auth();
@@ -24,9 +21,7 @@ export async function clearAllNotificationsAction() {
 
     return { success: true };
   } catch (error) {
-    logger.error("notification.clear_failed", error, {
-      userId,
-    });
+    console.error("Error clearing notifications:", error);
     return { success: false, error: "Failed to clear notifications" };
   }
 }

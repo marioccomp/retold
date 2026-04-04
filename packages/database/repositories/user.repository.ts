@@ -1,6 +1,6 @@
 import { prisma } from "../index";
 import { Prisma } from "@prisma/client";
-import { GithubStats, Plan, Role, User } from "@prisma/client";
+import { GithubStats, User } from "@prisma/client";
 
 type UpdatableProfileFields = Pick<
   User,
@@ -18,19 +18,6 @@ type UpdatableProfileFields = Pick<
   | "contactEmail"
 >;
 type UpdateProfileInput = Partial<UpdatableProfileFields>;
-
-export type SessionUserSnapshot = {
-  id: number;
-  email: string;
-  name: string | null;
-  image: string | null;
-  role: Role;
-  plan: Plan;
-  username: string | null;
-  password: string | null;
-  hasCompletedOnboarding: boolean;
-  sessionVersion: number;
-};
 
 export const userRepository = {
   async findByEmailOrUsername(email: string, username: string) {
@@ -62,40 +49,9 @@ export const userRepository = {
   },
 
   async updatePassword(userId: number, passwordHash: string) {
-    return prisma.$transaction(async (tx) => {
-      const user = await tx.user.update({
-        where: { id: userId },
-        data: {
-          password: passwordHash,
-          sessionVersion: {
-            increment: 1,
-          },
-        },
-      });
-
-      await tx.session.deleteMany({
-        where: { userId },
-      });
-
-      return user;
-    });
-  },
-
-  async findSessionSnapshotById(userId: number): Promise<SessionUserSnapshot | null> {
-    return prisma.user.findUnique({
+    return prisma.user.update({
       where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        image: true,
-        role: true,
-        plan: true,
-        username: true,
-        password: true,
-        hasCompletedOnboarding: true,
-        sessionVersion: true,
-      },
+      data: { password: passwordHash },
     });
   },
   async findPublicProfileByUsername(

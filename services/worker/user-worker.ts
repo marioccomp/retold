@@ -5,11 +5,8 @@ import { execSync, spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 import { cloneRepository } from "./clone";
-import { createLogger } from "@repo/observability";
 
-const logger = createLogger("worker.user-analysis");
-
-logger.info("worker.started");
+console.log("[worker] Starting user worker...");
 
 export const userWorker = new Worker(
   "user-analyze",
@@ -18,7 +15,7 @@ export const userWorker = new Worker(
 
     const tmpPath = path.resolve("/tmp/retold-user-analysis", String(projectId));
 
-    logger.info("worker.job_started", { projectId });
+    console.log(`[user-worker] analyzing user stats for project ${projectId}`);
 
     try {
       const project = await prisma.project.findUnique({
@@ -29,7 +26,7 @@ export const userWorker = new Worker(
       if (!project) throw new Error("Project not found");
 
       if (project.visibility === "private") {
-        logger.info("worker.private_project_skipped", { projectId });
+        console.log(`[user-worker] Skipping stats for private project ${projectId}`);
         return;
       }
 
@@ -37,7 +34,7 @@ export const userWorker = new Worker(
       // Se não tiver URL no projeto, tentamos pegar do repositório linkado ou abortar
       const repoUrl = project.repository?.url;
       if (!repoUrl) {
-        logger.info("worker.repository_missing", { projectId });
+        console.log("[user-worker] No repository URL found, skipping analysis.");
         return;
       }
 
@@ -117,17 +114,13 @@ export const userWorker = new Worker(
           }
         }
       } catch (e) {
-        logger.warn("worker.numstat_calculation_failed", { projectId }, e);
+        console.error("Erro ao calcular numstat lines", e);
       }
 
-      logger.info("worker.stats_calculated", {
-        projectId: project.id,
-        userId: project.userId,
-        commitsCount: userCommitsCount,
-        linesAdded,
-        linesDeleted,
-        activeDays: daysActive.size,
-      });
+      console.log(`[user-worker] Stats calculated for ${project.id}:`);
+      console.log(`- Commits: ${userCommitsCount}`);
+      console.log(`- Lines Added: ${linesAdded}, Deleted: ${linesDeleted}`);
+      console.log(`- Active Days: ${daysActive.size}`);
 
       // Salvar no Banco
       await prisma.userProjectStats.upsert({
@@ -159,7 +152,7 @@ export const userWorker = new Worker(
         },
       });
     } catch (err) {
-      logger.error("worker.job_failed", err, { projectId });
+      console.error("[user-worker] error:", err);
       // Não damos throw para não re-enfileirar infinito se for erro de lógica,
       // mas em produção talvez queira retry
     } finally {

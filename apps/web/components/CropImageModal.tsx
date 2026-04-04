@@ -5,9 +5,6 @@ import Cropper, { Area } from "react-easy-crop";
 import { Button } from "@/components/ui/button";
 import { FiZoomIn, FiZoomOut, FiCheck, FiX } from "react-icons/fi";
 import { useTranslation } from "@/src/i18n/client";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.ui.crop-image-modal");
 
 type Props = {
   isOpen: boolean;
@@ -61,9 +58,7 @@ export default function CropImageModal({
       onCropComplete(croppedBlob);
       onClose();
     } catch (error) {
-      logger.error("image.crop_failed", error, {
-        hasCropArea: Boolean(croppedAreaPixels),
-      });
+      console.error("Error cropping image:", error);
     } finally {
       setIsProcessing(false);
     }
@@ -298,4 +293,5 @@ function createImage(url: string): Promise<HTMLImageElement> {
     image.src = url;
   });
 }
+
 

@@ -2,63 +2,66 @@
 
 ## Overview
 
-The Retold password recovery flow is built around one-time reset tokens whose plaintext value is never stored in the database.
+The **Retold** password recovery system is built on a **One-Time Use Token** mechanism using deterministic hashing to ensure no plaintext secrets are stored in the database.
 
-The current hardened flow now includes:
+The flow is split into two main phases:
 
-- deterministic token hashing with SHA-256
-- neutral responses on forgot-password requests
-- rate limiting on the public reset request entrypoint
-- invalidation of all active reset tokens after a successful password reset
-- session revocation after password reset through `sessionVersion`
+- **Request Phase (`forgotPassword`)**: Token generation, hashing, and email delivery.
+- **Reset Phase (`resetPassword`)**: Token validation, password hashing, and state finalization.
 
-## Forgot Password Flow
+---
 
-1. The user submits the forgot-password form with an email.
-2. The server action validates the payload.
-3. A server-side rate limit is applied before any reset workflow continues.
-4. The service looks up the user and keeps the external response neutral.
-5. Any older active reset tokens for that user are invalidated.
-6. A new random reset token is generated.
-7. The token is hashed with SHA-256 before being stored.
-8. The raw token is sent by email in the reset link.
+## Forgot Password Flow (Request)
 
-If the email does not exist, the caller still receives the same neutral success response.
+1. User submits the forgot password form with their `email`.
+2. Server Action `/forgot-password.ts` is executed.
+3. Input is validated using **Zod** (`forgot-password.schema.ts`).
+4. `forgotPassword()` service is called to manage the token lifecycle:
 
-If the request is throttled, the caller also receives the same neutral success response.
+- Verifies user existence via Prisma.
+- Calls `invalidateAllActiveTokens()` to cancel any previous pending requests for that user.
+- Generates a cryptographically strong random token using `crypto.randomBytes(32)`.
+- Creates a **SHA-256 hash** of the token for secure storage and database lookups.
+- Sets an expiration window of **30 minutes**.
 
-That behavior is intentional to reduce account enumeration and abuse value.
+5. The token hash and expiration are persisted in the `PasswordResetToken` table.
+6. An email is sent via **Resend** containing a link with the **original raw token** (not the hash).
 
-## Reset Password Flow
+---
 
-1. The user opens the reset link containing the raw token.
-2. The reset form submits the new password and token to the server.
-3. The incoming token is hashed again with SHA-256.
-4. The server validates that the token exists and is still valid.
-5. The new password is hashed with bcrypt.
-6. The user password hash is replaced.
-7. All active reset tokens for that user are invalidated.
-8. `sessionVersion` is incremented so old sessions stop being accepted.
-9. The user is redirected back to login and must authenticate again.
+## Reset Password Flow (Execution)
 
-## Security Properties
+1. User clicks the link `auth/reset-password?token=...` in their email.
+2. User submits the new password via the reset form.
+3. Server Action `/reset-password.ts` captures the token from the URL and the new password.
+4. Input is validated using **Zod**.
+5. `resetPassword()` service processes the update:
 
-- Plaintext reset tokens are never stored in the database.
-- Only the hash is indexed and queried.
-- A successful password reset invalidates parallel reset links.
-- A successful password reset also revokes older sessions.
-- Public abuse is reduced with server-side throttling and neutral responses.
+- Re-hashes the incoming token using SHA-256 to match database records.
+- `findValidByTokenHash()` validates the token exists, has not been used (`usedAt === null`), and is not expired.
+- If validation fails, a domain error is thrown.
+- The new password is hashed using **bcrypt**.
+- User credentials are updated via `userRepository.updatePassword()`.
+- The token is consumed by calling `markAsUsed()`, setting the `usedAt` timestamp.
 
-## Operational Notes
+---
 
-- The email provider still lives outside the repository and must be configured with a real `RESEND_API_KEY`.
-- Delivery timing can still vary because the final email handoff depends on the provider.
-- Password reset protection now depends on the same production secret hygiene documented in [docs/deploy-production.md](docs/deploy-production.md).
+## Security Strategy
 
-## Related Files
+- **Deterministic Hashing (SHA-256)**: Allows for a `@unique` index on the `tokenHash` field, providing high-performance lookups while keeping the actual secret out of the database.
+- **One-Time Use Enforcement**: The `usedAt` field acts as a circuit breaker, preventing replay attacks once a password has been successfully changed.
+- **Bcrypt Hashing**: New passwords benefit from bcrypt's computational cost, protecting against brute-force attacks in the event of a data leak.
+- **Referential Integrity**: `onDelete: Cascade` ensures that if a user is deleted, their sensitive pending reset tokens are automatically purged.
 
-- `apps/web/src/app/(auth)/_actions/forgot-password.ts`
-- `apps/web/src/domains/auth/services/forgot-password.service.ts`
-- `apps/web/src/domains/auth/services/reset-password.service.ts`
-- `apps/web/lib/mail.ts`
-- `apps/web/src/domains/auth/auth.config.ts`
+---
+
+### Reset Level
+
+- Enforced by token expiration and one-time use logic.
+
+---
+
+## Future Improvements
+
+- **Cleanup Job**: Implement a recurring task to delete expired tokens older than 7 days to maintain database health.
+- **Email Throttling**: Implement IP-based limits for email requests to prevent API abuse on Resend.

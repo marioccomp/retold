@@ -2,9 +2,6 @@ import { userRepository } from "@repo/database";
 import { Octokit } from "octokit";
 import { createAppAuth } from "@octokit/auth-app";
 import { auth } from "@/src/domains/auth/auth";
-import { createLogger } from "@repo/observability";
-
-const logger = createLogger("web.lib.github");
 
 export async function getUserRepositories() {
   // ISSO DEVE SER JOGADO PARA O DOMAIN GITHUB
@@ -32,9 +29,7 @@ export async function getUserRepositories() {
 
     return data.repositories;
   } catch (error) {
-    logger.error("github.repositories_fetch_failed", error, {
-      userId: Number(id),
-    });
+    console.error("Erro ao buscar repos: ", error);
     return [];
   }
 }

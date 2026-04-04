@@ -19,14 +19,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers: [
     GitHub({
+      allowDangerousEmailAccountLinking: true,
       clientId: process.env.AUTH_GITHUB_ID,
       clientSecret: process.env.AUTH_GITHUB_SECRET,
-        authorization: {
-          params: {
-            scope: "read:user user:email read:org",
-          },
+      authorization: {
+        params: {
+          scope: "read:user user:email",
         },
-      }),
+      },
+    }),
     Credentials({
       name: "credentials",
       credentials: {
@@ -51,7 +52,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         return {
           id: String(user.id),
-          email: user.email,
           name: user.name,
           role: user.role,
           plan: user.plan,
@@ -59,7 +59,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           username: user.username,
           hasPassword: true,
           hasCompletedOnboarding: user.hasCompletedOnboarding,
-          sessionVersion: user.sessionVersion,
         };
       },
     }),
