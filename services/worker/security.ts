@@ -37,7 +37,7 @@ export function assertPathInsideBase(
   }
 }
 
-export function parseProjectId(value: unknown) {
+export function parsePositiveSafeInteger(value: unknown, fieldName: string) {
   if (typeof value === "number" && Number.isSafeInteger(value) && value > 0) {
     return value;
   }
@@ -49,7 +49,11 @@ export function parseProjectId(value: unknown) {
     }
   }
 
-  throw new Error("Invalid projectId in worker job payload");
+  throw new Error(`Invalid ${fieldName} in worker job payload`);
+}
+
+export function parseProjectId(value: unknown) {
+  return parsePositiveSafeInteger(value, "projectId");
 }
 
 export function getProjectTempPath(basePath: string, projectId: number) {

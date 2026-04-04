@@ -14,11 +14,19 @@ The worker layer now enforces server-side guards before reading cloned repositor
 - **Scoped temp directories:** temporary clone paths are created under fixed worker-specific roots, and cleanup is restricted to those roots to prevent path traversal and path escape.
 - **Repository origin rehydration:** the main project analysis worker no longer trusts `repoUrl` from queue payloads. It reloads the linked repository from the database, validates ownership consistency, and only accepts `https://github.com/<owner>/<repo>` origins.
 - **Symlink and path-escape blocking:** repository scanning skips symbolic links and rejects any file whose real path escapes the cloned repository root. README loading also refuses symbolic links and escaped paths.
+- **Git clone without token in URL/argv:** repository cloning now runs without shell interpolation and no longer embeds the GitHub token in the remote URL or command-line arguments. Authentication uses a short-lived `GIT_ASKPASS` helper that is deleted after the clone finishes.
+- **Queue retention hardening:** BullMQ queues now define explicit retention windows, reduced stack trace retention, and deduplicated job IDs for sensitive worker flows.
+- **Non-destructive failure handling:** project analysis failures now mark the project as `ERROR` or `RATE_LIMITED` instead of deleting the `Project` record as a default reaction to worker errors.
+- **Automatic rate-limit retry:** when the LLM provider returns a retry window, the worker stores `rateLimitResetAt`, marks the project as `RATE_LIMITED`, and schedules a delayed retry job for the same project.
+- **Reduced queue payload sensitivity:** internal worker chaining avoids enqueuing user email/GitHub username when the consumer can safely rehydrate the same data from the database.
 
 ### Operational Note
 
 - These protections assume the database remains the source of truth for project-to-repository linkage.
-- Redis transport hardening, credential handling during `git clone`, and broader LLM payload minimization remain follow-up work.
+- Production Redis now expects authenticated configuration from the environment. Managed Redis TLS, ACL rotation, and certificate provisioning still depend on external infrastructure setup.
+- The clone flow now avoids token exposure in URL/argv and `.git/config`, but token handling still depends on secure process isolation and environment hygiene on the host.
+- The UI now exposes the next scheduled retry time to the project owner, based on `rateLimitResetAt` stored for the affected user.
+- Broader LLM payload minimization remains follow-up work.
 
 ---
 
@@ -31,7 +39,7 @@ This worker is responsible for performing a deep analysis of a specific user's c
 ### What it does:
 
 - **Local Cloning:** Clones the project repository into a worker-scoped directory under the OS temp root.
-- **Git Log Extraction:** Executes native Git commands to extract commit history, filtering by author (GitHub email or username).
+- **Git Log Extraction:** Executes native Git commands without shell interpolation to extract commit history, filtering by author.
 - **Metrics Calculation:**
   - Total commit count.
   - First and last commit dates.

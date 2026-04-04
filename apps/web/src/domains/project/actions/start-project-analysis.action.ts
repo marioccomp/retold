@@ -20,10 +20,25 @@ export async function startProjectAnalysisAction(projectId: number) {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { dailyAnalysisCount: true, dailyAnalysisDate: true },
+    select: { rateLimitResetAt: true, dailyAnalysisCount: true, dailyAnalysisDate: true },
   });
 
   if (!user) throw new Error("User not found");
+
+  if (user.rateLimitResetAt && user.rateLimitResetAt > new Date()) {
+    const diff = user.rateLimitResetAt.getTime() - Date.now();
+    const hoursLeft = Math.floor(diff / 3600000);
+    const minutesLeft = Math.floor((diff % 3600000) / 60000);
+
+    return {
+      queued: false,
+      limitReached: true,
+      remaining: 0,
+      limit: DAILY_ANALYSIS_LIMIT,
+      hoursLeft,
+      minutesLeft,
+    };
+  }
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -75,19 +90,18 @@ export async function startProjectAnalysisAction(projectId: number) {
       locale: locale,
     },
     {
+      jobId: `project-analysis-${project.id}`,
       attempts: 3,
       backoff: {
         type: "exponential",
         delay: 5000,
       },
-      removeOnComplete: true,
     }
   );
 
   return {
     queued: true,
     projectId: project.id,
-    repoUrl: project.repository.url,
     remaining: DAILY_ANALYSIS_LIMIT - currentCount - 1,
     limit: DAILY_ANALYSIS_LIMIT,
   };

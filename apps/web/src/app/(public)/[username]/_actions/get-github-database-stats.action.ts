@@ -19,8 +19,6 @@ export async function getGithubDatabaseStats(username: string) {
       { userId: user.id },
       {
         jobId: `lastCommit-${user.id}`,
-        removeOnComplete: true,
-        removeOnFail: 50,
         attempts: 3,
         backoff: { type: "exponential", delay: 30_000 },
       }

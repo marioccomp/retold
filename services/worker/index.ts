@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Worker } from "bullmq";
-import { redisConnection, userAnalyzeQueue } from "@repo/queue";
+import { analyzeRepoQueue, redisConnection, userAnalyzeQueue } from "@repo/queue";
 import "./user-worker";
 import "./last-commit-worker";
 import { cloneRepository } from "./clone";
@@ -35,6 +35,8 @@ function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
 }
 
 logger.info("worker.started");
+
+const PROJECT_ANALYSIS_RETRY_JOB_ID_PREFIX = "project-analysis-retry-";
 
 const worker = new Worker(
   "analyze-repo",
@@ -85,8 +87,6 @@ const worker = new Worker(
       logger.info("worker.repository_clone_completed", { projectId });
       const readmeContent = readRepositoryReadme(tmpPath);
 
-      const githubUsernameFromUrl = repositoryOrigin.owner || projectWithUser.user.username;
-
       logger.info("worker.repository_analysis_started", { projectId });
       const analysis = await analyzeRepository(tmpPath, {
         readme: readmeContent,
@@ -104,11 +104,15 @@ const worker = new Worker(
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
       userAnalyzeQueue
-        .add("analyze-user", {
-          projectId,
-          userEmail: projectWithUser.user.email,
-          githubUsername: githubUsernameFromUrl,
-        })
+        .add(
+          "analyze-user",
+          {
+            projectId,
+          },
+          {
+            jobId: `user-analysis-${projectId}`,
+          }
+        )
         .catch((error) =>
           logger.error("worker.user_analysis_queue_failed", error, {
             projectId,
@@ -273,6 +277,11 @@ const worker = new Worker(
           userId: ownerProject.userId,
           dailyAnalysisCount: isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1,
         });
+
+        await prisma.user.update({
+          where: { id: ownerProject.userId },
+          data: { rateLimitResetAt: null },
+        });
       }
     } catch (err: any) {
       logger.error("worker.job_failed", err, { projectId });
@@ -316,6 +325,13 @@ const worker = new Worker(
           resetAt,
         });
 
+        const retryJobId = `${PROJECT_ANALYSIS_RETRY_JOB_ID_PREFIX}${projectId}`;
+
+        const existingRetryJob = await analyzeRepoQueue.getJob(retryJobId);
+        if (existingRetryJob) {
+          await existingRetryJob.remove();
+        }
+
         // Find owner to lock
         const project = await prisma.project.findUnique({
           where: { id: projectId },
@@ -323,26 +339,58 @@ const worker = new Worker(
         });
 
         if (project) {
-          await prisma.user.update({
-            where: { id: project.userId },
-            data: { rateLimitResetAt: resetAt },
-          });
+          await prisma.$transaction([
+            prisma.user.update({
+              where: { id: project.userId },
+              data: { rateLimitResetAt: resetAt },
+            }),
+            prisma.project.update({
+              where: { id: projectId },
+              data: { status: "RATE_LIMITED" },
+            }),
+          ]);
           logger.warn("worker.user_rate_limited", {
             projectId,
             userId: project.userId,
             resetAt,
           });
+        } else {
+          await prisma.project.updateMany({
+            where: { id: projectId },
+            data: { status: "RATE_LIMITED" },
+          });
         }
 
-        await prisma.project.delete({
-          where: { id: projectId },
+        await analyzeRepoQueue.add(
+          "analyze",
+          {
+            projectId,
+            locale,
+          },
+          {
+            jobId: retryJobId,
+            delay: addMs,
+            attempts: 3,
+            backoff: {
+              type: "exponential",
+              delay: 5000,
+            },
+          }
+        );
+
+        logger.info("worker.retry_scheduled_after_rate_limit", {
+          projectId,
+          retryJobId,
+          retryAfterMs: addMs,
+          scheduledFor: resetAt,
         });
 
         return;
       }
 
-      await prisma.project.delete({
+      await prisma.project.updateMany({
         where: { id: projectId },
+        data: { status: "ERROR" },
       });
 
       throw err;

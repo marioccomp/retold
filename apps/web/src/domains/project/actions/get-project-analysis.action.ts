@@ -45,6 +45,11 @@ export async function getProjectAnalysisAction(projectId: number) {
         where: { id: projectId },
         select: {
             status: true,
+            user: {
+                select: {
+                    rateLimitResetAt: true,
+                },
+            },
             analysis: {
                 select: {
                     createdAt: true,
@@ -65,6 +70,10 @@ export async function getProjectAnalysisAction(projectId: number) {
 
     return {
         status: project.status,
+        nextRetryAt:
+            isOwner && project.status === "RATE_LIMITED" && project.user.rateLimitResetAt
+                ? project.user.rateLimitResetAt.toISOString()
+                : null,
         analysis: project.analysis
             ? {
                 appType: project.analysis.appType,

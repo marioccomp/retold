@@ -23,18 +23,28 @@ services:
     image: redis:7-alpine
     container_name: retold-redis
     restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required for production Redis}
     ports:
       # Expõe o Redis APENAS para a própria máquina (localhost)
       - "127.0.0.1:6379:6379"
     volumes:
       - redisdata:/data
-    command: redis-server --appendonly yes
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cat <<EOF >/usr/local/etc/redis/redis.conf
+        appendonly yes
+        requirepass $${REDIS_PASSWORD}
+        EOF
+        exec redis-server /usr/local/etc/redis/redis.conf
     deploy:
       resources:
         limits:
           memory: 128M
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$${REDIS_PASSWORD}\" redis-cli ping"]
       interval: 5s
       timeout: 3s
       retries: 5

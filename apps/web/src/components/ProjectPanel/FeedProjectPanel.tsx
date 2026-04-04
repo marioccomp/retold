@@ -120,7 +120,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
   const isOwner = session?.user?.id && project.userId && Number(session.user.id) === project.userId;
 
-  const { status, analysis, data, handleAnalyzeRepo } = useProjectAnalysis(project);
+  const { status, nextRetryAt, analysis, data, handleAnalyzeRepo } = useProjectAnalysis(project);
 
   const llm = safeParseLlm(data?.llmOverview);
   const hasOwnerSuggestions = Boolean(isOwner && llm?.suggestions && llm.suggestions.length > 0);
@@ -355,7 +355,9 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               />
             ))}
 
-          {status === "RATE_LIMITED" && <RateLimitedView t={t} />}
+          {status === "RATE_LIMITED" && (
+            <RateLimitedView t={t} nextRetryAt={nextRetryAt} isOwner={Boolean(isOwner)} />
+          )}
 
           {/* Report Content - Unified View */}
           {status === "DONE" && (
@@ -626,6 +628,12 @@ const StatusBadge = ({ status, isOwner, t }: { status: string; isOwner: boolean;
       label: t.status.ERROR,
       dotColor: "bg-red-500",
     },
+    RATE_LIMITED: {
+      bg: "bg-amber-50 border-amber-100",
+      text: "text-amber-700",
+      label: t.status.RATE_LIMITED,
+      dotColor: "bg-amber-500",
+    },
   };
 
   const c = config[status] || config.PENDING;
@@ -710,13 +718,38 @@ const ErrorView = ({ onRetry, t }: { onRetry: () => void; t: any }) => (
   </div>
 );
 
-const RateLimitedView = ({ t }: { t: any }) => (
-  <div className="flex flex-col items-center justify-center py-16 text-center bg-amber-50/30 rounded-2xl border border-amber-100">
-    <Clock className="w-12 h-12 text-amber-500 mb-5" />
-    <h3 className="text-xl font-bold text-amber-900 mb-2">{t.overlay.rate_limited_view.title}</h3>
-    <p className="text-amber-600/80 text-base">{t.overlay.rate_limited_view.description}</p>
-  </div>
-);
+const RateLimitedView = ({
+  t,
+  nextRetryAt,
+  isOwner,
+}: {
+  t: any;
+  nextRetryAt: string | null;
+  isOwner: boolean;
+}) => {
+  const scheduledDate = nextRetryAt ? new Date(nextRetryAt) : null;
+  const formattedNextRetry =
+    scheduledDate && !Number.isNaN(scheduledDate.getTime())
+      ? new Intl.DateTimeFormat(undefined, {
+          dateStyle: "short",
+          timeStyle: "short",
+        }).format(scheduledDate)
+      : null;
+
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center bg-amber-50/30 rounded-2xl border border-amber-100">
+      <Clock className="w-12 h-12 text-amber-500 mb-5" />
+      <h3 className="text-xl font-bold text-amber-900 mb-2">{t.overlay.rate_limited_view.title}</h3>
+      <p className="text-amber-600/80 text-base max-w-xl">{t.overlay.rate_limited_view.description}</p>
+      {isOwner && formattedNextRetry && (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-background/80 px-4 py-3 text-sm text-amber-900 shadow-sm">
+          <div className="font-semibold">{t.overlay.rate_limited_view.retry_scheduled}</div>
+          <div className="mt-1 text-amber-700">{formattedNextRetry}</div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ImageGallery = ({ images }: { images: string[] }) => {
   const [activeIndex, setActiveIndex] = useState(0);

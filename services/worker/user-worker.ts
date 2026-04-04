@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import { redisConnection } from "@repo/queue";
 import { prisma, githubRepository } from "@repo/database";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { cloneRepository } from "./clone";
 import { createLogger } from "@repo/observability";
 import {
@@ -20,8 +20,6 @@ export const userWorker = new Worker(
   "user-analyze",
   async (job) => {
     const projectId = parseProjectId(job.data?.projectId);
-    const userEmail = job.data?.userEmail;
-    const githubUsername = job.data?.githubUsername;
     const tmpPath = getProjectTempPath(USER_ANALYSIS_TMP_ROOT, projectId);
 
     logger.info("worker.job_started", { projectId });
@@ -62,13 +60,9 @@ export const userWorker = new Worker(
 
       // Identificadores do user
       const primaryEmail =
-        typeof userEmail === "string" && userEmail.trim()
-          ? userEmail.toLowerCase().trim()
-          : project.user.email.toLowerCase().trim();
+        project.user.email.toLowerCase().trim();
       const userIdentifier =
-        (typeof githubUsername === "string" && githubUsername.trim()
-          ? githubUsername.toLowerCase().trim()
-          : project.user.username?.toLowerCase().trim()) || primaryEmail.split("@")[0];
+        project.user.username?.toLowerCase().trim() || primaryEmail.split("@")[0];
       // Lista de emails possíveis (poderíamos pegar mais do banco se tivesse)
       const targetEmails = [primaryEmail];
 
@@ -77,7 +71,7 @@ export const userWorker = new Worker(
       // Mas o author pode variar, então pegamos TUDO e filtramos no JS ou usamos --author com varias opcoes se o git deixar.
       // Mais seguro: git log --format="%aE|%cd" e filtrar
 
-      const logOutput = execSync(`git -C "${tmpPath}" log --format="%aE|%cd"`, {
+      const logOutput = execFileSync("git", ["-C", tmpPath, "log", "--format=%aE|%cd"], {
         encoding: "utf8",
       });
       const commits = logOutput.split("\n").filter(Boolean);
@@ -107,9 +101,13 @@ export const userWorker = new Worker(
       let linesDeleted = 0;
 
       try {
-        const numstatOutput = execSync(`git -C "${tmpPath}" log --all --numstat --pretty="%aE"`, {
-          encoding: "utf8",
-        });
+        const numstatOutput = execFileSync(
+          "git",
+          ["-C", tmpPath, "log", "--all", "--numstat", "--pretty=%aE"],
+          {
+            encoding: "utf8",
+          }
+        );
         const numstatLines = numstatOutput.split("\n");
 
         let isUserCommit = false;

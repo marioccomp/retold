@@ -92,7 +92,8 @@
       "PENDING": "Pending",
       "ANALYZING": "Processing",
       "DONE": "Analyzed",
-      "ERROR": "Error"
+      "ERROR": "Error",
+      "RATE_LIMITED": "Waiting to retry"
     },
     "analysis": {
       "started": "Analysis started",
@@ -135,7 +136,8 @@
       },
       "rate_limited_view": {
         "title": "Service Temporarily Unavailable",
-        "description": "We've reached our analysis limit for today. Please try again in about 1 hour.",
+        "description": "This analysis hit the provider's temporary rate limit. We will retry automatically as soon as the rate-limit window ends.",
+        "retry_scheduled": "Next attempt scheduled for",
         "button": "Retry Later"
       },
       "sections": {

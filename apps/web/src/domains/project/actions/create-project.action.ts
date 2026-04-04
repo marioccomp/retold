@@ -120,8 +120,6 @@ export async function createProjectAction(
     { userId: Number(session.user.id) },
     {
       jobId: `lastCommit-${session.user.id}`,
-      removeOnComplete: true,
-      removeOnFail: 50,
       attempts: 3,
       backoff: { type: "exponential", delay: 30_000 },
     }
