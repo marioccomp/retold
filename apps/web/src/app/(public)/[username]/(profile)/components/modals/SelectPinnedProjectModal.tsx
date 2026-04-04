@@ -11,6 +11,7 @@ import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import placeholderImage from "@/assets/empty_file.png";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+import { capitalizeSkill, getProjectCardTags } from "@/lib/utils";
 
 type Props = {
   isOpen: boolean;
@@ -119,12 +120,12 @@ export default function SelectPinnedProjectModal({ isOpen, onClose, unpinnedProj
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity flex items-end p-4">
                     <div className="flex gap-1.5 flex-wrap">
-                      {project.tags.slice(0, 2).map((tag) => (
+                      {getProjectCardTags(project.tags, project.featuredTagIds, 2).map((tag) => (
                         <span
                           key={tag.id}
                           className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-[9px] font-black text-white uppercase tracking-wider"
                         >
-                          {tag.name}
+                          {capitalizeSkill(tag.name)}
                         </span>
                       ))}
                     </div>

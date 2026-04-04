@@ -8,6 +8,7 @@ import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { capitalizeSkill, getProjectCardTags } from "@/lib/utils";
 
 interface Props {
   project: ProjectCardDTO;
@@ -67,13 +68,13 @@ export default function OnboardingProjectCard({ project }: Props) {
           
           {project.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2.5 max-[650px]:mt-2">
-              {project.tags.slice(0, 3).map((tag) => (
+              {getProjectCardTags(project.tags, project.featuredTagIds, 3).map((tag) => (
                 <Badge
                   key={tag.id}
                   variant="secondary"
                   className="px-1.5 py-[1px] rounded-[4px] text-[9px] font-semibold border-none shadow-none"
                 >
-                  {tag.name}
+                  {capitalizeSkill(tag.name)}
                 </Badge>
               ))}
             </div>

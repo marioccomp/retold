@@ -52,7 +52,11 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
       title: highlightedProject.title,
       description: highlightedProject.description,
       status: highlightedProject.status,
+      visibility: highlightedProject.visibility,
       images: highlightedProject.images,
+      featuredTagIds: highlightedProject.featuredTagIds,
+      tags: highlightedProject.tags,
+      commentsCount: highlightedProject.commentsCount,
       owner: {
         name: highlightedProject.ownerName,
         image: highlightedProject.ownerImage,

@@ -29,7 +29,7 @@ import { ProjectSettings } from "./components/ProjectSettings";
 import { useTranslation } from "@/src/i18n/client";
 import { incrementView } from "@/src/domains/project/actions/increment-view.action";
 import { CommentSection } from "./CommentSection";
-import { cn } from "@/lib/utils";
+import { capitalizeSkill, cn } from "@/lib/utils";
 
 type FeedProjectPanelProps = {
   project: ProjectForOverlay;
@@ -124,6 +124,19 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
   const llm = safeParseLlm(data?.llmOverview);
   const hasOwnerSuggestions = Boolean(isOwner && llm?.suggestions && llm.suggestions.length > 0);
+  const techStack = Array.from(
+    new Set(
+      [
+        ...(data?.stack.languages || []),
+        ...(data?.stack.frameworks || []),
+        ...(data?.stack.tools || []),
+        ...(data?.infra?.ciProviders || []),
+        ...((project.tags || []).map((tag) => tag.name) || []),
+      ]
+        .filter(Boolean)
+        .map((tech) => capitalizeSkill(String(tech)))
+    )
+  );
 
   return (
     <div
@@ -417,7 +430,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                     </div>
 
                     {/* Tech Stack */}
-                    {data?.stack && (
+                    {techStack.length > 0 && (
                       <>
                         <Separator />
                         <div>
@@ -427,12 +440,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                             color="blue"
                           />
                           <div className="mt-4 flex flex-wrap gap-2">
-                            {[
-                              ...(data.stack.languages || []),
-                              ...(data.stack.frameworks || []),
-                              ...(data.stack.tools || []),
-                              ...(data.infra?.ciProviders || []),
-                            ].map((tech, i) => (
+                            {techStack.map((tech, i) => (
                               <Badge
                                 key={i}
                                 variant="outline"

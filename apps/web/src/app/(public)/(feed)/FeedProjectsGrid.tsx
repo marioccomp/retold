@@ -52,7 +52,11 @@ export default function FeedProjectsGrid({
         title: projectData.title,
         description: projectData.description,
         status: projectData.status,
+        visibility: projectData.visibility,
         images: projectData.images,
+        featuredTagIds: projectData.featuredTagIds,
+        tags: projectData.tags,
+        commentsCount: projectData.commentsCount,
         owner: {
           name: projectData.ownerName,
           image: projectData.ownerImage,

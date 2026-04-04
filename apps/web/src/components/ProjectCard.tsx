@@ -19,6 +19,7 @@ import { FollowButton } from "./FollowButton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthModal } from "@/src/providers/AuthModalContext";
 import Link from "next/link";
+import { capitalizeSkill, getProjectCardTags } from "@/lib/utils";
 
 interface Props {
   project: ProjectCardDTO;
@@ -225,13 +226,13 @@ export default function ProjectCard({
           </p>
           {project.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {project.tags.slice(0, 4).map((tag) => (
+              {getProjectCardTags(project.tags, project.featuredTagIds, 4).map((tag) => (
                 <Badge
                   key={tag.id}
                   variant="secondary"
                   className="px-2 py-[3px] rounded text-[11px] font-semibold border-none shadow-none"
                 >
-                  {tag.name}
+                  {capitalizeSkill(tag.name)}
                 </Badge>
               ))}
             </div>
