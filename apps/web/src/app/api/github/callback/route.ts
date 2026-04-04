@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
+import { createLogger } from "@repo/observability";
 
 const STATE_COOKIE = "github_link_state";
 const USER_COOKIE = "github_link_user";
+const logger = createLogger("web.api.github-callback");
 
 type GithubUser = {
     id: number;
@@ -177,7 +179,11 @@ export async function GET(req: NextRequest) {
 
         return redirectWith("/settings?github=linked");
     } catch (err) {
-        console.error("GitHub link error:", err);
+        logger.error("github.oauth_link_failed", err, {
+            currentUserId,
+            hasCode: Boolean(code),
+            hasState: Boolean(state),
+        });
         return redirectWith("/settings?github=oauth_error");
     }
 }

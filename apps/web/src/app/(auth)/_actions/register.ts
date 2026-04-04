@@ -10,6 +10,9 @@ import {
 import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getDictionary } from "@/src/i18n/server";
 import { enforceRegisterRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.auth-register");
 
 type RegisterResponseData = {
   email: string;
@@ -65,7 +68,10 @@ export async function register(formData: FormData): Promise<ActionResponse<Regis
       };
     }
 
-    console.error("Register error:", error);
+    logger.error("auth.register_failed", error, {
+      hasName: Boolean(name),
+      usernameLength: username.length,
+    });
     return {
       success: false,
       message: dict.auth.errors.create_account_generic,

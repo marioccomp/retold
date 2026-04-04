@@ -1,6 +1,9 @@
 import "server-only";
 
 import { minioClient, MINIO_BUCKET, MINIO_PUBLIC_URL } from "@repo/storage";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.storage.delete-file");
 
 export async function deleteFileByUrlService(fileUrl: string) {
     if (!fileUrl) {
@@ -19,6 +22,9 @@ export async function deleteFileByUrlService(fileUrl: string) {
     try {
         await minioClient.removeObject(MINIO_BUCKET, objectName);
     } catch (err) {
-        console.error("Failed to delete file from MinIO:", err);
+        logger.error("storage.object_delete_failed", err, {
+            bucket: MINIO_BUCKET,
+            hasObjectName: Boolean(objectName),
+        });
     }
 }

@@ -8,7 +8,10 @@ import {
     UnauthorizedError,
 } from "@/src/lib/server-auth"
 import { prisma } from "@repo/database"
+import { createLogger } from "@repo/observability"
 import { revalidatePath } from "next/cache"
+
+const logger = createLogger("web.action.project-comments")
 
 export async function createComment(
     projectId: number,
@@ -72,7 +75,10 @@ export async function createComment(
             return { success: false, message: "Project not found" }
         }
 
-        console.error("Error creating comment:", error)
+        logger.error("project.comment_create_failed", error, {
+            projectId,
+            hasParentId: Boolean(parentId),
+        })
         return { success: false, message: "Failed to create comment" }
     }
 }
@@ -106,7 +112,10 @@ export async function deleteComment(commentId: number, projectId: number): Promi
             return { success: false, message: "Project not found" }
         }
 
-        console.error("Error deleting comment:", error)
+        logger.error("project.comment_delete_failed", error, {
+            projectId,
+            commentId,
+        })
         return { success: false, message: "Failed to delete comment" }
     }
 }
@@ -153,7 +162,9 @@ export async function getProjectComments(projectId: number) {
             return []
         }
 
-        console.error("Error fetching comments:", error)
+        logger.error("project.comments_fetch_failed", error, {
+            projectId,
+        })
         return []
     }
 }

@@ -5,6 +5,9 @@ import { prisma } from "@repo/database";
 import { revalidatePath } from "next/cache";
 import { deleteFileByUrlService } from "../../storage/services/delete-file.service";
 import { ActionResponse } from "@/lib/action-response";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.action.delete-project-image");
 
 export async function deleteProjectImageAction(
     projectId: number,
@@ -40,7 +43,10 @@ export async function deleteProjectImageAction(
         try {
             await deleteFileByUrlService(imageUrl);
         } catch (e) {
-            console.error("Failed to delete file from storage, but will remove from DB", e);
+            logger.warn("project.image_storage_delete_failed", {
+                projectId,
+                userId: Number(session.user.id),
+            }, e);
         }
 
         const newImages = currentImages.filter((img) => img !== imageUrl);
@@ -58,7 +64,10 @@ export async function deleteProjectImageAction(
 
         return { success: true, data: updated.images };
     } catch (error) {
-        console.error(error);
+        logger.error("project.image_delete_failed", error, {
+            projectId,
+            userId: Number(session.user.id),
+        });
         return { success: false, message: "Failed to delete image." };
     }
 }

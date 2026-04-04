@@ -8,6 +8,9 @@ import { getRegisterSchema } from "@/src/domains/auth/schemas/register.schema";
 import { getProfileSchema, getProfileDetailsSchema } from "@/src/domains/profile/schemas/profile.schema";
 import { getDictionary } from "@/src/i18n/server";
 import { requireAuthenticatedUserId, UnauthorizedError } from "@/src/lib/server-auth";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.action.edit-profile");
 
 type ActionFailure = Extract<ActionResponse, { success: false }>;
 
@@ -354,7 +357,9 @@ export async function updateProfileDetails(
       data: user,
     };
   } catch (error) {
-    console.error(error);
+    logger.error("profile.details_update_failed", error, {
+      userId,
+    });
     return {
       success: false,
       message: dict.validation.details_update_error,

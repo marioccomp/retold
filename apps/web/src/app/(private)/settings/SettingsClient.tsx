@@ -34,6 +34,9 @@ import {
 } from "@/src/actions/settings";
 import { setLanguageAction, setAnalysisLanguageAction } from "@/src/actions/language";
 import { useTranslation } from "@/src/i18n/client";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.ui.settings-client");
 
 export function SettingsClient({
   initialAnalysisLocale = "auto",
@@ -64,7 +67,7 @@ export function SettingsClient({
         const connected = await getConnectedProvidersAction();
         setIsGithubLinked(connected.includes("github"));
       } catch (error) {
-        console.error("Failed to load providers", error);
+        logger.error("settings.providers_load_failed", error);
       } finally {
         setLoadingProviders(false);
       }

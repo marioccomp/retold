@@ -28,6 +28,9 @@ import { deleteProjectImageAction } from "@/src/domains/user/actions/delete-proj
 import { useQueryClient } from "@tanstack/react-query";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
 import CropImageModal from "@/components/CropImageModal";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.ui.project-settings");
 
 type ProjectSettingsProps = {
   project: {
@@ -242,7 +245,9 @@ export const ProjectSettings = ({
       setIsEditOpen(false);
       if (onUpdate) onUpdate();
     } catch (error) {
-      console.error(error);
+      logger.error("project.update_failed", error, {
+        projectId: project.id,
+      });
       toast.error(t.toast.error);
     } finally {
       setIsSaving(false);
@@ -265,7 +270,9 @@ export const ProjectSettings = ({
         queryClient.invalidateQueries({ queryKey: ["github-stats", project.ownerUsername] });
       }
     } catch (error) {
-      console.error(error);
+      logger.error("project.delete_failed", error, {
+        projectId: project.id,
+      });
       toast.error(t.toast.delete_error);
     } finally {
       setIsDeleting(false);

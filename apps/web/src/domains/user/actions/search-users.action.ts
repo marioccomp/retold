@@ -3,6 +3,9 @@
 import { auth } from "@/src/domains/auth/auth";
 import { userRepository } from "../repositories/user.repository";
 import { unstable_cache } from "next/cache";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.action.search-users");
 
 const getCachedActiveUsers = unstable_cache(
   async (currentUserId: number | undefined, page: number, limit: number) => {
@@ -48,7 +51,13 @@ export async function searchUsersAction(
       },
     };
   } catch (error) {
-    console.error("Error searching users:", error);
+    logger.error("user.search_failed", error, {
+      page,
+      limit,
+      sort,
+      hasQuery: Boolean(query),
+      queryLength: query.length,
+    });
     return { success: false, error: "Failed to search users" };
   }
 }

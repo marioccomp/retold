@@ -4,7 +4,10 @@ import { ActionResponse } from "@/lib/action-response"
 import { ProjectAccessError, requireProjectAccess } from "@/src/domains/project/lib/project-access"
 import { requireAuthenticatedUserId, UnauthorizedError } from "@/src/lib/server-auth"
 import { prisma } from "@repo/database"
+import { createLogger } from "@repo/observability"
 import { revalidatePath } from "next/cache"
+
+const logger = createLogger("web.action.toggle-like")
 
 export async function toggleLike(projectId: number): Promise<ActionResponse> {
     try {
@@ -71,7 +74,9 @@ export async function toggleLike(projectId: number): Promise<ActionResponse> {
             return { success: false, message: "Project not found" }
         }
 
-        console.error("Error toggling like:", error)
+        logger.error("project.like_toggle_failed", error, {
+            projectId,
+        })
         return { success: false, message: "Failed to toggle like" }
     }
 }

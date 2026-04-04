@@ -7,8 +7,11 @@ import "./user-worker";
 import "./last-commit-worker";
 import { cloneRepository } from "./clone";
 import { prisma, githubRepository } from "@repo/database";
+import { createLogger } from "@repo/observability";
 import { analyzeProjectWithLLM } from "./llm/analyze-project";
 import { analyzeRepository } from "./analyze/index";
+
+const logger = createLogger("worker.project-analysis");
 
 function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
   const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
@@ -22,7 +25,7 @@ function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
   return "";
 }
 
-console.log("[worker] Starting worker...");
+logger.info("worker.started");
 
 const worker = new Worker(
   "analyze-repo",
@@ -31,7 +34,7 @@ const worker = new Worker(
 
     const tmpPath = path.resolve("/tmp/retold", String(projectId));
 
-    console.log(`[worker] analyzing project ${projectId}`);
+    logger.info("worker.job_started", { projectId });
 
     try {
       await prisma.project.update({
@@ -44,9 +47,9 @@ const worker = new Worker(
         token = await githubRepository.getToken(projectId);
       } catch (e: any) {
         if (e.message.includes("No github installations found")) {
-          console.log(
-            "[worker] No GitHub installation found. Attempting public clone without token."
-          );
+          logger.info("worker.github_installation_missing_public_clone", {
+            projectId,
+          });
         } else {
           throw e;
         }
@@ -61,9 +64,9 @@ const worker = new Worker(
         throw new Error("Project or User not found");
       }
 
-      console.log(`[worker] Clonando repositorio ID ${projectId}...`);
+      logger.info("worker.repository_clone_started", { projectId });
       await cloneRepository(repoUrl, tmpPath, token);
-      console.log(`[worker] Repositorio clonado. Lendo Readme...`);
+      logger.info("worker.repository_clone_completed", { projectId });
       const readmeContent = readRepositoryReadme(tmpPath);
 
       // Extract username from repo URL (e.g., https://github.com/username/repo -> username)
@@ -72,9 +75,14 @@ const worker = new Worker(
         repoUrl.split("github.com:")[1]?.split("/")[0] ||
         projectWithUser.user.username;
 
-      console.log(`[worker] Analisando dependencias e estrutura inicial...`);
+      logger.info("worker.repository_analysis_started", { projectId });
       const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
-      console.log(`[worker] Analise previa terminada. Enviando dados via API para a GROQ...`);
+      logger.info("worker.repository_analysis_completed", {
+        projectId,
+        totalFiles: analysis.stats.totalFiles,
+        frameworkCount: analysis.stack.frameworks.length,
+        languageCount: analysis.stack.languages.length,
+      });
 
       const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
 
@@ -86,7 +94,12 @@ const worker = new Worker(
           userEmail: projectWithUser.user.email,
           githubUsername: githubUsernameFromUrl,
         })
-        .catch((e) => console.error("[worker] failed to queue user analysis", e));
+        .catch((error) =>
+          logger.error("worker.user_analysis_queue_failed", error, {
+            projectId,
+            userId: projectWithUser.userId,
+          })
+        );
 
       const llmInsights = await analyzeProjectWithLLM(
         {
@@ -99,11 +112,25 @@ const worker = new Worker(
         projectWithUser.title,
         projectWithUser.description || undefined
       );
-      console.log(`[worker] MAGIA FEITA! A Groq retornou a resposta de IA sem erros.`);
+      const llmSummaryParagraphs = Array.isArray(
+        (llmInsights as { summary?: { paragraphs?: unknown[] } }).summary?.paragraphs
+      )
+        ? (llmInsights as { summary?: { paragraphs?: unknown[] } }).summary?.paragraphs?.length ?? 0
+        : 0;
+      const llmSuggestions: unknown[] = Array.isArray(
+        (llmInsights as { suggestions?: unknown[] }).suggestions
+      )
+        ? (llmInsights as { suggestions?: unknown[] }).suggestions ?? []
+        : [];
+
+      logger.info("worker.llm_analysis_completed", {
+        projectId,
+        hasError: Boolean((llmInsights as { error?: unknown }).error),
+        summaryParagraphs: llmSummaryParagraphs,
+        suggestionCount: llmSuggestions.length,
+      });
 
       const llmInsightsJson = JSON.stringify(llmInsights);
-
-      console.log(llmInsightsJson);
 
       await prisma.repositoryAnalysis.upsert({
         where: { projectId },
@@ -188,7 +215,11 @@ const worker = new Worker(
             },
           },
         });
-        console.log(`[worker] assigned tags: ${tagsToAssign.join(", ")}`);
+        logger.info("worker.tags_assigned", {
+          projectId,
+          tagCount: tagsToAssign.length,
+          tags: tagsToAssign,
+        });
       }
 
       await prisma.project.update({
@@ -222,14 +253,14 @@ const worker = new Worker(
           },
         });
 
-        console.log(
-          `[worker] User ${ownerProject.userId} daily analysis count: ${
-            isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1
-          }`
-        );
+        logger.info("worker.daily_analysis_counter_updated", {
+          projectId,
+          userId: ownerProject.userId,
+          dailyAnalysisCount: isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1,
+        });
       }
     } catch (err: any) {
-      console.error(err);
+      logger.error("worker.job_failed", err, { projectId });
 
       // Check if it's a rate limit error from Groq
       const isRateLimitError =
@@ -238,7 +269,7 @@ const worker = new Worker(
         err?.message?.includes("rate_limit_exceeded");
 
       if (isRateLimitError) {
-        console.log("[worker] Rate limit hit - marking project as RATE_LIMITED");
+        logger.warn("worker.rate_limit_detected", { projectId });
 
         const message = err?.error?.error?.message || err?.message || "";
         let addMs = 0;
@@ -264,9 +295,11 @@ const worker = new Worker(
 
         const resetAt = new Date(Date.now() + addMs);
 
-        console.log(
-          `[worker] Rate limit duration parsed: ${addMs}ms. Reset at: ${resetAt.toISOString()}`
-        );
+        logger.info("worker.rate_limit_window_parsed", {
+          projectId,
+          retryAfterMs: addMs,
+          resetAt,
+        });
 
         // Find owner to lock
         const project = await prisma.project.findUnique({
@@ -279,7 +312,11 @@ const worker = new Worker(
             where: { id: project.userId },
             data: { rateLimitResetAt: resetAt },
           });
-          console.log(`[worker] User ${project.userId} locked until ${resetAt.toISOString()}`);
+          logger.warn("worker.user_rate_limited", {
+            projectId,
+            userId: project.userId,
+            resetAt,
+          });
         }
 
         await prisma.project.delete({
@@ -306,4 +343,4 @@ const worker = new Worker(
   }
 );
 
-console.log("Worker running...");
+logger.info("worker.ready");
