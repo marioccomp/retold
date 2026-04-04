@@ -3,7 +3,6 @@ import ProfileClient from "./ProfileClient";
 import { auth } from "@/src/domains/auth/auth";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
 import { getProfile } from "../_actions/get-profile";
-import { getGithubDatabaseStats } from "../_actions/get-github-database-stats.action";
 import { prisma } from "@repo/database";
 
 type PageProps = {
@@ -32,16 +31,10 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   // 2. Prefetch assíncrono - O Next.js começará a fazer o stream do loading.tsx
   // enquanto as queries abaixo são resolvidas no servidor.
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ["profile", username, page, "", "newest"],
-      queryFn: () => getProfile(username, page, "", "newest"),
-    }),
-    queryClient.prefetchQuery({
-      queryKey: ["github-stats", username],
-      queryFn: () => getGithubDatabaseStats(username),
-    }),
-  ]);
+  await queryClient.prefetchQuery({
+    queryKey: ["profile", username, page, "", "newest"],
+    queryFn: () => getProfile(username, page, "", "newest"),
+  });
 
   const ownProfile: boolean = session?.user.username === username;
 

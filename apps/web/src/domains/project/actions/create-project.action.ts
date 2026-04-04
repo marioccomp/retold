@@ -6,7 +6,6 @@ import { getUserRepositories } from "@/src/domains/github/github";
 import { startProjectAnalysisAction } from "./start-project-analysis.action";
 import { DAILY_ANALYSIS_LIMIT } from "../constants";
 import { ActionResponse } from "@/lib/action-response";
-import { Project } from "@prisma/client";
 import { getDictionary } from "@/src/i18n/server";
 import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 import { lastCommitQueue } from "@repo/queue";
@@ -115,15 +114,23 @@ export async function createProjectAction(
 
   await postGithubStats();
 
-  await lastCommitQueue.add(
-    "refresh-last-commit",
-    { userId: Number(session.user.id) },
-    {
-      jobId: `lastCommit-${session.user.id}`,
-      attempts: 3,
-      backoff: { type: "exponential", delay: 30_000 },
-    }
-  );
+  void lastCommitQueue
+    .add(
+      "refresh-last-commit",
+      { userId: Number(session.user.id) },
+      {
+        jobId: `lastCommit-${session.user.id}`,
+        attempts: 3,
+        backoff: { type: "exponential", delay: 30_000 },
+      }
+    )
+    .catch((error) => {
+      console.error("Failed to enqueue last commit refresh after project creation", {
+        userId: Number(session.user.id),
+        projectId,
+        error,
+      });
+    });
 
 
   await startProjectAnalysisAction(projectId);
