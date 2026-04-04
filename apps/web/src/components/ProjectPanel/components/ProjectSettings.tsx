@@ -29,6 +29,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SortableImageGrid, type SortableImage } from "@/components/SortableImageGrid";
 import CropImageModal from "@/components/CropImageModal";
 import { createLogger } from "@repo/observability";
+import { Badge } from "@/components/ui/badge";
+import { capitalizeSkill } from "@/lib/utils";
+import { FiCheck, FiPlus } from "react-icons/fi";
 
 const logger = createLogger("web.ui.project-settings");
 
@@ -40,6 +43,8 @@ type ProjectSettingsProps = {
     images?: string[];
     ownerUsername?: string;
     visibility?: string;
+    tags?: { id: number; name: string }[];
+    featuredTagIds?: number[];
   };
   onUpdate?: () => void;
   onDelete?: () => void;
@@ -64,6 +69,9 @@ export const ProjectSettings = ({
   const [visibility, setVisibility] = useState<"public" | "private">(
     (project.visibility as "public" | "private") || "public"
   );
+  const [tags, setTags] = useState<{ id?: number; name: string }[]>(project.tags || []);
+  const [featuredTags, setFeaturedTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
 
   // Local state for batch editing
   type LocalImage = {
@@ -102,6 +110,17 @@ export const ProjectSettings = ({
       setTitle(project.title);
       setDescription(project.description || "");
       setVisibility((project.visibility as "public" | "private") || "public");
+      const normalizedTags = (project.tags || []).map((tag) => ({
+        id: tag.id,
+        name: capitalizeSkill(tag.name),
+      }));
+      setTags(normalizedTags);
+      setFeaturedTags(
+        normalizedTags
+          .filter((tag) => (project.featuredTagIds || []).includes(tag.id ?? -1))
+          .map((tag) => tag.name)
+      );
+      setNewTag("");
     }
   }, [isEditOpen, project]);
 
@@ -185,8 +204,49 @@ export const ProjectSettings = ({
     title !== project.title ||
     description !== (project.description || "") ||
     visibility !== (project.visibility || "public") ||
+    JSON.stringify(tags.map((tag) => tag.name).sort()) !==
+      JSON.stringify((project.tags || []).map((tag) => capitalizeSkill(tag.name)).sort()) ||
+    JSON.stringify([...featuredTags].sort()) !==
+      JSON.stringify(
+        (project.tags || [])
+          .filter((tag) => (project.featuredTagIds || []).includes(tag.id))
+          .map((tag) => capitalizeSkill(tag.name))
+          .sort()
+      ) ||
     imagesToDelete.length > 0 ||
     localImages.some((img) => !img.isOriginal);
+
+  const handleAddTag = () => {
+    const formattedTag = capitalizeSkill(newTag);
+    if (!formattedTag) return;
+    if (tags.some((tag) => tag.name.toLowerCase() === formattedTag.toLowerCase())) {
+      setNewTag("");
+      return;
+    }
+
+    setTags((prev) => [...prev, { name: formattedTag }]);
+    setNewTag("");
+  };
+
+  const handleRemoveTag = (tagName: string) => {
+    setTags((prev) => prev.filter((tag) => tag.name !== tagName));
+    setFeaturedTags((prev) => prev.filter((tag) => tag !== tagName));
+  };
+
+  const handleToggleFeaturedTag = (tagName: string) => {
+    setFeaturedTags((prev) => {
+      if (prev.includes(tagName)) {
+        return prev.filter((tag) => tag !== tagName);
+      }
+
+      if (prev.length >= 4) {
+        toast.error(t.toast.max_featured_tags);
+        return prev;
+      }
+
+      return [...prev, tagName];
+    });
+  };
 
   const handleSave = async () => {
     if (!hasChanges) {
@@ -224,6 +284,9 @@ export const ProjectSettings = ({
         title,
         description,
         visibility,
+        manualTags: tags
+          .map((tag) => capitalizeSkill(tag.name)),
+        featuredTags,
       });
 
       toast.success(t.toast.success);
@@ -417,6 +480,77 @@ export const ProjectSettings = ({
                       {description.length}/1500
                     </span>
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="edit-tag-input" className="text-foreground font-semibold">
+                    {t.labels.tags}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="edit-tag-input"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
+                      placeholder={t.placeholders.tags}
+                      className="text-foreground bg-background border-border focus:border-primary focus:ring-primary font-medium"
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      onClick={handleAddTag}
+                      className="cursor-pointer shrink-0"
+                    >
+                      <FiPlus size={16} />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t.tags_hint}</p>
+                  <div className="flex flex-wrap gap-2 rounded-xl border border-dashed border-border/70 bg-muted/10 p-3 min-h-[84px]">
+                    {tags.length > 0 ? (
+                      tags.map((tag) => {
+                        const isFeatured = featuredTags.includes(tag.name);
+                        return (
+                          <div key={tag.id ?? tag.name} className="relative inline-flex shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleFeaturedTag(tag.name)}
+                              className="cursor-pointer"
+                              title={isFeatured ? t.unfeature_tag : t.feature_tag}
+                            >
+                              <Badge
+                                variant="secondary"
+                                className={
+                                  isFeatured
+                                    ? "bg-primary/15 text-primary border border-primary/30 pl-3 pr-8 py-1.5 rounded-xl flex items-center gap-1.5"
+                                    : "bg-muted text-muted-foreground border border-border pl-3 pr-8 py-1.5 rounded-xl flex items-center gap-1.5"
+                                }
+                              >
+                                {tag.name}
+                                {isFeatured && <FiCheck size={12} />}
+                              </Badge>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTag(tag.name)}
+                              className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-background/90 border border-border/70 text-muted-foreground hover:text-destructive hover:bg-background cursor-pointer"
+                              title={t.remove_tag}
+                              aria-label={t.remove_tag}
+                            >
+                              <X size={11} />
+                            </button>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic m-auto">
+                        {t.no_tags}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t.featured_tags_count.replace("{count}", String(featuredTags.length))}
+                  </p>
                 </div>
 
                 {/* Visibility */}

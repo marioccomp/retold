@@ -33,6 +33,7 @@ export function mapProjectToProjectDTO(request: ProjectRequestDTO): ProjectCardD
     status: project.status,
     visibility: project.visibility,
     images: project.images,
+    featuredTagIds: project.featuredTagIds,
     likes: likes,
     views: views,
     commentsCount: commentsCount,

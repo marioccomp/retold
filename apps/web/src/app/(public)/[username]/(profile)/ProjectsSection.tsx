@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
 
 type Props = {
   profile: PublicProfileDTO;
@@ -28,23 +29,6 @@ type Props = {
   searchQuery: string;
   onPageChange?: (page: number) => void;
   sort?: "newest" | "oldest" | "popular";
-};
-
-// Tipo adaptado para o overlay (campos mínimos necessários)
-type ProjectForOverlay = {
-  id: number;
-  userId?: number;
-  title: string;
-  description: string | null;
-  status: string;
-  visibility?: string;
-  repository: any;
-  images: string[];
-  owner?: {
-    username: string;
-    name: string;
-    image: string | null;
-  };
 };
 
 export default function ProjectsSection({
@@ -84,7 +68,10 @@ export default function ProjectsSection({
         description: projectData.description,
         status: projectData.status,
         visibility: projectData.visibility,
-        images: projectData.images, // Pass images directly
+        images: projectData.images,
+        featuredTagIds: projectData.featuredTagIds,
+        tags: projectData.tags,
+        commentsCount: projectData.commentsCount,
         repository: projectData.repositoryUrl
           ? {
               id: 0,

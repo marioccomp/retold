@@ -214,7 +214,8 @@ model Project {
   description       String
   longerDescription String
 
-  images String[]
+  images         String[]
+  featuredTagIds Int[] @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

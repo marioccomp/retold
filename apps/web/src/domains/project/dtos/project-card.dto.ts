@@ -10,6 +10,7 @@ export interface ProjectCardDTO {
   status: string;
   visibility: string;
   images: string[];
+  featuredTagIds: number[];
 
   likes: number;
   views: number;

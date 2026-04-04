@@ -260,13 +260,21 @@
       "labels": {
         "title": "Título",
         "description": "Descrição",
-        "visibility": "Visibilidade"
+        "visibility": "Visibilidade",
+        "tags": "Tags"
       },
       "placeholders": {
         "title": "Nome do projeto",
         "description": "Descrição breve",
-        "visibility": "Selecione a visibilidade"
+        "visibility": "Selecione a visibilidade",
+        "tags": "Digite uma tag e aperte Enter"
       },
+      "tags_hint": "Clique em até 4 tags para destacar no card do projeto.",
+      "feature_tag": "Destacar tag",
+      "unfeature_tag": "Remover destaque da tag",
+      "remove_tag": "Remover tag",
+      "featured_tags_count": "{count}/4 tags em evidência",
+      "no_tags": "Nenhuma tag adicionada",
       "cancel": "Cancelar",
       "save": "Salvar alterações",
       "saving": "Salvando...",
@@ -287,7 +295,8 @@
         "delete_success": "Projeto excluído com sucesso!",
         "delete_error": "Erro ao excluir projeto",
         "title_required": "O título não pode estar vazio",
-        "max_images": "Máximo de 3 imagens permitido."
+        "max_images": "Máximo de 3 imagens permitido.",
+        "max_featured_tags": "Você pode destacar no máximo 4 tags."
       },
       "visibility_options": {
         "public": "Público",

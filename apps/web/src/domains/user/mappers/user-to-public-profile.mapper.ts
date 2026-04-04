@@ -78,6 +78,7 @@ export function mapUserToPublicProfile(
       status: project.status,
       visibility: project.visibility,
       images: project.images,
+      featuredTagIds: project.featuredTagIds ?? [],
       createdAt: project.createdAt.toISOString(),
 
       likes: project._count?.likes ?? 0,

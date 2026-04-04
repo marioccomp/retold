@@ -6,6 +6,8 @@ export type ProjectForOverlay = {
   status?: string;
   visibility?: string;
   images?: string[];
+  featuredTagIds?: number[];
+  tags?: { id: number; name: string }[];
   commentsCount?: number;
   userOwnership?: number; // % contribution to the project
   owner?: {

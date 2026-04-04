@@ -57,7 +57,11 @@ export default function ProfilePinnedProject({ allProjects, ownProfile }: Props)
       title: project.title,
       description: project.description,
       status: project.status,
+      visibility: project.visibility,
       images: project.images,
+      featuredTagIds: project.featuredTagIds,
+      tags: project.tags,
+      commentsCount: project.commentsCount,
       userOwnership: project.userOwnership,
       owner: {
         name: project.ownerName,

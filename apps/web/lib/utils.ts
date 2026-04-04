@@ -24,3 +24,12 @@ export function capitalizeSkill(skill: string) {
     })
     .join(" ");
 }
+
+export function getProjectCardTags<T extends { id: number; name: string }>(
+  tags: T[],
+  featuredTagIds: number[] = [],
+  limit: number = 4
+) {
+  const featured = tags.filter((tag) => featuredTagIds.includes(tag.id));
+  return (featured.length > 0 ? featured : tags).slice(0, limit);
+}
