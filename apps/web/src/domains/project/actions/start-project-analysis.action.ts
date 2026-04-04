@@ -72,7 +72,6 @@ export async function startProjectAnalysisAction(projectId: number) {
     "analyze",
     {
       projectId: project.id,
-      repoUrl: project.repository.url,
       locale: locale,
     },
     {

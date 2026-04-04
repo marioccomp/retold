@@ -58,15 +58,70 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sortableImagesRef = useRef<SortableImage[]>([]);
+  const repositoryIdsRef = useRef<number[]>([]);
+  const githubInstallPopupRef = useRef<Window | null>(null);
+  const githubInstallPollRef = useRef<number | null>(null);
 
   const DESCRIPTION_LIMIT = 1500;
 
   // Fetch repositories
-  const { data: repositories = [], isLoading: isLoadingRepos } = useQuery<Repository[]>({
+  const {
+    data: repositories = [],
+    isLoading: isLoadingRepos,
+    refetch: refetchRepositories,
+  } = useQuery<Repository[]>({
     queryKey: ["repositories"],
     queryFn: () => getRepositoriesAction(),
     staleTime: 0, // Always refetch
   });
+
+  async function refreshRepositoriesAfterInstall() {
+    const previousIds = repositoryIdsRef.current;
+
+    await queryClient.invalidateQueries({ queryKey: ["repositories"] });
+
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const result = await refetchRepositories();
+      const nextRepositories = result.data ?? [];
+      const nextIds = nextRepositories.map((repo) => repo.id);
+
+      if (
+        attempt > 0 ||
+        nextIds.length !== previousIds.length ||
+        nextIds.some((id, index) => id !== previousIds[index])
+      ) {
+        return;
+      }
+
+      await new Promise((resolve) => window.setTimeout(resolve, 750));
+    }
+  }
+
+  function stopGithubInstallPopupPolling() {
+    if (githubInstallPollRef.current !== null) {
+      window.clearInterval(githubInstallPollRef.current);
+      githubInstallPollRef.current = null;
+    }
+  }
+
+  function startGithubInstallPopupPolling(popup: Window | null) {
+    stopGithubInstallPopupPolling();
+
+    githubInstallPopupRef.current = popup;
+
+    if (!popup) {
+      void refreshRepositoriesAfterInstall();
+      return;
+    }
+
+    githubInstallPollRef.current = window.setInterval(() => {
+      if (!githubInstallPopupRef.current || githubInstallPopupRef.current.closed) {
+        stopGithubInstallPopupPolling();
+        githubInstallPopupRef.current = null;
+        void refreshRepositoriesAfterInstall();
+      }
+    }, 500);
+  }
 
   // Listen for GitHub App repository updates
   useEffect(() => {
@@ -74,7 +129,9 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
       if (event.origin !== window.location.origin) return;
 
       if (event.data?.type === "GITHUB_APP_REPOSITORIES_UPDATED") {
-        queryClient.invalidateQueries({ queryKey: ["repositories"] });
+        stopGithubInstallPopupPolling();
+        githubInstallPopupRef.current = null;
+        void refreshRepositoriesAfterInstall();
         return;
       }
 
@@ -99,8 +156,26 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
     }
 
     window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [dict.auth.errors.unauthorized, queryClient, t.toast.error]);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      stopGithubInstallPopupPolling();
+    };
+  }, [dict.auth.errors.unauthorized, queryClient, refetchRepositories, t.toast.error]);
+
+  useEffect(() => {
+    repositoryIdsRef.current = repositories.map((repo) => repo.id);
+  }, [repositories]);
+
+  useEffect(() => {
+    if (selectedRepoId === null) {
+      return;
+    }
+
+    const repositoryStillAvailable = repositories.some((repo) => repo.id === selectedRepoId);
+    if (!repositoryStillAvailable) {
+      setSelectedRepoId(null);
+    }
+  }, [repositories, selectedRepoId]);
 
   useEffect(() => {
     sortableImagesRef.current = sortableImages;
@@ -200,11 +275,12 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
     const left = width / 2 - w / 2 + dualScreenLeft;
     const top = height / 2 - h / 2 + dualScreenTop;
 
-    window.open(url, title, `scrollbars=yes,width=${w},height=${h},top=${top},left=${left}`);
+    return window.open(url, title, `scrollbars=yes,width=${w},height=${h},top=${top},left=${left}`);
   }
 
   const handleAddRepository = () => {
-    openCenteredPopup(installUrl);
+    const popup = openCenteredPopup(installUrl);
+    startGithubInstallPopupPolling(popup);
   };
 
   // Create Project Mutation

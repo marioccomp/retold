@@ -1,6 +1,4 @@
 import "dotenv/config";
-import path from "path";
-import fs from "fs";
 import { Worker } from "bullmq";
 import { redisConnection, userAnalyzeQueue } from "@repo/queue";
 import "./user-worker";
@@ -10,16 +8,27 @@ import { prisma, githubRepository } from "@repo/database";
 import { createLogger } from "@repo/observability";
 import { analyzeProjectWithLLM } from "./llm/analyze-project";
 import { analyzeRepository } from "./analyze/index";
+import {
+  PROJECT_ANALYSIS_TMP_ROOT,
+  cleanupScopedDirectory,
+  getProjectTempPath,
+  parseProjectId,
+  tryReadRepositoryTextFile,
+  validateGitHubRepositoryUrl,
+} from "./security.js";
 
 const logger = createLogger("worker.project-analysis");
 
 function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
   const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
   for (const fileName of possibleReadmePaths) {
-    const filePath = path.join(repoPath, fileName);
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, "utf-8");
-      return content.length > maxChars ? content.slice(0, maxChars) : content;
+    try {
+      const content = tryReadRepositoryTextFile(repoPath, fileName, maxChars);
+      if (content !== null) {
+        return content;
+      }
+    } catch (error) {
+      logger.warn("worker.repository_readme_blocked", { readmeName: fileName }, error);
     }
   }
   return "";
@@ -30,13 +39,29 @@ logger.info("worker.started");
 const worker = new Worker(
   "analyze-repo",
   async (job) => {
-    const { projectId, repoUrl, locale } = job.data;
-
-    const tmpPath = path.resolve("/tmp/retold", String(projectId));
+    const projectId = parseProjectId(job.data?.projectId);
+    const locale =
+      typeof job.data?.locale === "string" && job.data.locale.trim() ? job.data.locale : "en";
+    const tmpPath = getProjectTempPath(PROJECT_ANALYSIS_TMP_ROOT, projectId);
 
     logger.info("worker.job_started", { projectId });
 
     try {
+      const projectWithUser = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: { user: true, repository: true },
+      });
+
+      if (!projectWithUser || !projectWithUser.user || !projectWithUser.repository) {
+        throw new Error("Project, User or Repository not found");
+      }
+
+      if (projectWithUser.repository.userId !== projectWithUser.userId) {
+        throw new Error("Repository ownership mismatch for project analysis");
+      }
+
+      const repositoryOrigin = validateGitHubRepositoryUrl(projectWithUser.repository.url);
+
       await prisma.project.update({
         where: { id: projectId },
         data: { status: "ANALYZING" },
@@ -55,28 +80,18 @@ const worker = new Worker(
         }
       }
 
-      const projectWithUser = await prisma.project.findUnique({
-        where: { id: projectId },
-        include: { user: true },
-      });
-
-      if (!projectWithUser || !projectWithUser.user) {
-        throw new Error("Project or User not found");
-      }
-
       logger.info("worker.repository_clone_started", { projectId });
-      await cloneRepository(repoUrl, tmpPath, token);
+      await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token);
       logger.info("worker.repository_clone_completed", { projectId });
       const readmeContent = readRepositoryReadme(tmpPath);
 
-      // Extract username from repo URL (e.g., https://github.com/username/repo -> username)
-      const githubUsernameFromUrl =
-        repoUrl.split("github.com/")[1]?.split("/")[0] ||
-        repoUrl.split("github.com:")[1]?.split("/")[0] ||
-        projectWithUser.user.username;
+      const githubUsernameFromUrl = repositoryOrigin.owner || projectWithUser.user.username;
 
       logger.info("worker.repository_analysis_started", { projectId });
-      const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
+      const analysis = await analyzeRepository(tmpPath, {
+        readme: readmeContent,
+        repoUrl: repositoryOrigin.normalizedUrl,
+      });
       logger.info("worker.repository_analysis_completed", {
         projectId,
         totalFiles: analysis.stats.totalFiles,
@@ -84,7 +99,7 @@ const worker = new Worker(
         languageCount: analysis.stack.languages.length,
       });
 
-      const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
+      const repoName = repositoryOrigin.repo;
 
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
@@ -106,7 +121,7 @@ const worker = new Worker(
           ...analysis,
           readme: readmeContent,
           codeSamples: analysis.codeSamples,
-          locale: locale || "en",
+          locale,
         },
         repoName,
         projectWithUser.title,
@@ -333,7 +348,7 @@ const worker = new Worker(
       throw err;
     } finally {
       if (process.env.NODE_ENV === "production") {
-        fs.rmSync(tmpPath, { recursive: true, force: true });
+        cleanupScopedDirectory(tmpPath, PROJECT_ANALYSIS_TMP_ROOT);
       }
     }
   },

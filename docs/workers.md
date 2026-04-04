@@ -6,6 +6,20 @@ This document describes the system workers responsible for heavy background proc
 
 Workers are located in `services/worker/` and run as independent processes. They share the Redis connection with the applications to process task queues asynchronously.
 
+## Security Hardening
+
+The worker layer now enforces server-side guards before reading cloned repositories or using queue payloads for privileged operations.
+
+- **Strict `projectId` validation:** workers only accept positive safe integers before touching the database or filesystem.
+- **Scoped temp directories:** temporary clone paths are created under fixed worker-specific roots, and cleanup is restricted to those roots to prevent path traversal and path escape.
+- **Repository origin rehydration:** the main project analysis worker no longer trusts `repoUrl` from queue payloads. It reloads the linked repository from the database, validates ownership consistency, and only accepts `https://github.com/<owner>/<repo>` origins.
+- **Symlink and path-escape blocking:** repository scanning skips symbolic links and rejects any file whose real path escapes the cloned repository root. README loading also refuses symbolic links and escaped paths.
+
+### Operational Note
+
+- These protections assume the database remains the source of truth for project-to-repository linkage.
+- Redis transport hardening, credential handling during `git clone`, and broader LLM payload minimization remain follow-up work.
+
 ---
 
 ## 1. User Worker (`user-analyze`)
@@ -16,7 +30,7 @@ This worker is responsible for performing a deep analysis of a specific user's c
 
 ### What it does:
 
-- **Local Cloning:** Clones the project repository into a temporary directory (`/tmp/retold-user-analysis`).
+- **Local Cloning:** Clones the project repository into a worker-scoped directory under the OS temp root.
 - **Git Log Extraction:** Executes native Git commands to extract commit history, filtering by author (GitHub email or username).
 - **Metrics Calculation:**
   - Total commit count.
