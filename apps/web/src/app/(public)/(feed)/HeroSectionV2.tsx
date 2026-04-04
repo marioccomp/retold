@@ -149,8 +149,6 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
       const response = await toggleLike(highlightedProject.id);
 
       if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
-        queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
         return;
       }
 

@@ -22,7 +22,7 @@ type CreateProjectInput = {
 
 export async function createProjectAction(
   input: CreateProjectInput
-): Promise<ActionResponse<Project>> {
+): Promise<ActionResponse<{ id: number }>> {
   const session = await auth();
   const dict = await getDictionary();
   const t = dict.project.create_panel.toast;
@@ -140,7 +140,7 @@ export async function createProjectAction(
 
   return {
     success: true,
-    data: project,
+    data: { id: project.id },
     remaining,
     limit: DAILY_ANALYSIS_LIMIT,
   };

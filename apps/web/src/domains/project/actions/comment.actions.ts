@@ -127,7 +127,11 @@ export async function getProjectComments(projectId: number) {
 
         const comments = await prisma.comment.findMany({
             where: { projectId, parentId: null },
-            include: {
+            select: {
+                id: true,
+                content: true,
+                createdAt: true,
+                userId: true,
                 user: {
                     select: {
                         id: true,
@@ -137,7 +141,11 @@ export async function getProjectComments(projectId: number) {
                     },
                 },
                 replies: {
-                    include: {
+                    select: {
+                        id: true,
+                        content: true,
+                        createdAt: true,
+                        userId: true,
                         user: {
                             select: {
                                 id: true,

@@ -295,7 +295,7 @@ export async function updateProfile(
   }
 
   try {
-    const user = await userRepository.updateProfileById(userId, {
+    await userRepository.updateProfileById(userId, {
       name: parsed.data.name,
       title: parsed.data.title,
       bio: parsed.data.bio,
@@ -308,7 +308,6 @@ export async function updateProfile(
 
     return {
       success: true,
-      data: user,
     };
   } catch {
     return {
@@ -342,7 +341,7 @@ export async function updateProfileDetails(
   }
 
   try {
-    const user = await userRepository.updateProfileDetails(userId, {
+    await userRepository.updateProfileDetails(userId, {
       longBio: parsed.data.longBio ?? undefined,
       skills: parsed.data.skills ?? undefined,
       educations: parsed.data.educations?.map((edu) => ({
@@ -354,7 +353,6 @@ export async function updateProfileDetails(
 
     return {
       success: true,
-      data: user,
     };
   } catch (error) {
     logger.error("profile.details_update_failed", error, {

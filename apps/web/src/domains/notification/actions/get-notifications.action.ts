@@ -20,7 +20,11 @@ export async function getNotificationsAction() {
       where: {
         userId,
       },
-      include: {
+      select: {
+        id: true,
+        type: true,
+        read: true,
+        createdAt: true,
         sourceUser: {
           select: {
             id: true,
