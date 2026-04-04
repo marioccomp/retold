@@ -18,8 +18,6 @@ export async function getMeAction() {
             email: true,
             image: true,
             username: true,
-            role: true,
-            plan: true,
         },
     });
 

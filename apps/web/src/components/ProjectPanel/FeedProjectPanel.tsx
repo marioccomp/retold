@@ -123,6 +123,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
   const { status, analysis, data, handleAnalyzeRepo } = useProjectAnalysis(project);
 
   const llm = safeParseLlm(data?.llmOverview);
+  const hasOwnerSuggestions = Boolean(isOwner && llm?.suggestions && llm.suggestions.length > 0);
 
   return (
     <div
@@ -446,7 +447,7 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                     )}
 
                     {/* Suggestions Section - Only visible to the project owner */}
-                    {isOwner && llm.suggestions && llm.suggestions.length > 0 && (
+                    {hasOwnerSuggestions && (
                       <>
                         <Separator />
                         <div>
@@ -483,7 +484,12 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                       </>
                     )}
                   </div>
-                  <div className="px-6 md:px-10 pb-10 border-t border-border/30 mt-6 pt-10">
+                  <div
+                    className={cn(
+                      "px-6 md:px-10 pb-10",
+                      hasOwnerSuggestions ? "border-t border-border/30 mt-6 pt-10" : "pt-4"
+                    )}
+                  >
                     <CommentSection projectId={project.id} />
                   </div>
                 </>

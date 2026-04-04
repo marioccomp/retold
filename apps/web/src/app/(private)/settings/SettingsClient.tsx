@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { createPortal } from "react-dom";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
   FiGithub,
@@ -40,10 +40,11 @@ const logger = createLogger("web.ui.settings-client");
 
 export function SettingsClient({
   initialAnalysisLocale = "auto",
+  initialHasPassword,
 }: {
   initialAnalysisLocale?: string;
+  initialHasPassword: boolean;
 }) {
-  const { data: session } = useSession();
   const { dict, lang } = useTranslation();
   const [loadingProviders, setLoadingProviders] = useState(true);
   const [isGithubLinked, setIsGithubLinked] = useState(false);
@@ -307,12 +308,12 @@ export function SettingsClient({
             <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>
-                  {session?.user?.hasPassword
+                  {initialHasPassword
                     ? dict.settings.password.title
                     : dict.settings.password.create_title}
                 </CardTitle>
                 <CardDescription>
-                  {session?.user?.hasPassword
+                  {initialHasPassword
                     ? dict.settings.password.description
                     : dict.settings.password.create_description}
                 </CardDescription>
@@ -327,7 +328,7 @@ export function SettingsClient({
                   className="space-y-4"
                   noValidate
                 >
-                  {session?.user?.hasPassword ? (
+                  {initialHasPassword ? (
                     <div className="grid gap-2">
                       <Label htmlFor="currentPassword">{dict.settings.password.current}</Label>
                       <Input id="currentPassword" name="currentPassword" type="password" />
@@ -357,7 +358,7 @@ export function SettingsClient({
                     >
                       {pendingPassword
                         ? dict.settings.password.buttonUpdating
-                        : session?.user?.hasPassword
+                        : initialHasPassword
                           ? dict.settings.password.button
                           : dict.settings.password.button_create}
                     </Button>
@@ -482,7 +483,7 @@ export function SettingsClient({
                 <p className="text-muted-foreground text-sm mb-6">
                   {dict.settings.dangerZone.modal_description}
                 </p>
-                {session?.user?.hasPassword ? (
+                {initialHasPassword ? (
                   <div className="text-left mb-4 space-y-2">
                     <Label htmlFor="delete-account-password">
                       {dict.settings.dangerZone.reauth.password_label}
@@ -537,7 +538,7 @@ export function SettingsClient({
                     onClick={confirmDeleteAccount}
                     disabled={
                       pendingDelete ||
-                      (session?.user?.hasPassword ? deleteCredential.trim().length === 0 : !isGithubLinked)
+                      (initialHasPassword ? deleteCredential.trim().length === 0 : !isGithubLinked)
                     }
                   >
                     {pendingDelete

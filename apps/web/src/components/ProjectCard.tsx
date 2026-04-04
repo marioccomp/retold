@@ -4,7 +4,7 @@
 import { MdFavoriteBorder, MdFavorite, MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 import { Lock, MessageCircle } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
 import { ProjectSettings } from "./ProjectPanel/components/ProjectSettings";
 import { useSession } from "next-auth/react";
@@ -43,6 +43,11 @@ export default function ProjectCard({
   const [isLiked, setIsLiked] = useState(project.hasLiked ?? false);
   const [likesCount, setLikesCount] = useState(project.likes);
   const [animateLike, setAnimateLike] = useState(false);
+
+  useEffect(() => {
+    setIsLiked(project.hasLiked ?? false);
+    setLikesCount(project.likes);
+  }, [project.hasLiked, project.likes]);
 
   const ownerName: string = project.ownerName || "Mario Junior";
 
@@ -98,9 +103,7 @@ export default function ProjectCard({
     startTransition(async () => {
       const response = await toggleLike(project.id);
       if (response.success) {
-        // Sync other components (like FeedProjectsGrid) by validating specific query keys
-        queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
-        queryClient.invalidateQueries({ queryKey: ["highlighted-project"] });
+        // Optimistic cache update already keeps the UI in sync without a heavy refetch.
       } else {
         // Rollback se falhar
         setIsLiked(!newIsLiked);

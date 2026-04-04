@@ -32,7 +32,14 @@ export async function searchUsersAction(
       : await userRepository.searchUsers(query, currentUserId, page, limit, sort);
 
     const mappedUsers = users.map((u: any) => ({
-      ...u,
+      id: u.id,
+      name: u.name,
+      username: u.username,
+      image: u.image,
+      title: u.title,
+      bio: u.bio,
+      cover: u.cover,
+      skills: u.skills,
       isFollowing: u.followers?.length > 0,
     }));
 
