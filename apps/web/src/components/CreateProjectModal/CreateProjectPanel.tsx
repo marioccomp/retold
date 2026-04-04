@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { createLogger } from "@repo/observability";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+
+const logger = createLogger("web.ui.create-project-panel");
 
 type Repository = {
   id: number;
@@ -252,7 +255,10 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
       onSuccess();
     },
     onError: (error: unknown) => {
-      console.error(error);
+      logger.error("project.create_failed", error, {
+        hasRepository: Boolean(selectedRepoId),
+        imageCount: sortableImages.length,
+      });
       toast.error(error instanceof Error ? error.message : t.toast.error);
     },
   });

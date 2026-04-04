@@ -8,6 +8,9 @@ import {
   enforceForgotPasswordRateLimit,
 } from "@/src/domains/auth/services/public-auth-rate-limit.service";
 import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.auth-forgot-password");
 
 export async function forgotPassword(formData: FormData): Promise<ActionResponse<string>> {
   const dict = await getDictionary();
@@ -40,7 +43,7 @@ export async function forgotPassword(formData: FormData): Promise<ActionResponse
       };
     }
 
-    console.error("forgot password error: ", error);
+    logger.error("auth.forgot_password_failed", error);
     return {
       success: false,
       message: dict.validation.generic_error,

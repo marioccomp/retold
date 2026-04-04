@@ -1,11 +1,14 @@
 import { lastCommitQueue } from "@repo/queue";
 import { QueueEvents } from "bullmq";
 import { redisConnection } from "@repo/queue";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("worker.test-enqueue");
 
 async function main() {
   const userId = 1; // <-- bota aqui um userId REAL do seu banco que tenha installation + projetos
 
-  console.log("📤 Enviando job lastCommit...");
+  logger.info("worker.test_job_enqueued");
 
   const queueEvents = new QueueEvents("github-last-commit", {
     connection: redisConnection,
@@ -21,7 +24,7 @@ async function main() {
     }
   );
 
-  console.log("⏳ Aguardando completar...", job.id);
+  logger.info("worker.test_job_waiting", { jobId: job.id });
 
   await new Promise<void>((resolve, reject) => {
     queueEvents.on("completed", ({ jobId }) => {
@@ -33,11 +36,11 @@ async function main() {
   });
 
   await queueEvents.close();
-  console.log("✅ Job concluído!");
+  logger.info("worker.test_job_completed", { jobId: job.id });
   process.exit(0);
 }
 
 main().catch((e) => {
-  console.error("❌ Falhou:", e);
+  logger.error("worker.test_job_failed", e);
   process.exit(1);
 });

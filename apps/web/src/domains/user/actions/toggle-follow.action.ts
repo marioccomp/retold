@@ -3,6 +3,9 @@
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.action.toggle-follow");
 
 export async function toggleFollowAction(targetUserId: number) {
     const session = await auth();
@@ -70,7 +73,10 @@ export async function toggleFollowAction(targetUserId: number) {
         revalidatePath(`/`, "layout");
         return { success: true };
     } catch (error) {
-        console.error("Error toggling follow:", error);
+        logger.error("user.follow_toggle_failed", error, {
+            currentUserId,
+            targetUserId,
+        });
         return { success: false, error: "Failed to process request" };
     }
 }

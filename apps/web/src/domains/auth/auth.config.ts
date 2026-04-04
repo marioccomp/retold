@@ -3,6 +3,9 @@ import type { NextAuthConfig } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
 import { userRepository } from "@repo/database";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.auth-config");
 
 async function hydrateTokenFromDatabase(token: JWT): Promise<JWT | null> {
   if (!token.id) {
@@ -59,7 +62,9 @@ export const authConfig = {
       try {
         return await hydrateTokenFromDatabase(token);
       } catch (error) {
-        console.error("JWT sync error:", error);
+        logger.error("auth.jwt_sync_failed", error, {
+          userId: token.id ?? null,
+        });
         return null;
       }
     },

@@ -1,14 +1,20 @@
 "use server"
 
 import { prisma } from "@repo/database"
+import { createLogger } from "@repo/observability"
 import { ProjectAccessError, requireProjectAccess } from "@/src/domains/project/lib/project-access"
 import { getAuthenticatedUserId } from "@/src/lib/server-auth"
 import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 
+const logger = createLogger("web.action.increment-view")
+
 export async function incrementView(projectId: number) {
+    let userId: number | null = null
+    let identifiedByIp = false
+
     try {
-        const userId = await getAuthenticatedUserId()
+        userId = await getAuthenticatedUserId()
         await requireProjectAccess(projectId, userId)
 
         const headerList = await headers()
@@ -33,6 +39,7 @@ export async function incrementView(projectId: number) {
         } else if (ipAddress) {
             baseWhere.ipAddress = ipAddress
             baseWhere.userId = null
+            identifiedByIp = true
         } else {
             return { success: false, message: "Could not identify user" }
         }
@@ -90,7 +97,11 @@ export async function incrementView(projectId: number) {
             return { success: false, message: "Project not found" }
         }
 
-        console.error("Failed to increment view:", error)
+        logger.error("project.view_increment_failed", error, {
+            projectId,
+            userId,
+            identifiedByIp,
+        })
         return { success: false }
     }
 }

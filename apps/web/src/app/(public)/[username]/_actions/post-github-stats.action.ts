@@ -5,6 +5,9 @@ import { Octokit } from "octokit";
 import { projectRepository } from "@repo/database";
 import { ActionResponse } from "@/lib/action-response";
 import { auth } from "@/src/domains/auth/auth";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.action.post-github-stats");
 
 export async function postGithubStats(): Promise<ActionResponse> {
   const session = await auth();
@@ -84,7 +87,9 @@ export async function postGithubStats(): Promise<ActionResponse> {
         message: "No github installations found",
       };
     }
-    console.error("Error fetching github stats:", error);
+    logger.error("github.stats_refresh_failed", error, {
+      userId,
+    });
     return {
       success: false,
       message: "Error fetching github stats",

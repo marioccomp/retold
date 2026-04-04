@@ -2,6 +2,9 @@ import { githubRepository } from "@repo/database";
 import { Octokit } from "octokit";
 import { auth } from "@/src/domains/auth/auth";
 import { prisma } from "@repo/database";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.domain.github");
 
 export async function getUserRepositories() {
   const session = await auth();
@@ -58,7 +61,9 @@ export async function getUserRepositories() {
       },
     });
   } catch (error) {
-    console.error("Erro ao buscar repos: ", error);
+    logger.error("github.repositories_sync_failed", error, {
+      userId,
+    });
     return [];
   }
 }

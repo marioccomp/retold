@@ -11,6 +11,9 @@ import {
 } from "@/src/lib/server-auth";
 import { enforceDestructiveActionRateLimit } from "@/src/domains/auth/services/public-auth-rate-limit.service";
 import { TooManyRequestsError } from "@/src/domains/auth/auth.errors";
+import { createLogger } from "@repo/observability";
+
+const logger = createLogger("web.settings-actions");
 
 type SettingsPasswordActionResult =
     | { error: string | Record<string, string[]> }
@@ -177,7 +180,9 @@ export async function deleteAccountAction(
             await tx.user.delete({ where: { id: userId } });
         });
     } catch (error) {
-        console.error("Error deleting account:", error);
+        logger.error("settings.account_delete_failed", error, {
+            userId,
+        });
         return {
             success: false,
             message: dict.settings.dangerZone.toast.delete_error,
