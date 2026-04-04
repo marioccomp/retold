@@ -1,5 +1,48 @@
 import { NextResponse } from "next/server";
 import type { NextAuthConfig } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+
+import { userRepository } from "@repo/database";
+
+async function hydrateTokenFromDatabase(token: JWT): Promise<JWT | null> {
+  if (!token.id) {
+    return token;
+  }
+
+  const userId = Number(token.id);
+
+  if (Number.isNaN(userId)) {
+    return null;
+  }
+
+  const freshUser = await userRepository.findSessionSnapshotById(userId);
+
+  if (!freshUser) {
+    return null;
+  }
+
+  const tokenSessionVersion =
+    typeof token.sessionVersion === "number"
+      ? token.sessionVersion
+      : freshUser.sessionVersion;
+
+  if (tokenSessionVersion !== freshUser.sessionVersion) {
+    return null;
+  }
+
+  token.email = freshUser.email;
+  token.name = freshUser.name ?? undefined;
+  token.picture = freshUser.image ?? undefined;
+  token.image = freshUser.image ?? undefined;
+  token.role = freshUser.role;
+  token.plan = freshUser.plan;
+  token.username = freshUser.username;
+  token.hasCompletedOnboarding = freshUser.hasCompletedOnboarding;
+  token.hasPassword = !!freshUser.password;
+  token.sessionVersion = freshUser.sessionVersion;
+
+  return token;
+}
 
 export const authConfig = {
   pages: {
@@ -7,85 +50,36 @@ export const authConfig = {
   },
 
   callbacks: {
-    async jwt({ token, user, account, trigger, session }) {
-      if (user) {
-
-        token.id = user.id;
-        token.role = (user as any).role;
-        token.plan = (user as any).plan;
-        token.name = user.name;
-        token.image = user.image;
-        token.username = (user as any).username;
-        token.hasCompletedOnboarding = (user as any).hasCompletedOnboarding;
-        token.hasPassword =
-          "hasPassword" in user ? (user as any).hasPassword : !!(user as any).password;
+    async jwt({ token, user }) {
+      if (user?.id) {
+        token.id = String(user.id);
+        token.authenticatedAt = Date.now();
       }
 
-      // When session.update() is called
-      if (trigger === "update" && token.id) {
-        // Handle explicit updates passed to update()
-        if (session?.user?.hasCompletedOnboarding !== undefined) {
-          token.hasCompletedOnboarding = session.user.hasCompletedOnboarding;
-        }
-        if (session?.user?.username) {
-          token.username = session.user.username;
-        }
-
-        // If no explicit data was passed, or if we want to sync with DB
-        // We only do this if we haven't already updated the relevant flags
-        if (session?.user?.hasCompletedOnboarding === undefined && !session?.user?.username) {
-          try {
-            const { prisma } = await import("@repo/database");
-            const freshUser = await prisma.user.findUnique({
-              where: { id: Number(token.id) },
-              select: {
-                username: true,
-                name: true,
-                image: true,
-                role: true,
-                plan: true,
-                password: true,
-                hasCompletedOnboarding: true,
-              },
-            });
-            if (freshUser) {
-              token.username = freshUser.username;
-              token.name = freshUser.name;
-              token.image = freshUser.image;
-              token.role = freshUser.role;
-              token.plan = freshUser.plan;
-              token.hasCompletedOnboarding = freshUser.hasCompletedOnboarding;
-              token.hasPassword =
-                session?.hasPassword !== undefined ? session.hasPassword : !!freshUser.password;
-            }
-          } catch (error) {
-            console.error("JWT Update Error:", error);
-          }
-        }
+      try {
+        return await hydrateTokenFromDatabase(token);
+      } catch (error) {
+        console.error("JWT sync error:", error);
+        return null;
       }
-
-      if (account) {
-        token.accessToken = account.access_token as string;
-        token.scope = account.scope as string;
-      }
-      return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as any;
-        session.user.plan = token.plan as any;
-        session.user.name = token.name as string;
-        session.user.image = token.image as string;
-        session.user.username = token.username as string;
-        session.user.hasCompletedOnboarding = token.hasCompletedOnboarding as boolean;
-        session.user.hasPassword = token.hasPassword as boolean;
+      if (!session.user || !token.id) {
+        return session;
       }
 
-      if (token.accessToken) {
-        (session as any).accessToken = token.accessToken as string;
-        (session as any).scope = token.scope as string;
-      }
+      session.user.id = token.id;
+      session.user.email = typeof token.email === "string" ? token.email : session.user.email;
+      session.user.role = token.role;
+      session.user.plan = token.plan;
+      session.user.name = typeof token.name === "string" ? token.name : session.user.name;
+      session.user.image = typeof token.image === "string" ? token.image : session.user.image;
+      session.user.username = typeof token.username === "string" ? token.username : null;
+      session.user.hasCompletedOnboarding = Boolean(token.hasCompletedOnboarding);
+      session.user.hasPassword = Boolean(token.hasPassword);
+      session.user.authenticatedAt =
+        typeof token.authenticatedAt === "number" ? token.authenticatedAt : undefined;
+
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {
@@ -97,7 +91,6 @@ export const authConfig = {
 
       const pathname = nextUrl.pathname;
 
-      // Rotas que não devem ser bloqueadas pelo middleware de username
       const publicRoutes = [
         "/login",
         "/register",
@@ -110,54 +103,36 @@ export const authConfig = {
       ];
 
       const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
-      const isProfileRoute = /^\/[a-zA-Z0-9_-]+$/.test(pathname); // Rota de perfil /{username}
 
-      // Se o usuário está logado mas não tem username
-      // Redireciona apenas se NÃO for rota pública e NÃO for rota de perfil
       if (isLoggedIn && !username && !isPublicRoute) {
         return NextResponse.redirect(new URL("/choose-username", nextUrl));
       }
 
-      // Mandatory redirection to onboarding for newcomers
-      if (isLoggedIn && username && hasCompletedOnboarding === false && !isPublicRoute && pathname !== "/onboarding") {
+      if (
+        isLoggedIn &&
+        username &&
+        hasCompletedOnboarding === false &&
+        !isPublicRoute &&
+        pathname !== "/onboarding"
+      ) {
         return NextResponse.redirect(new URL("/onboarding", nextUrl));
       }
 
-
-      // Rotas premium
       if (pathname.startsWith("/premium")) {
         return isLoggedIn && plan === "PREMIUM";
       }
 
-      // Rotas recruiter
       if (pathname.startsWith("/recruiter")) {
         return isLoggedIn && role === "RECRUITER";
       }
 
-      // Rotas admin
       if (pathname.startsWith("/admin")) {
         return isLoggedIn && role === "ADMIN";
       }
 
-      // Público
       return true;
     },
   },
 
   providers: [],
 } satisfies NextAuthConfig;
-
-declare module "next-auth" {
-  interface User {
-    id?: string;
-    role?: string;
-    plan?: string;
-    username?: string | null;
-    hasPassword?: boolean;
-    hasCompletedOnboarding?: boolean;
-  }
-
-  interface Session {
-    user: User;
-  }
-}

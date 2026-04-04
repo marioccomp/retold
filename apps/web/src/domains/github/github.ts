@@ -5,7 +5,11 @@ import { prisma } from "@repo/database";
 
 export async function getUserRepositories() {
   const session = await auth();
-  const userId = Number(session?.user.id);
+  const userId = session?.user?.id ? Number(session.user.id) : null;
+
+  if (!userId || Number.isNaN(userId)) {
+    return [];
+  }
 
   try {
     const token = await githubRepository.getTokenByUserId(userId);

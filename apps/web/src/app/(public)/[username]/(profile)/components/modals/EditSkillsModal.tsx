@@ -32,7 +32,7 @@ export default function EditSkillsModal({ isOpen, onClose, profile }: Props) {
   }, [isOpen, profile]);
 
   const mutation = useMutation({
-    mutationFn: (data: { skills: string[] }) => updateProfileDetails(data, profile.id),
+    mutationFn: (data: { skills: string[] }) => updateProfileDetails(data),
     onSuccess: (res) => {
       if (res.success) {
         toast.success(dict.profile.edit_modal.success);

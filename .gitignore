@@ -45,3 +45,6 @@ services/worker/.tmp/
 
 # backup config
 scripts/backup/backup.env
+
+# deploy state
+.deploy-state/
