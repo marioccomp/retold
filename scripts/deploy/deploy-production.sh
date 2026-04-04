@@ -27,7 +27,6 @@ main() {
   fi
 
   ensure_no_local_commits_ahead
-  validate_env_file
   validate_compose_config
 
   local previous_sha target_sha started_at

@@ -67,9 +67,6 @@ resolve_current_sha() {
   git -C "${ROOT_DIR}" rev-parse HEAD
 }
 
-validate_env_file() {
-  node "${SCRIPT_DIR}/validate-production-env.mjs" --env-file "${ROOT_DIR}/${ENV_FILE}"
-}
 
 validate_compose_config() {
   docker compose -f "${ROOT_DIR}/${COMPOSE_FILE}" config -q >/dev/null

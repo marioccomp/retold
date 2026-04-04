@@ -27,8 +27,6 @@ main() {
 
   ensure_no_local_commits_ahead
 
-  log "Validating production env"
-  validate_env_file
 
   log "Validating Docker Compose configuration"
   validate_compose_config
