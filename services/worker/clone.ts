@@ -1,16 +1,14 @@
 import { spawn } from "child_process";
 import fs from "fs";
-import os from "os";
-import path from "path";
 
 type GitCommandOptions = {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
+  timeoutMs?: number;
 };
 
 type GitAuthHelper = {
   env: NodeJS.ProcessEnv;
-  cleanup: () => void;
 };
 
 function createGitCommandError(stderr: string, exitCode: number | null) {
@@ -40,6 +38,13 @@ function createGitCommandError(stderr: string, exitCode: number | null) {
   });
 }
 
+function createGitTimeoutError(timeoutMs: number) {
+  return Object.assign(new Error(`Git command timed out after ${timeoutMs}ms`), {
+    code: "GIT_COMMAND_TIMEOUT",
+    exitCode: null,
+  });
+}
+
 export async function runGitCommand(args: string[], options: GitCommandOptions = {}) {
   await new Promise<void>((resolve, reject) => {
     const child = spawn("git", args, {
@@ -54,13 +59,29 @@ export async function runGitCommand(args: string[], options: GitCommandOptions =
     });
 
     let stderr = "";
+    let timedOut = false;
+    const timeoutMs = options.timeoutMs ?? 45_000;
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGTERM");
+    }, timeoutMs);
 
     child.stderr.on("data", (chunk: Buffer | string) => {
       stderr += chunk.toString();
     });
 
-    child.on("error", reject);
+    child.on("error", (error) => {
+      clearTimeout(timeout);
+      reject(error);
+    });
     child.on("close", (code) => {
+      clearTimeout(timeout);
+
+      if (timedOut) {
+        reject(createGitTimeoutError(timeoutMs));
+        return;
+      }
+
       if (code === 0) {
         resolve();
         return;
@@ -71,44 +92,18 @@ export async function runGitCommand(args: string[], options: GitCommandOptions =
   });
 }
 
-function createGitAskPassHelper(token: string): GitAuthHelper {
-  const helperDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "retold-git-auth-"));
-  const isWindows = process.platform === "win32";
-  const helperPath = path.join(helperDirectory, isWindows ? "git-askpass.cmd" : "git-askpass.sh");
-
-  const helperScript = isWindows
-    ? [
-        "@echo off",
-        "set PROMPT_TEXT=%~1",
-        'echo %PROMPT_TEXT% | findstr /I "Username" >nul',
-        "if %ERRORLEVEL%==0 (",
-        "  echo %RETOLD_GIT_USERNAME%",
-        ") else (",
-        "  echo %RETOLD_GIT_PASSWORD%",
-        ")",
-      ].join("\r\n")
-    : [
-        "#!/bin/sh",
-        'case "$1" in',
-        '  *Username*) printf "%s\\n" "$RETOLD_GIT_USERNAME" ;;',
-        '  *) printf "%s\\n" "$RETOLD_GIT_PASSWORD" ;;',
-        "esac",
-      ].join("\n");
-
-  fs.writeFileSync(helperPath, helperScript, {
-    encoding: "utf8",
-    mode: 0o700,
-  });
+function createGitAuthEnvironment(token: string): GitAuthHelper {
+  const basicAuth = Buffer.from(`x-access-token:${token}`, "utf8").toString("base64");
 
   return {
     env: {
       GIT_TERMINAL_PROMPT: "0",
-      GIT_ASKPASS: helperPath,
-      RETOLD_GIT_USERNAME: "x-access-token",
-      RETOLD_GIT_PASSWORD: token,
-    },
-    cleanup() {
-      fs.rmSync(helperDirectory, { recursive: true, force: true });
+      GCM_INTERACTIVE: "Never",
+      GIT_CONFIG_COUNT: "2",
+      GIT_CONFIG_KEY_0: "credential.helper",
+      GIT_CONFIG_VALUE_0: "",
+      GIT_CONFIG_KEY_1: "http.https://github.com/.extraheader",
+      GIT_CONFIG_VALUE_1: `AUTHORIZATION: basic ${basicAuth}`,
     },
   };
 }
@@ -118,13 +113,9 @@ export async function cloneRepository(repoUrl: string, targetPath: string, token
     fs.rmSync(targetPath, { recursive: true, force: true });
   }
 
-  const authHelper = token ? createGitAskPassHelper(token) : null;
+  const authHelper = token ? createGitAuthEnvironment(token) : null;
 
-  try {
-    await runGitCommand(["clone", "--depth=50", repoUrl, targetPath], {
-      env: authHelper?.env,
-    });
-  } finally {
-    authHelper?.cleanup();
-  }
+  await runGitCommand(["clone", "--depth=50", repoUrl, targetPath], {
+    env: authHelper?.env,
+  });
 }

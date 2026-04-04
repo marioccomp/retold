@@ -359,6 +359,26 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
             <RateLimitedView t={t} nextRetryAt={nextRetryAt} isOwner={Boolean(isOwner)} />
           )}
 
+          {status === "PROJECT_NOT_FOUND" && (
+            <EmptyStateView
+              icon={PackageSearch}
+              title={t.overlay.analysis_not_started.title}
+              description={t.overlay.project_unavailable?.not_found || "Este projeto não está mais disponível."}
+            />
+          )}
+
+          {status === "PROJECT_NOT_ACCESSIBLE" && (
+            <EmptyStateView
+              icon={XCircle}
+              title={t.overlay.project_unavailable?.restricted_title || "Projeto indisponível"}
+              description={
+                t.overlay.project_unavailable?.restricted_description ||
+                "Você não tem mais permissão para acessar este projeto."
+              }
+              color="red"
+            />
+          )}
+
           {/* Report Content - Unified View */}
           {status === "DONE" && (
             <div className="bg-background rounded-2xl border border-border shadow-sm overflow-hidden">

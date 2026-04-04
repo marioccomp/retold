@@ -12,7 +12,7 @@ import { selectCodeSamples } from "./select-code-samples.js";
 
 export async function analyzeRepository(
   repoPath: string,
-  opts?: { readme?: string; repoUrl?: string }
+  opts?: { readme?: string; repoUrl?: string; includeCodeSamples?: boolean }
 ) {
   const { files } = scanRepository(repoPath);
 
@@ -58,7 +58,7 @@ export async function analyzeRepository(
   const needsMoreContext =
     !opts?.readme || classification.confidence < 0.6 || classification.purpose === "unknown";
 
-  if (needsMoreContext) {
+  if (opts?.includeCodeSamples && needsMoreContext) {
     codeSamples = selectCodeSamples(files, 2).map((s) => ({
       ...s,
       relativePath: path.relative(repoPath, s.relativePath),

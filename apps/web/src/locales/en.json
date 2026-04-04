@@ -120,6 +120,11 @@
         "title": "Analysis Error",
         "description": "Could not analyze the technical details of this project."
       },
+      "project_unavailable": {
+        "not_found": "This project is no longer available.",
+        "restricted_title": "Project unavailable",
+        "restricted_description": "You no longer have permission to access this project."
+      },
       "pending_view": {
         "title": "Project Analysis",
         "description": "Generate a full technical report with insights about architecture, stack, and code quality.",

@@ -25,6 +25,18 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
             if (status === "RATE_LIMITED") return 5000;
             return false;
         },
+        retry: (failureCount, error) => {
+            const message = error instanceof Error ? error.message : "";
+            if (
+                message.includes("PROJECT_NOT_FOUND") ||
+                message.includes("PROJECT_NOT_ACCESSIBLE") ||
+                message.includes("Project not found")
+            ) {
+                return false;
+            }
+
+            return failureCount < 2;
+        },
     });
 
     const handleAnalyzeRepo = async () => {

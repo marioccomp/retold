@@ -14,19 +14,24 @@ The worker layer now enforces server-side guards before reading cloned repositor
 - **Scoped temp directories:** temporary clone paths are created under fixed worker-specific roots, and cleanup is restricted to those roots to prevent path traversal and path escape.
 - **Repository origin rehydration:** the main project analysis worker no longer trusts `repoUrl` from queue payloads. It reloads the linked repository from the database, validates ownership consistency, and only accepts `https://github.com/<owner>/<repo>` origins.
 - **Symlink and path-escape blocking:** repository scanning skips symbolic links and rejects any file whose real path escapes the cloned repository root. README loading also refuses symbolic links and escaped paths.
-- **Git clone without token in URL/argv:** repository cloning now runs without shell interpolation and no longer embeds the GitHub token in the remote URL or command-line arguments. Authentication uses a short-lived `GIT_ASKPASS` helper that is deleted after the clone finishes.
+- **Git clone without token in URL/argv:** repository cloning now runs without shell interpolation and no longer embeds the GitHub token in the remote URL or command-line arguments. Authentication uses an ephemeral Git HTTP authorization header injected through the worker environment, with clone timeout protection to avoid interactive hangs.
 - **Queue retention hardening:** BullMQ queues now define explicit retention windows, reduced stack trace retention, and deduplicated job IDs for sensitive worker flows.
 - **Non-destructive failure handling:** project analysis failures now mark the project as `ERROR` or `RATE_LIMITED` instead of deleting the `Project` record as a default reaction to worker errors.
 - **Automatic rate-limit retry:** when the LLM provider returns a retry window, the worker stores `rateLimitResetAt`, marks the project as `RATE_LIMITED`, and schedules a delayed retry job for the same project.
 - **Reduced queue payload sensitivity:** internal worker chaining avoids enqueuing user email/GitHub username when the consumer can safely rehydrate the same data from the database.
+- **LLM data minimization with high-context defaults:** public projects now send sanitized README plus sanitized code samples to the external LLM by default, while private projects send sanitized README plus structural metadata but keep code samples local-only.
+- **Private project gate:** private or repository-private projects no longer send code samples to the external LLM by default. Operators can still force a stricter local-only fallback with environment configuration if required by policy.
+- **Basic secret redaction:** README text and optional code samples are sanitized before any external LLM prompt is built, with common tokens, credentials, connection strings, private-key blocks, and prompt-injection style instructions redacted.
+- **Reduced persistence of sensitive analysis artifacts:** `rawAnalysis` stored in the database no longer persists README content or code samples and now keeps only structured signals plus privacy metadata.
 
 ### Operational Note
 
 - These protections assume the database remains the source of truth for project-to-repository linkage.
 - Production Redis now expects authenticated configuration from the environment. Managed Redis TLS, ACL rotation, and certificate provisioning still depend on external infrastructure setup.
-- The clone flow now avoids token exposure in URL/argv and `.git/config`, but token handling still depends on secure process isolation and environment hygiene on the host.
+- The clone flow now avoids token exposure in URL/argv and `.git/config`, but token handling still depends on secure process isolation and environment hygiene on the host because the child process still receives short-lived authentication material via environment.
 - The UI now exposes the next scheduled retry time to the project owner, based on `rateLimitResetAt` stored for the affected user.
-- Broader LLM payload minimization remains follow-up work.
+- Environment overrides now control whether public README or code samples may be included in LLM prompts (`WORKER_LLM_INCLUDE_PUBLIC_README`, `WORKER_LLM_INCLUDE_PUBLIC_CODE_SAMPLES`) and whether private projects should be forced into local-only fallback (`WORKER_LLM_ALLOW_PRIVATE_PROJECTS=false`).
+- This policy intentionally favors richer analysis for public repositories and README-level context for private repositories. If your compliance posture forbids any private content leaving the system, keep private projects in local-only mode.
 
 ---
 

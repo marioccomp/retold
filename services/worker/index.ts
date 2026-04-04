@@ -4,10 +4,11 @@ import { analyzeRepoQueue, redisConnection, userAnalyzeQueue } from "@repo/queue
 import "./user-worker";
 import "./last-commit-worker";
 import { cloneRepository } from "./clone";
-import { prisma, githubRepository } from "@repo/database";
+import { prisma, githubRepository, Prisma } from "@repo/database";
 import { createLogger } from "@repo/observability";
 import { analyzeProjectWithLLM } from "./llm/analyze-project";
 import { analyzeRepository } from "./analyze/index";
+import { buildLlmPrivacyDecision, prepareAnalysisForLlm } from "./privacy.js";
 import {
   PROJECT_ANALYSIS_TMP_ROOT,
   cleanupScopedDirectory,
@@ -63,6 +64,10 @@ const worker = new Worker(
       }
 
       const repositoryOrigin = validateGitHubRepositoryUrl(projectWithUser.repository.url);
+      const llmPrivacyDecision = buildLlmPrivacyDecision({
+        projectVisibility: projectWithUser.visibility,
+        repositoryPrivate: projectWithUser.repository.private,
+      });
 
       await prisma.project.update({
         where: { id: projectId },
@@ -91,15 +96,36 @@ const worker = new Worker(
       const analysis = await analyzeRepository(tmpPath, {
         readme: readmeContent,
         repoUrl: repositoryOrigin.normalizedUrl,
+        includeCodeSamples: llmPrivacyDecision.includeCodeSamples,
       });
       logger.info("worker.repository_analysis_completed", {
         projectId,
         totalFiles: analysis.stats.totalFiles,
         frameworkCount: analysis.stack.frameworks.length,
         languageCount: analysis.stack.languages.length,
+        codeSamplesCount: analysis.codeSamples?.length ?? 0,
       });
 
       const repoName = repositoryOrigin.repo;
+      const preparedLlmAnalysis = prepareAnalysisForLlm(
+        {
+          ...analysis,
+          readme: readmeContent,
+          codeSamples: analysis.codeSamples,
+          locale,
+        },
+        llmPrivacyDecision
+      );
+
+      logger.info("worker.llm_privacy_mode_selected", {
+        projectId,
+        mode: llmPrivacyDecision.mode,
+        projectSensitivity: llmPrivacyDecision.projectSensitivity,
+        externalLlmAllowed: llmPrivacyDecision.externalLlmAllowed,
+        includeReadme: llmPrivacyDecision.includeReadme,
+        includeCodeSamples: llmPrivacyDecision.includeCodeSamples,
+        redactionsApplied: preparedLlmAnalysis.redactionsApplied,
+      });
 
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
@@ -121,15 +147,11 @@ const worker = new Worker(
         );
 
       const llmInsights = await analyzeProjectWithLLM(
-        {
-          ...analysis,
-          readme: readmeContent,
-          codeSamples: analysis.codeSamples,
-          locale,
-        },
+        preparedLlmAnalysis.promptAnalysis,
         repoName,
         projectWithUser.title,
-        projectWithUser.description || undefined
+        projectWithUser.description || undefined,
+        llmPrivacyDecision
       );
       const llmSummaryParagraphs = Array.isArray(
         (llmInsights as { summary?: { paragraphs?: unknown[] } }).summary?.paragraphs
@@ -150,6 +172,7 @@ const worker = new Worker(
       });
 
       const llmInsightsJson = JSON.stringify(llmInsights);
+      const persistedRawAnalysis = preparedLlmAnalysis.persistenceAnalysis as Prisma.InputJsonValue;
 
       await prisma.repositoryAnalysis.upsert({
         where: { projectId },
@@ -159,7 +182,7 @@ const worker = new Worker(
           stack: analysis.stack,
           structure: analysis.structure,
           signals: analysis.infra,
-          rawAnalysis: analysis,
+          rawAnalysis: persistedRawAnalysis,
           llmOverview: llmInsightsJson,
         },
         update: {
@@ -167,7 +190,7 @@ const worker = new Worker(
           stack: analysis.stack,
           structure: analysis.structure,
           signals: analysis.infra,
-          rawAnalysis: analysis,
+          rawAnalysis: persistedRawAnalysis,
           llmOverview: llmInsightsJson,
         },
       });

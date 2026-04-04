@@ -120,6 +120,11 @@
         "title": "Erro na Análise",
         "description": "Não foi possível analisar os detalhes técnicos deste projeto."
       },
+      "project_unavailable": {
+        "not_found": "Este projeto não está mais disponível.",
+        "restricted_title": "Projeto indisponível",
+        "restricted_description": "Você não tem mais permissão para acessar este projeto."
+      },
       "pending_view": {
         "title": "Análise de Projeto",
         "description": "Gere um relatório técnico completo com insights sobre arquitetura, stack e qualidade de código.",
