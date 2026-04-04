@@ -33,15 +33,23 @@ export async function deleteProjectAction(projectId: number) {
 
   if (session.user.username) {
     await postGithubStats();
-    await lastCommitQueue.add(
-      "refresh-last-commit",
-      { userId: Number(session.user.id) },
-      {
-        jobId: `lastCommit-${session.user.id}`,
-        attempts: 3,
-        backoff: { type: "exponential", delay: 30_000 },
-      }
-    );
+    void lastCommitQueue
+      .add(
+        "refresh-last-commit",
+        { userId: Number(session.user.id) },
+        {
+          jobId: `lastCommit-${session.user.id}`,
+          attempts: 3,
+          backoff: { type: "exponential", delay: 30_000 },
+        }
+      )
+      .catch((error) => {
+        console.error("Failed to enqueue last commit refresh after project deletion", {
+          userId: Number(session.user.id),
+          projectId,
+          error,
+        });
+      });
   }
 
   revalidatePath(`/${session.user.username}`);
