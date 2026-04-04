@@ -49,16 +49,19 @@ main() {
     log "Local checkout already matches origin/${TARGET_BRANCH}"
   fi
 
+  log "Stopping services to free up RAM for build"
+  docker compose -f "${ROOT_DIR}/${COMPOSE_FILE}" down
+
   log "Installing dependencies with frozen lockfile"
   (cd "${ROOT_DIR}" && pnpm install --frozen-lockfile)
+
+  log "Building application"
+  (cd "${ROOT_DIR}" && NODE_OPTIONS="${BUILD_NODE_OPTIONS}" pnpm run build --concurrency=1)
 
   log "Ensuring database and redis are running"
   docker compose -f "${ROOT_DIR}/${COMPOSE_FILE}" up -d database redis
   wait_for_service database 90
   wait_for_service redis 60
-
-  log "Building application"
-  (cd "${ROOT_DIR}" && NODE_OPTIONS="${BUILD_NODE_OPTIONS}" pnpm run build)
 
   log "Applying Prisma migrations"
   (cd "${ROOT_DIR}" && pnpm --filter @repo/database exec prisma migrate deploy)
