@@ -1,180 +1,116 @@
 # Retold
 
-## Como rodar o projeto localmente
+## Local setup
 
-### 1️⃣ Instale as dependências
+### 1. Install dependencies
 
 ```bash
 pnpm install
 ```
 
----
+### 2. Configure environment variables
 
-### 2️⃣ Configure as variáveis de ambiente
+Copy the safe template and replace the placeholders you actually need:
 
-Crie um arquivo `.env` na **raiz do projeto**, usando como base o `.env.example`.
-
-Exemplo:
-
-```env
-POSTGRES_USER=local_db
-POSTGRES_PASSWORD=123
-POSTGRES_DB=local_db
-POSTGRES_PORT=5432
-
-AUTH_SECRET="PalavraMuitoSecretaHERE"
-
-DATABASE_URL="postgresql://local_db:123@localhost:5432/local_db"
-
-UPSTASH_REDIS_REST_URL="https://seu-banco.upstash.io"
-UPSTASH_REDIS_REST_TOKEN="seu_token_aqui"
-
-APP_URL="http://localhost:3000"
-
-RESEND_API_KEY = "Sua_Chave_Resend_Aqui"
-
-AUTH_GITHUB_ID="seuID"
-AUTH_GITHUB_SECRET="seuSecretHere"
-
-GITHUB_APP_ID="seuID"
-GITHUB_PRIVATE_KEY="suaKEY"
-
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-GROQ_API_KEY=suaKeyHere
-
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin123
-
-MINIO_ENDPOINT=localhost
-MINIO_PORT=9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin123
-MINIO_BUCKET=retold
-MINIO_PUBLIC_URL=http://localhost:9000
+```bash
+cp .env.example .env
 ```
 
----
+Important:
 
-### 3️⃣ Subir tudo (fluxo recomendado)
+- do not commit the real `.env`
+- replace every `CHANGE_ME_*` value before using the app in any shared or production-like environment
+- keep `APP_URL` aligned with the real public origin when testing auth flows
+
+### 3. Start the full local stack
 
 ```bash
 pnpm dev:full
 ```
 
-Esse comando:
+This command:
 
-1. Sobe o banco de dados via Docker
-2. Aplica as migrations do Prisma
-3. Sobe o servidor web (Next.js)
+1. starts PostgreSQL, Redis and MinIO with Docker
+2. applies Prisma migrations
+3. starts the Next.js app
 
----
+## Common workflows
 
-## Fluxos de uso
-
-### ▶️ Desenvolvimento diário
+### Daily development
 
 ```bash
 pnpm dev:full
 ```
 
----
+### Stop the app
 
-### ⏹ Parar o servidor web
+Press `Ctrl + C` in the terminal running Next.js.
 
-No terminal:
-
-```text
-Ctrl + C
-```
-
----
-
-### ⏹ Parar o banco de dados
+### Stop local services
 
 ```bash
 pnpm db:down
 ```
 
----
-
-### 🔄 Resetar o banco (CUIDADO)
+### Rebuild the local database
 
 ```bash
 pnpm db:rebuild
 ```
 
-> ⚠️ Esse comando remove todos os dados locais do banco.
+This deletes local database volumes. Do not use it if you need to keep local data.
 
----
+## Available commands
 
-## Comandos disponíveis
+### Database
 
-### Banco de dados (Docker + Prisma)
+| Command | Description |
+| --- | --- |
+| `pnpm db:up` | Start the local Docker services |
+| `pnpm db:down` | Stop the local Docker services |
+| `pnpm db:reset` | Remove containers and volumes |
+| `pnpm db:start` | Start services and apply migrations |
+| `pnpm db:rebuild` | Reset everything and re-apply migrations |
+| `pnpm db:migrate` | Run Prisma migrations |
+| `pnpm db:push` | Push schema changes without migrations |
+| `pnpm db:generate` | Generate Prisma Client |
+| `pnpm db:studio` | Open Prisma Studio |
 
-| Comando            | Descrição                                      |
-| ------------------ | ---------------------------------------------- |
-| `pnpm db:up`       | Sobe o Postgres via Docker                     |
-| `pnpm db:down`     | Para e remove os containers                    |
-| `pnpm db:reset`    | Remove containers **e volumes**                |
-| `pnpm db:start`    | Sobe o banco e aplica migrations               |
-| `pnpm db:rebuild`  | Reset total + migrations                       |
-| `pnpm db:migrate`  | Aplica migrations do Prisma                    |
-| `pnpm db:push`     | Sincroniza schema sem migrations (uso pontual) |
-| `pnpm db:generate` | Gera o Prisma Client                           |
-| `pnpm db:studio`   | Abre o Prisma Studio                           |
+### Application
 
----
+| Command | Description |
+| --- | --- |
+| `pnpm dev` | Run the web app |
+| `pnpm dev:full` | Run services, migrations and web app |
+| `pnpm build` | Production build |
+| `pnpm lint` | Monorepo lint |
 
-### Aplicação
+### Tests
 
-| Comando         | Descrição                |
-| --------------- | ------------------------ |
-| `pnpm dev`      | Sobe o servidor web      |
-| `pnpm dev:full` | Banco + migrations + web |
-| `pnpm build`    | Build de produção        |
-| `pnpm lint`     | Lint do monorepo         |
-
----
-
-### Testes com Vitest
-
-O projeto usa **Vitest** para testes unitários na aplicação web.
-Como o monorepo contém múltiplos pacotes, use **`--filter web`** para rodar apenas os testes do app Next.js:
+The web app uses Vitest. Run it with `--filter web` inside the monorepo:
 
 ```bash
-# Rodar testes em modo interativo
 pnpm --filter web test
-
-# Rodar todos os testes (sem interação)
 pnpm --filter web test:run
-
-# Rodar testes com cobertura
 pnpm --filter web test:coverage
 ```
 
-> Exemplo de teste com Vitest: `web/src/services/auth/register.service.test.ts`
-> Ele testa a função `registerUser` e usa mocks do repositório de usuários.
+## Production docs
 
----
-
-## Observações importantes
-
-- O banco de dados usa **PostgreSQL 18+ com pgvector**
-- Os dados do banco são persistidos
-- Os testes do web precisam sempre rodar com `--filter web` por conta do monorepo
-
----
+- Secure deploy runbook: [docs/deploy-production.md](docs/deploy-production.md)
+- Authentication hardening: [docs/authentication.md](docs/authentication.md)
+- Password reset flow: [docs/forgot-password.md](docs/forgot-password.md)
+- Backup workflow: [docs/google-drive-backup.md](docs/google-drive-backup.md)
+- Change history: [docs/change-log.md](docs/change-log.md)
 
 ## Stack
 
-- **Next.js**
-- **Prisma**
-- **PostgreSQL 18+ (pgvector)**
-- **Docker**
-- **PNPM**
-- **Turborepo**
-- **Vitest**
-- **Tanstack Query**
-- **Upstash (Redis)**
+- Next.js
+- Prisma
+- PostgreSQL 18+ with pgvector
+- Docker
+- PNPM
+- Turborepo
+- Vitest
+- TanStack Query
+- Upstash Redis

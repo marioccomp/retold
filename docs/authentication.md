@@ -248,6 +248,7 @@ Business authorization for server actions and domain mutations must still be enf
 - `APP_URL` and `ADDITIONAL_ALLOWED_ORIGINS` should reflect the real public hosts used by the app and its reverse proxy chain.
 - Account deletion for OAuth-only users now depends on a fresh GitHub reauthentication path remaining available.
 - The project still uses `next-auth@5.0.0-beta.30`, so release notes should continue to be monitored during future upgrades.
+- Production env hygiene and manual deploy controls are documented in [docs/deploy-production.md](docs/deploy-production.md).
 
 ---
 

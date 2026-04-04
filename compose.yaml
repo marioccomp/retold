@@ -4,7 +4,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql
     healthcheck:
@@ -17,7 +17,7 @@ services:
     image: redis:7-alpine
     container_name: retold-redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redisdata:/data
     command: redis-server --appendonly yes
@@ -32,8 +32,8 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000" # API
-      - "9001:9001" # console web
+      - "127.0.0.1:9000:9000" # API
+      - "127.0.0.1:9001:9001" # console web
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}

@@ -828,3 +828,269 @@ Resultado:
 2. revisar pipeline de deploy manual, rollback e hardening da VPS
 3. ampliar testes automatizados para auth, abuso, autorizacao e rotas sensiveis
 4. pentest manual complementar em staging com foco em server actions e integracoes GitHub
+
+---
+
+## 2026-04-03 - Hardening de segredos, configuracao insegura e deploy manual
+
+### Contexto
+
+Este bloco atacou os riscos operacionais e de configuracao ainda abertos:
+
+1. segredos e placeholders inseguros em arquivos versionados
+2. defaults perigosos que podiam induzir configuracao ruim em producao
+3. fluxo de deploy manual sem preflight, sem estado de rollback e sem checks minimos
+4. ausencia de documentacao operacional clara para VPS, proxy, TLS e segredos fora do repo
+
+O objetivo foi remover exemplos perigosos do repositorio, endurecer o caminho atual de deploy manual e deixar explicito o que ainda depende da infra externa.
+
+---
+
+## 1. Saneamento de segredos e defaults inseguros em arquivos versionados
+
+### Problema
+
+O repositorio ainda expunha ou sugeria configuracoes perigosas em arquivos versionados, incluindo:
+
+- placeholders fracos de segredo
+- defaults triviais de banco
+- exemplos inseguros de MinIO
+- credenciais concretas de GitHub OAuth no `.env.example`
+- documentacao raiz repetindo os mesmos exemplos ruins
+
+Mesmo quando nao eram os segredos de producao em si, esses exemplos eram perigosos porque:
+
+- podiam ser copiados literalmente para producao
+- induziam secrets fracos em ambientes reais
+- mantinham historico de configuracao ruim no repo
+
+### Como foi corrigido
+
+Arquivos:
+
+- `.env.example`
+- `README.md`
+
+Mudancas aplicadas:
+
+- `.env.example` agora contem apenas placeholders seguros no formato `CHANGE_ME_*`
+- foram removidos exemplos concretos de credenciais de GitHub OAuth e GitHub Link
+- `AUTH_SECRET` passou a instruir geracao de segredo forte
+- `RESEND_API_KEY` foi padronizada sem formato ambigio
+- exemplos de banco e storage deixaram de sugerir senhas triviais
+- o `README` deixou de duplicar blocos inseguros de `.env` e passou a apontar para o template seguro
+
+### Observacao importante sobre `.env`
+
+O arquivo `.env` local nao foi sobrescrito automaticamente.
+
+Isso foi intencional:
+
+- o `.env` raiz e ignorado pelo git
+- reescrever esse arquivo no workspace poderia quebrar o ambiente local do usuario
+
+Em vez disso, a acao operacional correta ficou documentada:
+
+- nao versionar o `.env`
+- rotacionar qualquer segredo que ja tenha sido exposto
+- substituir defaults fracos fora do repositorio quando o ambiente real for atualizado
+
+---
+
+## 2. Endurecimento de exposicao local de servicos no Docker Compose
+
+### Problema
+
+O `compose.yaml` de desenvolvimento ainda publicava Postgres, Redis e MinIO em todas as interfaces do host.
+
+Isso aumentava exposicao desnecessaria em redes locais ou ambientes compartilhados.
+
+### Como foi corrigido
+
+Arquivo:
+
+- `compose.yaml`
+
+Mudancas:
+
+- bind do Postgres alterado para `127.0.0.1:5432:5432`
+- bind do Redis alterado para `127.0.0.1:6379:6379`
+- bind do MinIO alterado para `127.0.0.1:9000:9000` e `127.0.0.1:9001:9001`
+
+### Efeito pratico
+
+- reduz exposicao de servicos locais para a rede
+- preserva o fluxo de desenvolvimento na propria maquina
+
+---
+
+## 3. Novo fluxo de deploy manual endurecido
+
+### Problema
+
+O deploy antigo executava uma cadeia fragil:
+
+- `git pull origin main`
+- `docker compose down`
+- `pnpm install`
+- `pnpm run build`
+- `docker compose up -d`
+- `prisma migrate deploy`
+- `pm2 restart`
+
+Os principais riscos eram:
+
+- parar servicos antes de confirmar que o novo codigo builda
+- instalar dependencias sem `--frozen-lockfile`
+- rodar deploy em checkout sujo
+- nao validar o `.env` antes do restart
+- nao registrar SHA anterior para rollback
+
+### Como foi corrigido
+
+Arquivos:
+
+- `package.json`
+- `.gitignore`
+- `scripts/deploy/common.sh`
+- `scripts/deploy/preflight.sh`
+- `scripts/deploy/deploy-production.sh`
+- `scripts/deploy/show-last-success.sh`
+- `scripts/deploy/validate-production-env.mjs`
+
+Mudancas aplicadas:
+
+- `pnpm run deploy` agora executa `scripts/deploy/deploy-production.sh`
+- `pnpm run deploy:preflight` executa checks minimos antes do deploy
+- `pnpm run deploy:verify-env` valida o `.env` de producao
+- `pnpm run deploy:status` mostra o ultimo estado bem-sucedido salvo
+
+O novo fluxo faz:
+
+1. valida branch e worktree limpo
+2. busca `origin/main`
+3. falha se o servidor estiver com commits locais a frente
+4. valida `.env` contra placeholders e defaults historicamente inseguros
+5. valida `compose.prod.yaml`
+6. faz fast-forward controlado
+7. roda `pnpm install --frozen-lockfile`
+8. sobe `database` e `redis` se necessario e espera healthcheck
+9. roda build antes de migracao e restart
+10. aplica migrations
+11. reinicia PM2 com `--update-env`
+12. grava `.deploy-state/last-attempt.env` e `.deploy-state/last-success.env`
+
+### Efeito pratico
+
+- reduz chance de restart cego com configuracao invalida
+- reduz drift entre lockfile e node_modules na VPS
+- evita derrubar banco e redis sem necessidade
+- cria base objetiva para rollback manual
+
+### Tradeoff
+
+O deploy continua sendo:
+
+- manual
+- in-place
+- sem blue/green
+- sem rollback automatico de banco
+
+O repositorio agora endurece o caminho atual, mas nao substitui uma esteira CI/CD completa.
+
+---
+
+## 4. Documentacao operacional de producao
+
+### Como foi corrigido
+
+Arquivos:
+
+- `docs/deploy-production.md`
+- `docs/forgot-password.md`
+
+Mudancas:
+
+- foi criado um runbook dedicado de deploy seguro para producao
+- o documento deixa explicito o que o script novo cobre e o que ainda depende da VPS
+- foram documentadas pendencias obrigatorias de proxy, TLS, firewall, PM2 e segredo real
+- `docs/forgot-password.md` foi atualizado para refletir o fluxo atual, incluindo resposta neutra, throttle e revogacao de sessao
+
+### Efeito pratico
+
+- melhora rastreabilidade operacional
+- reduz dependencia de memoria informal para deploy
+- deixa claras as lacunas que ainda nao podem ser resolvidas apenas no codigo
+
+---
+
+## 5. Validacoes executadas
+
+### Varredura textual de exemplos inseguros
+
+Foi executada uma busca no repositorio para identificar defaults fracos e exemplos concretos em:
+
+- `.env.example`
+- `README.md`
+- documentacao operacional
+
+Essa varredura confirmou a necessidade de saneamento dos exemplos versionados.
+
+### Validacao do `.env`
+
+Foi criado o validador:
+
+```bash
+node scripts/deploy/validate-production-env.mjs --env-file .env
+```
+
+Ele falha se o arquivo ainda contiver:
+
+- placeholders
+- secrets fracos
+- `APP_URL` local
+- origens invalidas
+- chaves GitHub App malformadas
+
+### Observacao sobre validacao local
+
+Os scripts de deploy novos foram escritos para o fluxo Linux da VPS.
+
+Quando a validacao local for executada em Windows, parte do teste e naturalmente limitada a:
+
+- parse do `package.json`
+- sintaxe/estrutura dos scripts
+- validacao do `.env`
+
+O comportamento de deploy real continua dependendo do ambiente Linux de producao.
+
+---
+
+## 6. Pendencias operacionais fora do repositorio
+
+- rotacionar qualquer segredo que ja tenha aparecido historicamente em arquivos versionados ou ambientes compartilhados
+- revisar o `.env` real de producao na VPS usando os novos criterios de validacao
+- configurar TLS real e redirect HTTPS na borda
+- garantir proxy reverso preservando `Host`, `Origin`, `x-forwarded-for` e `x-real-ip`
+- garantir firewall e regras de exposicao publica apenas para `80/443` e SSH controlado
+- validar persistencia do PM2 apos reboot
+- testar rollback manual com base em `.deploy-state/last-success.env`
+- testar restore de backup em ambiente separado
+
+---
+
+## 7. Riscos residuais
+
+- o modelo de deploy ainda e in-place, sem release directories e sem promotion de artefato imutavel
+- nao existe rollback automatico de migracao
+- o validador de `.env` protege o caminho manual, mas nao substitui secret manager
+- a VPS ainda precisa de hardening fora do repo para fechar completamente a superficie operacional
+
+---
+
+## 8. Proximo bloco recomendado
+
+1. ampliar testes automatizados para auth, abuse controls e deploy guardrails criticos
+2. revisar integracao de worker, logs e terceiros para reduzir vazamento de dados sensiveis em runtime
+3. testar manualmente o fluxo de deploy em staging/Linux com rollback controlado
+4. avancar para pipeline CI/CD com gate de build, audit e smoke test
