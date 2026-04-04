@@ -92,7 +92,8 @@
       "PENDING": "Pending",
       "ANALYZING": "Processing",
       "DONE": "Analyzed",
-      "ERROR": "Error"
+      "ERROR": "Error",
+      "RATE_LIMITED": "Waiting to retry"
     },
     "analysis": {
       "started": "Analysis started",
@@ -119,6 +120,11 @@
         "title": "Analysis Error",
         "description": "Could not analyze the technical details of this project."
       },
+      "project_unavailable": {
+        "not_found": "This project is no longer available.",
+        "restricted_title": "Project unavailable",
+        "restricted_description": "You no longer have permission to access this project."
+      },
       "pending_view": {
         "title": "Project Analysis",
         "description": "Generate a full technical report with insights about architecture, stack, and code quality.",
@@ -135,7 +141,8 @@
       },
       "rate_limited_view": {
         "title": "Service Temporarily Unavailable",
-        "description": "We've reached our analysis limit for today. Please try again in about 1 hour.",
+        "description": "This analysis hit the provider's temporary rate limit. We will retry automatically as soon as the rate-limit window ends.",
+        "retry_scheduled": "Next attempt scheduled for",
         "button": "Retry Later"
       },
       "sections": {

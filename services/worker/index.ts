@@ -1,25 +1,35 @@
 import "dotenv/config";
-import path from "path";
-import fs from "fs";
 import { Worker } from "bullmq";
-import { redisConnection, userAnalyzeQueue } from "@repo/queue";
+import { analyzeRepoQueue, redisConnection, userAnalyzeQueue } from "@repo/queue";
 import "./user-worker";
 import "./last-commit-worker";
 import { cloneRepository } from "./clone";
-import { prisma, githubRepository } from "@repo/database";
+import { prisma, githubRepository, Prisma } from "@repo/database";
 import { createLogger } from "@repo/observability";
 import { analyzeProjectWithLLM } from "./llm/analyze-project";
 import { analyzeRepository } from "./analyze/index";
+import { buildLlmPrivacyDecision, prepareAnalysisForLlm } from "./privacy.js";
+import {
+  PROJECT_ANALYSIS_TMP_ROOT,
+  cleanupScopedDirectory,
+  getProjectTempPath,
+  parseProjectId,
+  tryReadRepositoryTextFile,
+  validateGitHubRepositoryUrl,
+} from "./security.js";
 
 const logger = createLogger("worker.project-analysis");
 
 function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
   const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
   for (const fileName of possibleReadmePaths) {
-    const filePath = path.join(repoPath, fileName);
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, "utf-8");
-      return content.length > maxChars ? content.slice(0, maxChars) : content;
+    try {
+      const content = tryReadRepositoryTextFile(repoPath, fileName, maxChars);
+      if (content !== null) {
+        return content;
+      }
+    } catch (error) {
+      logger.warn("worker.repository_readme_blocked", { readmeName: fileName }, error);
     }
   }
   return "";
@@ -27,16 +37,38 @@ function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
 
 logger.info("worker.started");
 
+const PROJECT_ANALYSIS_RETRY_JOB_ID_PREFIX = "project-analysis-retry-";
+
 const worker = new Worker(
   "analyze-repo",
   async (job) => {
-    const { projectId, repoUrl, locale } = job.data;
-
-    const tmpPath = path.resolve("/tmp/retold", String(projectId));
+    const projectId = parseProjectId(job.data?.projectId);
+    const locale =
+      typeof job.data?.locale === "string" && job.data.locale.trim() ? job.data.locale : "en";
+    const tmpPath = getProjectTempPath(PROJECT_ANALYSIS_TMP_ROOT, projectId);
 
     logger.info("worker.job_started", { projectId });
 
     try {
+      const projectWithUser = await prisma.project.findUnique({
+        where: { id: projectId },
+        include: { user: true, repository: true },
+      });
+
+      if (!projectWithUser || !projectWithUser.user || !projectWithUser.repository) {
+        throw new Error("Project, User or Repository not found");
+      }
+
+      if (projectWithUser.repository.userId !== projectWithUser.userId) {
+        throw new Error("Repository ownership mismatch for project analysis");
+      }
+
+      const repositoryOrigin = validateGitHubRepositoryUrl(projectWithUser.repository.url);
+      const llmPrivacyDecision = buildLlmPrivacyDecision({
+        projectVisibility: projectWithUser.visibility,
+        repositoryPrivate: projectWithUser.repository.private,
+      });
+
       await prisma.project.update({
         where: { id: projectId },
         data: { status: "ANALYZING" },
@@ -55,45 +87,58 @@ const worker = new Worker(
         }
       }
 
-      const projectWithUser = await prisma.project.findUnique({
-        where: { id: projectId },
-        include: { user: true },
-      });
-
-      if (!projectWithUser || !projectWithUser.user) {
-        throw new Error("Project or User not found");
-      }
-
       logger.info("worker.repository_clone_started", { projectId });
-      await cloneRepository(repoUrl, tmpPath, token);
+      await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token);
       logger.info("worker.repository_clone_completed", { projectId });
       const readmeContent = readRepositoryReadme(tmpPath);
 
-      // Extract username from repo URL (e.g., https://github.com/username/repo -> username)
-      const githubUsernameFromUrl =
-        repoUrl.split("github.com/")[1]?.split("/")[0] ||
-        repoUrl.split("github.com:")[1]?.split("/")[0] ||
-        projectWithUser.user.username;
-
       logger.info("worker.repository_analysis_started", { projectId });
-      const analysis = await analyzeRepository(tmpPath, { readme: readmeContent, repoUrl });
+      const analysis = await analyzeRepository(tmpPath, {
+        readme: readmeContent,
+        repoUrl: repositoryOrigin.normalizedUrl,
+        includeCodeSamples: llmPrivacyDecision.includeCodeSamples,
+      });
       logger.info("worker.repository_analysis_completed", {
         projectId,
         totalFiles: analysis.stats.totalFiles,
         frameworkCount: analysis.stack.frameworks.length,
         languageCount: analysis.stack.languages.length,
+        codeSamplesCount: analysis.codeSamples?.length ?? 0,
       });
 
-      const repoName = repoUrl.split("github.com/")[1]?.split("/")[1] || "";
+      const repoName = repositoryOrigin.repo;
+      const preparedLlmAnalysis = prepareAnalysisForLlm(
+        {
+          ...analysis,
+          readme: readmeContent,
+          codeSamples: analysis.codeSamples,
+          locale,
+        },
+        llmPrivacyDecision
+      );
+
+      logger.info("worker.llm_privacy_mode_selected", {
+        projectId,
+        mode: llmPrivacyDecision.mode,
+        projectSensitivity: llmPrivacyDecision.projectSensitivity,
+        externalLlmAllowed: llmPrivacyDecision.externalLlmAllowed,
+        includeReadme: llmPrivacyDecision.includeReadme,
+        includeCodeSamples: llmPrivacyDecision.includeCodeSamples,
+        redactionsApplied: preparedLlmAnalysis.redactionsApplied,
+      });
 
       // Trigger user analysis in parallel with LLM processing
       // Fire and forget - lets the user worker handle it async
       userAnalyzeQueue
-        .add("analyze-user", {
-          projectId,
-          userEmail: projectWithUser.user.email,
-          githubUsername: githubUsernameFromUrl,
-        })
+        .add(
+          "analyze-user",
+          {
+            projectId,
+          },
+          {
+            jobId: `user-analysis-${projectId}`,
+          }
+        )
         .catch((error) =>
           logger.error("worker.user_analysis_queue_failed", error, {
             projectId,
@@ -102,15 +147,11 @@ const worker = new Worker(
         );
 
       const llmInsights = await analyzeProjectWithLLM(
-        {
-          ...analysis,
-          readme: readmeContent,
-          codeSamples: analysis.codeSamples,
-          locale: locale || "en",
-        },
+        preparedLlmAnalysis.promptAnalysis,
         repoName,
         projectWithUser.title,
-        projectWithUser.description || undefined
+        projectWithUser.description || undefined,
+        llmPrivacyDecision
       );
       const llmSummaryParagraphs = Array.isArray(
         (llmInsights as { summary?: { paragraphs?: unknown[] } }).summary?.paragraphs
@@ -131,6 +172,7 @@ const worker = new Worker(
       });
 
       const llmInsightsJson = JSON.stringify(llmInsights);
+      const persistedRawAnalysis = preparedLlmAnalysis.persistenceAnalysis as Prisma.InputJsonValue;
 
       await prisma.repositoryAnalysis.upsert({
         where: { projectId },
@@ -140,7 +182,7 @@ const worker = new Worker(
           stack: analysis.stack,
           structure: analysis.structure,
           signals: analysis.infra,
-          rawAnalysis: analysis,
+          rawAnalysis: persistedRawAnalysis,
           llmOverview: llmInsightsJson,
         },
         update: {
@@ -148,7 +190,7 @@ const worker = new Worker(
           stack: analysis.stack,
           structure: analysis.structure,
           signals: analysis.infra,
-          rawAnalysis: analysis,
+          rawAnalysis: persistedRawAnalysis,
           llmOverview: llmInsightsJson,
         },
       });
@@ -258,6 +300,11 @@ const worker = new Worker(
           userId: ownerProject.userId,
           dailyAnalysisCount: isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1,
         });
+
+        await prisma.user.update({
+          where: { id: ownerProject.userId },
+          data: { rateLimitResetAt: null },
+        });
       }
     } catch (err: any) {
       logger.error("worker.job_failed", err, { projectId });
@@ -301,6 +348,13 @@ const worker = new Worker(
           resetAt,
         });
 
+        const retryJobId = `${PROJECT_ANALYSIS_RETRY_JOB_ID_PREFIX}${projectId}`;
+
+        const existingRetryJob = await analyzeRepoQueue.getJob(retryJobId);
+        if (existingRetryJob) {
+          await existingRetryJob.remove();
+        }
+
         // Find owner to lock
         const project = await prisma.project.findUnique({
           where: { id: projectId },
@@ -308,32 +362,64 @@ const worker = new Worker(
         });
 
         if (project) {
-          await prisma.user.update({
-            where: { id: project.userId },
-            data: { rateLimitResetAt: resetAt },
-          });
+          await prisma.$transaction([
+            prisma.user.update({
+              where: { id: project.userId },
+              data: { rateLimitResetAt: resetAt },
+            }),
+            prisma.project.update({
+              where: { id: projectId },
+              data: { status: "RATE_LIMITED" },
+            }),
+          ]);
           logger.warn("worker.user_rate_limited", {
             projectId,
             userId: project.userId,
             resetAt,
           });
+        } else {
+          await prisma.project.updateMany({
+            where: { id: projectId },
+            data: { status: "RATE_LIMITED" },
+          });
         }
 
-        await prisma.project.delete({
-          where: { id: projectId },
+        await analyzeRepoQueue.add(
+          "analyze",
+          {
+            projectId,
+            locale,
+          },
+          {
+            jobId: retryJobId,
+            delay: addMs,
+            attempts: 3,
+            backoff: {
+              type: "exponential",
+              delay: 5000,
+            },
+          }
+        );
+
+        logger.info("worker.retry_scheduled_after_rate_limit", {
+          projectId,
+          retryJobId,
+          retryAfterMs: addMs,
+          scheduledFor: resetAt,
         });
 
         return;
       }
 
-      await prisma.project.delete({
+      await prisma.project.updateMany({
         where: { id: projectId },
+        data: { status: "ERROR" },
       });
 
       throw err;
     } finally {
       if (process.env.NODE_ENV === "production") {
-        fs.rmSync(tmpPath, { recursive: true, force: true });
+        cleanupScopedDirectory(tmpPath, PROJECT_ANALYSIS_TMP_ROOT);
       }
     }
   },

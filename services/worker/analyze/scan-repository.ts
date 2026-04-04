@@ -1,6 +1,7 @@
 // worker/analyze/scan-repository.ts
 import fs from "fs";
 import path from "path";
+import { isPathInsideBase, resolveRepositoryRoot } from "../security.js";
 
 export type FileEntry = {
   path: string; // absoluto
@@ -41,24 +42,53 @@ export function scanRepository(
 ): RepositoryScanResult {
   if (currentDepth > maxDepth) return { files: acc };
 
-  const entries = fs.readdirSync(basePath, { withFileTypes: true });
+  const repositoryRoot = resolveRepositoryRoot(rootPath);
+  const currentPath = resolveRepositoryRoot(basePath);
+
+  if (!isPathInsideBase(currentPath, repositoryRoot)) {
+    return { files: acc };
+  }
+
+  const entries = fs.readdirSync(currentPath, { withFileTypes: true });
 
   for (const entry of entries) {
     if (IGNORED_DIRS.has(entry.name)) continue;
 
-    const fullPath = path.join(basePath, entry.name);
+    const fullPath = path.join(currentPath, entry.name);
+    let entryStats: fs.Stats;
 
-    if (entry.isDirectory()) {
-      scanRepository(fullPath, maxDepth, currentDepth + 1, acc, rootPath);
+    try {
+      entryStats = fs.lstatSync(fullPath);
+    } catch {
+      continue;
+    }
+
+    if (entryStats.isSymbolicLink()) {
+      continue;
+    }
+
+    let realPath: string;
+    try {
+      realPath = fs.realpathSync.native(fullPath);
+    } catch {
+      continue;
+    }
+
+    if (!isPathInsideBase(realPath, repositoryRoot)) {
+      continue;
+    }
+
+    if (entryStats.isDirectory()) {
+      scanRepository(realPath, maxDepth, currentDepth + 1, acc, repositoryRoot);
     } else {
       let size = 0;
       try {
-        size = fs.statSync(fullPath).size;
+        size = fs.statSync(realPath).size;
       } catch {}
 
       acc.push({
-        path: fullPath,
-        relativePath: path.relative(rootPath, fullPath),
+        path: realPath,
+        relativePath: path.relative(repositoryRoot, realPath),
         name: entry.name,
         ext: path.extname(entry.name),
         size,

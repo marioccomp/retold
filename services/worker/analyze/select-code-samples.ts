@@ -1,6 +1,7 @@
 import fs from "fs";
 import { FileEntry } from "./scan-repository.js";
 import { classifyFile } from "./classify-file.js";
+import { redactSensitiveRepositoryText } from "../privacy.js";
 
 export type CodeSample = {
   relativePath: string;
@@ -46,6 +47,16 @@ const IGNORED_PATHS = [
   ".vscode",
 ];
 
+const SENSITIVE_PATH_PATTERNS = [
+  "secret",
+  "credential",
+  "token",
+  "private",
+  ".env",
+  "id_rsa",
+  "id_dsa",
+];
+
 export function selectCodeSamples(files: FileEntry[], limit = 2): CodeSample[] {
   // 1. Filter viable code files
   const codeFiles = files.filter((f) => {
@@ -57,6 +68,11 @@ export function selectCodeSamples(files: FileEntry[], limit = 2): CodeSample[] {
 
     // Must not be in ignored paths
     if (IGNORED_PATHS.some((ip) => f.path.includes(ip))) return false;
+
+    // Avoid files that are more likely to contain credentials or key material.
+    if (SENSITIVE_PATH_PATTERNS.some((pattern) => f.relativePath.toLowerCase().includes(pattern))) {
+      return false;
+    }
 
     return true;
   });
@@ -117,11 +133,14 @@ export function selectCodeSamples(files: FileEntry[], limit = 2): CodeSample[] {
   return selected.map((s) => {
     let content = "";
     try {
-      content = fs.readFileSync(s.file.path, "utf-8");
-      // Basic truncation
+      content = redactSensitiveRepositoryText(fs.readFileSync(s.file.path, "utf-8"));
+      // Basic truncation with a lower ceiling to avoid over-sharing raw code.
       const lines = content.split("\n");
-      if (lines.length > 250) {
-        content = lines.slice(0, 250).join("\n") + "\n... (TRUNCATED)";
+      if (lines.length > 120) {
+        content = lines.slice(0, 120).join("\n") + "\n... (TRUNCATED)";
+      }
+      if (content.length > 4_000) {
+        content = `${content.slice(0, 4_000)}\n... (TRUNCATED)`;
       }
     } catch (e) {
       content = "// Error reading file";

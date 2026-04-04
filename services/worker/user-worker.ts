@@ -1,11 +1,16 @@
 import { Worker } from "bullmq";
 import { redisConnection } from "@repo/queue";
 import { prisma, githubRepository } from "@repo/database";
-import { execSync, spawn } from "child_process";
-import path from "path";
-import fs from "fs";
+import { execFileSync } from "child_process";
 import { cloneRepository } from "./clone";
 import { createLogger } from "@repo/observability";
+import {
+  USER_ANALYSIS_TMP_ROOT,
+  cleanupScopedDirectory,
+  getProjectTempPath,
+  parseProjectId,
+  validateGitHubRepositoryUrl,
+} from "./security.js";
 
 const logger = createLogger("worker.user-analysis");
 
@@ -14,9 +19,8 @@ logger.info("worker.started");
 export const userWorker = new Worker(
   "user-analyze",
   async (job) => {
-    const { projectId, userEmail, githubUsername } = job.data;
-
-    const tmpPath = path.resolve("/tmp/retold-user-analysis", String(projectId));
+    const projectId = parseProjectId(job.data?.projectId);
+    const tmpPath = getProjectTempPath(USER_ANALYSIS_TMP_ROOT, projectId);
 
     logger.info("worker.job_started", { projectId });
 
@@ -33,6 +37,10 @@ export const userWorker = new Worker(
         return;
       }
 
+      if (project.repository && project.repository.userId !== project.userId) {
+        throw new Error("Repository ownership mismatch for user analysis");
+      }
+
       // 1. Preparar o repositório
       // Se não tiver URL no projeto, tentamos pegar do repositório linkado ou abortar
       const repoUrl = project.repository?.url;
@@ -40,18 +48,21 @@ export const userWorker = new Worker(
         logger.info("worker.repository_missing", { projectId });
         return;
       }
+      const repositoryOrigin = validateGitHubRepositoryUrl(repoUrl);
 
       // Token para clonar se for privado
       const token = await githubRepository.getToken(projectId);
 
       // Clone limpo para análise
-      await cloneRepository(repoUrl, tmpPath, token);
+      await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token);
 
       // --- ESTATÍSTICAS ---
 
       // Identificadores do user
-      const primaryEmail = userEmail.toLowerCase().trim();
-      const userIdentifier = githubUsername?.toLowerCase().trim() || primaryEmail.split("@")[0];
+      const primaryEmail =
+        project.user.email.toLowerCase().trim();
+      const userIdentifier =
+        project.user.username?.toLowerCase().trim() || primaryEmail.split("@")[0];
       // Lista de emails possíveis (poderíamos pegar mais do banco se tivesse)
       const targetEmails = [primaryEmail];
 
@@ -60,7 +71,7 @@ export const userWorker = new Worker(
       // Mas o author pode variar, então pegamos TUDO e filtramos no JS ou usamos --author com varias opcoes se o git deixar.
       // Mais seguro: git log --format="%aE|%cd" e filtrar
 
-      const logOutput = execSync(`git -C "${tmpPath}" log --format="%aE|%cd"`, {
+      const logOutput = execFileSync("git", ["-C", tmpPath, "log", "--format=%aE|%cd"], {
         encoding: "utf8",
       });
       const commits = logOutput.split("\n").filter(Boolean);
@@ -90,9 +101,13 @@ export const userWorker = new Worker(
       let linesDeleted = 0;
 
       try {
-        const numstatOutput = execSync(`git -C "${tmpPath}" log --all --numstat --pretty="%aE"`, {
-          encoding: "utf8",
-        });
+        const numstatOutput = execFileSync(
+          "git",
+          ["-C", tmpPath, "log", "--all", "--numstat", "--pretty=%aE"],
+          {
+            encoding: "utf8",
+          }
+        );
         const numstatLines = numstatOutput.split("\n");
 
         let isUserCommit = false;
@@ -163,9 +178,7 @@ export const userWorker = new Worker(
       // Não damos throw para não re-enfileirar infinito se for erro de lógica,
       // mas em produção talvez queira retry
     } finally {
-      if (fs.existsSync(tmpPath)) {
-        fs.rmSync(tmpPath, { recursive: true, force: true });
-      }
+      cleanupScopedDirectory(tmpPath, USER_ANALYSIS_TMP_ROOT);
     }
   },
   {

@@ -22,7 +22,20 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
         refetchInterval: (query) => {
             const status = query.state.data?.status;
             if (status === "ANALYZING" || status === "PENDING") return 2000;
+            if (status === "RATE_LIMITED") return 5000;
             return false;
+        },
+        retry: (failureCount, error) => {
+            const message = error instanceof Error ? error.message : "";
+            if (
+                message.includes("PROJECT_NOT_FOUND") ||
+                message.includes("PROJECT_NOT_ACCESSIBLE") ||
+                message.includes("Project not found")
+            ) {
+                return false;
+            }
+
+            return failureCount < 2;
         },
     });
 
@@ -68,6 +81,7 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
     };
 
     const status = data?.status ?? project.status;
+    const nextRetryAt = data?.nextRetryAt ?? null;
     const analysis = data?.analysis ?? null;
     const rawAnalysis = (analysis as any)?.rawAnalysis ?? null;
 
@@ -93,7 +107,10 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
         }
 
         // When analysis completes, invalidate profile immediately
-        if (prevStatusRef.current === "ANALYZING" && status === "DONE") {
+        if (
+            (prevStatusRef.current === "ANALYZING" || prevStatusRef.current === "RATE_LIMITED") &&
+            status === "DONE"
+        ) {
             queryClient.invalidateQueries({ queryKey: ["profile"], refetchType: "all" });
         }
         prevStatusRef.current = status;
@@ -110,6 +127,7 @@ export function useProjectAnalysis(project: ProjectForOverlay) {
 
     return {
         status,
+        nextRetryAt,
         analysis,
         data: {
             llmOverview,

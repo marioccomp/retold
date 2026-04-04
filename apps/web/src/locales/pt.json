@@ -92,7 +92,8 @@
       "PENDING": "Pendente",
       "ANALYZING": "Processando",
       "DONE": "Analisado",
-      "ERROR": "Erro"
+      "ERROR": "Erro",
+      "RATE_LIMITED": "Aguardando nova tentativa"
     },
     "analysis": {
       "started": "Análise iniciada",
@@ -119,6 +120,11 @@
         "title": "Erro na Análise",
         "description": "Não foi possível analisar os detalhes técnicos deste projeto."
       },
+      "project_unavailable": {
+        "not_found": "Este projeto não está mais disponível.",
+        "restricted_title": "Projeto indisponível",
+        "restricted_description": "Você não tem mais permissão para acessar este projeto."
+      },
       "pending_view": {
         "title": "Análise de Projeto",
         "description": "Gere um relatório técnico completo com insights sobre arquitetura, stack e qualidade de código.",
@@ -135,7 +141,8 @@
       },
       "rate_limited_view": {
         "title": "Serviço Temporariamente Indisponível",
-        "description": "Atingimos nosso limite de análises por hoje. Tente novamente em cerca de 1 hora.",
+        "description": "A análise atingiu o limite temporário do provedor. Vamos tentar novamente automaticamente assim que a janela de rate limit terminar.",
+        "retry_scheduled": "Nova tentativa agendada para",
         "button": "Tentar Depois"
       },
       "sections": {

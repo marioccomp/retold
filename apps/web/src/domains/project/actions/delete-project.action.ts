@@ -38,8 +38,6 @@ export async function deleteProjectAction(projectId: number) {
       { userId: Number(session.user.id) },
       {
         jobId: `lastCommit-${session.user.id}`,
-        removeOnComplete: true,
-        removeOnFail: 50,
         attempts: 3,
         backoff: { type: "exponential", delay: 30_000 },
       }

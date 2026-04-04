@@ -3,6 +3,7 @@ import { Octokit } from "octokit";
 import { Worker } from "bullmq";
 import { redisConnection } from "@repo/queue";
 import { createLogger } from "@repo/observability";
+import { parsePositiveSafeInteger } from "./security.js";
 
 type JobData = {
   userId: number;
@@ -15,7 +16,7 @@ logger.info("worker.started");
 export const lastCommitWorker = new Worker(
   "github-last-commit",
   async (job) => {
-    const { userId } = job.data as JobData;
+    const userId = parsePositiveSafeInteger((job.data as JobData | undefined)?.userId, "userId");
 
     const user = await prisma.user.findUnique({
       where: { id: userId },

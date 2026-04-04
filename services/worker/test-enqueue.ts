@@ -19,8 +19,6 @@ async function main() {
     { userId },
     {
       jobId: `lastCommit-${userId}`, // dedupe
-      removeOnComplete: true,
-      removeOnFail: 50,
     }
   );
 
