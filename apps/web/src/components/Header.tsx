@@ -305,7 +305,10 @@ export default function Header({ session: initialSession }: { session: Session |
               <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <button className="relative rounded-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 cursor-pointer border-none bg-transparent p-0 shadow-none">
+                <button
+                  data-testid="header-user-menu-trigger"
+                  className="relative rounded-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 cursor-pointer border-none bg-transparent p-0 shadow-none"
+                >
                   <Avatar className="h-9 w-9 cursor-pointer hover:opacity-80 transition-opacity shadow-none">
                     {userImage ? (
                       <AvatarImage src={userImage} alt={userName} className="object-cover" />
@@ -344,6 +347,7 @@ export default function Header({ session: initialSession }: { session: Session |
                 <DropdownMenuItem asChild>
                   <Link
                     href="/settings"
+                    data-testid="header-settings-link"
                     className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
                   >
                     <FiSettings className="h-4 w-4 hover:text-primary transition-colors" />
@@ -371,6 +375,7 @@ export default function Header({ session: initialSession }: { session: Session |
                 )}
                 <DropdownMenuSeparator className="opacity-50" />
                 <DropdownMenuItem
+                  data-testid="header-logout-button"
                   className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group mt-1"
                   onClick={() => signOut({ callbackUrl: "/" })}
                 >
@@ -382,7 +387,10 @@ export default function Header({ session: initialSession }: { session: Session |
             </div>
           ) : (
             <Link href="/login">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(var(--primary),0.4)] active:scale-[0.98] cursor-pointer">
+              <Button
+                data-testid="header-login-button"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-5 h-9 rounded-full transition-all hover:shadow-[0_0_15px_-3px_rgba(var(--primary),0.4)] active:scale-[0.98] cursor-pointer"
+              >
                 {dict.header.login}
               </Button>
             </Link>

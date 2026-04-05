@@ -123,7 +123,11 @@ function ResetPasswordForm() {
             <p className="text-muted-foreground text-center">{dict.auth.reset_password.subtitle}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            data-testid="reset-password-form"
+          >
             <input type="hidden" name="token" value={token} />
 
             <div className="space-y-2">
@@ -135,6 +139,7 @@ function ResetPasswordForm() {
                   id="password"
                   name="password"
                   type={isPasswordVisible ? "text" : "password"}
+                  data-testid="reset-password-input"
                   placeholder="••••••••"
                   required
                   className="h-11 pr-11 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
@@ -165,6 +170,7 @@ function ResetPasswordForm() {
             <Button
               type="submit"
               disabled={resetMutation.isPending}
+              data-testid="reset-password-submit-button"
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
             >
               {resetMutation.isPending ? (

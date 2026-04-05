@@ -38,6 +38,7 @@ export default function OnboardingNav({
           {currentSlide > 0 && (
             <button
               onClick={onPrev}
+              data-testid="onboarding-prev-button"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               ← {dict.onboarding.nav.prev}
@@ -65,6 +66,7 @@ export default function OnboardingNav({
           {!isLastSlide && (
             <button
               onClick={onSkip}
+              data-testid="onboarding-skip-button"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               {dict.onboarding.nav.skip}
@@ -72,6 +74,7 @@ export default function OnboardingNav({
           )}
           <button
             onClick={onNext}
+            data-testid="onboarding-next-button"
             className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer active:scale-95 ${
               isLastSlide
                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 onboarding-cta-glow hover:bg-primary/90"

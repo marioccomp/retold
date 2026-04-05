@@ -16,6 +16,7 @@ declare module "next-auth" {
     user: {
       id: string;
       username?: string | null;
+      hasCompletedOnboarding?: boolean;
       authenticatedAt?: number;
     } & DefaultSession["user"];
   }

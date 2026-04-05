@@ -5,6 +5,10 @@ import { getClientIp } from "@/lib/get-client-ip";
 import { InvalidCredentialsError, TooManyLoginAttemptsError } from "@/src/domains/auth/auth.errors";
 
 export async function checkLoginRateLimit(identifier: string) {
+  if (process.env.E2E_BYPASS_RATE_LIMITS === "true") {
+    return;
+  }
+
   const login = identifier.toLowerCase().trim();
   const ip = await getClientIp();
 

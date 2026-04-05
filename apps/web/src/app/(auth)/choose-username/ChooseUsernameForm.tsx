@@ -1,20 +1,18 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+
 import retoldImg from "@/assets/retold-login.png";
 import retoldLogo from "@/assets/retold-footer.png";
-import { setUsername } from "../_actions/set-username";
-import { checkUsername } from "../_actions/check-username";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
-import { useTranslation } from "@/src/i18n/client";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/src/i18n/client";
+import { checkUsername } from "../_actions/check-username";
+import { setUsername } from "../_actions/set-username";
 
 interface ChooseUsernameFormProps {
   userName: string;
@@ -22,9 +20,7 @@ interface ChooseUsernameFormProps {
 
 export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps) {
   const { dict } = useTranslation();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const { update, data: session } = useSession();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [usernameHelpVisible, setUsernameHelpVisible] = useState(true);
   const [lastCheckedUsername, setLastCheckedUsername] = useState<string | null>(null);
@@ -44,25 +40,14 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
       toast.success(
         dict.auth.choose_username.toast_welcome.replace("{username}", res.data!.username),
         {
-          duration: 2000,
+          duration: 1500,
         }
       );
 
-      // Atualiza a sessão client-side
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          username: res.data!.username,
-        },
-      });
+      setIsRedirecting(true);
 
-      // Invalida o cache do React Query para forçar o Header a buscar os dados novos
-      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-
-      // Redireciona para o novo perfil
-      router.push(`/${res.data!.username}`);
-      router.refresh();
+      // Faz um redirect completo para buscar a sessao nova direto no servidor.
+      window.location.replace("/onboarding");
     },
 
     onError: () => {
@@ -91,14 +76,45 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
   }
 
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      {/* Branding Column - Desktop Only */}
+    <div className="relative min-h-screen w-full lg:grid lg:grid-cols-2">
+      {isRedirecting && (
+        <div className="absolute inset-0 z-50 overflow-hidden bg-background/92 backdrop-blur-md">
+          <div className="absolute left-1/2 top-24 h-56 w-56 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+          <div className="absolute bottom-16 right-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+
+          <div className="relative flex min-h-screen items-center justify-center p-6">
+            <div className="w-full max-w-md rounded-[28px] border border-border/70 bg-card/95 px-8 py-10 text-center shadow-2xl">
+              <div className="mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-full bg-primary/10">
+                <div className="relative h-10 w-10">
+                  <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
+                  <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary border-r-primary animate-spin" />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
+                  Retold
+                </p>
+                <h3 className="text-2xl font-semibold text-foreground">
+                  Indo para seu onboarding
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  Estamos preparando sua conta e abrindo a experiencia inicial.
+                </p>
+              </div>
+
+              <div className="mt-8 overflow-hidden rounded-full bg-muted">
+                <div className="h-1.5 w-full origin-left animate-pulse rounded-full bg-primary" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="hidden lg:flex flex-col items-center justify-center relative bg-gradient-to-br from-primary via-primary/30 to-background dark:bg-background dark:border-r dark:border-border/40 p-12 overflow-hidden">
-        {/* Dark Mode Ambient Glows */}
         <div className="hidden dark:block absolute top-0 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-x-1/4 -translate-y-1/4 pointer-events-none" />
         <div className="hidden dark:block absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] translate-x-1/4 translate-y-1/4 pointer-events-none" />
 
-        {/* Abstract pattern overlay */}
         <div className="absolute inset-0 opacity-[0.03] dark:opacity-10 pointer-events-none">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -113,7 +129,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
         <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary/15 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-background/40 rounded-full blur-3xl" />
 
-        {/* Content */}
         <div className="relative z-10 text-center">
           <Image
             src={retoldLogo}
@@ -129,7 +144,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
             {dict.auth.choose_username.welcome_subtitle}
           </p>
 
-          {/* Feature highlights */}
           <div className="mt-12 space-y-4 text-left max-w-sm mx-auto">
             <div className="flex items-center gap-3 text-foreground">
               <div className="w-2 h-2 rounded-full bg-primary" />
@@ -147,15 +161,12 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
         </div>
       </div>
 
-      {/* Form Column */}
       <div className="flex items-center justify-center min-h-screen lg:min-h-0 p-6 lg:p-12 bg-background">
         <div className="w-full max-w-[400px]">
-          {/* Mobile logo */}
           <div className="flex justify-center mb-8 lg:hidden">
             <Image src={retoldImg} alt="Retold Logo" priority className="w-50 h-auto" />
           </div>
 
-          {/* Form header */}
           <div className="mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2 text-center">
               {dict.auth.choose_username.title}
@@ -173,8 +184,11 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Input */}
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            data-testid="choose-username-form"
+          >
             <div className="space-y-1">
               <Label htmlFor="username" className="text-foreground font-medium">
                 {dict.auth.choose_username.username_label}
@@ -186,6 +200,7 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                 <Input
                   id="username"
                   name="username"
+                  data-testid="choose-username-input"
                   placeholder={dict.auth.choose_username.username_placeholder}
                   required
                   autoFocus
@@ -198,7 +213,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                     if (value.length >= 3 && value.length <= 20) {
                       setUsernameHelpVisible(false);
 
-                      // Debounce: clear previous timeout and set new one
                       if (debounceRef.current) {
                         clearTimeout(debounceRef.current);
                       }
@@ -211,7 +225,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                       }, 500);
                     } else {
                       setUsernameHelpVisible(true);
-                      // Clear timeout if username becomes invalid
                       if (debounceRef.current) {
                         clearTimeout(debounceRef.current);
                       }
@@ -220,7 +233,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
                   onBlur={(e) => {
                     const value = e.target.value;
 
-                    // Clear debounce and check immediately on blur
                     if (debounceRef.current) {
                       clearTimeout(debounceRef.current);
                     }
@@ -242,7 +254,6 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
               {usernameError && <p className="text-destructive text-xs mt-1">{usernameError}</p>}
             </div>
 
-            {/* Preview */}
             {!usernameHelpVisible && !usernameError && lastCheckedUsername && (
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mt-4">
                 <p className="text-sm text-primary/80">{dict.auth.choose_username.preview_label}</p>
@@ -253,17 +264,38 @@ export default function ChooseUsernameForm({ userName }: ChooseUsernameFormProps
               </div>
             )}
 
-            {/* Submit Button */}
             <Button
               type="submit"
               disabled={
+                isRedirecting ||
                 setUsernameMutation.isPending ||
                 !!usernameError ||
                 usernameHelpVisible
               }
+              data-testid="choose-username-submit-button"
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {setUsernameMutation.isPending ? (
+              {isRedirecting ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Abrindo onboarding...
+                </span>
+              ) : setUsernameMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                     <circle

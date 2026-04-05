@@ -17,6 +17,10 @@ type RateLimitCheck = {
   limit: (identifier: string) => Promise<{ success: boolean }>;
 };
 
+function shouldBypassRateLimits() {
+  return process.env.E2E_BYPASS_RATE_LIMITS === "true";
+}
+
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
@@ -26,6 +30,10 @@ function normalizeUsername(username: string) {
 }
 
 async function enforceRateLimit(checks: RateLimitCheck[]) {
+  if (shouldBypassRateLimits()) {
+    return;
+  }
+
   const results = await Promise.all(checks.map((check) => check.limit(check.key)));
 
   if (results.some((result) => !result.success)) {

@@ -100,7 +100,11 @@ export default function ForgotPasswordForm() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            data-testid="forgot-password-form"
+          >
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground font-medium">
                 {dict.auth.register.email_label}
@@ -109,6 +113,7 @@ export default function ForgotPasswordForm() {
                 id="email"
                 name="email"
                 type="email"
+                data-testid="forgot-password-email-input"
                 placeholder={dict.auth.forgot_password.email_placeholder}
                 required
                 className="h-11 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
@@ -125,6 +130,7 @@ export default function ForgotPasswordForm() {
             <Button
               type="submit"
               disabled={forgotMutation.isPending}
+              data-testid="forgot-password-submit-button"
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
             >
               {forgotMutation.isPending ? (
