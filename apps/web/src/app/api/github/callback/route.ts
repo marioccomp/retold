@@ -101,6 +101,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
+    const publicBaseUrl = resolvePublicBaseUrl(req);
 
     const session = await auth();
     const currentUserIdStr = session?.user?.id;
@@ -109,7 +110,7 @@ export async function GET(req: NextRequest) {
     const cookieUser = req.cookies.get(USER_COOKIE)?.value;
 
     const redirectWith = (path: string) => {
-        const res = NextResponse.redirect(new URL(path, req.url));
+        const res = NextResponse.redirect(new URL(path, publicBaseUrl));
         res.cookies.delete(STATE_COOKIE);
         res.cookies.delete(USER_COOKIE);
         return res;
@@ -122,8 +123,7 @@ export async function GET(req: NextRequest) {
     if (cookieUser !== currentUserIdStr) return redirectWith("/settings?github=oauth_error");
 
     const currentUserId = Number(currentUserIdStr);
-    const baseUrl = resolvePublicBaseUrl(req);
-    const redirectUri = `${baseUrl}/api/github/callback`;
+    const redirectUri = `${publicBaseUrl}/api/github/callback`;
 
     try {
         const token = await exchangeCodeForToken({ code, redirectUri, state });
