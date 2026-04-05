@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/src/i18n/client";
 
@@ -9,20 +9,26 @@ export function CookieBanner() {
   const [shouldRender, setShouldRender] = useState(false);
   const { dict } = useTranslation();
 
+  const hideBanner = (persistConsent: boolean) => {
+    setIsVisible(false);
+
+    if (persistConsent) {
+      localStorage.setItem("cookie-consent", "true");
+    }
+
+    window.setTimeout(() => setShouldRender(false), 500);
+  };
+
   useEffect(() => {
     const consent = localStorage.getItem("cookie-consent");
     if (!consent) {
       setShouldRender(true);
-      // Pequeno delay para a animação de entrada
-      setTimeout(() => setIsVisible(true), 100);
+      window.setTimeout(() => setIsVisible(true), 100);
     }
   }, []);
 
   const acceptCookies = () => {
-    setIsVisible(false);
-    localStorage.setItem("cookie-consent", "true");
-    // Remove do DOM após a animação de saída
-    setTimeout(() => setShouldRender(false), 500);
+    hideBanner(true);
   };
 
   if (!shouldRender) return null;
@@ -30,12 +36,14 @@ export function CookieBanner() {
   return (
     <div
       className={`fixed bottom-6 left-6 right-6 md:left-auto md:right-8 md:max-w-md z-50 transition-all duration-500 transform ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+        isVisible
+          ? "translate-y-0 opacity-100 pointer-events-auto"
+          : "translate-y-12 opacity-0 pointer-events-none"
       }`}
     >
       <div className="bg-background rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-border p-6 flex flex-col gap-4 relative">
         <button
-          onClick={() => setIsVisible(false)}
+          onClick={() => hideBanner(false)}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           aria-label="Fechar"
         >

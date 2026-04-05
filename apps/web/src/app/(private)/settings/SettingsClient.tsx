@@ -54,6 +54,7 @@ export function SettingsClient({
   const [mounted, setMounted] = useState(false);
   const [deleteCredential, setDeleteCredential] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [requiresDeleteGithubReauth, setRequiresDeleteGithubReauth] = useState(false);
 
   const [pendingPassword, startPasswordTransition] = useTransition();
   const [pendingDelete, startDeleteTransition] = useTransition();
@@ -87,6 +88,7 @@ export function SettingsClient({
     if (reauth === "account-delete") {
       toast.success(dict.settings.dangerZone.reauth.oauth_success);
       setActiveTab("danger");
+      setRequiresDeleteGithubReauth(false);
     }
 
     if (github && reauth !== "account-delete") {
@@ -159,6 +161,7 @@ export function SettingsClient({
   function handleDeleteAccount() {
     setDeleteCredential("");
     setDeleteError(null);
+    setRequiresDeleteGithubReauth(false);
     setShowDeleteModal(true);
   }
 
@@ -174,6 +177,9 @@ export function SettingsClient({
       const result = await deleteAccountAction(deleteCredential);
 
       if (!result.success) {
+        if (result.requiresOAuthReauth) {
+          setRequiresDeleteGithubReauth(true);
+        }
         setDeleteError(result.message);
         toast.error(result.message);
         return;
@@ -203,6 +209,11 @@ export function SettingsClient({
     { id: "integrations", label: dict.settings.integrations, icon: FiGithub },
     { id: "danger", label: dict.settings.danger, icon: FiAlertTriangle },
   ];
+
+  const shouldShowDeleteGithubReauth =
+    !initialHasPassword &&
+    (requiresDeleteGithubReauth ||
+      deleteError === dict.settings.dangerZone.reauth.oauth_required);
 
   return (
     <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 md:px-6">
@@ -532,28 +543,32 @@ export function SettingsClient({
                   </div>
                 ) : (
                   <div className="text-left mb-4 space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      {dict.settings.dangerZone.reauth.oauth_help}
-                    </p>
-                    {isGithubLinked ? (
-                      <Button
-                        variant="outline"
-                        data-testid="settings-link-github-button"
-                        className="w-full font-medium cursor-pointer"
-                        onClick={handleDeleteGithubReauth}
-                        disabled={pendingDelete}
-                      >
-                        {dict.settings.dangerZone.reauth.oauth_button}
-                      </Button>
-                    ) : (
-                      <Alert variant="destructive">
-                        <FiAlertCircle className="h-4 w-4" />
-                        <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
-                        <AlertDescription>
-                          {dict.settings.dangerZone.reauth.oauth_missing_provider}
-                        </AlertDescription>
-                      </Alert>
-                    )}
+                    {shouldShowDeleteGithubReauth ? (
+                      <p className="text-sm text-muted-foreground">
+                        {dict.settings.dangerZone.reauth.oauth_help}
+                      </p>
+                    ) : null}
+                    {shouldShowDeleteGithubReauth ? (
+                      isGithubLinked ? (
+                        <Button
+                          variant="outline"
+                          data-testid="settings-link-github-button"
+                          className="w-full font-medium cursor-pointer"
+                          onClick={handleDeleteGithubReauth}
+                          disabled={pendingDelete}
+                        >
+                          {dict.settings.dangerZone.reauth.oauth_button}
+                        </Button>
+                      ) : (
+                        <Alert variant="destructive">
+                          <FiAlertCircle className="h-4 w-4" />
+                          <AlertTitle>{dict.settings.connectedAccounts.error_title}</AlertTitle>
+                          <AlertDescription>
+                            {dict.settings.dangerZone.reauth.oauth_missing_provider}
+                          </AlertDescription>
+                        </Alert>
+                      )
+                    ) : null}
                   </div>
                 )}
                 {deleteError && (
@@ -567,7 +582,9 @@ export function SettingsClient({
                     data-testid="settings-confirm-delete-button"
                     disabled={
                       pendingDelete ||
-                      (initialHasPassword ? deleteCredential.trim().length === 0 : !isGithubLinked)
+                      (initialHasPassword
+                        ? deleteCredential.trim().length === 0
+                        : shouldShowDeleteGithubReauth)
                     }
                   >
                     {pendingDelete

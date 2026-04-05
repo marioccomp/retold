@@ -10,7 +10,16 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { FiUser, FiSettings, FiLogOut, FiSearch, FiMoon, FiSun, FiMenu, FiPlayCircle } from "react-icons/fi";
+import {
+  FiUser,
+  FiSettings,
+  FiLogOut,
+  FiSearch,
+  FiMoon,
+  FiSun,
+  FiMenu,
+  FiPlayCircle,
+} from "react-icons/fi";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -41,7 +50,6 @@ export default function Header({ session: initialSession }: { session: Session |
   const [isSearchExpanded, setIsSearchExpanded] = useState(false); // Mobile
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
 
   useEffect(() => {
     setMounted(true);
@@ -146,25 +154,29 @@ export default function Header({ session: initialSession }: { session: Session |
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-[background-color,box-shadow,border-color] duration-300 border-b border-border/40 dark:border-border ${isScrolled
+      className={`sticky top-0 z-50 w-full transition-[background-color,box-shadow,border-color] duration-300 border-b border-border/40 dark:border-border ${
+        isScrolled
           ? "bg-background shadow-sm"
           : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-        }`}
+      }`}
     >
       <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center cursor-pointer shrink-0">
+          <Link
+            href="/"
+            className="flex h-16 max-w-[220px] items-center overflow-hidden cursor-pointer shrink-0 leading-none -mt-0.8"
+          >
             <Image
               src={logo}
               alt="Retold Logo"
-              className="h-30 md:h-30 w-auto cursor-pointer dark:hidden"
+              className="block h-32 w-auto max-w-none cursor-pointer dark:hidden pointer-events-none"
               priority
             />
             <Image
               src={logoDark}
               alt="Retold Logo"
-              className="h-30 md:h-30 w-auto cursor-pointer hidden dark:block"
+              className="hidden dark:block h-32 w-auto max-w-none cursor-pointer pointer-events-none"
               priority
             />
           </Link>
@@ -190,10 +202,11 @@ export default function Header({ session: initialSession }: { session: Session |
 
         {/* Center Search Bar (Desktop) */}
         <div
-          className={`hidden md:flex flex-1 max-w-2xl items-center gap-6 transition-all duration-500 ease-in-out transform ${showSearch || isSearchFocused
+          className={`hidden md:flex flex-1 max-w-2xl items-center gap-6 transition-all duration-500 ease-in-out transform ${
+            showSearch || isSearchFocused
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-4 pointer-events-none"
-            }`}
+          }`}
         >
           {/* Feed Tabs - Only visible on Home/Feed */}
           {pathname === "/" && (
@@ -203,10 +216,11 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("projects");
                   scrollToContent();
                 }}
-                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === "projects"
+                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTab === "projects"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/5"
                     : "text-muted-foreground hover:text-foreground"
-                  }`}
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
               </button>
@@ -215,10 +229,11 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("people");
                   scrollToContent();
                 }}
-                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === "people"
+                className={`cursor-pointer px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTab === "people"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/5"
                     : "text-muted-foreground hover:text-foreground"
-                  }`}
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
               </button>
@@ -305,85 +320,85 @@ export default function Header({ session: initialSession }: { session: Session |
               <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <button
-                  data-testid="header-user-menu-trigger"
-                  className="relative rounded-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 cursor-pointer border-none bg-transparent p-0 shadow-none"
-                >
-                  <Avatar className="h-9 w-9 cursor-pointer hover:opacity-80 transition-opacity shadow-none">
-                    {userImage ? (
-                      <AvatarImage src={userImage} alt={userName} className="object-cover" />
-                    ) : null}
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                      {userInitials}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-56 mt-2 p-1.5 rounded-xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl"
-                onCloseAutoFocus={(e) => e.preventDefault()}
-              >
-                <div className="px-3 py-2 border-b border-border/50">
-                  <p className="text-sm font-medium text-foreground">{userName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{userData?.email}</p>
-                </div>
-                <DropdownMenuItem
-                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
-                  onClick={handleProfileClick}
-                >
-                  <FiUser className="h-4 w-4 hover:text-primary transition-colors" />
-                  <span className="font-bold text-sm">{dict.header.profile}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/onboarding"
-                    className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
+                  <button
+                    data-testid="header-user-menu-trigger"
+                    className="relative rounded-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 cursor-pointer border-none bg-transparent p-0 shadow-none"
                   >
-                    <FiPlayCircle className="h-4 w-4 hover:text-primary transition-colors" />
-                    <span className="font-bold text-sm">{dict.header.tour}</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/settings"
-                    data-testid="header-settings-link"
-                    className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
-                  >
-                    <FiSettings className="h-4 w-4 hover:text-primary transition-colors" />
-                    <span className="font-bold text-sm">{dict.header.settings}</span>
-                  </Link>
-                </DropdownMenuItem>
-                {mounted && (
+                    <Avatar className="h-9 w-9 cursor-pointer hover:opacity-80 transition-opacity shadow-none">
+                      {userImage ? (
+                        <AvatarImage src={userImage} alt={userName} className="object-cover" />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 mt-2 p-1.5 rounded-xl border-border/50 bg-background/95 backdrop-blur-md shadow-xl"
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                >
+                  <div className="px-3 py-2 border-b border-border/50">
+                    <p className="text-sm font-medium text-foreground">{userName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{userData?.email}</p>
+                  </div>
                   <DropdownMenuItem
-                    className="cursor-pointer flex items-center justify-between gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setTheme(resolvedTheme === "dark" ? "light" : "dark");
-                    }}
+                    className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
+                    onClick={handleProfileClick}
                   >
-                    <div className="flex items-center gap-3">
-                      {resolvedTheme === "dark" ? (
-                        <FiMoon className="h-4 w-4 hover:text-primary transition-colors" />
-                      ) : (
-                        <FiSun className="h-4 w-4 hover:text-primary transition-colors" />
-                      )}
-                      <span className="font-bold text-sm">Dark Mode</span>
-                    </div>
-                    <Switch checked={resolvedTheme === "dark"} className="pointer-events-none" />
+                    <FiUser className="h-4 w-4 hover:text-primary transition-colors" />
+                    <span className="font-bold text-sm">{dict.header.profile}</span>
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator className="opacity-50" />
-                <DropdownMenuItem
-                  data-testid="header-logout-button"
-                  className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group mt-1"
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                >
-                  <FiLogOut className="h-4 w-4 hover:text-primary transition-colors" />
-                  <span className="font-bold text-sm">{dict.header.logout}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/onboarding"
+                      className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
+                    >
+                      <FiPlayCircle className="h-4 w-4 hover:text-primary transition-colors" />
+                      <span className="font-bold text-sm">{dict.header.tour}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/settings"
+                      data-testid="header-settings-link"
+                      className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group w-full flex items-center"
+                    >
+                      <FiSettings className="h-4 w-4 hover:text-primary transition-colors" />
+                      <span className="font-bold text-sm">{dict.header.settings}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {mounted && (
+                    <DropdownMenuItem
+                      className="cursor-pointer flex items-center justify-between gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        {resolvedTheme === "dark" ? (
+                          <FiMoon className="h-4 w-4 hover:text-primary transition-colors" />
+                        ) : (
+                          <FiSun className="h-4 w-4 hover:text-primary transition-colors" />
+                        )}
+                        <span className="font-bold text-sm">Dark Mode</span>
+                      </div>
+                      <Switch checked={resolvedTheme === "dark"} className="pointer-events-none" />
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator className="opacity-50" />
+                  <DropdownMenuItem
+                    data-testid="header-logout-button"
+                    className="cursor-pointer gap-3 py-3 px-3 rounded-lg focus:bg-primary/5 focus:text-primary dark:focus:bg-primary/20 dark:focus:text-primary transition-all duration-200 group mt-1"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                  >
+                    <FiLogOut className="h-4 w-4 hover:text-primary transition-colors" />
+                    <span className="font-bold text-sm">{dict.header.logout}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <Link href="/login">
@@ -400,10 +415,11 @@ export default function Header({ session: initialSession }: { session: Session |
 
       {/* Mobile Search Overlay */}
       <div
-        className={`md:hidden absolute top-full left-0 w-full bg-background border-b border-border/50 p-4 transition-all duration-300 origin-top shadow-xl ${isSearchExpanded && (showSearch || isSearchFocused)
+        className={`md:hidden absolute top-full left-0 w-full bg-background border-b border-border/50 p-4 transition-all duration-300 origin-top shadow-xl ${
+          isSearchExpanded && (showSearch || isSearchFocused)
             ? "opacity-100 scale-y-100"
             : "opacity-0 scale-y-0 pointer-events-none"
-          }`}
+        }`}
       >
         <div className="flex flex-col gap-4 w-full">
           {pathname === "/" && (
@@ -413,10 +429,11 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("projects");
                   scrollToContent();
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "projects"
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
+                  activeTab === "projects"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground"
-                  }`}
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.projects || "Projects"}
               </button>
@@ -425,10 +442,11 @@ export default function Header({ session: initialSession }: { session: Session |
                   setActiveTab("people");
                   scrollToContent();
                 }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${activeTab === "people"
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
+                  activeTab === "people"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground"
-                  }`}
+                }`}
               >
                 {dict.feed?.feedcontent?.tabs?.people || "People"}
               </button>
