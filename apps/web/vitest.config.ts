@@ -7,7 +7,7 @@ dotenv.config({
     override: true,
 });
 
-export default defineConfig({
+const sharedConfig = defineConfig({
     test: {
         environment: 'node', // Use node environment for server actions/services
         clearMocks: true,
@@ -20,3 +20,5 @@ export default defineConfig({
         },
     },
 });
+
+export default sharedConfig;
