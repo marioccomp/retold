@@ -19,7 +19,8 @@ const createMockUser = () => ({
     name: "Mario",
     username: "mario",
     image: "avatar.jpg",
-    email: "mario@example.com",
+    contactEmail: "mario@example.com",
+    phone: null,
     title: "Dev",
     bio: "Hello",
     longBio: "Long Hello",
@@ -28,10 +29,39 @@ const createMockUser = () => ({
     linkedinUrl: null,
     websiteUrl: null,
     createdAt: new Date(),
+    cover: null,
     educations: [],
-    projects: [],
+    projects: [
+        {
+            id: 10,
+            title: "Retold",
+            description: "Project description",
+            status: "DONE",
+            visibility: "public",
+            images: [],
+            featuredTagIds: [],
+            createdAt: new Date(),
+            views: 0,
+            repository: null,
+            tags: [],
+            likes: [],
+            _count: {
+                likes: 0,
+                comments: 0,
+            },
+            isPinned: false,
+        },
+    ],
     certifications: [],
-    participations: []
+    participations: [],
+    followers: [],
+    userStats: [],
+    githubStats: null,
+    _count: {
+        followers: 0,
+        following: 0,
+        projects: 1,
+    },
 });
 
 describe("getProfile Action", () => {
@@ -48,7 +78,14 @@ describe("getProfile Action", () => {
         const result = await getProfile("nonexistent");
 
         // Verify
-        expect(userRepository.findPublicProfileByUsername).toHaveBeenCalledWith("nonexistent", undefined);
+        expect(userRepository.findPublicProfileByUsername).toHaveBeenCalledWith(
+            "nonexistent",
+            undefined,
+            1,
+            12,
+            "",
+            "newest"
+        );
         expect(result).toBeNull();
     });
 
@@ -63,12 +100,25 @@ describe("getProfile Action", () => {
         const result = await getProfile("mario");
 
         // Verify
-        expect(userRepository.findPublicProfileByUsername).toHaveBeenCalledWith("mario", undefined);
+        expect(userRepository.findPublicProfileByUsername).toHaveBeenCalledWith(
+            "mario",
+            undefined,
+            1,
+            12,
+            "",
+            "newest"
+        );
 
         // We expect the result to be mapping correctly
         expect(result).toEqual(expect.objectContaining({
             name: "Mario",
             username: "mario",
+            followersCount: 0,
+            projectsMetadata: expect.objectContaining({
+                total: 1,
+                page: 1,
+                limit: 12,
+            }),
         }));
     });
 
@@ -85,6 +135,13 @@ describe("getProfile Action", () => {
         await getProfile("mario");
 
         // Verify: The Key part here is that '99' was passed as the second arg
-        expect(userRepository.findPublicProfileByUsername).toHaveBeenCalledWith("mario", 99);
+        expect(userRepository.findPublicProfileByUsername).toHaveBeenCalledWith(
+            "mario",
+            99,
+            1,
+            12,
+            "",
+            "newest"
+        );
     });
 });
