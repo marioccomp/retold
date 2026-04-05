@@ -5,6 +5,11 @@ import { auth } from "@/src/domains/auth/auth";
 const STATE_COOKIE = "github_link_state";
 const USER_COOKIE = "github_link_user";
 
+function resolvePublicBaseUrl(req: NextRequest) {
+    const configuredBaseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL;
+    return (configuredBaseUrl ?? new URL(req.url).origin).replace(/\/$/, "");
+}
+
 export async function GET(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
@@ -17,7 +22,7 @@ export async function GET(req: NextRequest) {
     }
 
     const state = crypto.randomBytes(32).toString("hex");
-    const baseUrl = new URL(req.url).origin;
+    const baseUrl = resolvePublicBaseUrl(req);
     const redirectUri = `${baseUrl}/api/github/callback`;
 
     const githubAuthorizeUrl = new URL("https://github.com/login/oauth/authorize");

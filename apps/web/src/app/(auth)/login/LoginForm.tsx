@@ -175,7 +175,7 @@ export default function LoginForm() {
             <p className="text-muted-foreground text-center">{dict.auth.login.subtitle}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
             <div className="space-y-2">
               <Label htmlFor="identifier" className="text-foreground font-medium">
                 {dict.auth.login.identifier_label}
@@ -185,6 +185,7 @@ export default function LoginForm() {
                 type="text"
                 name="identifier"
                 required
+                data-testid="login-identifier-input"
                 placeholder={dict.auth.login.email_placeholder}
                 className="h-11 shadow-none"
               />
@@ -200,6 +201,7 @@ export default function LoginForm() {
                   type={isPasswordVisible ? "text" : "password"}
                   name="password"
                   required
+                  data-testid="login-password-input"
                   placeholder="••••••••"
                   className="h-11 pr-11 shadow-none"
                 />
@@ -243,6 +245,7 @@ export default function LoginForm() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
+              data-testid="login-submit-button"
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer"
             >
               {loginMutation.isPending ? (
@@ -284,6 +287,7 @@ export default function LoginForm() {
               className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
               onClick={() => signIn("github", { callbackUrl: "/" })}
               type="button"
+              data-testid="login-github-button"
             >
               <FiGithub className="text-xl" />
               <span>GitHub</span>

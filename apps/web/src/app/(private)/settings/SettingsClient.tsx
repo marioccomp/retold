@@ -228,6 +228,7 @@ export function SettingsClient({
             <TabsTrigger
               key={item.id}
               value={item.id}
+              data-testid={`settings-tab-${item.id}`}
               className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 w-full text-left rounded-xl border transition-all
                                 border-primary/20 data-[state=active]:bg-primary/10 data-[state=active]:border-primary data-[state=active]:shadow-sm
                                 hover:bg-muted/50 flex flex-col md:flex-row items-center md:items-center
@@ -321,6 +322,7 @@ export function SettingsClient({
               <CardContent>
                 <form
                   id="password-form"
+                  data-testid="settings-password-form"
                   onSubmit={(e) => {
                     e.preventDefault();
                     handleUpdatePassword(new FormData(e.currentTarget));
@@ -331,29 +333,51 @@ export function SettingsClient({
                   {initialHasPassword ? (
                     <div className="grid gap-2">
                       <Label htmlFor="currentPassword">{dict.settings.password.current}</Label>
-                      <Input id="currentPassword" name="currentPassword" type="password" />
+                      <Input
+                        id="currentPassword"
+                        name="currentPassword"
+                        type="password"
+                        data-testid="settings-current-password-input"
+                      />
                     </div>
                   ) : (
                     <div className="grid gap-2">
                       <Label htmlFor="email">{dict.settings.password.confirm_email_label}</Label>
-                      <Input id="email" name="email" type="email" placeholder="name@example.com" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        data-testid="settings-email-input"
+                      />
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="newPassword">{dict.settings.password.new}</Label>
-                      <Input id="newPassword" name="newPassword" type="password" />
+                      <Input
+                        id="newPassword"
+                        name="newPassword"
+                        type="password"
+                        data-testid="settings-new-password-input"
+                      />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="confirmPassword">{dict.settings.password.confirm}</Label>
-                      <Input id="confirmPassword" name="confirmPassword" type="password" />
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        data-testid="settings-confirm-password-input"
+                      />
                     </div>
                   </div>
                   <div className="flex justify-end pt-2">
                     <Button
                       type="submit"
                       disabled={pendingPassword}
+                      data-testid="settings-password-submit-button"
                       className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
                     >
                       {pendingPassword
@@ -446,6 +470,7 @@ export function SettingsClient({
                 variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={pendingDelete}
+                data-testid="settings-open-delete-modal-button"
                 className="cursor-pointer font-bold h-11 md:h-12 px-8 md:px-10 rounded-xl shadow-lg shadow-destructive/20 transition-all duration-300 active:scale-95 shrink-0 w-full sm:w-auto"
               >
                 {pendingDelete
@@ -462,6 +487,7 @@ export function SettingsClient({
         mounted &&
         createPortal(
           <div
+            data-testid="settings-delete-modal"
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200"
             onMouseDown={(e) => {
               if (e.target === e.currentTarget) {
@@ -491,6 +517,7 @@ export function SettingsClient({
                     <Input
                       id="delete-account-password"
                       type="password"
+                      data-testid="settings-delete-password-input"
                       value={deleteCredential}
                       onChange={(e) => {
                         setDeleteCredential(e.target.value);
@@ -511,6 +538,7 @@ export function SettingsClient({
                     {isGithubLinked ? (
                       <Button
                         variant="outline"
+                        data-testid="settings-link-github-button"
                         className="w-full font-medium cursor-pointer"
                         onClick={handleDeleteGithubReauth}
                         disabled={pendingDelete}
@@ -536,6 +564,7 @@ export function SettingsClient({
                     variant="destructive"
                     className="w-full font-medium cursor-pointer"
                     onClick={confirmDeleteAccount}
+                    data-testid="settings-confirm-delete-button"
                     disabled={
                       pendingDelete ||
                       (initialHasPassword ? deleteCredential.trim().length === 0 : !isGithubLinked)
@@ -549,6 +578,7 @@ export function SettingsClient({
                     variant="ghost"
                     className="w-full text-muted-foreground hover:text-foreground hover:bg-muted font-medium cursor-pointer"
                     onClick={() => setShowDeleteModal(false)}
+                    data-testid="settings-cancel-delete-button"
                     disabled={pendingDelete}
                   >
                     {dict.settings.dangerZone.modal_cancel}

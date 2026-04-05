@@ -7,6 +7,11 @@ const STATE_COOKIE = "github_link_state";
 const USER_COOKIE = "github_link_user";
 const logger = createLogger("web.api.github-callback");
 
+function resolvePublicBaseUrl(req: NextRequest) {
+    const configuredBaseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL;
+    return (configuredBaseUrl ?? new URL(req.url).origin).replace(/\/$/, "");
+}
+
 type GithubUser = {
     id: number;
     login: string;
@@ -117,7 +122,7 @@ export async function GET(req: NextRequest) {
     if (cookieUser !== currentUserIdStr) return redirectWith("/settings?github=oauth_error");
 
     const currentUserId = Number(currentUserIdStr);
-    const baseUrl = new URL(req.url).origin;
+    const baseUrl = resolvePublicBaseUrl(req);
     const redirectUri = `${baseUrl}/api/github/callback`;
 
     try {

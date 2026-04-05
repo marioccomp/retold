@@ -143,6 +143,7 @@ describe("authConfig", () => {
           name: "New Name",
           image: "avatar.webp",
           username: "new-user",
+          hasCompletedOnboarding: false,
           authenticatedAt: 999,
         },
       } as any);
@@ -154,6 +155,7 @@ describe("authConfig", () => {
           name: "New Name",
           image: "avatar.webp",
           username: "new-user",
+          hasCompletedOnboarding: false,
           authenticatedAt: 999,
         })
       );

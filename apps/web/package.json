@@ -9,7 +9,12 @@
     "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:unit": "vitest run --exclude src/tests/integration/** --exclude e2e/**",
+    "test:integration": "vitest run src/tests/integration",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:all": "pnpm test:unit && pnpm test:integration && pnpm test:e2e"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -63,6 +68,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

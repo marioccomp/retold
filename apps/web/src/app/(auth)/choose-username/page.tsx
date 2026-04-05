@@ -3,17 +3,19 @@ import { redirect } from "next/navigation";
 import ChooseUsernameForm from "./ChooseUsernameForm";
 
 export default async function Page() {
-    const session = await auth();
+  const session = await auth();
 
-    // If not logged in, redirect to login
-    if (!session) {
-        redirect("/login");
+  if (!session) {
+    redirect("/login");
+  }
+
+  if (session.user.username) {
+    if (session.user.hasCompletedOnboarding === false) {
+      redirect("/onboarding");
     }
 
-    // If user already has username, redirect to dashboard
-    if (session.user.username) {
-        redirect("/");
-    }
+    redirect("/");
+  }
 
-    return <ChooseUsernameForm userName={session.user.name ?? ""} />;
+  return <ChooseUsernameForm userName={session.user.name ?? ""} />;
 }

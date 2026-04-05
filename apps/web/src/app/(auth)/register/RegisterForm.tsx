@@ -183,7 +183,7 @@ export default function RegisterForm() {
             <p className="text-muted-foreground text-center">{dict.auth.register.subtitle}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="register-form">
             {/* Name Input */}
             <div className="space-y-1">
               <Label htmlFor="name" className="text-foreground font-medium">
@@ -192,6 +192,7 @@ export default function RegisterForm() {
               <Input
                 id="name"
                 name="name"
+                data-testid="register-name-input"
                 placeholder={dict.profile.edit_modal.name_placeholder}
                 required
                 className="h-11 shadow-none"
@@ -221,6 +222,7 @@ export default function RegisterForm() {
               <Input
                 id="username"
                 name="username"
+                data-testid="register-username-input"
                 placeholder={dict.auth.register.username_placeholder}
                 required
                 className="h-11 shadow-none"
@@ -267,6 +269,7 @@ export default function RegisterForm() {
                 id="email"
                 type="email"
                 name="email"
+                data-testid="register-email-input"
                 placeholder={dict.auth.register.email_placeholder}
                 required
                 className="h-11 shadow-none"
@@ -302,6 +305,7 @@ export default function RegisterForm() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
+                  data-testid="register-password-input"
                   placeholder="••••••••"
                   required
                   className="h-11 pr-11 shadow-none"
@@ -349,6 +353,7 @@ export default function RegisterForm() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
+                  data-testid="register-confirm-password-input"
                   placeholder="••••••••"
                   required
                   className="h-11 pr-11 shadow-none"
@@ -398,6 +403,7 @@ export default function RegisterForm() {
                 passwordHelpVisible ||
                 confirmPasswordHelpVisible
               }
+              data-testid="register-submit-button"
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-all active:scale-[0.98] mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {registerMutation.isPending ? (
@@ -439,6 +445,7 @@ export default function RegisterForm() {
               className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
               onClick={() => signIn("github", { callbackUrl: "/" })}
               type="button"
+              data-testid="register-github-button"
             >
               <FiGithub className="text-xl" />
               <span>GitHub</span>
