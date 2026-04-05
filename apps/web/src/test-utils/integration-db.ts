@@ -1,11 +1,6 @@
 import { prisma } from "@repo/database";
-import type {
-  NotificationType,
-  Plan,
-  Prisma,
-  ProjectStatus,
-  Role,
-} from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import type { NotificationType, Plan, ProjectStatus, Role } from "@prisma/client";
 
 let uniqueGithubId =
   Math.floor(Date.now() / 1_000) + Math.floor(Math.random() * 10_000);
