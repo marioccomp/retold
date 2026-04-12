@@ -1,1 +1,2 @@
 export const DAILY_ANALYSIS_LIMIT = 5;
+export const MANUAL_REANALYZE_COOLDOWN_MS = 60_000;

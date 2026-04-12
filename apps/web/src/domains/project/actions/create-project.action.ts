@@ -3,15 +3,16 @@
 import { prisma } from "@repo/database";
 import { auth } from "@/src/domains/auth/auth";
 import { getUserRepositories } from "@/src/domains/github/github";
-import { startProjectAnalysisAction } from "./start-project-analysis.action";
-import { DAILY_ANALYSIS_LIMIT } from "../constants";
-import { ActionResponse } from "@/lib/action-response";
+import {
+  StartProjectAnalysisActionResult,
+  startProjectAnalysisAction,
+} from "./start-project-analysis.action";
 import { getDictionary } from "@/src/i18n/server";
 import { postGithubStats } from "@/src/app/(public)/[username]/_actions/post-github-stats.action";
 import { lastCommitQueue } from "@repo/queue";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { FEED_RECOMMENDED_TAG } from "@/src/app/(public)/(feed)/actions/constants";
-// import { analyzeRepoQueue } from "@repo/queue";
+
 type CreateProjectInput = {
   title: string;
   description: string;
@@ -19,9 +20,36 @@ type CreateProjectInput = {
   repositoryId: number;
 };
 
+export type CreateProjectActionResponse =
+  | {
+      success: true;
+      data: { id: number };
+      analysisStatus: "queued";
+      remaining: number;
+      limit: number;
+    }
+  | {
+      success: true;
+      data: { id: number };
+      analysisStatus: "quota_blocked";
+      hoursLeft: number;
+      minutesLeft: number;
+      limit: number;
+    }
+  | {
+      success: true;
+      data: { id: number };
+      analysisStatus: "enqueue_failed";
+    }
+  | {
+      success: false;
+      message: string;
+      fieldErrors?: Record<string, string[]>;
+    };
+
 export async function createProjectAction(
   input: CreateProjectInput
-): Promise<ActionResponse<{ id: number }>> {
+): Promise<CreateProjectActionResponse> {
   const session = await auth();
   const dict = await getDictionary();
   const t = dict.project.create_panel.toast;
@@ -30,38 +58,17 @@ export async function createProjectAction(
     return { success: false, message: dict.auth.errors.unauthorized };
   }
 
-  await getUserRepositories();
-
-  // Check rate limit
-  const user = await prisma.user.findUnique({
-    where: { id: Number(session.user.id) },
-    select: { rateLimitResetAt: true, dailyAnalysisCount: true, dailyAnalysisDate: true },
+  const userId = Number(session.user.id);
+  const now = new Date();
+  const currentUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { rateLimitResetAt: true },
   });
 
-  if (user?.rateLimitResetAt && user.rateLimitResetAt > new Date()) {
-    const diff = user.rateLimitResetAt.getTime() - Date.now();
-    const minutes = Math.floor(diff / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    return {
-      success: false,
-      message: `Limite de análises atingido. Tente novamente em ${minutes}m ${seconds}s.`,
-    };
-  }
-
-  // Check daily analysis limit
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const lastDate = user?.dailyAnalysisDate ? new Date(user.dailyAnalysisDate) : null;
-  const isToday = lastDate && lastDate.getTime() >= today.getTime();
-  const currentCount = isToday ? (user?.dailyAnalysisCount ?? 0) : 0;
-
-  if (currentCount >= DAILY_ANALYSIS_LIMIT) {
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const msUntilReset = tomorrow.getTime() - Date.now();
-    const hoursLeft = Math.floor(msUntilReset / 3600000);
-    const minutesLeft = Math.floor((msUntilReset % 3600000) / 60000);
-
+  if (currentUser?.rateLimitResetAt && currentUser.rateLimitResetAt > now) {
+    const diff = currentUser.rateLimitResetAt.getTime() - now.getTime();
+    const hoursLeft = Math.floor(diff / 3_600_000);
+    const minutesLeft = Math.floor((diff % 3_600_000) / 60_000);
     const timeStr =
       hoursLeft > 0
         ? dict.project.analysis.retry_time_hours
@@ -71,14 +78,16 @@ export async function createProjectAction(
 
     return {
       success: false,
-      message: `${dict.project.analysis.limit_reached_description} ${timeStr}`,
+      message: t.internal_error_cooldown.replace("{time}", timeStr),
     };
   }
+
+  await getUserRepositories();
 
   const repository = await prisma.repository.findFirst({
     where: {
       id: input.repositoryId,
-      userId: Number(session.user.id),
+      userId,
       isActive: true,
     },
   });
@@ -95,20 +104,18 @@ export async function createProjectAction(
     return { success: false, message: t.already_exists };
   }
 
-
   const project = await prisma.project.create({
     data: {
       title: input.title,
       description: input.description,
       longerDescription: input.description,
       images: [],
-      userId: Number(session.user.id),
+      userId,
       repositoryId: repository.id,
       status: "PENDING",
       visibility: input.visibility,
     },
   });
-
 
   const projectId = project.id;
 
@@ -117,36 +124,64 @@ export async function createProjectAction(
   void lastCommitQueue
     .add(
       "refresh-last-commit",
-      { userId: Number(session.user.id) },
+      { userId },
       {
-        jobId: `lastCommit-${session.user.id}`,
+        jobId: `lastCommit-${userId}`,
         attempts: 3,
         backoff: { type: "exponential", delay: 30_000 },
       }
     )
     .catch((error) => {
       console.error("Failed to enqueue last commit refresh after project creation", {
-        userId: Number(session.user.id),
+        userId,
         projectId,
         error,
       });
     });
 
+  let analysisStart:
+    | StartProjectAnalysisActionResult
+    | { queued: false; limitReached: false };
 
-  await startProjectAnalysisAction(projectId);
-
-
-  // Calculate remaining analyses for notification
-  const remaining = DAILY_ANALYSIS_LIMIT - currentCount - 1;
+  try {
+    analysisStart = await startProjectAnalysisAction(projectId);
+  } catch (error) {
+    console.error("Failed to start analysis after project creation", {
+      userId,
+      projectId,
+      error,
+    });
+    analysisStart = { queued: false, limitReached: false };
+  }
 
   // @ts-expect-error - documentation says single arg, but types seem to differ in this version
   revalidateTag(FEED_RECOMMENDED_TAG);
   revalidatePath("/");
 
+  if (analysisStart.queued) {
+    return {
+      success: true,
+      data: { id: project.id },
+      analysisStatus: "queued",
+      remaining: analysisStart.remaining,
+      limit: analysisStart.limit,
+    };
+  }
+
+  if ("limitReached" in analysisStart && analysisStart.limitReached) {
+    return {
+      success: true,
+      data: { id: project.id },
+      analysisStatus: "quota_blocked",
+      hoursLeft: analysisStart.hoursLeft ?? 0,
+      minutesLeft: analysisStart.minutesLeft ?? 0,
+      limit: analysisStart.limit,
+    };
+  }
+
   return {
     success: true,
     data: { id: project.id },
-    remaining,
-    limit: DAILY_ANALYSIS_LIMIT,
+    analysisStatus: "enqueue_failed",
   };
 }

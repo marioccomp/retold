@@ -26,10 +26,6 @@ export const lastCommitWorker = new Worker(
       },
     });
 
-    const publicRepos = user?.projects.filter(
-      (p) => p.visibility === "public" && p.repository?.private === false
-    );
-
     if (!user || user.githubInstallations.length === 0) {
       logger.info("worker.user_without_installation", { userId });
       return;
@@ -41,12 +37,16 @@ export const lastCommitWorker = new Worker(
 
     const octokit = new Octokit({ auth: token });
 
-    const repoFullNames = publicRepos
-      ?.map((p) => p.repository?.fullName)
-      .filter(Boolean) as string[];
+    const repoFullNames = Array.from(
+      new Set(
+        (user.projects ?? [])
+          .map((project) => project.repository?.fullName)
+          .filter(Boolean) as string[]
+      )
+    );
 
     if (repoFullNames.length === 0) {
-      logger.info("worker.no_public_repositories", { userId });
+      logger.info("worker.no_project_repositories", { userId });
       await prisma.githubStats.upsert({
         where: { userId },
         update: { lastCommit: Prisma.DbNull, lastCommitFetchedAt: new Date() },

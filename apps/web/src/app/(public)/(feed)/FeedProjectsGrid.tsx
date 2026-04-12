@@ -87,7 +87,11 @@ export default function FeedProjectsGrid({
   const queryClient = useQueryClient();
 
   const handleProjectClose = () => {
-    router.back();
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("project");
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+
+    router.replace(nextUrl, { scroll: false });
     queryClient.invalidateQueries({ queryKey: ["feed-projects"] });
   };
 

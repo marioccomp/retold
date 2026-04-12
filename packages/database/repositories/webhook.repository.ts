@@ -93,6 +93,12 @@ export const webhookRepository: WebhookRepository = {
     today.setHours(0, 0, 0, 0);
 
     await prisma.$transaction(async (tx) => {
+      const repo = await tx.repository.findUnique({
+        where: { githubId: repository.id },
+        include: { projects: { select: { id: true } } },
+      });
+
+      if (!repo || repo.projects.length === 0) return;
       // 1. Atualizar GithubStats (estatísticas globais do usuário)
       await tx.githubStats.upsert({
         where: { userId },
@@ -125,13 +131,6 @@ export const webhookRepository: WebhookRepository = {
       });
 
       // 2. Encontrar repositório na DB pelo githubId
-      const repo = await tx.repository.findUnique({
-        where: { githubId: repository.id },
-        include: { projects: { select: { id: true } } },
-      });
-
-      if (!repo) return;
-
       // 3. Atualizar UserProjectStats para cada projeto vinculado ao repositório
       for (const project of repo.projects) {
         const existing = await tx.userProjectStats.findUnique({

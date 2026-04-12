@@ -3,7 +3,7 @@
 // import styles from "./ProjectCard.module.css";
 import { MdFavoriteBorder, MdFavorite, MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
-import { Lock, MessageCircle } from "lucide-react";
+import { AlertTriangle, Lock, MessageCircle } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
 import { ProjectSettings } from "./ProjectPanel/components/ProjectSettings";
@@ -185,8 +185,26 @@ export default function ProjectCard({
           </div>
         )}
 
+        {isOwner && project.status === "PENDING" && (
+          <div className="absolute left-3 right-16 top-3 z-[12] sm:left-4 sm:right-[4.5rem] sm:top-4 lg:left-4 lg:right-auto lg:top-auto lg:bottom-4 lg:max-w-[320px]">
+            <Badge className="flex w-full items-start gap-3 whitespace-normal rounded-[18px] border border-[#EED9AC] bg-[linear-gradient(145deg,rgba(255,252,244,0.96)_0%,rgba(255,246,225,0.95)_58%,rgba(251,236,201,0.92)_100%)] px-3.5 py-3 text-left text-[#4A3414] shadow-[0_10px_24px_rgba(94,63,12,0.12)] backdrop-blur-md sm:px-4 sm:py-3 lg:w-auto">
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-white/65 text-[#A16207] shadow-inner ring-1 ring-[#E9C97A]/70">
+                <AlertTriangle size={15} />
+              </span>
+              <span className="min-w-0 flex-1 leading-tight">
+                <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-[#A16207]">
+                  {dict.project.card.pending_owner_label}
+                </span>
+                <span className="mt-1 block break-words text-[12.5px] font-semibold leading-[1.35] text-[#3F2A0F] sm:text-[13px]">
+                  {dict.project.card.pending_owner_action}
+                </span>
+              </span>
+            </Badge>
+          </div>
+        )}
+
         {/* Analyzing Overlay */}
-        {(project.status === "PENDING" || project.status === "ANALYZING") && (
+        {project.status === "ANALYZING" && (
           <div className="absolute inset-0 bg-black/60 z-[20] flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
             <div className="animate-spin mb-3">
               <FiLoader size={28} className="text-primary" />
