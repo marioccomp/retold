@@ -2,6 +2,7 @@
 
 import { getAuthenticatedUserId } from "@/src/lib/server-auth";
 import { prisma } from "@repo/database";
+import { MANUAL_REANALYZE_COOLDOWN_MS } from "../constants";
 
 import { ProjectAccessError, requireProjectAccess } from "../lib/project-access";
 
@@ -44,9 +45,26 @@ export async function getProjectAnalysisAction(projectId: number) {
         accessibleProject = await requireProjectAccess(projectId, currentUserId);
     } catch (error) {
         if (error instanceof ProjectAccessError) {
+            if (error.code === "PROJECT_NOT_FOUND" && currentUserId) {
+                const currentUser = await prisma.user.findUnique({
+                    where: { id: currentUserId },
+                    select: { rateLimitResetAt: true },
+                });
+
+                if (currentUser?.rateLimitResetAt && currentUser.rateLimitResetAt > new Date()) {
+                    return {
+                        status: "PROJECT_INTERNAL_ERROR" as const,
+                        nextRetryAt: currentUser.rateLimitResetAt.toISOString(),
+                        retryBlockedUntil: null,
+                        analysis: null,
+                    };
+                }
+            }
+
             return {
                 status: error.code,
                 nextRetryAt: null,
+                retryBlockedUntil: null,
                 analysis: null,
             };
         }
@@ -60,6 +78,7 @@ export async function getProjectAnalysisAction(projectId: number) {
         where: { id: projectId },
         select: {
             status: true,
+            updatedAt: true,
             user: {
                 select: {
                     rateLimitResetAt: true,
@@ -83,17 +102,26 @@ export async function getProjectAnalysisAction(projectId: number) {
         return {
             status: "PROJECT_NOT_FOUND" as const,
             nextRetryAt: null,
+            retryBlockedUntil: null,
             analysis: null,
         };
     }
 
     const rawAnalysis = sanitizeSuggestionsInRecord(project.analysis?.rawAnalysis, isOwner);
+    const retryBlockedUntil =
+        isOwner && project.status === "ERROR"
+            ? new Date(project.updatedAt.getTime() + MANUAL_REANALYZE_COOLDOWN_MS)
+            : null;
 
     return {
         status: project.status,
         nextRetryAt:
             isOwner && project.status === "RATE_LIMITED" && project.user.rateLimitResetAt
                 ? project.user.rateLimitResetAt.toISOString()
+                : null,
+        retryBlockedUntil:
+            retryBlockedUntil && retryBlockedUntil > new Date()
+                ? retryBlockedUntil.toISOString()
                 : null,
         analysis: project.analysis
             ? {

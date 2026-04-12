@@ -6,9 +6,39 @@ import { analyzeRepoQueue } from "@repo/queue";
 
 import { getAnalysisLocale } from "@/src/i18n/server";
 
-import { DAILY_ANALYSIS_LIMIT } from "../constants";
+import { DAILY_ANALYSIS_LIMIT, MANUAL_REANALYZE_COOLDOWN_MS } from "../constants";
+import {
+  getCurrentAnalysisQuota,
+  releaseDailyAnalysisQuotaReservation,
+  reserveDailyAnalysisQuota,
+} from "../lib/analysis-quota";
 
-export async function startProjectAnalysisAction(projectId: number) {
+export type StartProjectAnalysisActionResult =
+  | {
+      queued: true;
+      projectId: number;
+      remaining: number;
+      limit: number;
+      alreadyQueued?: true;
+    }
+  | {
+      queued: false;
+      limitReached: true;
+      remaining: 0;
+      limit: number;
+      hoursLeft: number;
+      minutesLeft: number;
+    }
+  | {
+      queued: false;
+      retryBlocked: true;
+      minutesLeft: number;
+      retryAvailableAt: string;
+    };
+
+export async function startProjectAnalysisAction(
+  projectId: number
+): Promise<StartProjectAnalysisActionResult> {
   const session = await auth();
   const locale = await getAnalysisLocale();
 
@@ -17,52 +47,6 @@ export async function startProjectAnalysisAction(projectId: number) {
   }
 
   const userId = Number(session.user.id);
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { rateLimitResetAt: true, dailyAnalysisCount: true, dailyAnalysisDate: true },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  if (user.rateLimitResetAt && user.rateLimitResetAt > new Date()) {
-    const diff = user.rateLimitResetAt.getTime() - Date.now();
-    const hoursLeft = Math.floor(diff / 3600000);
-    const minutesLeft = Math.floor((diff % 3600000) / 60000);
-
-    return {
-      queued: false,
-      limitReached: true,
-      remaining: 0,
-      limit: DAILY_ANALYSIS_LIMIT,
-      hoursLeft,
-      minutesLeft,
-    };
-  }
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const lastDate = user.dailyAnalysisDate ? new Date(user.dailyAnalysisDate) : null;
-  const isToday = lastDate && lastDate.getTime() >= today.getTime();
-  const currentCount = isToday ? user.dailyAnalysisCount : 0;
-
-  if (currentCount >= DAILY_ANALYSIS_LIMIT) {
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const msUntilReset = tomorrow.getTime() - Date.now();
-    const hoursLeft = Math.floor(msUntilReset / 3600000);
-    const minutesLeft = Math.floor((msUntilReset % 3600000) / 60000);
-
-    return {
-      queued: false,
-      limitReached: true,
-      remaining: 0,
-      limit: DAILY_ANALYSIS_LIMIT,
-      hoursLeft,
-      minutesLeft,
-    };
-  }
 
   const project = await prisma.project.findUnique({
     where: {
@@ -78,31 +62,82 @@ export async function startProjectAnalysisAction(projectId: number) {
 
   if (!project.repository?.url) throw new Error("Repository URL not found");
 
+  if (project.status === "ERROR") {
+    const retryAvailableAt = new Date(project.updatedAt.getTime() + MANUAL_REANALYZE_COOLDOWN_MS);
+    const now = new Date();
+
+    if (retryAvailableAt > now) {
+      const diffMs = retryAvailableAt.getTime() - now.getTime();
+      const minutesLeft = Math.ceil(diffMs / 60_000);
+
+      return {
+        queued: false,
+        retryBlocked: true,
+        minutesLeft,
+        retryAvailableAt: retryAvailableAt.toISOString(),
+      };
+    }
+  }
+
+  if (project.status === "ANALYZING") {
+    const quota = await getCurrentAnalysisQuota(userId);
+
+    return {
+      queued: true,
+      projectId: project.id,
+      remaining: quota.remaining,
+      limit: quota.limit,
+      alreadyQueued: true,
+    };
+  }
+
+  const quotaReservation = await reserveDailyAnalysisQuota(userId);
+
+  if (!quotaReservation.reserved) {
+    return {
+      queued: false,
+      limitReached: true,
+      remaining: 0,
+      limit: DAILY_ANALYSIS_LIMIT,
+      hoursLeft: quotaReservation.hoursLeft,
+      minutesLeft: quotaReservation.minutesLeft,
+    };
+  }
+
   await prisma.project.update({
     where: { id: projectId },
     data: { status: "ANALYZING" },
   });
 
-  await analyzeRepoQueue.add(
-    "analyze",
-    {
-      projectId: project.id,
-      locale: locale,
-    },
-    {
-      jobId: `project-analysis-${project.id}`,
-      attempts: 3,
-      backoff: {
-        type: "exponential",
-        delay: 5000,
+  try {
+    await analyzeRepoQueue.add(
+      "analyze",
+      {
+        projectId: project.id,
+        locale: locale,
       },
-    }
-  );
+      {
+        jobId: `project-analysis-${project.id}`,
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 5000,
+        },
+      }
+    );
+  } catch (error) {
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { status: "PENDING" },
+    });
+    await releaseDailyAnalysisQuotaReservation(userId);
+    throw error;
+  }
 
   return {
     queued: true,
     projectId: project.id,
-    remaining: DAILY_ANALYSIS_LIMIT - currentCount - 1,
-    limit: DAILY_ANALYSIS_LIMIT,
+    remaining: quotaReservation.remaining,
+    limit: quotaReservation.limit,
   };
 }

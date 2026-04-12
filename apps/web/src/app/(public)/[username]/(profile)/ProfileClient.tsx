@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { getProfile } from "../_actions/get-profile";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -24,10 +25,12 @@ type Props = {
 };
 
 import { useDebounce } from "@/src/hooks/useDebounce";
+import { useTranslation } from "@/src/i18n/client";
 
 // ... existing imports
 
 export default function ProfileClient({ username, ownProfile }: Props) {
+  const { dict } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -46,6 +49,8 @@ export default function ProfileClient({ username, ownProfile }: Props) {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [projectSort, setProjectSort] = useState<"newest" | "oldest" | "popular">("newest");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [hasShownInternalErrorToast, setHasShownInternalErrorToast] = useState(false);
+  const previousProjectsRef = useRef<Array<{ id: number; status: string }> | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", username, page, debouncedSearchQuery, projectSort],
@@ -55,12 +60,48 @@ export default function ProfileClient({ username, ownProfile }: Props) {
     placeholderData: (previousData) => previousData, // Garante que o perfil anterior continue visível enquanto carrega a nova busca
     refetchInterval: (query) => {
       const projects = query.state.data?.projects;
-      const isAnalyzing = projects?.some(
-        (p: any) => p.status === "ANALYZING" || p.status === "PENDING"
-      );
+      const isAnalyzing = projects?.some((p: any) => p.status === "ANALYZING");
       return isAnalyzing ? 3000 : false;
     },
   });
+
+  useEffect(() => {
+    setHasShownInternalErrorToast(false);
+    previousProjectsRef.current = null;
+  }, [username]);
+
+  useEffect(() => {
+    if (!ownProfile || !profile || hasShownInternalErrorToast) {
+      return;
+    }
+
+    const previousProjects = previousProjectsRef.current;
+
+    if (previousProjects === null) {
+      previousProjectsRef.current = profile.projects.map((project) => ({
+        id: project.id,
+        status: project.status,
+      }));
+      return;
+    }
+
+    const currentProjectIds = new Set(profile.projects.map((project) => project.id));
+    const lostAnalyzingProject = previousProjects.some(
+      (project) => project.status === "ANALYZING" && !currentProjectIds.has(project.id)
+    );
+
+    if (lostAnalyzingProject) {
+      toast.error(dict.project.overlay.internal_error.title, {
+        description: dict.project.overlay.internal_error.description,
+      });
+      setHasShownInternalErrorToast(true);
+    }
+
+    previousProjectsRef.current = profile.projects.map((project) => ({
+      id: project.id,
+      status: project.status,
+    }));
+  }, [dict.project.overlay.internal_error.description, dict.project.overlay.internal_error.title, hasShownInternalErrorToast, ownProfile, profile]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);

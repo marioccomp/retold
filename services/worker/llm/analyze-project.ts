@@ -6,6 +6,16 @@ import { projectPrompt } from "./prompts/project-prompt.js";
 
 const logger = createLogger("worker.llm-analysis");
 
+export class LlmAnalysisUnavailableError extends Error {
+  code: "provider_request_failed" | "invalid_json";
+
+  constructor(message: string, code: "provider_request_failed" | "invalid_json") {
+    super(message);
+    this.name = "LlmAnalysisUnavailableError";
+    this.code = code;
+  }
+}
+
 export async function analyzeProjectWithLLM(
   analysis: Heuristic,
   repoName: string,
@@ -103,15 +113,12 @@ export async function analyzeProjectWithLLM(
     });
   } catch (error) {
     logger.warn("llm.provider_request_failed", { repoName, mode: privacyDecision.mode }, error);
+    throw new LlmAnalysisUnavailableError("LLM provider request failed", "provider_request_failed");
   }
 
-  return buildLocalLlmFallback(
-    analysis,
-    repoName,
-    title,
-    description,
-    privacyDecision,
-    "llm_unavailable"
+  throw new LlmAnalysisUnavailableError(
+    "LLM provider returned invalid JSON twice",
+    "invalid_json"
   );
 }
 

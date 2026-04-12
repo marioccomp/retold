@@ -316,14 +316,39 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
         }
       }
 
-      return { project, remaining: result.remaining, limit: result.limit };
+      return {
+        project,
+        analysisStatus: result.analysisStatus,
+        remaining: "remaining" in result ? result.remaining : undefined,
+        limit: "limit" in result ? result.limit : undefined,
+        hoursLeft: "hoursLeft" in result ? result.hoursLeft : undefined,
+        minutesLeft: "minutesLeft" in result ? result.minutesLeft : undefined,
+      };
     },
     onSuccess: (data) => {
-      if (data && data.remaining !== undefined && data.limit !== undefined) {
+      if (data?.analysisStatus === "queued" && data.remaining !== undefined && data.limit !== undefined) {
         toast.success(t.toast.success, {
           description: dict.project.analysis.remaining
             .replace("{remaining}", String(data.remaining))
             .replace("{limit}", String(data.limit)),
+        });
+      } else if (data?.analysisStatus === "quota_blocked") {
+        const timeStr =
+          data.hoursLeft > 0
+            ? dict.project.analysis.retry_time_hours
+                .replace("{hours}", String(data.hoursLeft))
+                .replace("{minutes}", String(data.minutesLeft))
+            : dict.project.analysis.retry_time_minutes.replace(
+                "{minutes}",
+                String(data.minutesLeft)
+              );
+
+        toast.success(t.toast.success_pending, {
+          description: t.toast.analysis_pending_limit.replace("{time}", timeStr),
+        });
+      } else if (data?.analysisStatus === "enqueue_failed") {
+        toast.success(t.toast.success_pending, {
+          description: t.toast.analysis_pending_manual,
         });
       } else {
         toast.success(t.toast.success);

@@ -120,7 +120,15 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
   const isOwner = session?.user?.id && project.userId && Number(session.user.id) === project.userId;
 
-  const { status, nextRetryAt, analysis, data, handleAnalyzeRepo } = useProjectAnalysis(project);
+  const {
+    status,
+    nextRetryAt,
+    retryBlockedUntil,
+    analysis,
+    data,
+    handleAnalyzeRepo,
+    isStartingAnalysis,
+  } = useProjectAnalysis(project);
 
   const llm = safeParseLlm(data?.llmOverview);
   const hasOwnerSuggestions = Boolean(isOwner && llm?.suggestions && llm.suggestions.length > 0);
@@ -345,7 +353,12 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
           {status === "ERROR" &&
             (isOwner ? (
-              <ErrorView onRetry={handleAnalyzeRepo} t={t} />
+              <ErrorView
+                onRetry={handleAnalyzeRepo}
+                t={t}
+                retryBlockedUntil={retryBlockedUntil}
+                isSubmitting={isStartingAnalysis}
+              />
             ) : (
               <EmptyStateView
                 icon={XCircle}
@@ -364,6 +377,15 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               icon={PackageSearch}
               title={t.overlay.analysis_not_started.title}
               description={t.overlay.project_unavailable?.not_found || "Este projeto não está mais disponível."}
+            />
+          )}
+
+          {status === "PROJECT_INTERNAL_ERROR" && (
+            <EmptyStateView
+              icon={XCircle}
+              title={t.overlay.internal_error.title}
+              description={t.overlay.internal_error.description}
+              color="red"
             />
           )}
 
@@ -724,19 +746,50 @@ const AnalyzingView = ({ t }: { t: any }) => (
   </div>
 );
 
-const ErrorView = ({ onRetry, t }: { onRetry: () => void; t: any }) => (
-  <div className="flex flex-col items-center justify-center py-16 text-center bg-red-50/30 rounded-2xl border border-red-100">
-    <XCircle className="w-12 h-12 text-red-500 mb-5" />
-    <h3 className="text-xl font-bold text-red-900 mb-2">{t.overlay.error_view.title}</h3>
-    <p className="text-red-600/80 text-base mb-8">{t.overlay.error_view.description}</p>
-    <button
-      onClick={onRetry}
-      className="px-8 py-3 bg-background border-2 border-red-100 text-red-700 hover:bg-red-50 font-bold rounded-xl transition-all text-base shadow-sm active:scale-95"
-    >
-      {t.overlay.error_view.button}
-    </button>
-  </div>
-);
+const ErrorView = ({
+  onRetry,
+  t,
+  retryBlockedUntil,
+  isSubmitting,
+}: {
+  onRetry: () => void;
+  t: any;
+  retryBlockedUntil: string | null;
+  isSubmitting: boolean;
+}) => {
+  const cooldownDate = retryBlockedUntil ? new Date(retryBlockedUntil) : null;
+  const cooldownActive = Boolean(
+    cooldownDate && !Number.isNaN(cooldownDate.getTime()) && cooldownDate > new Date()
+  );
+  const cooldownMinutes =
+    cooldownActive && cooldownDate
+      ? Math.max(1, Math.ceil((cooldownDate.getTime() - Date.now()) / 60_000))
+      : 0;
+
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center bg-red-50/30 rounded-2xl border border-red-100">
+      <XCircle className="w-12 h-12 text-red-500 mb-5" />
+      <h3 className="text-xl font-bold text-red-900 mb-2">{t.overlay.error_view.title}</h3>
+      <p className="text-red-600/80 text-base max-w-xl">{t.overlay.error_view.description}</p>
+      <p className="mt-3 text-sm text-red-700/80">
+        {cooldownActive
+          ? t.overlay.error_view.cooldown_description.replace("{minutes}", String(cooldownMinutes))
+          : t.overlay.error_view.try_later}
+      </p>
+      <button
+        onClick={onRetry}
+        disabled={cooldownActive || isSubmitting}
+        className="mt-8 px-8 py-3 bg-background border-2 border-red-100 text-red-700 hover:bg-red-50 font-bold rounded-xl transition-all text-base shadow-sm active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-background"
+      >
+        {isSubmitting
+          ? t.overlay.error_view.retrying
+          : cooldownActive
+            ? t.overlay.error_view.button_disabled
+            : t.overlay.error_view.button}
+      </button>
+    </div>
+  );
+};
 
 const RateLimitedView = ({
   t,

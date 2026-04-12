@@ -30,6 +30,9 @@ export async function getFeedProjects(
   // Standard Prisma query for other sorts
   const where = {
     visibility: "public",
+    status: {
+      in: ["DONE", "ANALYZING"] as const,
+    },
     ...(query
       ? {
           OR: [
@@ -166,7 +169,7 @@ const getCachedScoredIds = unstable_cache(
     const [{ count: total }] = await prisma.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(*)::bigint as count
       FROM "Project" p
-      WHERE p.visibility = 'public' AND p.status IN ('DONE', 'PENDING', 'ANALYZING')
+      WHERE p.visibility = 'public' AND p.status IN ('DONE', 'ANALYZING')
     `;
 
     const scoredIds = await prisma.$queryRaw<{ id: number }[]>`
@@ -186,7 +189,7 @@ const getCachedScoredIds = unstable_cache(
         SELECT "projectId", COUNT(*)::int as cnt
         FROM "Like" GROUP BY "projectId"
       ) total_likes ON p.id = total_likes."projectId"
-      WHERE p.visibility = 'public' AND p.status IN ('DONE', 'PENDING', 'ANALYZING')
+      WHERE p.visibility = 'public' AND p.status IN ('DONE', 'ANALYZING')
       ORDER BY (
         (COALESCE(recent_likes.cnt, 0) * 5) +
         (COALESCE(recent_views.cnt, 0) * 0.5) +

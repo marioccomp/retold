@@ -95,6 +95,10 @@
       "ERROR": "Error",
       "RATE_LIMITED": "Waiting to retry"
     },
+    "card": {
+      "pending_owner_label": "Action needed",
+      "pending_owner_action": "Analysis pending: click to review"
+    },
     "analysis": {
       "started": "Analysis started",
       "start_error": "Failed to start analysis",
@@ -125,6 +129,11 @@
         "restricted_title": "Project unavailable",
         "restricted_description": "You no longer have permission to access this project."
       },
+      "internal_error": {
+        "title": "Internal Error",
+        "description": "An internal error happened during analysis. The project was removed and your account is temporarily blocked from creating another project.",
+        "cooldown_suffix": "You can try again after {time}."
+      },
       "pending_view": {
         "title": "Project Analysis",
         "description": "Generate a full technical report with insights about architecture, stack, and code quality.",
@@ -136,8 +145,13 @@
       },
       "error_view": {
         "title": "Analysis Failed",
-        "description": "Could not process the repository data.",
-        "button": "Try Again"
+        "description": "The analysis could not be completed right now. Please try again later.",
+        "button": "Reanalyze",
+        "button_disabled": "Wait to retry",
+        "retrying": "Retrying...",
+        "try_later": "Once the service is stable again, you can retry from here.",
+        "cooldown_title": "Try again later",
+        "cooldown_description": "To avoid spam, another manual retry will be available in about {minutes} minute(s)."
       },
       "rate_limited_view": {
         "title": "Service Temporarily Unavailable",
@@ -248,6 +262,10 @@
       "uploading_images": "Uploading images...",
       "toast": {
         "success": "Project created successfully!",
+        "success_pending": "Project created! Analysis is pending.",
+        "analysis_pending_limit": "Your project has been saved. You can start the analysis in {time}",
+        "analysis_pending_manual": "Your project has been saved. The analysis did not start right now, but you can retry it from the project panel.",
+        "internal_error_cooldown": "An internal error happened recently. You can create another project in {time}.",
         "error": "Error creating project. Try again.",
         "max_images": "Maximum of 3 images allowed.",
         "already_exists": "You already have a project for this repository.",

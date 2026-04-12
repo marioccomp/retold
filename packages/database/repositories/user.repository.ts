@@ -112,7 +112,13 @@ export const userRepository = {
     const projectsWhereInput: any = {
       AND: [
         {
-          OR: [{ visibility: "public" }, { userId: currentUserId }],
+          OR: [
+            {
+              visibility: "public",
+              status: { not: "PENDING" },
+            },
+            { userId: currentUserId },
+          ],
         },
       ],
     };

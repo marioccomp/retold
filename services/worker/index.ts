@@ -6,7 +6,7 @@ import "./last-commit-worker";
 import { cloneRepository } from "./clone";
 import { prisma, githubRepository, Prisma } from "@repo/database";
 import { createLogger } from "@repo/observability";
-import { analyzeProjectWithLLM } from "./llm/analyze-project";
+import { analyzeProjectWithLLM, LlmAnalysisUnavailableError } from "./llm/analyze-project";
 import { analyzeRepository } from "./analyze/index";
 import { buildLlmPrivacyDecision, prepareAnalysisForLlm } from "./privacy.js";
 import {
@@ -38,6 +38,27 @@ function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
 logger.info("worker.started");
 
 const PROJECT_ANALYSIS_RETRY_JOB_ID_PREFIX = "project-analysis-retry-";
+const INTERNAL_ERROR_COOLDOWN_MS = 60 * 60 * 1000;
+
+function startOfDay(now: Date) {
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+async function releaseReservedDailyAnalysisQuota(userId: number, now: Date = new Date()) {
+  const today = startOfDay(now);
+
+  await prisma.$executeRaw`
+    UPDATE "User"
+    SET "dailyAnalysisCount" = CASE
+      WHEN "dailyAnalysisDate" >= ${today} AND "dailyAnalysisCount" > 0
+        THEN "dailyAnalysisCount" - 1
+      ELSE "dailyAnalysisCount"
+    END
+    WHERE "id" = ${userId}
+  `;
+}
 
 const worker = new Worker(
   "analyze-repo",
@@ -269,41 +290,22 @@ const worker = new Worker(
         data: { status: "DONE" },
       });
 
-      // Increment daily analysis counter only on SUCCESS
+      // The daily quota was already reserved atomically at enqueue time.
+      // On success we only clear temporary rate-limit state.
       const ownerProject = await prisma.project.findUnique({
         where: { id: projectId },
         select: { userId: true },
       });
 
       if (ownerProject) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const owner = await prisma.user.findUnique({
-          where: { id: ownerProject.userId },
-          select: { dailyAnalysisCount: true, dailyAnalysisDate: true },
-        });
-
-        const lastDate = owner?.dailyAnalysisDate ? new Date(owner.dailyAnalysisDate) : null;
-        const isToday = lastDate && lastDate.getTime() >= today.getTime();
-
-        await prisma.user.update({
-          where: { id: ownerProject.userId },
-          data: {
-            dailyAnalysisCount: isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1,
-            dailyAnalysisDate: today,
-          },
-        });
-
-        logger.info("worker.daily_analysis_counter_updated", {
-          projectId,
-          userId: ownerProject.userId,
-          dailyAnalysisCount: isToday ? (owner?.dailyAnalysisCount ?? 0) + 1 : 1,
-        });
-
         await prisma.user.update({
           where: { id: ownerProject.userId },
           data: { rateLimitResetAt: null },
+        });
+
+        logger.info("worker.daily_analysis_reservation_committed", {
+          projectId,
+          userId: ownerProject.userId,
         });
       }
     } catch (err: any) {
@@ -411,10 +413,38 @@ const worker = new Worker(
         return;
       }
 
-      await prisma.project.updateMany({
+      const ownerProject = await prisma.project.findUnique({
         where: { id: projectId },
-        data: { status: "ERROR" },
+        select: { userId: true },
       });
+
+      if (ownerProject) {
+        await releaseReservedDailyAnalysisQuota(ownerProject.userId);
+
+        const cooldownUntil = new Date(Date.now() + INTERNAL_ERROR_COOLDOWN_MS);
+
+        await prisma.$transaction([
+          prisma.user.update({
+            where: { id: ownerProject.userId },
+            data: { rateLimitResetAt: cooldownUntil },
+          }),
+          prisma.project.delete({
+            where: { id: projectId },
+          }),
+        ]);
+
+        logger.warn("worker.project_removed_after_internal_error", {
+          projectId,
+          userId: ownerProject.userId,
+          cooldownUntil,
+          reason:
+            err instanceof LlmAnalysisUnavailableError ? err.code : "job_failed",
+        });
+      } else {
+        await prisma.project.deleteMany({
+          where: { id: projectId },
+        });
+      }
 
       throw err;
     } finally {

@@ -66,9 +66,7 @@ export default function FeedContent({ initialData }: Props) {
     initialData,
       refetchInterval: (query) => {
         const projects = query.state.data?.projects;
-        const isAnalyzing = projects?.some(
-          (project) => project.status === "ANALYZING" || project.status === "PENDING"
-        );
+        const isAnalyzing = projects?.some((project) => project.status === "ANALYZING");
         return isAnalyzing ? 3000 : false;
       },
   });
