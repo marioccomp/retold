@@ -333,14 +333,16 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
             .replace("{limit}", String(data.limit)),
         });
       } else if (data?.analysisStatus === "quota_blocked") {
+        const hoursLeft = data.hoursLeft ?? 0;
+        const minutesLeft = data.minutesLeft ?? 0;
         const timeStr =
-          data.hoursLeft > 0
+          hoursLeft > 0
             ? dict.project.analysis.retry_time_hours
-                .replace("{hours}", String(data.hoursLeft))
-                .replace("{minutes}", String(data.minutesLeft))
+                .replace("{hours}", String(hoursLeft))
+                .replace("{minutes}", String(minutesLeft))
             : dict.project.analysis.retry_time_minutes.replace(
                 "{minutes}",
-                String(data.minutesLeft)
+                String(minutesLeft)
               );
 
         toast.success(t.toast.success_pending, {
