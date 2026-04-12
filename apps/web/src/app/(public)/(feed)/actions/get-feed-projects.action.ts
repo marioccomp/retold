@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@repo/database";
+import { ProjectStatus } from "@prisma/client";
 import { ProjectCardDTO } from "@/src/domains/project/dtos/project-card.dto";
 import { auth } from "@/src/domains/auth/auth";
 import { unstable_cache } from "next/cache";
@@ -31,7 +32,7 @@ export async function getFeedProjects(
   const where = {
     visibility: "public",
     status: {
-      in: ["DONE", "ANALYZING"] as const,
+      in: [ProjectStatus.DONE, ProjectStatus.ANALYZING],
     },
     ...(query
       ? {
