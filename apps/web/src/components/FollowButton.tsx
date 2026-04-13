@@ -147,8 +147,8 @@ export function FollowButton({
         // Overlay variant (for ProjectCard images, etc)
         variant === "ghost"
           ? !isFollowing
-            ? "bg-primary text-primary-foreground hover:bg-white hover:text-primary border-none shadow-lg shadow-[0_4px_15px_rgba(5,220,127,0.3)]"
-            : "bg-primary/10 backdrop-blur-md border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-none font-bold"
+            ? "bg-primary text-primary-foreground border border-transparent hover:bg-primary/88 hover:text-primary-foreground hover:border-transparent dark:hover:bg-[rgba(11,18,15,0.92)] dark:hover:text-primary dark:hover:border-primary shadow-lg shadow-[0_4px_15px_rgba(5,220,127,0.3)]"
+            : "bg-primary/10 backdrop-blur-md border border-primary/30 text-primary hover:bg-primary/14 dark:hover:bg-primary/18 hover:text-primary hover:border-primary/45 shadow-none font-bold"
           : // Default brand styles
             !className?.includes("bg-") &&
               (!isFollowing

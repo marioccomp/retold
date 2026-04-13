@@ -22,6 +22,15 @@ export default function Footer() {
   // Do not render Footer on onboarding page
   if (pathname === "/onboarding") return null;
 
+  const handleLogoClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname !== "/") {
+      return;
+    }
+
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <footer
       className={`w-full border-t border-border bg-background backdrop-blur-sm ${
@@ -34,7 +43,8 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start gap-2">
             <Link
               href="/"
-              className="flex items-center opacity-80 hover:opacity-100 transition-opacity"
+              onClick={handleLogoClick}
+              className="flex items-center"
             >
               <Image
                 src={logo}

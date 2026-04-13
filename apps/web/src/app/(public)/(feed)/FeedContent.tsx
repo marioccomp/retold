@@ -102,9 +102,6 @@ export default function FeedContent({ initialData }: Props) {
       className="w-full max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col items-center relative scroll-mt-4"
     >
       {/* Zona de transição com a hero */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,transparent)_0%,color-mix(in_oklab,var(--background)_58%,transparent)_48%,transparent_100%)] dark:bg-[linear-gradient(180deg,rgba(16,22,19,0.86)_0%,rgba(16,22,19,0.34)_48%,transparent_100%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-16 w-[min(40rem,76vw)] -translate-x-1/2 rounded-[999px] bg-primary/6 blur-[72px] dark:bg-primary/4" />
-
       {/* Hero Search Bar - Main Feed Search */}
       {!isProjectSelected && (
         <div
@@ -113,7 +110,7 @@ export default function FeedContent({ initialData }: Props) {
         >
           <div className="relative">
             <FiSearch
-              className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none transition-colors duration-300 group-focus-within:text-primary"
+              className="absolute left-5 top-1/2 z-10 -translate-y-1/2 text-muted-foreground dark:text-white/70 pointer-events-none transition-colors duration-300 group-focus-within:text-primary dark:group-focus-within:text-primary"
               size={22}
             />
             <Input
@@ -126,11 +123,11 @@ export default function FeedContent({ initialData }: Props) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-4 pl-14 pr-6 rounded-full text-lg text-foreground h-auto
-                                bg-background dark:bg-muted/20 shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border border-border 
+                                bg-background dark:bg-[rgba(10,18,14,0.88)] dark:backdrop-blur-sm dark:border-white/12 shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] border border-border 
                                 placeholder:text-muted-foreground font-medium
-                                hover:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.08)] hover:border-primary/30
-                                focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:border-primary 
-                                focus-visible:shadow-[0_4px_30px_-5px_rgba(5,220,127,0.15)]
+                                hover:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.08)] hover:border-primary/30 dark:hover:border-primary/35
+                                focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:border-primary dark:focus-visible:ring-primary/18
+                                focus-visible:shadow-[0_4px_30px_-5px_rgba(5,220,127,0.15)] dark:focus-visible:shadow-[0_0_0_1px_rgba(5,220,127,0.9),0_0_28px_-6px_rgba(5,220,127,0.32)]
                                 transition-all duration-300"
             />
           </div>
@@ -146,7 +143,7 @@ export default function FeedContent({ initialData }: Props) {
                 <TabsTrigger
                   key={tab.key}
                   value={tab.key}
-                  className="bg-transparent border-0 py-2 text-sm font-medium text-muted-foreground cursor-pointer transition-all duration-300 hover:text-foreground data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:bg-primary after:transition-all after:duration-300 data-[state=active]:after:w-full"
+                  className="bg-transparent border-0 py-2 text-sm font-medium text-muted-foreground cursor-pointer transition-all duration-300 hover:text-foreground data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:bg-transparent dark:data-[state=active]:bg-transparent data-[state=active]:border-transparent dark:data-[state=active]:border-transparent data-[state=active]:shadow-none rounded-none whitespace-nowrap relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:bg-primary after:transition-all after:duration-300 data-[state=active]:after:w-full"
                 >
                   {tab.label}
                 </TabsTrigger>

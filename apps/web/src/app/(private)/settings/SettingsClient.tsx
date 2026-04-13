@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { signIn, signOut } from "next-auth/react";
 import { toast } from "sonner";
@@ -55,6 +55,8 @@ export function SettingsClient({
   const [deleteCredential, setDeleteCredential] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [requiresDeleteGithubReauth, setRequiresDeleteGithubReauth] = useState(false);
+  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [contentMinHeight, setContentMinHeight] = useState<number | null>(null);
 
   const [pendingPassword, startPasswordTransition] = useTransition();
   const [pendingDelete, startDeleteTransition] = useTransition();
@@ -252,6 +254,26 @@ export function SettingsClient({
     (requiresDeleteGithubReauth ||
       deleteError === dict.settings.dangerZone.reauth.oauth_required);
 
+  useEffect(() => {
+    const measureContentHeight = () => {
+      const heights = Object.values(contentRefs.current)
+        .map((node) => node?.scrollHeight ?? 0)
+        .filter(Boolean);
+
+      if (heights.length > 0) {
+        setContentMinHeight(Math.max(...heights));
+      }
+    };
+
+    const frame = window.requestAnimationFrame(measureContentHeight);
+    window.addEventListener("resize", measureContentHeight);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", measureContentHeight);
+    };
+  }, [activeTab, loadingProviders, linkError, shouldShowDeleteGithubReauth, initialHasPassword]);
+
   return (
     <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 md:px-6">
       <div className="mb-6 md:mb-8">
@@ -271,30 +293,48 @@ export function SettingsClient({
         className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8"
       >
         {/* Sidebar Navigation */}
-        <TabsList className="grid grid-cols-2 md:flex md:flex-col h-auto w-full md:w-64 bg-transparent p-0 gap-2 shrink-0 self-start sticky md:top-24">
+        <TabsList className="grid grid-cols-2 md:flex md:flex-col h-auto w-full md:w-64 bg-transparent p-0 gap-2 shrink-0 self-start md:sticky md:top-24">
           {navItems.map((item) => (
             <TabsTrigger
               key={item.id}
               value={item.id}
               data-testid={`settings-tab-${item.id}`}
-              className={`cursor-pointer justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:h-12 w-full text-left rounded-xl border transition-all
-                                border-primary/20 data-[state=active]:bg-primary/10 data-[state=active]:border-primary data-[state=active]:shadow-sm
-                                hover:bg-muted/50 flex flex-col md:flex-row items-center md:items-center
-                                ${item.id === "danger" ? "border-destructive/20 text-destructive data-[state=active]:text-destructive data-[state=active]:bg-destructive/10 data-[state=active]:border-destructive" : "text-muted-foreground data-[state=active]:text-foreground"}
+              className={`group cursor-pointer justify-start gap-3 px-4 py-3 md:h-14 w-full text-left rounded-2xl border transition-all duration-200
+                                bg-background border-border/75 shadow-[0_8px_22px_-18px_rgba(0,0,0,0.18)] hover:border-border hover:bg-muted/[0.26]
+                                data-[state=active]:shadow-[0_14px_36px_-26px_rgba(0,0,0,0.18)] flex flex-col md:flex-row items-center md:items-center
+                                ${item.id === "danger" ? "text-destructive/80 data-[state=active]:text-destructive data-[state=active]:bg-destructive/[0.06] data-[state=active]:border-destructive/35 hover:border-destructive/25" : "text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-primary/[0.07] data-[state=active]:border-primary/35"}
                             `}
             >
-              <item.icon className="h-4 w-4 shrink-0" />
-              <span className="font-medium text-xs md:text-base text-center md:text-left truncate w-full md:w-auto">
-                {item.label}
-              </span>
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors
+                            ${item.id === "danger" ? "border-destructive/20 bg-destructive/[0.05] text-destructive" : "border-primary/18 bg-primary/[0.07] text-primary"}
+                            group-data-[state=inactive]:border-border/70 group-data-[state=inactive]:bg-background group-data-[state=inactive]:text-current`}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+              </div>
+              <div className="flex min-w-0 flex-col items-center md:items-start">
+                <span className="font-semibold text-xs md:text-[0.98rem] text-center md:text-left truncate w-full md:w-auto">
+                  {item.label}
+                </span>
+              </div>
             </TabsTrigger>
           ))}
         </TabsList>
 
         {/* Content Area */}
-        <div className="flex-1 min-w-0">
+        <div
+          className="relative flex-1 min-w-0"
+          style={contentMinHeight ? { minHeight: `${contentMinHeight}px` } : undefined}
+        >
           {/* General Section (Language) */}
-          <TabsContent value="general" className="mt-0 space-y-6">
+          <TabsContent
+            value="general"
+            forceMount
+            ref={(node) => {
+              contentRefs.current.general = node;
+            }}
+            className="mt-0 w-full space-y-6 data-[state=inactive]:pointer-events-none data-[state=inactive]:absolute data-[state=inactive]:inset-0 data-[state=inactive]:opacity-0 data-[state=active]:relative"
+          >
             <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>{dict.settings.language.title}</CardTitle>
@@ -353,7 +393,14 @@ export function SettingsClient({
           </TabsContent>
 
           {/* Security Section */}
-          <TabsContent value="security" className="mt-0 space-y-6">
+          <TabsContent
+            value="security"
+            forceMount
+            ref={(node) => {
+              contentRefs.current.security = node;
+            }}
+            className="mt-0 w-full space-y-6 data-[state=inactive]:pointer-events-none data-[state=inactive]:absolute data-[state=inactive]:inset-0 data-[state=inactive]:opacity-0 data-[state=active]:relative"
+          >
             <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>
@@ -426,7 +473,7 @@ export function SettingsClient({
                       type="submit"
                       disabled={pendingPassword}
                       data-testid="settings-password-submit-button"
-                      className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                      className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
                     >
                       {pendingPassword
                         ? dict.settings.password.buttonUpdating
@@ -441,7 +488,14 @@ export function SettingsClient({
           </TabsContent>
 
           {/* Integrations Section */}
-          <TabsContent value="integrations" className="mt-0 space-y-6">
+          <TabsContent
+            value="integrations"
+            forceMount
+            ref={(node) => {
+              contentRefs.current.integrations = node;
+            }}
+            className="mt-0 w-full space-y-6 data-[state=inactive]:pointer-events-none data-[state=inactive]:absolute data-[state=inactive]:inset-0 data-[state=inactive]:opacity-0 data-[state=active]:relative"
+          >
             <Card className="border-primary/30 shadow-sm">
               <CardHeader>
                 <CardTitle>{dict.settings.connectedAccounts.title}</CardTitle>
@@ -485,7 +539,7 @@ export function SettingsClient({
                     ) : (
                       <Button
                         variant="outline"
-                        className="cursor-pointer w-full sm:w-auto"
+                        className="cursor-pointer w-full sm:w-auto dark:hover:bg-primary/10 dark:hover:border-primary/40 dark:hover:text-primary"
                         size="sm"
                         onClick={handleLinkGithub}
                       >
@@ -499,32 +553,39 @@ export function SettingsClient({
           </TabsContent>
 
           {/* Danger Zone */}
-          <TabsContent value="danger" className="mt-0 space-y-6">
-            <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 md:p-10 flex flex-col items-center text-center gap-6 shadow-sm">
-              <div className="flex flex-col items-center gap-4">
-                <div className="bg-card p-3 md:p-4 rounded-2xl border border-destructive/20 text-destructive shadow-sm">
-                  <FiAlertTriangle size={24} className="md:w-8 md:h-8" />
+          <TabsContent
+            value="danger"
+            forceMount
+            ref={(node) => {
+              contentRefs.current.danger = node;
+            }}
+            className="mt-0 w-full space-y-6 data-[state=inactive]:pointer-events-none data-[state=inactive]:absolute data-[state=inactive]:inset-0 data-[state=inactive]:opacity-0 data-[state=active]:relative"
+          >
+            <div className="rounded-[1.5rem] border border-destructive/18 bg-[linear-gradient(180deg,rgba(255,248,248,0.96)_0%,rgba(255,252,252,0.98)_100%)] px-6 py-8 text-center shadow-[0_20px_50px_-38px_rgba(255,77,77,0.28)] dark:border-destructive/22 dark:bg-[linear-gradient(180deg,rgba(34,20,20,0.88)_0%,rgba(24,17,17,0.94)_100%)] dark:shadow-[0_24px_70px_-46px_rgba(255,77,77,0.34)] md:px-10 md:py-10">
+              <div className="mx-auto flex max-w-xl flex-col items-center gap-5">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-destructive/18 bg-background/92 text-destructive shadow-[0_12px_26px_-18px_rgba(255,77,77,0.28)] dark:border-destructive/24 dark:bg-black/10">
+                  <FiAlertTriangle size={26} />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-destructive font-black text-xl md:text-2xl tracking-tight">
+                <div className="space-y-3">
+                  <h3 className="text-destructive font-black text-[1.75rem] tracking-tight">
                     {dict.settings.dangerZone.title}
                   </h3>
-                  <p className="text-sm md:text-base text-destructive/80 leading-relaxed max-w-md mx-auto">
+                  <p className="mx-auto max-w-lg text-sm leading-7 text-foreground/78 dark:text-foreground/82 md:text-base">
                     {dict.settings.dangerZone.description}
                   </p>
                 </div>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteAccount}
+                  disabled={pendingDelete}
+                  data-testid="settings-open-delete-modal-button"
+                  className="cursor-pointer h-11 rounded-xl px-8 font-bold shadow-[0_16px_32px_-18px_rgba(255,77,77,0.42)] transition-all duration-300 hover:shadow-[0_20px_36px_-18px_rgba(255,77,77,0.46)] active:scale-95 md:px-10"
+                >
+                  {pendingDelete
+                    ? dict.settings.dangerZone.buttonDeleting
+                    : dict.settings.dangerZone.button}
+                </Button>
               </div>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteAccount}
-                disabled={pendingDelete}
-                data-testid="settings-open-delete-modal-button"
-                className="cursor-pointer font-bold h-11 md:h-12 px-8 md:px-10 rounded-xl shadow-lg shadow-destructive/20 transition-all duration-300 active:scale-95 shrink-0 w-full sm:w-auto"
-              >
-                {pendingDelete
-                  ? dict.settings.dangerZone.buttonDeleting
-                  : dict.settings.dangerZone.button}
-              </Button>
             </div>
           </TabsContent>
         </div>

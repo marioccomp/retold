@@ -169,6 +169,11 @@ export default function ProfileSidebar({ profile, ownProfile, onEditClick }: Pro
         <div className="mt-3 text-xl font-bold text-foreground flex items-center gap-2">
           <span>{profile.name}</span>
         </div>
+        {profile.username && (
+          <div className="mt-1 text-sm font-semibold tracking-[0.01em] text-primary">
+            @{profile.username}
+          </div>
+        )}
       </div>
 
       <section className="mt-3 w-full max-w-[300px] md:max-w-full flex flex-col gap-4 items-center">

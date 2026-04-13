@@ -132,7 +132,7 @@ export default function CropImageModal({
             onZoomChange={onZoomChange}
             onCropComplete={onCropAreaChange}
             onMediaLoaded={onMediaLoaded}
-            showGrid={true}
+            showGrid={false}
             objectFit="contain"
             style={{
               containerStyle: {
@@ -140,8 +140,10 @@ export default function CropImageModal({
                 height: "100%",
               },
               cropAreaStyle: {
-                border: "2px solid hsl(var(--primary))",
+                border: "2px solid var(--primary)",
                 borderRadius: "8px",
+                boxShadow:
+                  "0 0 0 1px rgba(5, 220, 127, 0.24), 0 0 18px rgba(5, 220, 127, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.08)",
               },
             }}
           />
