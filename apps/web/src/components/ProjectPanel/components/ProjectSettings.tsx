@@ -393,7 +393,7 @@ export const ProjectSettings = ({
             }}
           >
             <div
-              className="bg-background rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200"
+              className="bg-background rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-4 border-b border-border">
@@ -405,7 +405,7 @@ export const ProjectSettings = ({
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-4 overflow-y-auto min-h-0 custom-scrollbar">
                 {/* Project Images Management */}
                 <div className="space-y-3">
                   <Label className="text-foreground font-semibold flex justify-between items-center">
