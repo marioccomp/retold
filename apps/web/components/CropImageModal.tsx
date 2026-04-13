@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Cropper, { Area } from "react-easy-crop";
 import { Button } from "@/components/ui/button";
 import { FiZoomIn, FiZoomOut, FiCheck, FiX } from "react-icons/fi";
@@ -31,6 +32,24 @@ export default function CropImageModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentAspect, setCurrentAspect] = useState(aspectRatio);
   const [mediaAspect, setMediaAspect] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  const isSquareDefault = Math.abs(aspectRatio - 1) < 0.01;
+  const isOriginalSameAsDefault =
+    mediaAspect !== null && Math.abs(mediaAspect - aspectRatio) < 0.01;
+  const selectedPresetLabel =
+    mediaAspect !== null && Math.abs(currentAspect - mediaAspect) < 0.01
+      ? "Formato Original"
+      : isSquareDefault
+        ? "Formato Quadrado (1:1)"
+        : currentAspect === 1
+          ? "Formato Quadrado (1:1)"
+          : "Formato Banner (16:9)";
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const onCropChange = useCallback((nextCrop: { x: number; y: number }) => {
     setCrop(nextCrop);
@@ -77,18 +96,18 @@ export default function CropImageModal({
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-background w-[90vw] h-[90vh] max-w-[1200px] sm:rounded-2xl shadow-2xl overflow-hidden sm:m-4 animate-in zoom-in-95 flex flex-col max-sm:w-full max-sm:h-full max-sm:m-0">
+  return createPortal(
+    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-background w-[92vw] h-[92vh] max-w-[1200px] max-h-[900px] sm:rounded-2xl shadow-2xl overflow-hidden sm:m-4 animate-in zoom-in-95 grid grid-rows-[auto_minmax(0,1fr)_auto_auto] min-h-0 max-sm:w-full max-sm:h-full max-sm:m-0">
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border shrink-0">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground leading-tight">
               {dict.profile.crop_modal.title}
             </h2>
             <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
-              {currentAspect === aspectRatio ? "Formato Banner (16:9)" : "Formato Original"}
+              {selectedPresetLabel}
             </p>
           </div>
           <button
@@ -100,7 +119,7 @@ export default function CropImageModal({
           </button>
         </div>
 
-        <div className="relative flex-1 bg-[#121212] overflow-hidden">
+        <div className="relative min-h-0 bg-[#121212] overflow-hidden">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -129,7 +148,7 @@ export default function CropImageModal({
         </div>
 
         {/* Aspect Ratio & Zoom Controls */}
-        <div className="flex flex-col bg-muted/30 border-t border-border shrink-0">
+        <div className="flex flex-col bg-background border-t border-border shrink-0">
           {/* Zoom Control */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 py-3 px-4 sm:px-6 border-b border-border/50">
             <button
@@ -170,7 +189,7 @@ export default function CropImageModal({
           </div>
 
           {/* Aspect Ratio Controls */}
-          <div className="flex items-center sm:justify-center gap-2 p-3 overflow-x-auto no-scrollbar scroll-smooth">
+          <div className="flex items-center sm:justify-center gap-2 px-3 py-2.5 overflow-x-auto no-scrollbar scroll-smooth">
             <Button
               variant={currentAspect === aspectRatio ? "secondary" : "ghost"}
               size="sm"
@@ -181,39 +200,43 @@ export default function CropImageModal({
               className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
             >
               <div className="w-4 h-2.5 border border-current opacity-70" />
-              Banner
+              {isSquareDefault ? "Padrão" : "Banner"}
             </Button>
-            <Button
-              variant={mediaAspect && currentAspect === mediaAspect ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => {
-                if (mediaAspect) {
-                  setCurrentAspect(mediaAspect);
+            {!isOriginalSameAsDefault && (
+              <Button
+                variant={mediaAspect && currentAspect === mediaAspect ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => {
+                  if (mediaAspect) {
+                    setCurrentAspect(mediaAspect);
+                    setZoom(1);
+                  }
+                }}
+                disabled={!mediaAspect}
+                className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
+              >
+                <div className="w-3.5 h-3.5 border border-dashed border-current opacity-70" />
+                Original
+              </Button>
+            )}
+            {!isSquareDefault && (
+              <Button
+                variant={currentAspect === 1 ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => {
+                  setCurrentAspect(1);
                   setZoom(1);
-                }
-              }}
-              disabled={!mediaAspect}
-              className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
-            >
-              <div className="w-3.5 h-3.5 border border-dashed border-current opacity-70" />
-              Original
-            </Button>
-            <Button
-              variant={currentAspect === 1 ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => {
-                setCurrentAspect(1);
-                setZoom(1);
-              }}
-              className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
-            >
-              <div className="w-3.5 h-3.5 border border-current opacity-70" />
-              Quadrado
-            </Button>
+                }}
+                className="h-9 sm:h-8 text-xs gap-2 px-4 sm:px-3 whitespace-nowrap rounded-lg"
+              >
+                <div className="w-3.5 h-3.5 border border-current opacity-70" />
+                Quadrado
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 px-4 sm:px-6 py-4 border-t border-border bg-background shrink-0 max-sm:grid max-sm:grid-cols-2">
+        <div className="flex justify-end gap-3 px-4 sm:px-6 py-3.5 border-t border-border bg-background shrink-0 max-sm:grid max-sm:grid-cols-2">
           <Button
             variant="ghost"
             onClick={handleClose}
@@ -245,7 +268,8 @@ export default function CropImageModal({
           scrollbar-width: none;
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 
