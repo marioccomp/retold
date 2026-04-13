@@ -99,8 +99,8 @@ export default function CropImageModal({
   if (!isOpen || !mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-background w-[92vw] h-[92vh] max-w-[1200px] max-h-[900px] sm:rounded-2xl shadow-2xl overflow-hidden sm:m-4 animate-in zoom-in-95 grid grid-rows-[auto_minmax(0,1fr)_auto_auto] min-h-0 max-sm:w-full max-sm:h-full max-sm:m-0">
+    <div className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-background w-full sm:w-[92vw] h-[88dvh] sm:h-[92vh] max-w-[1200px] max-h-[900px] rounded-t-[2rem] sm:rounded-2xl shadow-2xl overflow-hidden sm:m-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 grid grid-rows-[auto_minmax(0,1fr)_auto_auto] min-h-0">
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border shrink-0">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground leading-tight">
