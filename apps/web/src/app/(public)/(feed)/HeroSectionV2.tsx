@@ -169,20 +169,20 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
         <div className="absolute left-[-12%] top-[18%] h-64 w-64 rounded-full bg-primary/8 blur-[110px] animate-[heroPulse_12s_ease-in-out_infinite] dark:bg-white/[0.03] dark:blur-[140px]" />
         <div className="absolute inset-0 opacity-[0.08] dark:opacity-[0.08] [background-image:linear-gradient(to_right,color-mix(in_oklab,var(--foreground)_18%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--foreground)_18%,transparent)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_100%)] dark:[background-image:linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.045)_1px,transparent_1px)]" />
         <div className="absolute inset-y-0 right-0 hidden w-[46%] bg-[linear-gradient(90deg,transparent_0%,rgba(5,220,127,0.08)_100%)] dark:bg-[linear-gradient(90deg,transparent_0%,rgba(5,220,127,0.035)_100%)] dark:block" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,transparent_0%,color-mix(in_oklab,var(--background)_78%,transparent)_62%,var(--background)_100%)] dark:bg-[linear-gradient(180deg,transparent_0%,rgba(16,22,19,0.72)_62%,var(--background)_100%)]" />
-        <div className="absolute left-1/2 bottom-[-1.5rem] h-20 w-[min(44rem,72vw)] -translate-x-1/2 rounded-[999px] bg-primary/8 blur-[72px] dark:bg-primary/5" />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-[linear-gradient(180deg,transparent_0%,color-mix(in_oklab,var(--secondary)_24%,transparent)_44%,color-mix(in_oklab,var(--background)_86%,transparent)_72%,var(--background)_100%)] dark:bg-[linear-gradient(180deg,transparent_0%,rgba(16,22,19,0.18)_48%,rgba(16,22,19,0.56)_78%,var(--background)_100%)]" />
+        <div className="absolute left-1/2 bottom-[-2.25rem] h-24 w-[min(54rem,82vw)] -translate-x-1/2 rounded-[999px] bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--primary)_7%,transparent)_0%,transparent_72%)] blur-[84px] dark:bg-transparent" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-[1400px] items-center px-4 py-6 pb-12 sm:px-6 sm:py-8 md:px-8 lg:px-12 md:py-10 md:pb-14">
-        <div className="grid w-full items-center gap-8 min-[600px]:gap-7 md:grid-cols-2 md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
-          <div className="flex max-w-[35rem] flex-col items-center text-center min-[600px]:max-w-[40rem] md:items-start md:text-left">
+      <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-[1400px] items-center px-4 py-5 pb-10 sm:px-6 sm:py-8 md:px-8 lg:px-12 md:py-10 md:pb-14">
+        <div className="grid w-full items-center gap-7 min-[600px]:gap-7 md:grid-cols-2 md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
+          <div className="flex w-full max-w-[35rem] flex-col items-center text-center min-[600px]:max-w-[40rem] md:items-start md:text-left">
             <div
               className="opacity-0 animate-[heroFadeUp_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards]"
               style={{ animationDelay: "40ms" }}
             ></div>
 
             <h1
-              className="mt-4 max-w-[9ch] text-balance text-[2.6rem] font-semibold leading-[0.94] tracking-[-0.06em] text-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-5 sm:max-w-[10ch] sm:text-[3.4rem] min-[640px]:max-[760px]:max-w-[11ch] min-[640px]:max-[760px]:text-[3rem] md:max-w-[11ch] md:text-[3rem] lg:text-[4.6rem] xl:text-[5.7rem]"
+              className="mt-3 max-w-[9ch] text-balance text-[2.45rem] font-semibold leading-[0.92] tracking-[-0.065em] text-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[380px]:max-w-[8.4ch] max-[380px]:text-[2.15rem] sm:mt-5 sm:max-w-[10ch] sm:text-[3.4rem] min-[640px]:max-[760px]:max-w-[11ch] min-[640px]:max-[760px]:text-[3rem] md:max-w-[11ch] md:text-[3rem] lg:text-[4.6rem] xl:text-[5.7rem]"
               style={{ animationDelay: "120ms" }}
             >
               <span className="block">{dict.feed.feedhero.title_prefix}</span>
@@ -197,20 +197,20 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
             </h1>
 
             <p
-              className="mt-4 max-w-[31rem] px-1 text-pretty text-[0.98rem] leading-7 text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-5 sm:px-0 sm:text-lg min-[640px]:max-[760px]:max-w-[36rem] min-[640px]:max-[760px]:text-[1rem] min-[640px]:max-[760px]:leading-7"
+              className="mt-4 max-w-[31rem] px-1 text-pretty text-[0.98rem] leading-7 text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[380px]:text-[0.94rem] max-[380px]:leading-6 sm:mt-5 sm:px-0 sm:text-lg min-[640px]:max-[760px]:max-w-[36rem] min-[640px]:max-[760px]:text-[1rem] min-[640px]:max-[760px]:leading-7"
               style={{ animationDelay: "210ms" }}
             >
               {dict.feed.feedhero.subtitle}
             </p>
 
             <div
-              className="mt-7 flex w-full flex-col gap-3 opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 sm:w-full min-[760px]:w-auto min-[760px]:flex-row min-[760px]:justify-center md:justify-start"
+              className="mt-6 flex w-full flex-col gap-3 opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 sm:w-full min-[760px]:w-auto min-[760px]:flex-row min-[760px]:justify-center md:justify-start"
               style={{ animationDelay: "300ms" }}
             >
               {!session ? (
                 <Button
                   asChild
-                  className="group h-12 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer min-[760px]:w-auto"
+                  className="group h-12 max-[380px]:h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer min-[760px]:w-auto"
                 >
                   <Link href="/register">
                     {dict.feed.feedhero.create_profile}
@@ -219,7 +219,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 </Button>
               ) : (
                 <Button
-                  className="group h-12 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer min-[760px]:w-auto"
+                  className="group h-12 max-[380px]:h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_color-mix(in_oklab,var(--primary)_55%,black)] transition-all hover:-translate-y-0.5 hover:bg-primary/90 cursor-pointer min-[760px]:w-auto"
                   onClick={() => setIsCreating(true)}
                 >
                   <FiPlus className="mr-2" />
@@ -229,7 +229,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
 
               <Button
                 variant="outline"
-                className="h-12 w-full rounded-full border-border/70 bg-background/75 px-6 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background cursor-pointer min-[760px]:w-auto"
+                className="h-12 max-[380px]:h-11 w-full rounded-full border-border/70 bg-background/75 px-6 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background cursor-pointer min-[760px]:w-auto"
                 onClick={() => {
                   setActiveTab("projects");
                   document.getElementById("feed-content")?.scrollIntoView({ behavior: "smooth" });
@@ -241,7 +241,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
             </div>
 
             <div
-              className="mt-7 flex flex-col items-center gap-2.5 text-sm text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] sm:mt-8 min-[760px]:flex-row min-[760px]:flex-wrap min-[760px]:justify-center md:justify-start md:items-start"
+              className="mt-6 flex flex-col items-center gap-2.5 text-sm text-muted-foreground opacity-0 animate-[heroFadeUp_0.8s_cubic-bezier(0.22,1,0.36,1)_forwards] max-[380px]:text-[0.95rem] sm:mt-8 min-[760px]:flex-row min-[760px]:flex-wrap min-[760px]:justify-center md:justify-start md:items-start"
               style={{ animationDelay: "380ms" }}
             >
               <div className="flex items-center gap-2">
@@ -257,10 +257,10 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
           </div>
 
           <div
-            className="relative mx-auto w-full max-w-[33rem] opacity-0 animate-[heroFadeUp_0.9s_cubic-bezier(0.22,1,0.36,1)_forwards] min-[600px]:max-w-[36rem] md:ml-auto md:max-w-[38rem]"
+            className="relative mx-auto w-full max-w-[33rem] max-[380px]:max-w-full opacity-0 animate-[heroFadeUp_0.9s_cubic-bezier(0.22,1,0.36,1)_forwards] min-[600px]:max-w-[36rem] md:ml-auto md:max-w-[38rem]"
             style={{ animationDelay: "180ms" }}
           >
-            <div className="absolute inset-x-[12%] top-[12%] h-[72%] rounded-[2.5rem] bg-primary/15 blur-3xl animate-[heroDrift_20s_ease-in-out_infinite] dark:bg-black/45 dark:blur-[70px] sm:inset-x-[14%] sm:top-[14%] sm:h-[68%]" />
+            <div className="absolute inset-x-[12%] top-[12%] h-[72%] rounded-[2.5rem] bg-primary/15 blur-3xl animate-[heroDrift_20s_ease-in-out_infinite] max-[380px]:inset-x-[8%] max-[380px]:top-[10%] dark:bg-black/45 dark:blur-[70px] sm:inset-x-[14%] sm:top-[14%] sm:h-[68%]" />
 
             <div
               role="button"
@@ -272,12 +272,12 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                   handleProjectClick();
                 }
               }}
-              className="group relative block w-full overflow-hidden rounded-[1.7rem] border border-border/60 bg-background/75 text-left shadow-[0_26px_80px_-42px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:rounded-[2rem] sm:shadow-[0_32px_90px_-42px_rgba(0,0,0,0.45)] dark:border-white/14 dark:bg-[linear-gradient(180deg,rgba(18,25,22,0.98)_0%,rgba(20,30,25,0.98)_100%)] dark:shadow-[0_42px_120px_-52px_rgba(0,0,0,0.92),0_24px_64px_-36px_rgba(0,0,0,0.72),0_0_0_1px_rgba(255,255,255,0.05)]"
+              className="group relative block w-full overflow-hidden rounded-[1.55rem] border border-border/60 bg-background/75 text-left shadow-[0_26px_80px_-42px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-transform duration-500 hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 max-[380px]:rounded-[1.35rem] sm:rounded-[2rem] sm:shadow-[0_32px_90px_-42px_rgba(0,0,0,0.45)] dark:border-white/14 dark:bg-[linear-gradient(180deg,rgba(18,25,22,0.98)_0%,rgba(20,30,25,0.98)_100%)] dark:shadow-[0_42px_120px_-52px_rgba(0,0,0,0.92),0_24px_64px_-36px_rgba(0,0,0,0.72),0_0_0_1px_rgba(255,255,255,0.05)]"
             >
               <div className="absolute inset-0 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--background)_82%,transparent)_10%,transparent_42%,color-mix(in_oklab,var(--primary)_8%,transparent)_100%)] dark:bg-[linear-gradient(145deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_28%,rgba(5,220,127,0.03)_100%)]" />
               <div className="absolute inset-[1px] rounded-[calc(1.7rem-1px)] border border-white/0 dark:border-white/[0.045] sm:rounded-[calc(2rem-1px)]" />
 
-              <div className="relative flex flex-wrap items-center justify-between gap-3 px-4 py-4 min-[760px]:flex-nowrap min-[760px]:gap-4 min-[760px]:px-6">
+              <div className="relative flex flex-wrap items-center justify-between gap-3 px-4 py-4 max-[380px]:px-3.5 max-[380px]:py-3.5 min-[760px]:flex-nowrap min-[760px]:gap-4 min-[760px]:px-6">
                 <Link
                   href={`/${highlightedProject?.ownerUsername || "retold"}`}
                   onClick={(event) => event.stopPropagation()}
@@ -306,7 +306,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 <div className="flex w-full justify-start min-[760px]:w-auto min-[760px]:justify-end">
                   <Badge
                     variant="secondary"
-                    className="shrink-0 rounded-full border border-primary/15 bg-background/80 px-3 py-1 text-[0.62rem] uppercase tracking-[0.18em] text-foreground/75 dark:border-white/12 dark:bg-white/[0.04] dark:text-white/78 sm:text-[0.65rem] sm:tracking-[0.22em]"
+                    className="shrink-0 rounded-full border border-primary/15 bg-background/80 px-3 py-1 text-[0.62rem] uppercase tracking-[0.18em] text-foreground/75 max-[380px]:px-2.5 max-[380px]:text-[0.55rem] max-[380px]:tracking-[0.14em] dark:border-white/12 dark:bg-white/[0.04] dark:text-white/78 sm:text-[0.65rem] sm:tracking-[0.22em]"
                   >
                     <FiTrendingUp className="mr-1.5" />
                     {dict.feed.feedhero.featured_week}
@@ -314,8 +314,8 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                 </div>
               </div>
 
-              <div className="relative p-3 sm:p-4">
-                <div className="relative h-[15.5rem] overflow-hidden rounded-[1.25rem] bg-secondary/60 ring-1 ring-black/5 sm:h-[18rem] sm:rounded-[1.55rem] min-[640px]:max-[760px]:h-[16.5rem] lg:h-[26rem] dark:bg-black/20 dark:ring-white/12 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+              <div className="relative p-3 max-[380px]:p-2.5 sm:p-4">
+                <div className="relative h-[15rem] overflow-hidden rounded-[1.2rem] bg-secondary/60 ring-1 ring-black/5 max-[380px]:h-[13.25rem] max-[380px]:rounded-[1rem] sm:h-[18rem] sm:rounded-[1.55rem] min-[640px]:max-[760px]:h-[16.5rem] lg:h-[26rem] dark:bg-black/20 dark:ring-white/12 dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
                   {featuredImage ? (
                     <Image
                       src={featuredImage}
@@ -332,18 +332,18 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                   )}
 
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.18)_45%,rgba(0,0,0,0.72)_100%)] dark:bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.16)_36%,rgba(0,0,0,0.82)_100%)]" />
-                  <div className="absolute inset-x-0 bottom-0 p-4 sm:p-7">
-                    <h2 className="max-w-[12ch] text-[2rem] font-semibold leading-[0.94] tracking-[-0.05em] text-white sm:mt-3 sm:max-w-[14ch] sm:text-[2.6rem] min-[640px]:max-[760px]:text-[2.35rem] md:text-[2.2rem] lg:text-[3rem] xl:text-[3.4rem]">
+                  <div className="absolute inset-x-0 bottom-0 p-4 max-[380px]:p-3 sm:p-7">
+                    <h2 className="max-w-[12ch] text-[1.9rem] font-semibold leading-[0.94] tracking-[-0.05em] text-white max-[380px]:text-[1.55rem] sm:mt-3 sm:max-w-[14ch] sm:text-[2.6rem] min-[640px]:max-[760px]:text-[2.35rem] md:text-[2.2rem] lg:text-[3rem] xl:text-[3.4rem]">
                       {highlightedProject?.title || dict.feed.feedhero.title_highlight}
                     </h2>
-                    <p className="mt-3 max-w-[34rem] line-clamp-3 text-sm leading-5 text-white/78 sm:line-clamp-4 sm:text-[0.98rem] sm:leading-6">
+                    <p className="mt-2.5 max-w-[34rem] line-clamp-2 text-sm leading-5 text-white/78 max-[380px]:text-[0.82rem] max-[380px]:leading-[1.35] sm:mt-3 sm:line-clamp-4 sm:text-[0.98rem] sm:leading-6">
                       {highlightedProject?.description || dict.feed.feedhero.subtitle}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="relative flex flex-col gap-3 px-4 py-4 min-[760px]:flex-row min-[760px]:items-center min-[760px]:justify-between min-[760px]:px-6">
+              <div className="relative flex flex-col gap-3 px-4 py-4 max-[380px]:px-3.5 max-[380px]:py-3.5 min-[760px]:flex-row min-[760px]:items-center min-[760px]:justify-between min-[760px]:px-6">
                 <div className="min-w-0 flex-1">
                   {featuredRepoHref && featuredRepo ? (
                     <a
@@ -374,7 +374,7 @@ export default function HeroSectionV2({ projectDTO, session }: Props) {
                         handleLikeClick(event);
                       }
                     }}
-                    className={`inline-flex items-center gap-1.5 transition-colors ${isPending ? "pointer-events-none opacity-70" : "cursor-pointer"} ${isLiked ? "text-[#ff4d4d]" : "hover:text-[#ff4d4d]"}`}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-1 py-1 transition-colors ${isPending ? "pointer-events-none opacity-70" : "cursor-pointer"} ${isLiked ? "text-[#ff4d4d]" : "hover:text-[#ff4d4d]"}`}
                   >
                     {isLiked ? (
                       <MdFavorite

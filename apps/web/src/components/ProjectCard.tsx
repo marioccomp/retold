@@ -276,7 +276,7 @@ export default function ProjectCard({
 
           <div
             onClick={handleToggleLike}
-            className={`flex items-center gap-1.5 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer select-none transition-transform duration-100 active:scale-90 group/like ${isPending ? "opacity-70 pointer-events-none" : ""}`}
+            className={`flex items-center gap-1.5 rounded-full px-1 py-1 text-[14px] max-[650px]:text-[16px] max-[650px]:gap-2 cursor-pointer select-none transition-colors duration-150 active:scale-90 group/like ${isPending ? "opacity-70 pointer-events-none" : ""}`}
           >
             {isLiked ? (
               <MdFavorite
@@ -291,7 +291,7 @@ export default function ProjectCard({
               />
             )}
             <p
-              className={`transition-colors duration-200 ${isLiked ? "text-[#ff4d4d] font-semibold" : ""}`}
+              className={`transition-colors duration-200 group-hover/like:text-[#ff4d4d] ${isLiked ? "text-[#ff4d4d] font-semibold" : ""}`}
             >
               {likesCount}
             </p>

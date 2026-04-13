@@ -5,13 +5,12 @@ services:
       - .env
     restart: unless-stopped
     ports:
-      # Expõe a porta do banco APENAS para a própria máquina (localhost)
       - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql
     deploy:
       resources:
-        limits: # IMPORTANTÍSSIMO para a sua VPS de 1GB!
+        limits: 
           memory: 256M 
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "$POSTGRES_USER"]
@@ -26,7 +25,6 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required for production Redis}
     ports:
-      # Expõe o Redis APENAS para a própria máquina (localhost)
       - "127.0.0.1:6379:6379"
     volumes:
       - redisdata:/data

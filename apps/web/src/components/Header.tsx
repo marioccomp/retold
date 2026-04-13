@@ -149,6 +149,15 @@ export default function Header({ session: initialSession }: { session: Session |
     }
   };
 
+  const handleLogoClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname !== "/") {
+      return;
+    }
+
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // Do not render Header on onboarding page
   if (pathname === "/onboarding") return null;
 
@@ -160,23 +169,24 @@ export default function Header({ session: initialSession }: { session: Session |
           : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       }`}
     >
-      <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
+      <div className="max-w-7xl mx-auto h-16 px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-6 min-w-0">
           {/* Logo */}
           <Link
             href="/"
-            className="flex h-16 max-w-[220px] items-center overflow-hidden cursor-pointer shrink-0 leading-none -mt-0.8"
+            onClick={handleLogoClick}
+            className="flex h-16 max-w-[156px] sm:max-w-[220px] items-center overflow-hidden cursor-pointer shrink-0 leading-none -mt-0.8"
           >
             <Image
               src={logo}
               alt="Retold Logo"
-              className="block h-32 w-auto max-w-none cursor-pointer dark:hidden pointer-events-none"
+              className="block h-24 sm:h-32 w-auto max-w-none cursor-pointer dark:hidden pointer-events-none"
               priority
             />
             <Image
               src={logoDark}
               alt="Retold Logo"
-              className="hidden dark:block h-32 w-auto max-w-none cursor-pointer pointer-events-none"
+              className="hidden dark:block h-24 sm:h-32 w-auto max-w-none cursor-pointer pointer-events-none"
               priority
             />
           </Link>
@@ -258,7 +268,7 @@ export default function Header({ session: initialSession }: { session: Session |
         </div>
 
         {/* Profile / Actions / Mobile Search */}
-        <div className="flex items-center gap-3 pl-2">
+        <div className="flex items-center gap-2 sm:gap-3 pl-1 sm:pl-2 shrink-0">
           {/* Mobile Search Icon */}
           <div
             className={`md:hidden transition-all duration-300 ${showSearch || isSearchExpanded ? "opacity-100" : "opacity-0 scale-90 pointer-events-none"}`}
