@@ -85,6 +85,12 @@ export function classifyFile(file: FileEntry): FileRole {
   // Source code (ext)
   if (
     [
+      ".html",
+      ".htm",
+      ".css",
+      ".scss",
+      ".sass",
+      ".less",
       ".js",
       ".ts",
       ".jsx",

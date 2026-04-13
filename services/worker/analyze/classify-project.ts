@@ -161,7 +161,11 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     /next\.config|vite\.config|webpack\.config/i.test(f.name)
   );
 
-  const isWeb = hasWebFramework || hasWebConfigs;
+  const hasStaticWebFiles = files.some((f) =>
+    /\.(html?|css|scss|sass|less)$/.test(f.name.toLowerCase())
+  );
+
+  const isWeb = hasWebFramework || hasWebConfigs || hasStaticWebFiles;
 
   const systemsLangs = ["c", "c++", "rust", "go", "zig", "assembly"];
   const hasSystemsLang =
@@ -251,7 +255,11 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
   } else if (["python", "r", "julia"].includes(primLang)) {
     // Distinguish data vs scripting context based on domain
     languageFamily = domain === "data" ? "scientific" : "scripting";
-  } else if (["javascript", "typescript", "php", "ruby"].includes(primLang)) {
+  } else if (
+    ["javascript", "typescript", "php", "ruby", "html", "css", "scss", "sass", "less"].includes(
+      primLang
+    )
+  ) {
     languageFamily = "web"; // Generic bucket for these, usually web-related
   } else if (["lua", "bash", "shell"].includes(primLang)) {
     languageFamily = "scripting";

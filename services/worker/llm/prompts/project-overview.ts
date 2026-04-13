@@ -213,6 +213,13 @@ OTHER RULES:
 - Provide at least 3 evidence items when style != "unknown".
 `.trim();
 
+  const assertivenessPolicy = `
+ASSERTIVENESS POLICY:
+- When the repository evidence is strong, state conclusions directly.
+- Do NOT use hedging such as "seems to", "appears to", "probably", "likely", "might", "could be", "parece ser", or "pode ser" for well-supported conclusions.
+- Use uncertainty language only when evidence is genuinely missing or contradictory, and explain why.
+`.trim();
+
   // ============================================================
   // DYNAMIC BLOCKLIST - Tells LLM what the project ALREADY HAS
   // This makes it EXPLICIT and impossible to ignore
@@ -325,6 +332,8 @@ ${documentationPolicy}
 ${weaknessValidationPolicy}
 
 ${adaptationPolicy}
+
+${assertivenessPolicy}
 
 ## CRITICAL EVALUATION RULES (ABSOLUTE - VIOLATION INVALIDATES YOUR RESPONSE)
 

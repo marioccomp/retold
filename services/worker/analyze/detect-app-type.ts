@@ -19,6 +19,14 @@ export function detectAppType(input: {
     frontendScore += 3;
   }
 
+  if (languages.some((language) => ["HTML", "CSS", "SCSS", "Sass", "Less"].includes(language))) {
+    frontendScore += 2;
+  }
+
+  if (tools.some((tool) => ["Tailwind", "PostCSS", "Webpack", "Vite"].includes(tool))) {
+    frontendScore += 1;
+  }
+
   if (frameworks.includes("Next.js")) {
     frontendScore += 1;
     backendScore += 1; // Next pode ser fullstack

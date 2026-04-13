@@ -1,6 +1,12 @@
 import { FileEntry } from "./scan-repository.js";
 
 const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
+  ".html": "HTML",
+  ".htm": "HTML",
+  ".css": "CSS",
+  ".scss": "SCSS",
+  ".sass": "Sass",
+  ".less": "Less",
   ".ts": "TypeScript",
   ".js": "JavaScript",
   ".py": "Python",
