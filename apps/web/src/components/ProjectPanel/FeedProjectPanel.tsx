@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
 
 import {
   Github,
@@ -103,6 +104,11 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
   const t = dict.project;
   const { data: session } = useSession();
   const repo = project.repository;
+  const formattedDescription = useMemo(() => {
+    if (!project.description) return null;
+
+    return project.description.replace(/\\n/g, "\n").replace(/\r\n/g, "\n").trim();
+  }, [project.description]);
 
   const queryClient = useQueryClient();
   const hasIncremented = useRef(false);
@@ -234,10 +240,34 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
 
             {/* Description & Repo Row */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mt-2 w-full">
-              {project.description && (
-                <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-3xl text-justify">
-                  {project.description}
-                </p>
+              {formattedDescription && (
+                <div className="max-w-3xl text-left">
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => (
+                        <p className="mb-3 text-muted-foreground text-sm md:text-base leading-relaxed last:mb-0">
+                          {children}
+                        </p>
+                      ),
+                      strong: ({ children }) => (
+                        <strong className="font-bold text-foreground">{children}</strong>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className="mb-3 list-disc space-y-1.5 pl-5 text-muted-foreground text-sm md:text-base leading-relaxed last:mb-0">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="mb-3 list-decimal space-y-1.5 pl-5 text-muted-foreground text-sm md:text-base leading-relaxed last:mb-0">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => <li>{children}</li>,
+                    }}
+                  >
+                    {formattedDescription}
+                  </ReactMarkdown>
+                </div>
               )}
 
               {/* Repo Link - Hidden on mobile, shown on right on desktop */}
