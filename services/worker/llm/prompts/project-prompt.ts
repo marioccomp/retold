@@ -351,6 +351,14 @@ ANTI-HALLUCINATION RULES:
 - If you are unsure if a feature exists, DO NOT mention it as a suggestion.
 `.trim();
 
+  const assertivenessPolicy = `
+ASSERTIVENESS POLICY:
+- When repository evidence is strong and coherent, write conclusions directly and confidently.
+- Do NOT hedge strong conclusions with phrases such as "seems to", "appears to", "probably", "likely", "might", "could be", "parece ser", or "pode ser".
+- Prefer direct wording such as "the project is", "the repository uses", "the architecture follows", and "the codebase is organized as".
+- Reserve uncertainty language only for cases with genuinely missing or conflicting evidence, and then explain exactly what is missing or conflicting.
+`.trim();
+
   const namingPolicy = `
 NAMING / REFERENCING POLICY (STRICT):
 - Do NOT refer to the project by its repository name ("${repoName}") in the narrative.
@@ -374,6 +382,7 @@ NAMING / REFERENCING POLICY (STRICT):
 
         ${JSON.stringify(inputLite, null, 2)}
         ${antiHallucinationPolicy}
+        ${assertivenessPolicy}
 
         ${namingPolicy}
         ${summaryInstructions}
