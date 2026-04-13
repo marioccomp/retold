@@ -3,6 +3,7 @@
 import retoldImg from "@/assets/retold-login.png";
 import retoldLogo from "@/assets/retold-footer.png";
 import { FiGithub } from "react-icons/fi";
+import { HiMiniSparkles } from "react-icons/hi2";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -175,6 +176,30 @@ export default function LoginForm() {
             <p className="text-muted-foreground text-center">{dict.auth.login.subtitle}</p>
           </div>
 
+          <div className="mb-6">
+            <div className="mb-4 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-primary-foreground shadow-md shadow-primary/20 ring-1 ring-primary/10">
+                <HiMiniSparkles className="text-sm" />
+                {dict.auth.login.github_recommended_badge}
+              </span>
+            </div>
+            <button
+              className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
+              onClick={() => signIn("github", { callbackUrl: "/" })}
+              type="button"
+              data-testid="login-github-button"
+            >
+              <FiGithub className="text-xl" />
+              <span>{dict.auth.login.github_cta}</span>
+            </button>
+          </div>
+
+          <div className="flex items-center mb-8 text-muted-foreground text-sm">
+            <div className="flex-1 h-px bg-border" />
+            <span className="px-4">{dict.auth.login.email_divider}</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
             <div className="space-y-2">
               <Label htmlFor="identifier" className="text-foreground font-medium">
@@ -273,26 +298,6 @@ export default function LoginForm() {
               )}
             </Button>
           </form>
-
-          {/* Divider */}
-          <div className="flex items-center my-8 text-muted-foreground text-sm">
-            <div className="flex-1 h-px bg-border" />
-            <span className="px-4">{dict.auth.login.social_divider}</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          {/* Social accounts */}
-          <div className="flex justify-center gap-4">
-            <button
-              className="flex items-center justify-center w-full h-12 rounded-lg border border-border text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5 hover:-translate-y-0.5 cursor-pointer gap-2 font-medium"
-              onClick={() => signIn("github", { callbackUrl: "/" })}
-              type="button"
-              data-testid="login-github-button"
-            >
-              <FiGithub className="text-xl" />
-              <span>GitHub</span>
-            </button>
-          </div>
 
           {/* Create account */}
           <p className="text-center text-muted-foreground text-sm mt-8">

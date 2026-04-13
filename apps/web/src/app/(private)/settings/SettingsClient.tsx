@@ -81,12 +81,25 @@ export function SettingsClient({
     const params = new URLSearchParams(window.location.search);
     const github = params.get("github");
     const reauth = params.get("reauth");
+    const pendingGithubConnectToast =
+      window.sessionStorage.getItem("settings:github-connect-required") === "1";
+    const cleanupTimers: number[] = [];
+    const schedule = (callback: () => void, delay: number) => {
+      const timer = window.setTimeout(callback, delay);
+      cleanupTimers.push(timer);
+    };
 
-    if (!github && !reauth) return;
+    if (!github && !reauth && !pendingGithubConnectToast) return;
 
-    if (github === "linked") toast.success("GitHub conectado com sucesso.");
+    if (github === "linked") {
+      schedule(() => {
+        toast.success("GitHub conectado com sucesso.");
+      }, 80);
+    }
     if (reauth === "account-delete") {
-      toast.success(dict.settings.dangerZone.reauth.oauth_success);
+      schedule(() => {
+        toast.success(dict.settings.dangerZone.reauth.oauth_success);
+      }, 80);
       setActiveTab("danger");
       setRequiresDeleteGithubReauth(false);
     }
@@ -96,10 +109,34 @@ export function SettingsClient({
     }
 
     if (github === "already_linked") setLinkError("already_linked");
-    if (github === "oauth_error") toast.error("Falha ao conectar o GitHub. Tente novamente.");
+    if (github === "oauth_error") {
+      schedule(() => {
+        toast.error("Falha ao conectar o GitHub. Tente novamente.");
+      }, 80);
+    }
+    if (github === "connect_required" || pendingGithubConnectToast) {
+      setActiveTab("integrations");
+      schedule(() => {
+        toast.error(dict.settings.connectedAccounts.connect_required);
+        window.sessionStorage.removeItem("settings:github-connect-required");
+      }, 120);
+    } else {
+      window.sessionStorage.removeItem("settings:github-connect-required");
+    }
 
-    window.history.replaceState(null, "", "/settings");
-  }, [dict.settings.dangerZone.reauth.oauth_success]);
+    schedule(() => {
+      window.history.replaceState(null, "", "/settings");
+    }, 160);
+
+    return () => {
+      for (const timer of cleanupTimers) {
+        window.clearTimeout(timer);
+      }
+    };
+  }, [
+    dict.settings.connectedAccounts.connect_required,
+    dict.settings.dangerZone.reauth.oauth_success,
+  ]);
 
   async function handleUpdatePassword(formData: FormData) {
     const form = document.getElementById("password-form") as HTMLFormElement;

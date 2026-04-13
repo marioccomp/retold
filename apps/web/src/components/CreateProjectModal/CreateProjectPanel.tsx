@@ -136,7 +136,10 @@ export default function CreateProjectPanel({ onClose, onSuccess, isModal }: Prop
       }
 
       if (event.data?.type === "GITHUB_APP_NOT_LINKED_GITHUB") {
-        toast.error("Conecte sua conta do GitHub nas configuracoes antes de instalar o app.");
+        stopGithubInstallPopupPolling();
+        githubInstallPopupRef.current = null;
+        window.sessionStorage.setItem("settings:github-connect-required", "1");
+        window.location.href = "/settings?github=connect_required";
         return;
       }
 
