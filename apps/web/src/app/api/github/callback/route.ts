@@ -179,7 +179,10 @@ export async function GET(req: NextRequest) {
 
         await prisma.user.update({
             where: { id: currentUserId },
-            data: { githubEmail: githubEmail ?? null },
+            data: {
+                githubEmail: githubEmail ?? null,
+                githubUrl: ghUser.login ? `https://github.com/${ghUser.login}` : null,
+            },
         });
 
         return redirectWith("/settings?github=linked");
