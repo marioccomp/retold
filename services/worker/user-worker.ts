@@ -1,6 +1,11 @@
 import { Worker } from "bullmq";
 import { redisConnection } from "@repo/queue";
-import { prisma, githubRepository } from "@repo/database";
+import {
+  prisma,
+  githubRepository,
+  matchesUserCommitAuthor,
+  resolveUserCommitIdentity,
+} from "@repo/database";
 import { execFileSync } from "child_process";
 import { cloneRepository } from "./clone";
 import { createLogger } from "@repo/observability";
@@ -27,7 +32,21 @@ export const userWorker = new Worker(
     try {
       const project = await prisma.project.findUnique({
         where: { id: projectId },
-        include: { user: true, repository: true },
+        include: {
+          repository: true,
+          user: {
+            include: {
+              accounts: {
+                where: { provider: "github" },
+                select: { providerAccountId: true },
+              },
+              githubInstallations: {
+                select: { accountLogin: true, accountType: true },
+                take: 1,
+              },
+            },
+          },
+        },
       });
 
       if (!project) throw new Error("Project not found");
@@ -41,8 +60,6 @@ export const userWorker = new Worker(
         throw new Error("Repository ownership mismatch for user analysis");
       }
 
-      // 1. Preparar o repositório
-      // Se não tiver URL no projeto, tentamos pegar do repositório linkado ou abortar
       const repoUrl = project.repository?.url;
       if (!repoUrl) {
         logger.info("worker.repository_missing", { projectId });
@@ -50,47 +67,64 @@ export const userWorker = new Worker(
       }
       const repositoryOrigin = validateGitHubRepositoryUrl(repoUrl);
 
-      // Token para clonar se for privado
-      const token = await githubRepository.getToken(projectId);
+      let token = "";
+      try {
+        token = await githubRepository.getToken(projectId);
+      } catch (error: any) {
+        if (error.message.includes("No github installations found")) {
+          logger.info("worker.github_installation_missing_public_clone", { projectId });
+        } else {
+          throw error;
+        }
+      }
 
-      // Clone limpo para análise
       await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token);
 
-      // --- ESTATÍSTICAS ---
-
-      // Identificadores do user
-      const primaryEmail =
-        project.user.email.toLowerCase().trim();
-      const userIdentifier =
-        project.user.username?.toLowerCase().trim() || primaryEmail.split("@")[0];
-      // Lista de emails possíveis (poderíamos pegar mais do banco se tivesse)
-      const targetEmails = [primaryEmail];
-
-      // 1. Commits Count & Datas (First/Last)
-      // git log --author="name_or_email" --format="%cd" --date=iso
-      // Mas o author pode variar, então pegamos TUDO e filtramos no JS ou usamos --author com varias opcoes se o git deixar.
-      // Mais seguro: git log --format="%aE|%cd" e filtrar
-
-      const logOutput = execFileSync("git", ["-C", tmpPath, "log", "--format=%aE|%cd"], {
-        encoding: "utf8",
+      const personalGithubInstallation = project.user.githubInstallations[0];
+      const githubAccount = project.user.accounts[0];
+      const commitIdentity = resolveUserCommitIdentity({
+        email: project.user.email,
+        githubEmail: project.user.githubEmail,
+        username: project.user.username,
+        name: project.user.name,
+        githubUrl: project.user.githubUrl,
+        githubLogin:
+          personalGithubInstallation?.accountType === "User"
+            ? personalGithubInstallation.accountLogin
+            : null,
+        githubAccountId: githubAccount?.providerAccountId ?? null,
       });
+
+      const logOutput = execFileSync(
+        "git",
+        ["-C", tmpPath, "log", "--format=%aE%x1f%aN%x1f%cd"],
+        {
+          encoding: "utf8",
+        }
+      );
       const commits = logOutput.split("\n").filter(Boolean);
 
       let userCommitsCount = 0;
       let firstCommit: string | null = null;
       let lastCommit: string | null = null;
-      const daysActive = new Set<string>(); // "YYYY-MM-DD"
+      const daysActive = new Set<string>();
 
       for (const line of commits) {
-        const [email, dateStr] = line.split("|");
-        const commitEmail = email.toLowerCase().trim();
-
-        if (targetEmails.includes(commitEmail) || commitEmail.includes(userIdentifier)) {
+        const [email, authorName, dateStr] = line.split("\x1f");
+        if (
+          matchesUserCommitAuthor(
+            {
+              email,
+              name: authorName,
+            },
+            commitIdentity
+          )
+        ) {
           userCommitsCount++;
           const dateObj = new Date(dateStr);
 
-          if (!lastCommit) lastCommit = dateStr; // A ordem do log é desc (mais recente primeiro)
-          firstCommit = dateStr; // Vai atualizando até chegar no mais antigo
+          if (!lastCommit) lastCommit = dateStr;
+          firstCommit = dateStr;
 
           const dayKey = dateObj.toISOString().split("T")[0];
           daysActive.add(dayKey);
@@ -103,7 +137,7 @@ export const userWorker = new Worker(
       try {
         const numstatOutput = execFileSync(
           "git",
-          ["-C", tmpPath, "log", "--all", "--numstat", "--pretty=%aE"],
+          ["-C", tmpPath, "log", "--all", "--numstat", "--pretty=%aE%x1f%aN"],
           {
             encoding: "utf8",
           }
@@ -115,13 +149,16 @@ export const userWorker = new Worker(
         for (const line of numstatLines) {
           if (!line.trim()) continue;
 
-          // Se linha tem @ é o cabeçalho do commit (autor)
-          if (line.includes("@")) {
-            const commitEmail = line.trim().toLowerCase();
-            isUserCommit =
-              targetEmails.includes(commitEmail) || commitEmail.includes(userIdentifier);
+          if (line.includes("\x1f")) {
+            const [email, authorName] = line.split("\x1f");
+            isUserCommit = matchesUserCommitAuthor(
+              {
+                email,
+                name: authorName,
+              },
+              commitIdentity
+            );
           } else if (isUserCommit) {
-            // É linha de stats: "added deleted path"
             const parts = line.split("\t");
             if (parts.length >= 2) {
               const add = parseInt(parts[0]);
@@ -131,8 +168,8 @@ export const userWorker = new Worker(
             }
           }
         }
-      } catch (e) {
-        logger.warn("worker.numstat_calculation_failed", { projectId }, e);
+      } catch (error) {
+        logger.warn("worker.numstat_calculation_failed", { projectId }, error);
       }
 
       logger.info("worker.stats_calculated", {
@@ -144,24 +181,23 @@ export const userWorker = new Worker(
         activeDays: daysActive.size,
       });
 
-      // Salvar no Banco
       await prisma.userProjectStats.upsert({
         where: {
           userId_projectId: {
             userId: project.userId,
-            projectId: projectId,
+            projectId,
           },
         },
         create: {
           userId: project.userId,
-          projectId: projectId,
+          projectId,
           commitsCount: userCommitsCount,
           linesAdded,
           linesDeleted,
           activeDays: daysActive.size,
           firstCommitDate: firstCommit ? new Date(firstCommit) : null,
           lastCommitDate: lastCommit ? new Date(lastCommit) : null,
-          impactScore: (linesAdded - linesDeleted) * 0.01 + userCommitsCount, // Exemplo simples
+          impactScore: (linesAdded - linesDeleted) * 0.01 + userCommitsCount,
         },
         update: {
           commitsCount: userCommitsCount,
@@ -175,8 +211,6 @@ export const userWorker = new Worker(
       });
     } catch (err) {
       logger.error("worker.job_failed", err, { projectId });
-      // Não damos throw para não re-enfileirar infinito se for erro de lógica,
-      // mas em produção talvez queira retry
     } finally {
       cleanupScopedDirectory(tmpPath, USER_ANALYSIS_TMP_ROOT);
     }
