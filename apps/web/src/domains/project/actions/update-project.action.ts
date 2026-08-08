@@ -88,7 +88,7 @@ export async function updateProjectAction(input: UpdateProjectInput) {
   });
 
   revalidatePath(`/${session.user.username}`);
-  // @ts-ignore
+  // @ts-expect-error - documentation says single arg, but types seem to differ in this version
   revalidateTag(FEED_RECOMMENDED_TAG);
   revalidatePath("/");
   return updatedProject;
