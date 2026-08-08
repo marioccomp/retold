@@ -21,6 +21,8 @@ const launchOptions =
       }
     : undefined;
 
+const isCI = Boolean(process.env.CI);
+
 export default defineConfig({
   testDir: "./e2e/specs",
   fullyParallel: false,
@@ -44,14 +46,22 @@ export default defineConfig({
     launchOptions,
   },
   webServer: {
-    command: "pnpm dev --port 3000",
+    // Turbopack's dev server recompiles routes incrementally as tests navigate
+    // around, and its incremental module graph has known internal stability
+    // bugs (e.g. "inner_of_uppers_lost_follower" panics) that surface as
+    // random ERR_ABORTED navigations after enough route compilations pile up
+    // in one long-lived `next dev` process. A production build has no
+    // incremental compilation, so it doesn't hit that class of bug — use it
+    // in CI where determinism matters more than a ~30-60s longer startup.
+    command: isCI ? "pnpm build && pnpm start" : "pnpm dev --port 3000",
     cwd: __dirname,
     url: "http://localhost:3000",
-    timeout: 180_000,
-    reuseExistingServer: true,
+    timeout: isCI ? 300_000 : 180_000,
+    reuseExistingServer: !isCI,
     env: {
       ...process.env,
-      NODE_ENV: "development",
+      NODE_ENV: isCI ? "production" : "development",
+      PORT: "3000",
       NEXTAUTH_URL: "http://localhost:3000",
       APP_URL: "http://localhost:3000",
       E2E_BYPASS_RATE_LIMITS: "true",
