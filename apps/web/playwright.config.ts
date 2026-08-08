@@ -29,9 +29,15 @@ export default defineConfig({
   workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  timeout: 60_000,
+  // GitHub Actions' standard runners are noticeably slower than a dev
+  // laptop for this kind of CPU-bound work (bcrypt hashing on every
+  // login/register, Postgres round-trips, SSR) — the local-tuned 10s
+  // action/expect timeouts were being legitimately exceeded there
+  // (consistently, on both the initial attempt and the retry, not
+  // flakily), not masking an actual behavioral bug.
+  timeout: isCI ? 90_000 : 60_000,
   expect: {
-    timeout: 10_000,
+    timeout: isCI ? 20_000 : 10_000,
   },
   reporter: "list",
   outputDir: "./test-results/e2e",
@@ -41,7 +47,7 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "off",
-    actionTimeout: 10_000,
+    actionTimeout: isCI ? 20_000 : 10_000,
     testIdAttribute: "data-testid",
     launchOptions,
   },

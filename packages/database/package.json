@@ -7,7 +7,8 @@
   "scripts": {
     "postinstall": "pnpm db:generate",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed/run.js"
   },
   "dependencies": {
     "@octokit/auth-app": "^8.1.2",
