@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiX, FiBookOpen } from "react-icons/fi";
 import { toast } from "sonner";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
@@ -22,11 +22,15 @@ export default function EditAboutModal({ isOpen, onClose, profile }: Props) {
   const queryClient = useQueryClient();
   const [longBio, setLongBio] = useState(profile.longBio ?? "");
 
-  useEffect(() => {
+  // Reset the form from `profile` on the moment the modal opens, without a
+  // useEffect: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setLongBio(profile.longBio ?? "");
     }
-  }, [isOpen, profile]);
+  }
 
   const mutation = useMutation({
     mutationFn: (data: { longBio: string | null }) => updateProfileDetails(data),

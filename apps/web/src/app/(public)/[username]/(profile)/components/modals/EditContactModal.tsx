@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiX, FiPhone, FiMail } from "react-icons/fi";
 import { toast } from "sonner";
 import { PublicProfileDTO } from "@/src/domains/user/dtos/public-profile.dto";
@@ -24,12 +24,16 @@ export default function EditContactModal({ isOpen, onClose, profile }: Props) {
   const [email, setEmail] = useState(profile.email || "");
   const [phone, setPhone] = useState(profile.phone || "");
 
-  useEffect(() => {
+  // Reset the form from `profile` on the moment the modal opens, without a
+  // useEffect: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setEmail(profile.email || "");
       setPhone(profile.phone || "");
     }
-  }, [isOpen, profile]);
+  }
 
   const realMutation = useMutation({
     mutationFn: async (data: any) => {

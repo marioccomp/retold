@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "envMode": "loose",
   "tasks": {
     "db:generate": {
       "cache": false
@@ -9,6 +10,9 @@
       "outputs": [".next/**", "dist/**"]
     },
     "lint": {
+      "dependsOn": ["^db:generate"]
+    },
+    "typecheck": {
       "dependsOn": ["^db:generate"]
     },
     "dev": {

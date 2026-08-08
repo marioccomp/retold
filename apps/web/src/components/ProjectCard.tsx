@@ -4,7 +4,7 @@
 import { MdFavoriteBorder, MdFavorite, MdOutlineVisibility } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 import { AlertTriangle, Lock, MessageCircle } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { ProjectCardDTO } from "../domains/project/dtos/project-card.dto";
 import { ProjectSettings } from "./ProjectPanel/components/ProjectSettings";
 import { useSession } from "next-auth/react";
@@ -45,10 +45,16 @@ export default function ProjectCard({
   const [likesCount, setLikesCount] = useState(project.likes);
   const [animateLike, setAnimateLike] = useState(false);
 
-  useEffect(() => {
+  // Sync local like state when the underlying project data changes, without
+  // a useEffect: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevHasLiked, setPrevHasLiked] = useState(project.hasLiked);
+  const [prevLikes, setPrevLikes] = useState(project.likes);
+  if (project.hasLiked !== prevHasLiked || project.likes !== prevLikes) {
+    setPrevHasLiked(project.hasLiked);
+    setPrevLikes(project.likes);
     setIsLiked(project.hasLiked ?? false);
     setLikesCount(project.likes);
-  }, [project.hasLiked, project.likes]);
+  }
 
   const ownerName: string = project.ownerName || "Mario Junior";
 

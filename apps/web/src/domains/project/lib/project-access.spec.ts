@@ -9,7 +9,7 @@ vi.mock("@repo/database", () => ({
 }));
 
 import { prisma } from "@repo/database";
-import { ProjectAccessError, canAccessProject, requireProjectAccess } from "./project-access";
+import { canAccessProject, requireProjectAccess } from "./project-access";
 
 describe("project-access", () => {
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe("project-access", () => {
       vi.mocked(prisma.project.findUnique).mockResolvedValue(null);
 
       await expect(requireProjectAccess(123, 1)).rejects.toEqual(
-        expect.objectContaining<ProjectAccessError>({
+        expect.objectContaining({
           code: "PROJECT_NOT_FOUND",
         })
       );
@@ -62,7 +62,7 @@ describe("project-access", () => {
       } as any);
 
       await expect(requireProjectAccess(15, 51)).rejects.toEqual(
-        expect.objectContaining<ProjectAccessError>({
+        expect.objectContaining({
           code: "PROJECT_NOT_ACCESSIBLE",
         })
       );

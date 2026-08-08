@@ -13,6 +13,38 @@ Regra daqui para frente:
 - sempre que possivel, registrar o contexto, a motivacao e o impacto
 - correcoes de seguranca devem indicar a falha fechada e a estrategia usada
 
+## 2026-08-04 - Fix: callback do GitHub OAuth quebrava com AUTH_URL/NEXTAUTH_URL vazias
+
+### Contexto
+
+Ao validar as suítes de teste antes de configurar CI, os testes de integração de `github-routes.integration.spec.ts` revelaram um bug real (não um problema de ambiente) em `resolvePublicBaseUrl()`, usado pelo callback de link do GitHub (`apps/web/src/app/api/github/callback/route.ts`).
+
+### Problema
+
+```ts
+const configuredBaseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL;
+return (configuredBaseUrl ?? new URL(req.url).origin).replace(/\/$/, "");
+```
+
+Se `AUTH_URL` e `NEXTAUTH_URL` estivessem ambas definidas como string vazia (`""`) — configuração presente mas em branco, não apenas ausente — `configuredBaseUrl` resultava em `""`. Como `""` não é `null`/`undefined`, o operador `??` não caía no fallback do `origin` da própria requisição, e `new URL(path, "")` lançava `TypeError: Invalid URL`, quebrando todo o fluxo de callback (login não autenticado, state inválido, e link bem-sucedido).
+
+### Correção
+
+Unificada a cadeia para usar `||` de ponta a ponta, tratando string vazia da mesma forma que `undefined`:
+
+```ts
+const configuredBaseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || new URL(req.url).origin;
+return configuredBaseUrl.replace(/\/$/, "");
+```
+
+### Impacto
+
+- Arquivo: `apps/web/src/app/api/github/callback/route.ts`
+- Antes: qualquer ambiente com `AUTH_URL`/`NEXTAUTH_URL` setadas em branco quebrava o link de conta GitHub.
+- Depois: `src/tests/integration/github-routes.integration.spec.ts` passa 6/6 (era 3/6).
+
+---
+
 ## 2026-04-03 - Hardening dos achados P0 da auditoria
 
 ### Contexto

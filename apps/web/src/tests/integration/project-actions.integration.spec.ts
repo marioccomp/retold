@@ -131,8 +131,11 @@ describe("project actions integration", () => {
       repositoryId: repository.id,
     });
 
-    expect(result.success).toBe(true);
-    expect(result.data?.id).toBeTypeOf("number");
+    if (!result.success || result.analysisStatus !== "queued") {
+      throw new Error(`expected a queued analysis result, got ${JSON.stringify(result)}`);
+    }
+
+    expect(result.data.id).toBeTypeOf("number");
     expect(result.remaining).toBe(DAILY_ANALYSIS_LIMIT - 1);
 
     const createdProject = await prisma.project.findUnique({

@@ -22,8 +22,13 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "projects");
 
-  // Sync from URL only for external changes (like back button)
-  useEffect(() => {
+  // Sync from URL only for external changes (like back button), without a
+  // useEffect: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const searchParamsKey = searchParams.toString();
+  const [prevSearchParamsKey, setPrevSearchParamsKey] = useState(searchParamsKey);
+  if (searchParamsKey !== prevSearchParamsKey) {
+    setPrevSearchParamsKey(searchParamsKey);
+
     const urlQ = searchParams.get("q") || "";
     const urlTab = searchParams.get("tab") || "projects";
 
@@ -33,7 +38,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       setDebouncedSearchQuery(urlQ);
     }
     if (urlTab !== activeTab) setActiveTab(urlTab);
-  }, [searchParams]);
+  }
 
   // Update debounced value and URL
   useEffect(() => {

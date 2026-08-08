@@ -177,7 +177,10 @@ describe("createProjectAction", () => {
       repositoryId: 22,
     });
 
-    expect(result.success).toBe(false);
+    if (result.success) {
+      throw new Error("expected project creation to be blocked by cooldown");
+    }
+
     expect(result.message).toContain("Internal error cooldown:");
     expect(prismaMock.project.create).not.toHaveBeenCalled();
   });

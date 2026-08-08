@@ -72,7 +72,7 @@ export function ComboboxInput({
                     }
                   }}
                 >
-                  Use "{inputValue}"
+                  Use &quot;{inputValue}&quot;
                 </Button>
               </div>
             </CommandEmpty>

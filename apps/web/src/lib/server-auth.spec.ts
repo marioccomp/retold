@@ -1,10 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/src/domains/auth/auth", () => ({
-  auth: vi.fn(),
+// auth() is overloaded (plain session lookup vs. route-handler/middleware
+// wrapping), which makes `vi.mocked(auth).mockResolvedValue(...)` resolve to
+// the wrong overload's type. Driving the mock through a plain async factory
+// sidesteps that — same pattern used in the integration specs.
+const { currentSession } = vi.hoisted(() => ({
+  currentSession: {
+    value: null as any,
+  },
 }));
 
-import { auth } from "@/src/domains/auth/auth";
+vi.mock("@/src/domains/auth/auth", () => ({
+  auth: vi.fn(async () => currentSession.value),
+}));
+
 import {
   RECENT_AUTH_WINDOW_MS,
   UnauthorizedError,
@@ -17,6 +26,7 @@ import {
 describe("server-auth", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    currentSession.value = null;
   });
 
   describe("hasRecentAuthentication", () => {
@@ -44,24 +54,24 @@ describe("server-auth", () => {
 
   describe("getAuthenticatedUserId", () => {
     it("should return the numeric user id when the session is valid", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      currentSession.value = {
         user: {
           id: "42",
         },
-      } as any);
+      };
 
       await expect(getAuthenticatedUserId()).resolves.toBe(42);
     });
 
     it("should return null when the session is missing or invalid", async () => {
-      vi.mocked(auth).mockResolvedValue(null);
+      currentSession.value = null;
       await expect(getAuthenticatedUserId()).resolves.toBeNull();
 
-      vi.mocked(auth).mockResolvedValue({
+      currentSession.value = {
         user: {
           id: "not-a-number",
         },
-      } as any);
+      };
       await expect(getAuthenticatedUserId()).resolves.toBeNull();
     });
   });
@@ -75,37 +85,37 @@ describe("server-auth", () => {
         },
       } as any;
 
-      vi.mocked(auth).mockResolvedValue(session);
+      currentSession.value = session;
 
       await expect(requireAuthenticatedSession()).resolves.toBe(session);
     });
 
     it("should throw UnauthorizedError for missing or invalid user ids", async () => {
-      vi.mocked(auth).mockResolvedValue(null);
+      currentSession.value = null;
       await expect(requireAuthenticatedSession()).rejects.toBeInstanceOf(UnauthorizedError);
 
-      vi.mocked(auth).mockResolvedValue({
+      currentSession.value = {
         user: {
           id: "NaN",
         },
-      } as any);
+      };
       await expect(requireAuthenticatedSession()).rejects.toBeInstanceOf(UnauthorizedError);
     });
   });
 
   describe("requireAuthenticatedUserId", () => {
     it("should return the user id for authenticated users", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      currentSession.value = {
         user: {
           id: "99",
         },
-      } as any);
+      };
 
       await expect(requireAuthenticatedUserId()).resolves.toBe(99);
     });
 
     it("should throw UnauthorizedError when the user is not authenticated", async () => {
-      vi.mocked(auth).mockResolvedValue(null);
+      currentSession.value = null;
 
       await expect(requireAuthenticatedUserId()).rejects.toBeInstanceOf(UnauthorizedError);
     });

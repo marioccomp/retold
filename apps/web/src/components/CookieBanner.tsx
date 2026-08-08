@@ -22,6 +22,7 @@ export function CookieBanner() {
   useEffect(() => {
     const consent = localStorage.getItem("cookie-consent");
     if (!consent) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time localStorage read on mount, can't be derived during render (no localStorage during SSR)
       setShouldRender(true);
       window.setTimeout(() => setIsVisible(true), 100);
     }

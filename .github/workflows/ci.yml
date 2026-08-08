@@ -1,0 +1,192 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# CI-only placeholders. None of these are real credentials — they exist so that
+# modules which read env vars at import time (e.g. packages/storage's MinIO
+# client, NextAuth config) don't crash before tests/build even run.
+# Real secrets live only in the production .env on the VPS, never here.
+env:
+  NODE_ENV: test
+  DATABASE_URL: "postgresql://retold_ci:retold_ci@localhost:5432/retold_ci"
+  AUTH_SECRET: "ci-placeholder-secret-not-used-in-production-0000000000"
+  APP_URL: "http://localhost:3000"
+  ADDITIONAL_ALLOWED_ORIGINS: ""
+  UPSTASH_REDIS_REST_URL: "http://localhost:8079"
+  UPSTASH_REDIS_REST_TOKEN: "ci-placeholder-token"
+  REDIS_HOST: "localhost"
+  REDIS_PORT: "6379"
+  RESEND_API_KEY: "ci-placeholder-resend-key"
+  AUTH_GITHUB_ID: "ci-placeholder-github-oauth-id"
+  AUTH_GITHUB_SECRET: "ci-placeholder-github-oauth-secret"
+  GITHUB_LINK_CLIENT_ID: "ci-placeholder-link-client-id"
+  GITHUB_LINK_CLIENT_SECRET: "ci-placeholder-link-client-secret"
+  GITHUB_APP_ID: "123456"
+  GITHUB_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nci-placeholder\n-----END PRIVATE KEY-----"
+  GITHUB_WEBHOOK_SECRET: "ci-placeholder-webhook-secret"
+  GROQ_API_KEY: "ci-placeholder-groq-key"
+  MINIO_ENDPOINT: "localhost"
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_REGION: "auto"
+  MINIO_ACCESS_KEY: "ci-placeholder-access-key"
+  MINIO_SECRET_KEY: "ci-placeholder-secret-key"
+  MINIO_BUCKET: "retold-ci"
+  MINIO_PUBLIC_URL: "http://localhost:9000"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      # Cheap schema sanity check — catches a schema.prisma that doesn't even
+      # parse, ahead of the fuller migration-drift check planned for later.
+      - run: pnpm --filter @repo/database exec prisma validate
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:web:unit
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg18
+        env:
+          POSTGRES_USER: retold_ci
+          POSTGRES_PASSWORD: retold_ci
+          POSTGRES_DB: retold_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U retold_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Apply Prisma migrations to the CI database
+        run: pnpm --filter @repo/database exec prisma migrate deploy
+      - run: pnpm test:web:integration
+
+  build:
+    runs-on: ubuntu-latest
+    # `next build` (like `next start`) always forces NODE_ENV=production
+    # internally, which trips the same Redis password guard described below
+    # on the e2e job. No job actually needs to *connect* to Redis during a
+    # build though — `packages/queue/redis.ts` only builds a config object at
+    # import time — so a placeholder value is enough here, no Redis service
+    # container needed.
+    env:
+      REDIS_PASSWORD: "ci-placeholder-redis-password"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  e2e:
+    runs-on: ubuntu-latest
+    # `next start` (used by playwright.config.ts's webServer in CI) always
+    # forces NODE_ENV=production, and packages/queue/redis.ts intentionally
+    # refuses to connect to Redis without a password when NODE_ENV is
+    # production — the same guard that protects real production Redis (see
+    # compose.prod.yaml). redis:7-alpine (used by integration-tests above)
+    # has no built-in way to require a password via an env var, and GitHub
+    # Actions' `services:` block can't pass a custom command/args to a
+    # service container either, so this job starts its own Redis container
+    # by hand (see the step below) instead of using `services:`.
+    env:
+      REDIS_PASSWORD: "ci-placeholder-redis-password"
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg18
+        env:
+          POSTGRES_USER: retold_ci
+          POSTGRES_PASSWORD: retold_ci
+          POSTGRES_DB: retold_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U retold_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Start a password-protected Redis
+        run: |
+          docker run -d --name redis-e2e -p 6379:6379 \
+            redis:7-alpine redis-server --requirepass "$REDIS_PASSWORD"
+          for i in $(seq 1 30); do
+            if docker exec redis-e2e redis-cli -a "$REDIS_PASSWORD" ping 2>/dev/null | grep -q PONG; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Redis did not become ready in time" >&2
+          exit 1
+      - name: Apply Prisma migrations to the CI database
+        run: pnpm --filter @repo/database exec prisma migrate deploy
+      - name: Install Playwright's Chromium build
+        run: pnpm --filter web exec playwright install --with-deps chromium
+      - run: pnpm test:web:e2e

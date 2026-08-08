@@ -8,8 +8,8 @@ const USER_COOKIE = "github_link_user";
 const logger = createLogger("web.api.github-callback");
 
 function resolvePublicBaseUrl(req: NextRequest) {
-    const configuredBaseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL;
-    return (configuredBaseUrl ?? new URL(req.url).origin).replace(/\/$/, "");
+    const configuredBaseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || new URL(req.url).origin;
+    return configuredBaseUrl.replace(/\/$/, "");
 }
 
 type GithubUser = {

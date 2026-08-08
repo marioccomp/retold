@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiX, FiPlus, FiBriefcase, FiTrash2 } from "react-icons/fi";
 import { toast } from "sonner";
 import { PublicProfileDTO, EducationDTO } from "@/src/domains/user/dtos/public-profile.dto";
@@ -83,7 +83,11 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
         ]
   );
 
-  useEffect(() => {
+  // Reset the form from `profile` on the moment the modal opens, without a
+  // useEffect: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setEducations(
         profile.educations?.length > 0
@@ -102,7 +106,7 @@ export default function EditEducationModal({ isOpen, onClose, profile }: Props) 
             ]
       );
     }
-  }, [isOpen, profile]);
+  }
 
   const mutation = useMutation({
     mutationFn: (data: { educations: any[] }) => updateProfileDetails(data),

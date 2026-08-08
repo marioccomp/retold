@@ -67,7 +67,7 @@ export async function toggleFollowAction(targetUserId: number) {
             }
         }
 
-        // @ts-ignore
+        // @ts-expect-error - documentation says single arg, but types seem to differ in this version
         revalidateTag("feed-active-users-scoring");
         revalidatePath(`/[username]`, "layout");
         revalidatePath(`/`, "layout");

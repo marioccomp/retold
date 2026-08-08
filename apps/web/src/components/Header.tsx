@@ -52,6 +52,7 @@ export default function Header({ session: initialSession }: { session: Session |
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard client-mounted flag to avoid SSR/client hydration mismatch, can't be known during render
     setMounted(true);
   }, []);
 
