@@ -793,7 +793,8 @@ const ErrorView = ({
   );
   const cooldownMinutes =
     cooldownActive && cooldownDate
-      ? Math.max(1, Math.ceil((cooldownDate.getTime() - Date.now()) / 60_000))
+      ? // eslint-disable-next-line react-hooks/purity -- countdown display should reflect the actual current time on every render, not a value frozen at mount
+        Math.max(1, Math.ceil((cooldownDate.getTime() - Date.now()) / 60_000))
       : 0;
 
   return (
@@ -869,12 +870,13 @@ const ImageGallery = ({ images }: { images: string[] }) => {
     };
   }, [isZoomed]);
 
-  // Reset active index if images change or current index becomes invalid
-  useEffect(() => {
-    if (activeIndex >= images.length) {
-      setActiveIndex(0);
-    }
-  }, [images.length, activeIndex]);
+  // Clamp the active index during render if images shrink and it becomes
+  // invalid — a no-op once activeIndex is back in range, so it's safe to
+  // check unconditionally here instead of in a useEffect:
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  if (activeIndex >= images.length) {
+    setActiveIndex(0);
+  }
 
   if (!images || images.length === 0) return null;
 

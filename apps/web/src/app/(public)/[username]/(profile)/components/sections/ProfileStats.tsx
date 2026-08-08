@@ -17,6 +17,7 @@ export default function ProfileStats({ stats }: Props) {
 
   const formatRelative = (iso: string) => {
     const dt = new Date(iso);
+    // eslint-disable-next-line react-hooks/purity -- relative time display should reflect the actual current time on every render, not a value frozen at mount
     const diff = Date.now() - dt.getTime();
 
     const minutes = Math.floor(diff / 60000);

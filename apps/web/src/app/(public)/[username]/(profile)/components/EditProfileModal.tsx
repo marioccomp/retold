@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   FiX,
   FiGithub,
@@ -61,7 +61,11 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
 
   const queryClient = useQueryClient();
 
-  useEffect(() => {
+  // Reset the form from `profile` on the moment the modal opens, without a
+  // useEffect: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setName(profile.name ?? "");
       setTitle(profile.title ?? "");
@@ -73,7 +77,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, username }:
       setCoverPreview(profile.cover ?? null);
       setPendingAvatarFile(null);
     }
-  }, [isOpen, profile]);
+  }
 
   const updateProfileMutation = useMutation({
     mutationFn: async () => {
