@@ -34,7 +34,7 @@ vai apontar para o arquivo, as linhas ou o commit que a prova.
 
 ---
 
-## Fase 0: Arrumar a base (1–2 semanas)
+## Fase 0: Arrumar a base ✅
 
 Corrigir o que distorce os dados hoje e criar a ferramenta de medição.
 
@@ -78,7 +78,7 @@ Corrigir o que distorce os dados hoje e criar a ferramenta de medição.
 | Modo | Resultado | Observações |
 |---|---|---|
 | Heurísticas (`pnpm eval`, 22 casos) | **61/76** checks | **A detecção de projeto de estudo é a heurística mais fraca:** de 9 projetos realmente de aprendizado, só 1 é reconhecido (`lucasOS` diz "learning project" no README e mesmo assim sai como `demo`). Sem README (`lumia`, `GETAPET`, `light-devil`), o propósito acadêmico é invisível. Outras falhas: GDScript não é reconhecido; `vllm` vira `research` (por citar arXiv) e domínio `web`; notebooks viram domínio `web`; `cobra` vira `systems`; `is` fica com domínio `unknown`; `lumia` (AdonisJS + Edge) vira `Frontend`; o `spring-petclinic` (app de exemplo) vira `production`. |
-| LLM (`pnpm eval --llm`, `groq/openai/gpt-oss-120b`, 22 casos) | **80/94** checks, 5 casos com erro | Os 5 erros (`ripgrep`, `web-dev-for-beginners`, `retold`, `vllm`, `tabnews`) são `413 Request too large`: o prompt passa do limite de **8.000 tokens/min do free tier**, sempre por causa de README grande. **23% dos repos não são analisáveis no free tier.** Nas checagens de texto, o LLM não percebe o `node_modules` commitado no `GETAPET` (o scan ignora a pasta, então ele nunca vê) e não cita Godot no `light-devil`. Cerca de 70K tokens de entrada e 43K de saída nos 17 casos que rodaram (média de ~4K/~2,5K). |
+| LLM (`pnpm eval --llm`, `groq/openai/gpt-oss-120b`, 22 casos) | **80/94** checks, 5 casos com erro | Os 5 erros (`ripgrep`, `web-dev-for-beginners`, `retold`, `vllm`, `tabnews`) são `413 Request too large`: o prompt passa do limite de **8.000 tokens/min do free tier**. **23% dos repos ficam no limite ou acima.** ~~A causa é README grande~~ (errado: o README já é cortado em 4.000 caracteres, ~1K tokens). Medido depois: ~3,5K tokens são **instruções fixas do prompt**, e a lista de pastas de repos grandes soma até 2,5K. O Groq ainda reserva o `max_completion_tokens` dentro do limite (com 2.500, "Requested" = entrada + 2.500). Nas checagens de texto, o LLM não percebe o `node_modules` commitado no `GETAPET` (o scan ignora a pasta, então ele nunca vê) e não cita Godot no `light-devil`. Cerca de 70K tokens de entrada e 43K de saída nos 17 casos que rodaram (média de ~4K/~2,5K). |
 
 ### Achados durante a Fase 0 (fora do plano original)
 
@@ -100,20 +100,69 @@ Corrigir o que distorce os dados hoje e criar a ferramenta de medição.
 - [x] Completar os casos do eval (22).
 - [x] ~~Confirmar qual modelo a produção usa~~: não há produção no ar. Com a chave nova do Groq, o
       `llama-3.3-70b-versatile` continua `404`, então foi removido de fato; o limite segue em 8.000 tokens/min.
-- [ ] **Decidir o que fazer com o limite de 8K tokens/min do free tier** (23% dos repos do eval falham com 413):
-      (a) cortar o README enviado ao LLM para ~12K caracteres (todos cabem, com menos contexto), ou (b) subir para o
-      Developer tier do Groq. A Fase 2 resolve de vez com orçamento de tokens por chamada.
+- [ ] **Limite de 8K tokens/min do free tier** (23% dos repos do eval no limite ou acima). Cortar o README **não**
+      resolve (ele já é ~1K tokens). O que resolve é encolher a entrada: o prompt de ~400 linhas (~3,5K tokens fixos) e
+      a lista de pastas em 6 níveis. Isso é exatamente a Fase 2 (prompts curtos, mapa do repo compacto da Fase 1 no
+      lugar da árvore de pastas, orçamento de tokens). Alternativa imediata: Developer tier do Groq.
 - [x] Suíte completa verificada com o Redis do Retold: 134 unitários, 31 de integração e 13 e2e (incluindo um e2e
       novo do fluxo de equipe com duas sessões de navegador).
 
-## Fase 1: Entender o repo sem LLM (2 semanas)
+## Fase 1: Entender o repo sem LLM ✅
 
-- [ ] Grafo de imports (compilador do TypeScript para TS/JS; tree-sitter para outras linguagens) e centralidade por arquivo.
-- [ ] Churn por arquivo (`git log --numstat`) e detecção de arquivos gerados.
-- [ ] Divisão em módulos (workspaces, pacotes, pastas de domínio).
-- [ ] Fatos por módulo: LOC, proporção de testes, dependências relevantes, complexidade aproximada.
-- [ ] "Mapa do repo" persistido (JSON), substituindo a heurística de palavras-chave.
-- [ ] Maturidade **medida** (CI executa testes? cobertura aproximada?) em vez de inferida do README.
+Código em `services/worker/analyze/repo-map/`. O resultado (`RepoMap`) é persistido em
+`RepositoryAnalysis.repoMap` (migration `20261105180000`). Ele **não** entra no prompt atual, que já está no limite
+do free tier; a Fase 2 é que decide o que o LLM lê a partir dele.
+
+- [x] **Grafo de imports e centralidade.** Decisão: extração por regex por linguagem (TS/JS, Python, Go, Java/Kotlin,
+      C/C++, Rust, Ruby, GDScript), sem compilador do TypeScript nem tree-sitter, para não ter dependência nativa e
+      continuar rápido (vLLM, com 3,3K arquivos no grafo, leva ~4s). A resolução entende aliases do tsconfig, pacotes de
+      workspace, `go.mod`, classes JVM, `-Iinclude` em C e `crate/self/super` em Rust. A importância é medida por PageRank.
+- [x] **Churn** nos últimos 50 commits (`--no-renames`; com detecção de renomeação, um repo de traduções levava 68s, e
+      agora leva 0,15s) e **código gerado** (marcadores `@generated`/"DO NOT EDIT", arquivos minificados, lockfiles e build).
+- [x] **Módulos:** workspaces declarados (npm/pnpm/lerna/Cargo/go.work), depois pastas convencionais (`apps/*`,
+      `packages/*`, `crates/*`...), depois pastas de topo. Layout Maven (`src/main`, `src/test`) não vira módulo.
+- [x] **Fatos por módulo:** arquivos, fontes, testes, LOC, linguagens, arquivos-chave (mais centrais), dependências
+      externas e de quais outros módulos depende.
+      *Complexidade aproximada:* não feita. Sem LLM ela agrega pouco; volta se a Fase 2 mostrar necessidade.
+- [x] **Mapa persistido** no banco.
+- [x] **Maturidade medida** (0–100, com evidência por sinal): testes e proporção, CI que **roda** testes, lint (inclusive
+      configurado em `pyproject`, pre-commit, rustfmt, golangci...), tipagem, container, documentação, histórico e higiene.
+- [x] **Higiene** (o que está commitado e não deveria): `node_modules`, venv, `__pycache__`, artefatos compilados,
+      `.env`, chaves privadas e arquivos grandes, lidos do `git ls-files` (o scan ignora `node_modules`, então não via).
+      Fixtures de teste (`tests/.../.env`) não contam.
+- [x] **Classificação com fatos, não só com palavras-chave:**
+  - domínio "biblioteca" quando o manifesto da raiz descreve um pacote publicável (npm sem `private` e com entry
+    point, módulo Go sem `package main`, crate só com lib, pacote Python que não é site Django);
+  - citar arXiv não torna "research" um projeto com CI/Docker;
+  - repositórios dominados por notebooks são "data";
+  - alguns HTML soltos (docs, templates) não tornam um repo "web";
+  - frases de aprendizado ("learning project", "for educational purposes", título com "Curriculum"/"Handbook",
+    "24 lessons") e de demo ("Sample Application" no título ou na introdução);
+  - backends que faltavam no tipo de app (AdonisJS, FastAPI, Django, Spring, Gin...): o lumia deixou de ser "Frontend".
+- [x] **Lacunas corrigidas:** README `.rst/.txt/.adoc` não era lido (afetava também o que ia para o LLM); GDScript e
+      Godot não eram reconhecidos; notebooks não contavam como Python.
+
+### Linha de base depois da Fase 1
+
+| Modo | Antes | Depois |
+|---|---|---|
+| Heurísticas (`pnpm eval`) | 61/76 | **107/110** (inclui 34 checks novos do mapa: módulos, arquivos centrais, higiene, maturidade) |
+
+As 3 falhas restantes são trabalhos de faculdade **sem README** (`lumia`, `light-devil`, `GETAPET`): nada no código diz
+"isto é trabalho de faculdade". **Recomendação de produto:** perguntar na criação do projeto "Que tipo de projeto é este?"
+(acadêmico / estudo / pessoal / profissional). É barato, exato, e o usuário sabe a resposta melhor que qualquer
+heurística ou LLM.
+
+**Risco de sobreajuste:** algumas regras novas foram motivadas por casos do eval (títulos "Curriculum"/"Handbook",
+"N lessons"). São regras gerais, mas o único jeito de controlar o risco é continuar adicionando casos que **não** foram
+usados para escrever as regras.
+
+### Achados da Fase 1
+
+- **Checks de texto do LLM são instáveis numa execução só:** o mesmo caso (`flask`) falhou e depois passou sem nenhuma
+  mudança relevante. Na Fase 2, rodar cada caso N vezes e olhar a taxa, não um resultado único. O relatório JSON do eval
+  agora guarda a resposta do LLM (`llmOutput`) para investigar falhas.
+- O eval passou a baixar os repos com 50 commits (como o clone da produção), para churn e histórico serem comparáveis.
 
 ## Fase 2: Análise em duas etapas com evidência verificada (3 semanas)
 
@@ -187,3 +236,5 @@ oficiais antes de decidir.
 | 2026-11-05 | 0.7 | Eval com 22 casos (7 do time + 15 open source). Nova linha de base de heurísticas: 61/76. |
 | 2026-11-05 | 0.7 | Linha de base com LLM nos 22 casos: 80/94 checks; 5 casos (23%) não cabem no free tier (413, prompt > 8K tokens/min). |
 | 2026-11-05 | 0 | Fase 0 encerrada. E2E do fluxo de equipe (dono convida, colega aceita pelo sino, projeto no perfil). Corrigido de quebra um bug antigo: o modal de projeto do perfil quebrava no SSR com link direto (`document is not defined`). |
+| 2026-11-05 | 0.7 | Corrigido o diagnóstico dos 413: não é o README (já cortado em ~1K tokens), é o prompt fixo (~3,5K tokens) + a árvore de pastas. O Groq também conta o `max_completion_tokens` no limite por minuto. |
+| 2026-11-05 | 1 | Fase 1 concluída: `services/worker/analyze/repo-map/` (grafo de imports + PageRank, churn, gerados, módulos, higiene, maturidade medida), persistido em `RepositoryAnalysis.repoMap`. Classificação com fatos (pacote publicável, notebooks, research só sem CI, frases de aprendizado/demo, backends no tipo de app), README `.rst`, GDScript/Godot. Eval de heurísticas: 61/76 → 107/110. 28 testes unitários novos. |
