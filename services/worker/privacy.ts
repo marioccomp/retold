@@ -30,7 +30,7 @@ const SECRET_NAME_PATTERN =
   /\b(api[_-]?key|secret|token|password|passwd|private[_-]?key|client[_-]?secret|access[_-]?key|refresh[_-]?token|authorization)\b/i;
 const INJECTION_PATTERN =
   /(ignore\s+(all|any|previous)|system\s+prompt|developer\s+message|you\s+are\s+chatgpt|exfiltrat|reveal\s+.*secret|print\s+.*token|leak\s+.*key)/i;
-const SENSITIVE_PATH_PATTERN =
+export const SENSITIVE_PATH_PATTERN =
   /(secret|credential|token|private|id_rsa|id_dsa|ssh|\.env|pem|key)/i;
 
 function parseBooleanEnv(name: string, defaultValue = false) {
@@ -97,6 +97,22 @@ export function redactSensitiveRepositoryText(text: string) {
     .join("\n");
 
   return redacted;
+}
+
+/**
+ * Same redaction as redactSensitiveRepositoryText, but the result has exactly as
+ * many lines as the input: evidence cites line numbers of the real file, so a
+ * multi-line private key block becomes one marker per line.
+ */
+export function redactPreservingLines(content: string) {
+  const withoutKeyBlocks = content.replace(
+    /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,
+    (block) => block.split("\n").map(() => "[REDACTED_PRIVATE_KEY_BLOCK]").join("\n")
+  );
+  return withoutKeyBlocks
+    .split("\n")
+    .map((line) => redactSensitiveRepositoryText(line))
+    .join("\n");
 }
 
 function sanitizeReadmeForLlm(readme: string, maxChars: number) {

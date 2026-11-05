@@ -1,18 +1,21 @@
 /**
  * The project analysis pipeline, independent of BullMQ and of the database:
- * README → repository heuristics → privacy preparation → LLM → tags.
+ * README → repository heuristics + repo map → privacy preparation →
+ * two-stage LLM analysis (map → verify → reduce) → tags.
  *
  * The worker job (index.ts) and the eval runner (evals/run-eval.ts) both call
  * this, so the eval measures exactly what production runs.
  */
+import { execFileSync } from "child_process";
 import fs from "fs";
 
 import { createLogger } from "@repo/observability";
 
 import { analyzeRepository } from "./analyze/index.js";
-import { analyzeProjectWithLLM } from "./llm/analyze-project.js";
+import { LlmBudget, readLlmBudget } from "./llm/budget.js";
 import { getDefaultLlmProvider, LlmProvider } from "./llm/index.js";
-import { LlmPrivacyDecision, prepareAnalysisForLlm } from "./privacy.js";
+import { runTwoStageAnalysis, TwoStageResult } from "./llm/two-stage/run.js";
+import { buildLocalLlmFallback, LlmPrivacyDecision, prepareAnalysisForLlm } from "./privacy.js";
 import { tryReadRepositoryTextFile } from "./security.js";
 
 const logger = createLogger("worker.project-analysis");
@@ -59,6 +62,8 @@ export type AnalysisPipelineInput = {
   locale: string;
   privacyDecision: LlmPrivacyDecision;
   provider?: LlmProvider;
+  /** Token budget override (default: read from LLM_* env vars). */
+  budget?: LlmBudget;
   /** Extra fields for log lines (e.g. projectId). */
   logContext?: Record<string, unknown>;
 };
@@ -71,27 +76,20 @@ export async function runAnalysisPipeline(input: AnalysisPipelineInput) {
   const analysis = await analyzeRepository(repoPath, {
     readme,
     repoUrl: input.repoUrl,
-    includeCodeSamples: privacyDecision.includeCodeSamples,
+    // The two-stage analysis reads central files itself (llm/two-stage/units.ts).
+    includeCodeSamples: false,
   });
   logger.info("worker.repository_analysis_completed", {
     ...logContext,
     totalFiles: analysis.stats.totalFiles,
     frameworkCount: analysis.stack.frameworks.length,
     languageCount: analysis.stack.languages.length,
-    codeSamplesCount: analysis.codeSamples?.length ?? 0,
+    modules: analysis.repoMap.modules.length,
   });
 
-  // The repository map is persisted, not sent: the current prompt is already at
-  // the free-tier token limit. Phase 2 uses it to choose what the LLM reads.
   const { repoMap: _repoMap, ...analysisForLlm } = analysis;
-
   const preparedLlmAnalysis = prepareAnalysisForLlm(
-    {
-      ...analysisForLlm,
-      readme,
-      codeSamples: analysis.codeSamples,
-      locale: input.locale,
-    },
+    { ...analysisForLlm, readme, locale: input.locale },
     privacyDecision
   );
 
@@ -105,36 +103,77 @@ export async function runAnalysisPipeline(input: AnalysisPipelineInput) {
     redactionsApplied: preparedLlmAnalysis.redactionsApplied,
   });
 
-  const llmInsights = await analyzeProjectWithLLM(
-    preparedLlmAnalysis.promptAnalysis,
-    input.repoName,
-    input.title,
-    input.description,
-    privacyDecision,
-    input.provider ?? getDefaultLlmProvider()
-  );
+  let llmInsights: Record<string, unknown>;
+  let twoStage: TwoStageResult | null = null;
 
-  const insights = llmInsights as {
-    summary?: { paragraphs?: unknown[] };
-    suggestions?: unknown[];
-    error?: unknown;
+  if (!privacyDecision.externalLlmAllowed) {
+    llmInsights = buildLocalLlmFallback(
+      preparedLlmAnalysis.promptAnalysis,
+      input.repoName,
+      input.title,
+      input.description,
+      privacyDecision,
+      "private_project_protected"
+    );
+  } else {
+    twoStage = await runTwoStageAnalysis({
+      repoPath,
+      repoName: input.repoName,
+      repoUrl: input.repoUrl,
+      commitSha: readHeadSha(repoPath),
+      title: input.title,
+      description: input.description,
+      locale: input.locale,
+      analysis,
+      readme: preparedLlmAnalysis.promptAnalysis.readme,
+      privacyDecision,
+      provider: input.provider ?? getDefaultLlmProvider(),
+      budget: input.budget ?? readLlmBudget(),
+    });
+    llmInsights = twoStage.overview;
+
+    logger.info("worker.llm_analysis_completed", {
+      ...logContext,
+      units: twoStage.units.length,
+      mapFailures: twoStage.mapFailures.length,
+      claimsVerified: twoStage.claims.length,
+      claimsRejected: Object.values(twoStage.rejectedClaims).reduce((sum, n) => sum + (n ?? 0), 0),
+      llmCalls: twoStage.calls.length,
+      inputTokens: twoStage.usage.inputTokens,
+      outputTokens: twoStage.usage.outputTokens,
+    });
+  }
+
+  const persistenceAnalysis = {
+    ...preparedLlmAnalysis.persistenceAnalysis,
+    privacy: {
+      ...(preparedLlmAnalysis.persistenceAnalysis.privacy as Record<string, unknown>),
+      codeFilesSharedWithLlm: twoStage?.units.reduce((sum, u) => sum + u.files.length, 0) ?? 0,
+    },
   };
-  logger.info("worker.llm_analysis_completed", {
-    ...logContext,
-    hasError: Boolean(insights.error),
-    summaryParagraphs: Array.isArray(insights.summary?.paragraphs)
-      ? insights.summary.paragraphs.length
-      : 0,
-    suggestionCount: Array.isArray(insights.suggestions) ? insights.suggestions.length : 0,
-  });
 
   return {
     readme,
     analysis,
-    preparedLlmAnalysis,
+    preparedLlmAnalysis: { ...preparedLlmAnalysis, persistenceAnalysis },
     llmInsights,
+    twoStage,
     tags: selectProjectTags(analysis),
   };
+}
+
+/** Commit analyzed, for permalinks; null when the clone has no git metadata. */
+export function readHeadSha(repoPath: string) {
+  try {
+    const sha = execFileSync("git", ["-C", repoPath, "rev-parse", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: 10_000,
+    }).trim();
+    return /^[0-9a-f]{40}$/.test(sha) ? sha : null;
+  } catch {
+    return null;
+  }
 }
 
 export type RepositoryAnalysisResult = Awaited<ReturnType<typeof analyzeRepository>>;

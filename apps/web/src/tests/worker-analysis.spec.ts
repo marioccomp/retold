@@ -4,60 +4,8 @@ import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { analyzeRepository } from "../../../../services/worker/analyze";
-import { projectPrompt } from "../../../../services/worker/llm/prompts/project-prompt";
-import type { Heuristic } from "../../../../services/worker/types/heuristic";
 
 const tempDirs: string[] = [];
-
-const baseHeuristic: Heuristic = {
-  summary: {
-    primaryLanguage: "HTML",
-    appType: "Frontend",
-  },
-  stack: {
-    languages: ["HTML", "CSS"],
-    frameworks: [],
-    tools: [],
-  },
-  infra: {
-    hasDockerfile: false,
-    hasCompose: false,
-    ciProviders: [],
-    lintTools: [],
-    testTools: [],
-    hasTests: false,
-    hasKubernetes: false,
-    hasTerraform: false,
-  },
-  stats: {
-    totalFiles: 3,
-    sourceFiles: 3,
-    testFiles: 0,
-    configFiles: 0,
-    docsFiles: 0,
-    unknownFiles: 0,
-  },
-  structure: {
-    topLevelDirs: [],
-    secondLevelDirs: [],
-    thirdLevelDirs: [],
-    fourthLevelDirs: [],
-    fifthLevelDirs: [],
-    sixthLevelDirs: [],
-    packageJsonCount: 0,
-    hasAppsDir: false,
-    hasPackagesDir: false,
-  },
-  classification: {
-    domain: "web",
-    purpose: "demo",
-    languageFamily: "web",
-    maturityExpectation: "medium",
-    confidence: 0.9,
-    signals: ["Static HTML/CSS files detected"],
-  },
-  locale: "pt-BR",
-};
 
 function createStaticSiteFixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "retold-static-site-"));
@@ -94,13 +42,5 @@ describe("worker repository analysis", () => {
     expect(analysis.classification.languageFamily).toBe("web");
     expect(analysis.stats.sourceFiles).toBe(3);
     expect(analysis.stats.unknownFiles).toBe(0);
-  });
-
-  it("tells the LLM to be assertive when the evidence is strong", () => {
-    const prompt = projectPrompt(baseHeuristic, "mcdonalds");
-
-    expect(prompt).toContain("ASSERTIVENESS POLICY:");
-    expect(prompt).toContain('Do NOT hedge strong conclusions with phrases such as "seems to"');
-    expect(prompt).toContain('Reserve uncertainty language only for cases with genuinely missing or conflicting evidence');
   });
 });

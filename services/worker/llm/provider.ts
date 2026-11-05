@@ -14,7 +14,10 @@ export type LlmCompletionRequest = {
   temperature?: number;
   /** Ask the provider to return a single JSON object, when supported. */
   json?: boolean;
+  /** Upper bound for the answer. Reasoning models also spend it on reasoning. */
   maxOutputTokens?: number;
+  /** For reasoning models: less effort spends fewer (rate-limited) tokens. */
+  reasoningEffort?: "low" | "medium" | "high";
 };
 
 export type LlmUsage = {

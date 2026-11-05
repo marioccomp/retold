@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  analyzeProjectWithLLM,
+  completeJson,
   LlmAnalysisUnavailableError,
 } from "../../../../services/worker/llm/analyze-project";
 import { toGroqRateLimitError } from "../../../../services/worker/llm/groq-provider";
@@ -12,56 +12,6 @@ import {
   LlmRateLimitError,
   parseDurationMs,
 } from "../../../../services/worker/llm/index";
-import { buildLlmPrivacyDecision } from "../../../../services/worker/privacy";
-import type { Heuristic } from "../../../../services/worker/types/heuristic";
-
-const heuristic: Heuristic = {
-  summary: { primaryLanguage: "TypeScript", appType: "Backend" },
-  stack: { languages: ["TypeScript"], frameworks: ["Express"], tools: [] },
-  infra: {
-    hasDockerfile: false,
-    hasCompose: false,
-    ciProviders: [],
-    lintTools: [],
-    testTools: [],
-    hasTests: false,
-    hasKubernetes: false,
-    hasTerraform: false,
-  },
-  stats: {
-    totalFiles: 3,
-    sourceFiles: 3,
-    testFiles: 0,
-    configFiles: 0,
-    docsFiles: 0,
-    unknownFiles: 0,
-  },
-  structure: {
-    topLevelDirs: ["src"],
-    secondLevelDirs: [],
-    thirdLevelDirs: [],
-    fourthLevelDirs: [],
-    fifthLevelDirs: [],
-    sixthLevelDirs: [],
-    packageJsonCount: 1,
-    hasAppsDir: false,
-    hasPackagesDir: false,
-  },
-  classification: {
-    domain: "web",
-    purpose: "demo",
-    languageFamily: "web",
-    maturityExpectation: "medium",
-    confidence: 0.6,
-    signals: [],
-  },
-  locale: "en",
-};
-
-const publicProject = buildLlmPrivacyDecision({
-  projectVisibility: "public",
-  repositoryPrivate: false,
-});
 
 /** Provider that replays scripted results (a string or an Error) in order. */
 function scriptedProvider(results: Array<string | Error>) {
@@ -80,8 +30,17 @@ function scriptedProvider(results: Array<string | Error>) {
   return { provider, requests };
 }
 
+/** Any JSON object is accepted unless it has "reject": true. */
+const acceptUnlessRejected = (value: unknown) =>
+  (value as { reject?: boolean }).reject ? null : value;
+
 function analyze(provider: LlmProvider) {
-  return analyzeProjectWithLLM(heuristic, "api", "API", undefined, publicProject, provider);
+  return completeJson(
+    provider,
+    { messages: [{ role: "user", content: "Review the project." }] },
+    acceptUnlessRejected,
+    { label: "test", repoName: "api" }
+  );
 }
 
 describe("parseDurationMs", () => {
@@ -138,7 +97,7 @@ describe("toGroqRateLimitError", () => {
   });
 });
 
-describe("analyzeProjectWithLLM", () => {
+describe("completeJson", () => {
   it("returns the parsed JSON from the first attempt in JSON mode", async () => {
     const { provider, requests } = scriptedProvider(['{"summary":{"title":"API"}}']);
 
@@ -153,6 +112,14 @@ describe("analyzeProjectWithLLM", () => {
     await expect(analyze(provider)).resolves.toEqual({ ok: true });
     expect(requests).toHaveLength(2);
     expect(requests[1].json).toBe(false);
+  });
+
+  it("retries when the JSON is valid but does not match the expected shape", async () => {
+    const { provider, requests } = scriptedProvider(['{"reject":true}', '{"ok":true}']);
+
+    await expect(analyze(provider)).resolves.toEqual({ ok: true });
+    expect(requests).toHaveLength(2);
+    expect(requests[1].messages.at(-1)?.content).toContain("return ONLY valid JSON");
   });
 
   it("still tries the second attempt when the first request fails", async () => {
@@ -181,7 +148,7 @@ describe("analyzeProjectWithLLM", () => {
   it("reports provider_request_failed when the last attempt errored", async () => {
     const { provider } = scriptedProvider(["nope", new Error("boom")]);
 
-    const error = await analyze(provider).catch((e) => e);
+    const error = (await analyze(provider).catch((e: unknown) => e)) as LlmAnalysisUnavailableError;
     expect(error).toBeInstanceOf(LlmAnalysisUnavailableError);
     expect(error.code).toBe("provider_request_failed");
   });

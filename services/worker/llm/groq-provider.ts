@@ -11,6 +11,10 @@ import {
 // llama-3.3-70b-versatile was removed from Groq (404 model_not_found, checked 2026-11-05).
 export const GROQ_DEFAULT_MODEL = "openai/gpt-oss-120b";
 
+export function isGroqReasoningModel(model: string) {
+  return /gpt-oss/i.test(model);
+}
+
 type GroqLikeError = {
   status?: number;
   message?: string;
@@ -63,12 +67,19 @@ export class GroqProvider implements LlmProvider {
   }
 
   async complete(request: LlmCompletionRequest): Promise<LlmCompletion> {
+    // Only reasoning models accept these; others reject the request.
+    const reasoning =
+      request.reasoningEffort && isGroqReasoningModel(this.model)
+        ? { reasoning_effort: request.reasoningEffort, include_reasoning: false }
+        : {};
+
     try {
       const completion = await this.client.chat.completions.create({
         model: this.model,
         messages: request.messages,
         temperature: request.temperature,
         max_completion_tokens: request.maxOutputTokens,
+        ...reasoning,
         ...(request.json ? { response_format: { type: "json_object" as const } } : {}),
       });
 

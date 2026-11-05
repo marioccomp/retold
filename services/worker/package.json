@@ -19,7 +19,8 @@
     "dotenv": "^16.4.7",
     "groq-sdk": "^0.37.0",
     "ioredis": "^5.4.1",
-    "octokit": "^5.0.5"
+    "octokit": "^5.0.5",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
