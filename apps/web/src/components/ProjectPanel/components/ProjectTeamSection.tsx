@@ -152,7 +152,10 @@ export function ProjectTeamSection({ projectId, visibility }: ProjectTeamSection
       : [];
 
   return (
-    <div className="space-y-5 rounded-2xl border border-border bg-background p-5 shadow-sm md:p-6">
+    <div
+      data-testid="project-team-section"
+      className="space-y-5 rounded-2xl border border-border bg-background p-5 shadow-sm md:p-6"
+    >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
@@ -175,6 +178,7 @@ export function ProjectTeamSection({ projectId, visibility }: ProjectTeamSection
           <div className="flex shrink-0 gap-2">
             <Button
               size="sm"
+              data-testid="team-invite-accept"
               disabled={respondMutation.isPending}
               onClick={() => respondMutation.mutate(true)}
             >
@@ -196,6 +200,7 @@ export function ProjectTeamSection({ projectId, visibility }: ProjectTeamSection
         {team.members.map((member) => (
           <li
             key={member.user.id}
+            data-testid={`team-member-${member.user.username}`}
             className="flex items-start gap-3 rounded-xl border border-border/60 bg-muted/40 p-3"
           >
             <Link href={`/${member.user.username}`} className="shrink-0">
@@ -238,6 +243,7 @@ export function ProjectTeamSection({ projectId, visibility }: ProjectTeamSection
         <Button
           variant="ghost"
           size="sm"
+          data-testid="team-leave-button"
           className="text-muted-foreground hover:text-destructive"
           disabled={removeMutation.isPending}
           onClick={() => {
@@ -260,7 +266,11 @@ export function ProjectTeamSection({ projectId, visibility }: ProjectTeamSection
               </p>
               <ul className="space-y-2">
                 {team.pendingInvitations.map((invitation) => (
-                  <li key={invitation.user.id} className="flex items-center gap-3">
+                  <li
+                    key={invitation.user.id}
+                    data-testid={`team-pending-${invitation.user.username}`}
+                    className="flex items-center gap-3"
+                  >
                     <MemberAvatar user={invitation.user} className="h-7 w-7" />
                     <span className="min-w-0 flex-1 truncate text-sm text-foreground">
                       @{invitation.user.username}
@@ -289,12 +299,17 @@ export function ProjectTeamSection({ projectId, visibility }: ProjectTeamSection
               <div className="relative flex gap-2">
                 <Input
                   id={`invite-${projectId}`}
+                  data-testid="team-invite-input"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                   placeholder={t.invite_placeholder}
                   autoComplete="off"
                 />
-                <Button type="submit" disabled={!username.trim() || inviteMutation.isPending}>
+                <Button
+                  type="submit"
+                  data-testid="team-invite-submit"
+                  disabled={!username.trim() || inviteMutation.isPending}
+                >
                   {inviteMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (

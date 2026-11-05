@@ -148,6 +148,7 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
+          data-testid="notification-bell-trigger"
           className="relative rounded-full hover:bg-muted text-muted-foreground h-9 w-9 cursor-pointer focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 border-none select-none"
         >
           <FiBell size={20} />
@@ -260,6 +261,7 @@ export function NotificationBell() {
                         <div className="flex gap-2 pt-1">
                           <Button
                             size="sm"
+                            data-testid="notification-invite-accept"
                             className="h-7 px-3 text-xs cursor-pointer"
                             disabled={isRespondingToInvite}
                             onClick={(e) => {

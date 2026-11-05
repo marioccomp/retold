@@ -186,7 +186,10 @@ export default function ProjectCard({
 
         {project.isCollaboration && (
           <div className="absolute top-3 right-3 z-[10]">
-            <Badge className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-md">
+            <Badge
+              data-testid="project-card-collaboration-badge"
+              className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-md"
+            >
               {dict.project.team.collaboration_badge}
             </Badge>
           </div>
