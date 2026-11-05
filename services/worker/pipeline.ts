@@ -5,6 +5,8 @@
  * The worker job (index.ts) and the eval runner (evals/run-eval.ts) both call
  * this, so the eval measures exactly what production runs.
  */
+import fs from "fs";
+
 import { createLogger } from "@repo/observability";
 
 import { analyzeRepository } from "./analyze/index.js";
@@ -15,8 +17,26 @@ import { tryReadRepositoryTextFile } from "./security.js";
 
 const logger = createLogger("worker.project-analysis");
 
+/** Root README names, by preference (README.rst is common in Python projects). */
+const README_PATTERN = /^readme(\.(md|markdown|rst|txt|adoc|org))?$/i;
+const README_EXTENSION_PREFERENCE = [".md", ".markdown", ".rst", ".adoc", ".org", ".txt", ""];
+
 export function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
-  const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
+  let rootEntries: string[] = [];
+  try {
+    rootEntries = fs.readdirSync(repoPath);
+  } catch {
+    return "";
+  }
+
+  const extensionRank = (name: string) => {
+    const dot = name.indexOf(".");
+    return README_EXTENSION_PREFERENCE.indexOf(dot === -1 ? "" : name.slice(dot).toLowerCase());
+  };
+  const possibleReadmePaths = rootEntries
+    .filter((name) => README_PATTERN.test(name))
+    .sort((a, b) => extensionRank(a) - extensionRank(b));
+
   for (const fileName of possibleReadmePaths) {
     try {
       const content = tryReadRepositoryTextFile(repoPath, fileName, maxChars);
@@ -61,9 +81,13 @@ export async function runAnalysisPipeline(input: AnalysisPipelineInput) {
     codeSamplesCount: analysis.codeSamples?.length ?? 0,
   });
 
+  // The repository map is persisted, not sent: the current prompt is already at
+  // the free-tier token limit. Phase 2 uses it to choose what the LLM reads.
+  const { repoMap: _repoMap, ...analysisForLlm } = analysis;
+
   const preparedLlmAnalysis = prepareAnalysisForLlm(
     {
-      ...analysis,
+      ...analysisForLlm,
       readme,
       codeSamples: analysis.codeSamples,
       locale: input.locale,

@@ -9,6 +9,9 @@ import { buildStructure } from "./build-struct.js";
 import path from "path";
 import { classifyProject } from "./classify-project.js";
 import { selectCodeSamples } from "./select-code-samples.js";
+import { buildRepoMap } from "./repo-map/index.js";
+import { detectPublishableLibrary } from "./detect-packaging.js";
+import { tryReadRepositoryTextFile } from "../security.js";
 
 export async function analyzeRepository(
   repoPath: string,
@@ -49,6 +52,16 @@ export async function analyzeRepository(
       hasTests: infra.hasTests,
     },
     primaryLanguage,
+    publishableLibrary: detectPublishableLibrary(
+      files.map((f) => f.relativePath),
+      (filePath) => {
+        try {
+          return tryReadRepositoryTextFile(repoPath, filePath, 200_000);
+        } catch {
+          return null;
+        }
+      }
+    ).library,
   });
 
   const testFiles = files.filter((f) => classifyFile(f) === "test");
@@ -65,7 +78,17 @@ export async function analyzeRepository(
     }));
   }
 
+  // Deterministic repository map (phase 1). Kept out of the LLM prompt for now.
+  const repoMap = buildRepoMap({
+    repoPath,
+    files,
+    readme: opts?.readme ?? "",
+    primaryLanguage,
+    infra,
+  });
+
   return {
+    repoMap,
     summary: {
       // Prefer extension-based detection; fallback to inferred stack languages.
       primaryLanguage,

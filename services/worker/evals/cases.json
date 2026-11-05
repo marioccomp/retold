@@ -15,6 +15,12 @@
       ],
       "llmMustMention": [
         "middleware|routing"
+      ],
+      "centralFilesInclude": [
+        "^lib/(utils|express|application)\\.js$"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -34,6 +40,12 @@
       ],
       "llmMustMention": [
         "WSGI|micro ?framework|web framework"
+      ],
+      "centralFilesInclude": [
+        "^src/flask/"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -53,6 +65,9 @@
       ],
       "llmMustMention": [
         "CLI|command[- ]line"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -72,6 +87,14 @@
       ],
       "llmMustMention": [
         "search|grep"
+      ],
+      "modulesInclude": [
+        "crates/searcher",
+        "crates/printer",
+        "crates/ignore"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -87,6 +110,14 @@
       ],
       "llmMustMention": [
         "scaffold|template|boilerplate|create"
+      ],
+      "modulesInclude": [
+        "cli",
+        "www"
+      ],
+      "maturity": [
+        "medium",
+        "high"
       ]
     }
   },
@@ -119,6 +150,9 @@
       ],
       "llmMustMention": [
         "type (check|guard)|runtime type|type assertion"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -165,6 +199,17 @@
       "llmMustMention": [
         "portf[oó]lio",
         "BullMQ|worker|queue|fila"
+      ],
+      "modulesInclude": [
+        "apps/web",
+        "services/worker",
+        "packages/database"
+      ],
+      "centralFilesInclude": [
+        "^packages/database/index\\.ts$"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -185,6 +230,9 @@
       ],
       "llmMustMention": [
         "inference|serving|infer[eê]ncia"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -234,6 +282,13 @@
       ],
       "llmMustMention": [
         "FastAPI"
+      ],
+      "modulesInclude": [
+        "backend"
+      ],
+      "maturity": [
+        "low",
+        "medium"
       ]
     }
   },
@@ -249,6 +304,12 @@
       ],
       "llmMustMention": [
         "Godot"
+      ],
+      "frameworksInclude": [
+        "Godot"
+      ],
+      "maturity": [
+        "low"
       ]
     }
   },
@@ -267,6 +328,12 @@
       ],
       "llmMustMention": [
         "kernel|operating system|sistema operacional"
+      ],
+      "centralFilesInclude": [
+        "\\.h$"
+      ],
+      "maturity": [
+        "low"
       ]
     }
   },
@@ -292,6 +359,12 @@
       "llmMustMention": [
         "Mongo",
         "node_modules"
+      ],
+      "hygieneFlags": [
+        "node_modules"
+      ],
+      "maturity": [
+        "low"
       ]
     }
   },
@@ -317,6 +390,13 @@
       ],
       "llmMustMention": [
         "Spring"
+      ],
+      "centralFilesInclude": [
+        "/model/"
+      ],
+      "maturity": [
+        "medium",
+        "high"
       ]
     }
   },
@@ -359,6 +439,10 @@
       ],
       "llmMustMention": [
         "Redux"
+      ],
+      "maturity": [
+        "low",
+        "medium"
       ]
     }
   },
@@ -380,6 +464,9 @@
       ],
       "llmMustMention": [
         "Django"
+      ],
+      "maturity": [
+        "high"
       ]
     }
   },
@@ -404,6 +491,10 @@
       ],
       "llmMustMention": [
         "communit|comunidade|forum|news"
+      ],
+      "maturity": [
+        "medium",
+        "high"
       ]
     }
   },
@@ -419,6 +510,12 @@
       ],
       "llmMustMention": [
         "course|curso|lesson|aula|beginner|iniciante"
+      ],
+      "hygieneFlags": [
+        "compiled-artifacts"
+      ],
+      "maturity": [
+        "low"
       ]
     }
   },

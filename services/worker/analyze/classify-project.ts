@@ -34,6 +34,8 @@ interface ClassificationInput {
   };
   primaryLanguage: string;
   repoUrl?: string;
+  /** Root manifests describe a publishable library (see detect-packaging.ts). */
+  publishableLibrary?: boolean;
 }
 
 export function classifyProject(input: ClassificationInput): ProjectClassification {
@@ -87,6 +89,16 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     }
   }
 
+  // Example/sample applications say so in their title or first paragraph.
+  if (purpose === "unknown") {
+    const demoMatches = detectReadmeDemoSignals(readme);
+    if (demoMatches.length > 0) {
+      purpose = "demo";
+      signals.push(`README presents the project as a sample: ${demoMatches.join(", ")}`);
+      confidence += 0.15;
+    }
+  }
+
   // Simple structure check for learning (e.g. just a main file and no infra)
   const hasSimpleStructure =
     files.length < 15 && files.some((f) => f.name.match(/^main\.(c|cpp|rs|py|js|ts)$/i));
@@ -99,8 +111,9 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     }
   }
 
-  // Check for research/academic paper signals
-  if (purpose === "unknown") {
+  // Check for research/academic paper signals. Citing a paper doesn't make a
+  // project with CI/containers a research prototype (e.g. vLLM cites its paper).
+  if (purpose === "unknown" && !infra.hasCI && !infra.hasDocker) {
     const hasLatex = files.some((f) => f.name.endsWith(".tex") || f.name === "paper.md");
     if (hasLatex || lowerReadme.includes("citation") || lowerReadme.includes("arxiv")) {
       purpose = "research";
@@ -139,9 +152,19 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     /next\.config|vite\.config|webpack\.config/i.test(f.name)
   );
 
-  const hasStaticWebFiles = files.some((f) =>
-    /\.(html?|css|scss|sass|less)$/.test(f.name.toLowerCase())
-  );
+  // A few HTML/CSS files (docs, templates) don't make a repository a web project:
+  // require a root page or a meaningful share of the code.
+  const isWebFile = (name: string) => /\.(html?|css|scss|sass|less)$/.test(name.toLowerCase());
+  const isCodeFile = (name: string) =>
+    /\.(py|js|ts|tsx|jsx|java|go|rs|c|cc|cpp|h|hpp|rb|php|cs|kt|swift|r|jl|gd)$/.test(name.toLowerCase());
+  const webFileCount = files.filter((f) => isWebFile(f.name)).length;
+  const codeFileCount = files.filter((f) => isCodeFile(f.name)).length;
+  const hasRootPage = lowerPaths.some((p) => /^(public\/|src\/|static\/)?index\.html?$/.test(p));
+  const hasStaticWebFiles =
+    webFileCount > 0 && (hasRootPage || webFileCount / (webFileCount + codeFileCount) >= 0.15);
+
+  const notebookCount = files.filter((f) => f.name.endsWith(".ipynb")).length;
+  const notebooksDominate = notebookCount >= 5 && notebookCount / (notebookCount + codeFileCount) >= 0.3;
 
   const isWeb = hasWebFramework || hasWebConfigs || hasStaticWebFiles;
 
@@ -195,7 +218,14 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     hasCliDirs &&
     (hasCliEntrypointHint || stack.tools.map((t) => t.toLowerCase()).includes("cobra"));
 
-  if (isWeb) {
+  if (notebooksDominate) {
+    domain = "data";
+    signals.push(`Notebooks dominate the repository (${notebookCount} notebooks)`);
+  } else if (input.publishableLibrary) {
+    domain = "library";
+    signals.push("Root manifest describes a publishable library");
+    confidence += 0.1;
+  } else if (isWeb) {
     domain = "web";
     signals.push("Detected web/mobile app signals (frameworks/configs/)");
     confidence += 0.1;
@@ -316,7 +346,37 @@ const README_ACADEMIC_PHRASES = [
   "college project",
   "homework assignment",
   "programming assignment",
+  "learning project",
+  "learning resource",
+  "for educational purposes",
+  "educators and students",
+  "lesson curriculum",
+  "projeto de estudo",
+  "projeto de estudos",
+  "projeto para estudo",
+  "projeto para estudos",
+  "projeto de aprendizado",
+  "para fins de estudo",
+  "fins didaticos",
 ];
+
+/** Phrases that present the repository itself as an example, in its title/intro. */
+const README_DEMO_PHRASES = [
+  "sample application",
+  "sample app",
+  "example application",
+  "example app",
+  "demo application",
+  "demo app",
+  "aplicacao de exemplo",
+  "projeto de exemplo",
+];
+
+/** Only the title and first paragraph count: "see the example app" deep in a README doesn't. */
+export function detectReadmeDemoSignals(readme: string): string[] {
+  const intro = ` ${tokenize(readme.slice(0, 400)).join(" ")} `;
+  return README_DEMO_PHRASES.filter((phrase) => intro.includes(` ${phrase} `));
+}
 
 /**
  * Words that hint at coursework but can also describe the app's domain
@@ -340,6 +400,27 @@ const README_ACADEMIC_WORDS = new Set([
   "bootcamp",
 ]);
 
+/**
+ * Educational material announces itself in the README title ("X for Beginners - A
+ * Curriculum"). "course"/"curso" are left out on purpose: apps *about* courses
+ * ("Sistema de Cursos") are common student portfolio projects.
+ */
+const README_TITLE_LEARNING_WORDS = new Set([
+  "curriculum",
+  "tutorial",
+  "handbook",
+  "workshop",
+  "bootcamp",
+]);
+const README_TITLE_LEARNING_PHRASES = ["for beginners", "para iniciantes"];
+
+function readmeTitle(readme: string) {
+  // Markdown "# Title" or reStructuredText/setext "Title\n=====".
+  const heading =
+    readme.match(/^\s*#{1,2}\s+(.+)$/m)?.[1] ?? readme.match(/^\s*(\S.*)\n[=-]{3,}\s*$/m)?.[1];
+  return heading ?? "";
+}
+
 export function detectReadmeAcademicSignals(readme: string): {
   isAcademic: boolean;
   matches: string[];
@@ -353,9 +434,20 @@ export function detectReadmeAcademicSignals(readme: string): {
   );
   const wordMatches = [...new Set(tokens.filter((t) => README_ACADEMIC_WORDS.has(t)))];
 
+  const titleTokens = tokenize(readmeTitle(readme));
+  const paddedTitle = ` ${titleTokens.join(" ")} `;
+  const titleMatches = [
+    ...titleTokens.filter((t) => README_TITLE_LEARNING_WORDS.has(t)),
+    ...README_TITLE_LEARNING_PHRASES.filter((phrase) => paddedTitle.includes(` ${phrase} `)),
+  ].map((m) => `title: ${m}`);
+
+  // "24 lessons", "12 aulas": numbered lessons are course material.
+  const lessonMatch = padded.match(/ \d+ (lessons|aulas) /)?.[0].trim();
+
   return {
-    isAcademic: phraseMatches.length > 0 || wordMatches.length >= 2,
-    matches: [...phraseMatches, ...wordMatches],
+    isAcademic:
+      phraseMatches.length > 0 || wordMatches.length >= 2 || titleMatches.length > 0 || Boolean(lessonMatch),
+    matches: [...phraseMatches, ...titleMatches, ...(lessonMatch ? [lessonMatch] : []), ...wordMatches],
   };
 }
 

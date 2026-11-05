@@ -34,7 +34,27 @@ export function detectAppType(input: {
 
   /* ================= BACKEND (Node) ================= */
 
-  if (frameworks.some((f) => ["Express", "NestJS"].includes(f))) {
+  // Server frameworks (any language). Server-rendered ones (Adonis, Django, Rails,
+  // Laravel, Spring) also produce pages: their frontend side comes from HTML/CSS
+  // and frontend tooling below, which makes them Fullstack.
+  const SERVER_FRAMEWORKS = [
+    "Express",
+    "NestJS",
+    "AdonisJS",
+    "FastAPI",
+    "Django",
+    "Flask",
+    "Laravel",
+    "Ruby on Rails",
+    "Spring Boot",
+    "Gin",
+    "Echo",
+    "Fiber",
+    "Actix",
+    "Axum",
+    ".NET",
+  ];
+  if (frameworks.some((f) => SERVER_FRAMEWORKS.includes(f))) {
     backendScore += 3;
   }
 

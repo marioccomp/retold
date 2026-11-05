@@ -32,6 +32,14 @@ type EvalExpectations = {
   llmMustMention?: string[];
   /** Regexes (case-insensitive); none may match the LLM output. */
   llmMustNotMention?: string[];
+  /** Repository map (phase 1): module paths that must be detected. */
+  modulesInclude?: string[];
+  /** Repository map: each regex must match one of the 10 most central files. */
+  centralFilesInclude?: string[];
+  /** Repository map: hygiene flags that must be raised (e.g. "node_modules"). */
+  hygieneFlags?: string[];
+  /** Repository map: accepted measured maturity levels. */
+  maturity?: string[];
 };
 
 type EvalCase = {
@@ -51,6 +59,8 @@ type CaseResult = {
   durationMs: number;
   usage: LlmUsage | null;
   error?: string;
+  /** Raw LLM answer (JSON report only), to understand failed text checks. */
+  llmOutput?: unknown;
 };
 
 const evalsDir = path.dirname(fileURLToPath(import.meta.url));
@@ -74,20 +84,29 @@ function parseArgs(argv: string[]) {
   return { caseIds, llm, locale };
 }
 
-/** Shallow checkout of exactly `ref`, cached across runs. */
+/** Same history depth as the production analysis clone (churn, history signals). */
+const EVAL_CLONE_DEPTH = 50;
+
+/** Shallow checkout of exactly `ref` (with recent history), cached across runs. */
 async function checkoutCase(evalCase: EvalCase) {
   const target = path.join(cacheRoot, `${evalCase.id}@${evalCase.ref.slice(0, 12)}`);
-  if (fs.existsSync(path.join(target, ".git"))) return target;
-
-  fs.rmSync(target, { recursive: true, force: true });
-  fs.mkdirSync(target, { recursive: true });
+  const marker = path.join(target, ".git", `retold-eval-depth-${EVAL_CLONE_DEPTH}`);
+  if (fs.existsSync(marker)) return target;
 
   const url = `https://github.com/${evalCase.repo}.git`;
-  await runGitCommand(["-C", target, "init", "-q"]);
-  await runGitCommand(["-C", target, "fetch", "-q", "--depth=1", url, evalCase.ref], {
+  if (!fs.existsSync(path.join(target, ".git"))) {
+    fs.rmSync(target, { recursive: true, force: true });
+    fs.mkdirSync(target, { recursive: true });
+    await runGitCommand(["-C", target, "init", "-q"]);
+  }
+  // Also deepens checkouts cached by older runs (which used --depth=1).
+  await runGitCommand(["-C", target, "fetch", "-q", `--depth=${EVAL_CLONE_DEPTH}`, url, evalCase.ref], {
+    timeoutMs: 300_000,
+  });
+  await runGitCommand(["-C", target, "-c", "core.longpaths=true", "checkout", "-q", "-f", evalCase.ref], {
     timeoutMs: 180_000,
   });
-  await runGitCommand(["-C", target, "checkout", "-q", "FETCH_HEAD"], { timeoutMs: 180_000 });
+  fs.writeFileSync(marker, "");
   return target;
 }
 
@@ -149,6 +168,34 @@ function heuristicChecks(
   for (const framework of expect.frameworksInclude ?? []) {
     checks.push(
       check(`framework:${framework}`, stack.frameworks.includes(framework), framework, stack.frameworks)
+    );
+  }
+
+  const { repoMap } = analysis;
+  const modulePaths = repoMap.modules.map((m) => m.path);
+  for (const modulePath of expect.modulesInclude ?? []) {
+    checks.push(check(`module:${modulePath}`, modulePaths.includes(modulePath), modulePath, modulePaths));
+  }
+  const topCentral = repoMap.centralFiles.slice(0, 10).map((f) => f.path);
+  for (const pattern of expect.centralFilesInclude ?? []) {
+    const regex = new RegExp(pattern);
+    checks.push(
+      check(`central:/${pattern}/`, topCentral.some((f) => regex.test(f)), pattern, topCentral.slice(0, 5))
+    );
+  }
+  for (const flag of expect.hygieneFlags ?? []) {
+    checks.push(
+      check(`hygiene:${flag}`, repoMap.hygiene.flags.includes(flag as never), flag, repoMap.hygiene.flags)
+    );
+  }
+  if (expect.maturity) {
+    checks.push(
+      check(
+        "maturity",
+        expect.maturity.includes(repoMap.maturity.level),
+        expect.maturity,
+        `${repoMap.maturity.level} (${repoMap.maturity.score})`
+      )
     );
   }
 
@@ -229,6 +276,7 @@ async function runCase(
     ],
     durationMs: Date.now() - startedAt,
     usage,
+    llmOutput: result.llmInsights,
   };
 }
 

@@ -121,6 +121,7 @@ const worker = new Worker(
           signals: analysis.infra,
           rawAnalysis: persistedRawAnalysis,
           llmOverview: llmInsightsJson,
+          repoMap: analysis.repoMap as unknown as Prisma.InputJsonValue,
         },
         update: {
           appType: analysis.summary.appType,
@@ -129,6 +130,7 @@ const worker = new Worker(
           signals: analysis.infra,
           rawAnalysis: persistedRawAnalysis,
           llmOverview: llmInsightsJson,
+          repoMap: analysis.repoMap as unknown as Prisma.InputJsonValue,
         },
       });
 
