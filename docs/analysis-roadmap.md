@@ -98,13 +98,13 @@ Corrigir o que distorce os dados hoje e criar a ferramenta de medição.
 
 - [x] Decisão da 0.5: opção A (colaboradores).
 - [x] Completar os casos do eval (22).
-- [ ] Confirmar qual modelo a produção usa e se as análises estão falhando por lá.
+- [x] ~~Confirmar qual modelo a produção usa~~: não há produção no ar. Com a chave nova do Groq, o
+      `llama-3.3-70b-versatile` continua `404`, então foi removido de fato; o limite segue em 8.000 tokens/min.
 - [ ] **Decidir o que fazer com o limite de 8K tokens/min do free tier** (23% dos repos do eval falham com 413):
       (a) cortar o README enviado ao LLM para ~12K caracteres (todos cabem, com menos contexto), ou (b) subir para o
       Developer tier do Groq. A Fase 2 resolve de vez com orçamento de tokens por chamada.
-- [ ] Rodar `pnpm test:web:integration` com o Redis do Retold na porta 6379 e o `pnpm dev` parado. O teste
-      `project-actions` enfileira jobs de verdade: com o worker local rodando, ele consome o job ("job locked by
-      another worker"); no CI isso não acontece.
+- [x] Suíte completa verificada com o Redis do Retold: 134 unitários, 31 de integração e 13 e2e (incluindo um e2e
+      novo do fluxo de equipe com duas sessões de navegador).
 
 ## Fase 1: Entender o repo sem LLM (2 semanas)
 
@@ -186,3 +186,4 @@ oficiais antes de decidir.
 | 2026-11-05 | 0.5 | Opção A implementada: `ProjectCollaborator` (migration `20261105130000`), convites com notificação, estatísticas por membro no `user-worker` (cada commit creditado a no máximo um membro), seção "Equipe" no painel, aceite pelo sino, acesso a privados para membros, colaborações no perfil. 11 testes de integração + testes unitários. |
 | 2026-11-05 | 0.7 | Eval com 22 casos (7 do time + 15 open source). Nova linha de base de heurísticas: 61/76. |
 | 2026-11-05 | 0.7 | Linha de base com LLM nos 22 casos: 80/94 checks; 5 casos (23%) não cabem no free tier (413, prompt > 8K tokens/min). |
+| 2026-11-05 | 0 | Fase 0 encerrada. E2E do fluxo de equipe (dono convida, colega aceita pelo sino, projeto no perfil). Corrigido de quebra um bug antigo: o modal de projeto do perfil quebrava no SSR com link direto (`document is not defined`). |
