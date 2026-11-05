@@ -5,7 +5,7 @@ import { isPathInsideBase, resolveRepositoryRoot } from "../security.js";
 
 export type FileEntry = {
   path: string; // absoluto
-  relativePath: string; // relativo ao repo
+  relativePath: string; // relativo ao repo, sempre com "/" (também no Windows)
   name: string;
   ext: string;
   size: number; // bytes
@@ -88,7 +88,9 @@ export function scanRepository(
 
       acc.push({
         path: realPath,
-        relativePath: path.relative(repositoryRoot, realPath),
+        // Always POSIX separators: path checks such as ".github/workflows/" must
+        // behave the same on Windows dev machines and on the Linux server.
+        relativePath: path.relative(repositoryRoot, realPath).split(path.sep).join("/"),
         name: entry.name,
         ext: path.extname(entry.name),
         size,

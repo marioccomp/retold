@@ -18,6 +18,5 @@ export type { User, Project, Tag, Certification, Participation, Repository, Repo
 export * from "./repositories/index";
 export * from "./user-commit-identity";
 export { githubRepository } from "./repositories/github.repository";
-export { webhookRepository } from "./repositories/webhook.repository";
 
 

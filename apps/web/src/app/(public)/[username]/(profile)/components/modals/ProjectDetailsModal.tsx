@@ -2,7 +2,7 @@
 
 import { FeedProjectPanel } from "@/src/components/ProjectPanel/FeedProjectPanel";
 import { ProjectForOverlay } from "@/src/components/ProjectPanel/types";
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
 
@@ -12,7 +12,17 @@ type Props = {
   project: ProjectForOverlay | null;
 };
 
+const subscribeNoop = () => () => {};
+
 export default function ProjectDetailsModal({ isOpen, onClose, project }: Props) {
+  // The portal targets document.body, which doesn't exist during SSR (a deep link
+  // such as /user?tab=projects&project=1 renders the modal on the server).
+  const isClient = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false
+  );
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -27,7 +37,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, project }: Props)
     };
   }, [isOpen]);
 
-  if (!isOpen || !project) return null;
+  if (!isOpen || !project || !isClient) return null;
 
   return createPortal(
     <div

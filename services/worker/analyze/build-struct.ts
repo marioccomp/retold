@@ -1,5 +1,4 @@
 // worker/analyze/build-struct.ts
-import path from "path";
 import { FileEntry } from "./scan-repository.js";
 
 export function buildStructure(files: FileEntry[]) {
@@ -17,7 +16,7 @@ export function buildStructure(files: FileEntry[]) {
   let hasPackagesDir = false;
 
   for (const f of files) {
-    const rel = f.relativePath.split(path.sep);
+    const rel = f.relativePath.split("/");
     const top = rel[0];
     if (top && top !== "." && !top.includes(".") && !ignored.includes(top)) topLevelDirs.add(top);
     let second;

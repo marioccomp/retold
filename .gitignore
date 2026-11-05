@@ -48,3 +48,4 @@ scripts/backup/backup.env
 
 # deploy state
 .deploy-state/
+services/worker/evals/results/

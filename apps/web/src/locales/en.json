@@ -12,8 +12,14 @@
     "types": {
       "follow": "started following you",
       "like": "liked your project",
-      "comment": "commented on your project"
-    }
+      "comment": "commented on your project",
+      "project_invite": "invited you to collaborate on",
+      "project_invite_accepted": "accepted the invitation to"
+    },
+    "project_invite": "{{user}} invited you to the project {{project}}",
+    "project_invite_accepted": "{{user}} joined your project {{project}}",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "settings": {
     "title": "Settings",
@@ -344,6 +350,48 @@
       "success_delete": "Comment deleted!",
       "error_create": "Failed to post comment",
       "error_delete": "Failed to delete comment"
+    },
+    "team": {
+      "title": "Team",
+      "owner_label": "Owner",
+      "collaborator_label": "Collaborator",
+      "collaboration_badge": "Collaboration",
+      "commits": "{count} commits",
+      "lines": "+{added} / −{deleted} lines",
+      "active_days": "{count} active days",
+      "no_stats": "Contributions not computed yet",
+      "stats_private": "Contributions are only computed for public projects.",
+      "invite_title": "Invite a collaborator",
+      "invite_placeholder": "@username",
+      "invite_button": "Invite",
+      "invite_help": "They get a notification and join the project when they accept. Their commits in this repository then count on their profile.",
+      "pending_title": "Pending invitations",
+      "cancel_invite": "Cancel",
+      "remove_member": "Remove",
+      "remove_confirm": "Remove {name} from the project? Their contributions to this project leave their profile.",
+      "leave_project": "Leave project",
+      "leave_confirm": "Leave this project? Your contributions to it leave your profile.",
+      "invited_banner": "{name} invited you to collaborate on this project.",
+      "accept": "Accept",
+      "decline": "Decline",
+      "invite_sent": "Invitation sent to @{username}",
+      "invite_accepted": "You are now part of the project",
+      "invite_declined": "Invitation declined",
+      "member_removed": "Member removed",
+      "left_project": "You left the project",
+      "limit": "{count}/{max} collaborators",
+      "errors": {
+        "USER_NOT_FOUND": "User not found",
+        "CANNOT_INVITE_SELF": "You already own this project",
+        "ALREADY_MEMBER": "This person is already part of the project",
+        "ALREADY_INVITED": "This person has already been invited",
+        "TOO_MANY_COLLABORATORS": "Collaborator limit reached",
+        "INVITATION_NOT_FOUND": "Invitation not found or already answered",
+        "NOT_PROJECT_OWNER": "Only the project owner can do this",
+        "NOT_A_MEMBER": "This person is not part of the project",
+        "PROJECT_NOT_FOUND": "Project not found",
+        "default": "Something went wrong. Please try again."
+      }
     }
   },
   "feed": {

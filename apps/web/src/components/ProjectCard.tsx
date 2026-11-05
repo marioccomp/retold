@@ -59,7 +59,9 @@ export default function ProjectCard({
   const ownerName: string = project.ownerName || "Mario Junior";
 
   // Check if owner is current user
-  const isOwner = ownProfile || session?.user?.username === project.ownerUsername;
+  // On your own profile every card is yours, except projects you collaborate on.
+  const isOwner =
+    (ownProfile && !project.isCollaboration) || session?.user?.username === project.ownerUsername;
 
   const { openLoginModal } = useAuthModal();
 
@@ -181,6 +183,17 @@ export default function ProjectCard({
             <p className="whitespace-pre-wrap">{project.description}</p>
           </div>
         </div>
+
+        {project.isCollaboration && (
+          <div className="absolute top-3 right-3 z-[10]">
+            <Badge
+              data-testid="project-card-collaboration-badge"
+              className="rounded-full border border-white/20 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-md"
+            >
+              {dict.project.team.collaboration_badge}
+            </Badge>
+          </div>
+        )}
 
         {isOwner && !disableConfig && (
           <div className="absolute top-3 right-3 z-[10]">

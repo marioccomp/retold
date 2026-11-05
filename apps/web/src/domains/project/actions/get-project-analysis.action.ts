@@ -45,22 +45,8 @@ export async function getProjectAnalysisAction(projectId: number) {
         accessibleProject = await requireProjectAccess(projectId, currentUserId);
     } catch (error) {
         if (error instanceof ProjectAccessError) {
-            if (error.code === "PROJECT_NOT_FOUND" && currentUserId) {
-                const currentUser = await prisma.user.findUnique({
-                    where: { id: currentUserId },
-                    select: { rateLimitResetAt: true },
-                });
-
-                if (currentUser?.rateLimitResetAt && currentUser.rateLimitResetAt > new Date()) {
-                    return {
-                        status: "PROJECT_INTERNAL_ERROR" as const,
-                        nextRetryAt: currentUser.rateLimitResetAt.toISOString(),
-                        retryBlockedUntil: null,
-                        analysis: null,
-                    };
-                }
-            }
-
+            // Failed analyses keep the project in ERROR (it is no longer deleted),
+            // so a missing project here really is missing.
             return {
                 status: error.code,
                 nextRetryAt: null,

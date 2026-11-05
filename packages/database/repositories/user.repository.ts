@@ -108,19 +108,23 @@ export const userRepository = {
   ) {
     const skip = (projectsPage - 1) * projectsLimit;
 
+    // Visibility: everyone sees public, analyzed projects. A signed-in viewer also
+    // sees the projects they own or are a member of. The viewer clauses are only
+    // added when there is a viewer, so no filter ever depends on an undefined id.
+    const publicProjects = { visibility: "public", status: { not: "PENDING" } };
+    const visibilityFilter = currentUserId
+      ? {
+          OR: [
+            publicProjects,
+            { userId: currentUserId },
+            { collaborators: { some: { userId: currentUserId, status: "ACCEPTED" } } },
+          ],
+        }
+      : publicProjects;
+
     // Filter condition for projects
     const projectsWhereInput: any = {
-      AND: [
-        {
-          OR: [
-            {
-              visibility: "public",
-              status: { not: "PENDING" },
-            },
-            { userId: currentUserId },
-          ],
-        },
-      ],
+      AND: [visibilityFilter],
     };
 
     if (projectsQuery) {
@@ -139,44 +143,11 @@ export const userRepository = {
     const user = await prisma.user.findUnique({
       where: { username },
       include: {
-        projects: {
-          where: projectsWhereInput,
-          orderBy:
-            projectsSort === "popular"
-              ? { views: "desc" }
-              : projectsSort === "oldest"
-                ? { createdAt: "asc" }
-                : { createdAt: "desc" },
-          skip,
-          take: projectsLimit,
-          include: {
-            tags: true,
-            repository: true,
-            _count: {
-              select: {
-                likes: true,
-                comments: true,
-              },
-            },
-            ...(currentUserId
-              ? {
-                  likes: {
-                    where: {
-                      userId: currentUserId,
-                    },
-                    select: {
-                      userId: true,
-                    },
-                  },
-                }
-              : {}),
-          },
-        },
         _count: {
           select: {
             followers: true,
             following: true,
-            projects: true, // This counts ALL projects, not filtered ones
+            projects: true, // Replaced below by the filtered count (owned + collaborations)
           },
         },
         ...(currentUserId
@@ -211,18 +182,66 @@ export const userRepository = {
       },
     });
 
-    if (user) {
-      // Correction of the count to always match the filters (visibility, repository, query)
-      const filteredCount = await prisma.project.count({
-        where: {
-          userId: user.id,
-          ...projectsWhereInput,
-        },
-      });
-      (user as any)._count.projects = filteredCount;
-    }
+    if (!user) return null;
 
-    return user;
+    // Projects the user owns or collaborates on (accepted invitations).
+    const profileProjectsWhere = {
+      AND: [
+        {
+          OR: [
+            { userId: user.id },
+            { collaborators: { some: { userId: user.id, status: "ACCEPTED" } } },
+          ],
+        },
+        ...projectsWhereInput.AND,
+      ],
+    } as Prisma.ProjectWhereInput;
+
+    const [projects, filteredCount] = await Promise.all([
+      prisma.project.findMany({
+        where: profileProjectsWhere,
+        orderBy:
+          projectsSort === "popular"
+            ? { views: "desc" }
+            : projectsSort === "oldest"
+              ? { createdAt: "asc" }
+              : { createdAt: "desc" },
+        skip,
+        take: projectsLimit,
+        include: {
+          tags: true,
+          repository: true,
+          // Owner of each project (differs from the profile user on collaborations).
+          user: { select: { id: true, name: true, username: true, image: true } },
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
+          },
+          ...(currentUserId
+            ? {
+                likes: {
+                  where: {
+                    userId: currentUserId,
+                  },
+                  select: {
+                    userId: true,
+                  },
+                },
+              }
+            : {}),
+        },
+      }),
+      // Count matching the same filters (visibility, query, collaborations)
+      prisma.project.count({ where: profileProjectsWhere }),
+    ]);
+
+    return {
+      ...user,
+      projects,
+      _count: { ...user._count, projects: filteredCount },
+    };
   },
 
   async updateProfileById(userId: number, data: UpdateProfileInput) {

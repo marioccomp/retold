@@ -67,5 +67,37 @@ describe("project-access", () => {
         })
       );
     });
+
+    it("should allow collaborators and invited users to access a private project", async () => {
+      for (const status of ["ACCEPTED", "PENDING"]) {
+        vi.mocked(prisma.project.findUnique).mockResolvedValue({
+          id: 15,
+          userId: 50,
+          visibility: "private",
+          collaborators: [{ status }],
+        } as any);
+
+        await expect(requireProjectAccess(15, 51)).resolves.toEqual({
+          id: 15,
+          userId: 50,
+          visibility: "private",
+        });
+      }
+    });
+
+    it("should only look up membership for signed-in users", async () => {
+      vi.mocked(prisma.project.findUnique).mockResolvedValue({
+        id: 15,
+        userId: 50,
+        visibility: "private",
+      } as any);
+
+      await expect(requireProjectAccess(15, null)).rejects.toEqual(
+        expect.objectContaining({ code: "PROJECT_NOT_ACCESSIBLE" })
+      );
+      expect(vi.mocked(prisma.project.findUnique).mock.calls[0][0].select).not.toHaveProperty(
+        "collaborators"
+      );
+    });
   });
 });

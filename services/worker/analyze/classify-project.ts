@@ -46,49 +46,22 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
   // --- Step 1: Detect Purpose (Learning/Academic signals are strong overrides) ---
   let purpose: ProjectPurpose = "unknown";
 
-  const strongAcademicKeywords = [
-    "disciplina",
-    "trabalho",
-    "atividade",
-    "lista",
-    "exercício",
-    "exercicio",
-    "assignment",
-    "course",
-    "university",
-    "faculdade",
-    "tarefa",
-    "prova",
-    "aula",
-    "capitulo",
-    "homework",
-    "tp",
-    "t1",
-    "t2",
-  ];
-
-  const weakAcademicKeywords = ["projeto", "project", "challenge", "desafio"];
-
-  // Check README
-  const foundStrongInReadme = strongAcademicKeywords.filter((w) => lowerReadme.includes(w));
-  const foundWeakInReadme = weakAcademicKeywords.filter((w) => lowerReadme.includes(w));
-
-  if (foundStrongInReadme.length > 0) {
+  // README: matched as whole words/phrases (never substrings: "tp" used to match "http").
+  const readmeAcademic = detectReadmeAcademicSignals(readme);
+  if (readmeAcademic.isAcademic) {
     purpose = "learning";
-    signals.push(`README academic signals: ${foundStrongInReadme.slice(0, 3).join(", ")}`);
+    signals.push(`README academic signals: ${readmeAcademic.matches.slice(0, 3).join(", ")}`);
     confidence += 0.25;
-  } else if (foundWeakInReadme.length > 0) {
-    // weak-only does NOT auto-set learning, just a hint
-    signals.push(
-      `README contains weak academic terms: ${foundWeakInReadme.slice(0, 2).join(", ")}`
-    );
+  } else if (readmeAcademic.matches.length > 0) {
+    // A single ambiguous hit (e.g. "university" may be the app's domain) is only a hint.
+    signals.push(`README contains weak academic terms: ${readmeAcademic.matches.join(", ")}`);
     confidence += 0.05;
   }
 
-  // Check Repo URL / Name
+  // Repo name: tokens like "tp1", "aula-03", "lista2", "homework" are reliable here.
   if (purpose === "unknown" && repoUrl) {
-    const repoName = repoUrl.split("/").pop()?.toLowerCase() || "";
-    const foundInName = strongAcademicKeywords.filter((w) => repoName.includes(w));
+    const repoName = repoUrl.split("/").pop() ?? "";
+    const foundInName = tokenize(repoName).filter(isAcademicNameToken);
     if (foundInName.length > 0) {
       purpose = "learning";
       signals.push(`Repo Name contains academic terms: ${foundInName.join(", ")}`);
@@ -96,15 +69,20 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     }
   }
 
-  // Check Folder Names (e.g. capitulo1, exercicios)
+  // Folder names (e.g. aula01/, capitulo-3/, exercicios/)
   if (purpose === "unknown") {
-    const suspiciousFolders = files.filter((f) => {
-      const lowerPath = f.path.toLowerCase();
-      return strongAcademicKeywords.some((w) => lowerPath.includes(w));
-    });
-    if (suspiciousFolders.length > 0) {
+    const academicFolders = new Set<string>();
+    for (const f of files) {
+      const segments = f.path.replace(/\\/g, "/").split("/").slice(0, -1);
+      for (const segment of segments) {
+        if (isAcademicFolderName(segment)) academicFolders.add(segment);
+      }
+    }
+    if (academicFolders.size > 0) {
       purpose = "learning";
-      signals.push("Directory structure contains academic terms");
+      signals.push(
+        `Directory structure contains academic terms: ${[...academicFolders].slice(0, 3).join(", ")}`
+      );
       confidence += 0.2;
     }
   }
@@ -294,4 +272,160 @@ export function classifyProject(input: ClassificationInput): ProjectClassificati
     confidence: Math.min(confidence, 1.0),
     signals,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Academic signal detection helpers.
+// All matching is done on whole tokens/phrases after accent stripping, never on
+// raw substrings (substring matching made "tp" match "http" and "lista" match
+// "realista", which classified almost every repository as a learning project).
+// ---------------------------------------------------------------------------
+
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+}
+
+/** Splits text into lowercase, accent-free tokens. camelCase is split too. */
+function tokenize(value: string) {
+  return normalizeText(value.replace(/([a-z])([A-Z])/g, "$1 $2"))
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+/** Phrases that almost only appear when the repository is coursework. */
+const README_ACADEMIC_PHRASES = [
+  "trabalho pratico",
+  "trabalho final",
+  "trabalho academico",
+  "trabalho da disciplina",
+  "trabalho de conclusao",
+  "lista de exercicios",
+  "atividade avaliativa",
+  "atividade da disciplina",
+  "projeto academico",
+  "projeto da disciplina",
+  "projeto de faculdade",
+  "projeto da faculdade",
+  "course project",
+  "class project",
+  "school project",
+  "university project",
+  "college project",
+  "homework assignment",
+  "programming assignment",
+];
+
+/**
+ * Words that hint at coursework but can also describe the app's domain
+ * ("a university management system"). Two distinct hits are required.
+ */
+const README_ACADEMIC_WORDS = new Set([
+  "disciplina",
+  "homework",
+  "assignment",
+  "faculdade",
+  "universidade",
+  "university",
+  "college",
+  "semestre",
+  "semester",
+  "professor",
+  "professora",
+  "exercicio",
+  "exercicios",
+  "tcc",
+  "bootcamp",
+]);
+
+export function detectReadmeAcademicSignals(readme: string): {
+  isAcademic: boolean;
+  matches: string[];
+} {
+  const tokens = tokenize(readme);
+  if (tokens.length === 0) return { isAcademic: false, matches: [] };
+
+  const padded = ` ${tokens.join(" ")} `;
+  const phraseMatches = README_ACADEMIC_PHRASES.filter((phrase) =>
+    padded.includes(` ${phrase} `)
+  );
+  const wordMatches = [...new Set(tokens.filter((t) => README_ACADEMIC_WORDS.has(t)))];
+
+  return {
+    isAcademic: phraseMatches.length > 0 || wordMatches.length >= 2,
+    matches: [...phraseMatches, ...wordMatches],
+  };
+}
+
+const ACADEMIC_NAME_WORDS = new Set([
+  "tp",
+  "ep",
+  "trabalho",
+  "atividade",
+  "atividades",
+  "exercicio",
+  "exercicios",
+  "lista",
+  "listas",
+  "aula",
+  "aulas",
+  "homework",
+  "assignment",
+  "assignments",
+  "disciplina",
+  "faculdade",
+  "tcc",
+  "semestre",
+]);
+
+// Note: a bare "t" prefix is intentionally excluded ("t3" is a popular stack name).
+const NUMBERED_ACADEMIC_TOKEN =
+  /^(tp|ep|hw|lab|aula|lista|atividade|exercicio|ex|trabalho|cap|capitulo|semana|week|chapter)\d+$/;
+
+/** Token from a repository name, e.g. "tp1", "aula", "homework". */
+export function isAcademicNameToken(token: string) {
+  return ACADEMIC_NAME_WORDS.has(token) || NUMBERED_ACADEMIC_TOKEN.test(token);
+}
+
+/** Folder names that are coursework on their own, without a number. */
+const ACADEMIC_FOLDER_WORDS = new Set([
+  "exercicios",
+  "exercises",
+  "listas",
+  "aulas",
+  "atividades",
+  "homework",
+  "homeworks",
+  "assignments",
+]);
+
+/** Folder words that only count when numbered ("aula-01", "lista 2", "capitulo3"). */
+const NUMBERED_FOLDER_WORDS = new Set([
+  "aula",
+  "lista",
+  "exercicio",
+  "exercise",
+  "capitulo",
+  "chapter",
+  "cap",
+  "atividade",
+  "semana",
+  "week",
+  "tp",
+  "ep",
+  "lab",
+  "hw",
+  "assignment",
+]);
+
+export function isAcademicFolderName(segment: string) {
+  const tokens = tokenize(segment);
+  if (tokens.length === 0) return false;
+  if (tokens.some((t) => ACADEMIC_FOLDER_WORDS.has(t))) return true;
+  if (tokens.some((t) => NUMBERED_ACADEMIC_TOKEN.test(t))) return true;
+
+  const hasNumber = tokens.some((t) => /^\d+$/.test(t));
+  return hasNumber && tokens.some((t) => NUMBERED_FOLDER_WORDS.has(t));
 }
