@@ -8,10 +8,8 @@ const { processPushEvent, loggerInfo, loggerWarn, loggerError } = vi.hoisted(() 
   loggerError: vi.fn(),
 }));
 
-vi.mock("@repo/database", () => ({
-  webhookRepository: {
-    processPushEvent,
-  },
+vi.mock("@/src/domains/github/push-webhook.service", () => ({
+  handlePushEvent: processPushEvent,
 }));
 
 vi.mock("@repo/observability", () => ({
@@ -76,7 +74,8 @@ describe("POST /api/webhook/github", () => {
   it("should process valid push events", async () => {
     processPushEvent.mockResolvedValue({
       processed: true,
-      userId: 99,
+      projectIds: [7],
+      userIds: [99],
     });
 
     const payload = {

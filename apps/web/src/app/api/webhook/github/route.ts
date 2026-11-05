@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { webhookRepository } from "@repo/database";
+import { handlePushEvent } from "@/src/domains/github/push-webhook.service";
 import { createLogger } from "@repo/observability";
 
 const logger = createLogger("web.api.github-webhook");
@@ -56,21 +56,22 @@ export async function POST(req: Request) {
         ref: payload.ref ?? null,
       });
 
-      const result = await webhookRepository.processPushEvent(payload);
+      const result = await handlePushEvent(payload);
 
       if (!result.processed) {
         logger.info("webhook.push_ignored", {
           deliveryId,
           repositoryId: payload.repository?.id ?? null,
           installationId: payload.installation?.id ?? null,
-          reason: result.reason ?? "unknown",
+          reason: result.reason,
         });
       } else {
         logger.info("webhook.push_processed", {
           deliveryId,
           repositoryId: payload.repository?.id ?? null,
           installationId: payload.installation?.id ?? null,
-          userId: result.userId ?? null,
+          scheduledProjectCount: result.projectIds.length,
+          linkedUserCount: result.userIds.length,
           commitCount: payload.commits?.length ?? 0,
         });
       }
