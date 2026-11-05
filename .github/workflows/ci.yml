@@ -17,6 +17,10 @@ env:
   NODE_ENV: test
   DATABASE_URL: "postgresql://retold_ci:retold_ci@localhost:5432/retold_ci"
   AUTH_SECRET: "ci-placeholder-secret-not-used-in-production-0000000000"
+  # `next start` runs with NODE_ENV=production, where Auth.js rejects requests
+  # from hosts it was not told to trust (UntrustedHost), breaking every page
+  # that reads the session.
+  AUTH_TRUST_HOST: "true"
   APP_URL: "http://localhost:3000"
   ADDITIONAL_ALLOWED_ORIGINS: ""
   UPSTASH_REDIS_REST_URL: "http://localhost:8079"
