@@ -15,9 +15,11 @@ function sanitizeSuggestionsInRecord(value: unknown, includeSuggestions: boolean
 
     const record = value as JsonRecord;
 
+    // Axis scores (analysis v3) carry rationales that may describe weaknesses, so they
+    // stay owner-only like suggestions until the project page decides what is public.
     return {
         ...record,
-        ...(includeSuggestions ? {} : { suggestions: undefined }),
+        ...(includeSuggestions ? {} : { suggestions: undefined, scores: undefined }),
     };
 }
 

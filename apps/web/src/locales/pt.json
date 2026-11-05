@@ -225,7 +225,9 @@
         "authored_suffix": "do código base"
       },
       "llm_empty_overview": "Nenhum resumo disponível.",
-      "llm_empty_architecture": "Nenhum detalhe de arquitetura disponível."
+      "llm_empty_architecture": "Nenhum detalhe de arquitetura disponível.",
+      "evidence_label": "Evidência",
+      "evidence_link_title": "Abrir estas linhas no GitHub, no commit analisado"
     },
     "create_panel": {
       "title": "Novo projeto",

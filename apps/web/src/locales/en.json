@@ -225,7 +225,9 @@
         "authored_suffix": "of the codebase"
       },
       "llm_empty_overview": "No overview available.",
-      "llm_empty_architecture": "No architecture details."
+      "llm_empty_architecture": "No architecture details.",
+      "evidence_label": "Evidence",
+      "evidence_link_title": "Open these lines on GitHub at the analyzed commit"
     },
     "create_panel": {
       "title": "New project",

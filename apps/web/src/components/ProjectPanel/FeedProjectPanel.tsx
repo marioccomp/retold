@@ -28,6 +28,7 @@ import { ProjectForOverlay } from "./types";
 import { useProjectAnalysis } from "./hooks/useProjectAnalysis";
 import { ProjectSettings } from "./components/ProjectSettings";
 import { ProjectTeamSection } from "./components/ProjectTeamSection";
+import { AnalysisEvidence, EvidenceLinks } from "./components/EvidenceLinks";
 import { useTranslation } from "@/src/i18n/client";
 import { incrementView } from "@/src/domains/project/actions/increment-view.action";
 import { CommentSection } from "./CommentSection";
@@ -58,11 +59,13 @@ type LlmReportV21 = {
 
   architecture?: {
     explanation?: string;
+    evidence?: AnalysisEvidence[];
   };
 
   strengths?: Array<{
     name: string;
     explanation: string;
+    evidence?: AnalysisEvidence[];
   }>;
 
   weaknesses?: Array<{
@@ -73,6 +76,7 @@ type LlmReportV21 = {
   suggestions?: Array<{
     name: string;
     explanation: string;
+    evidence?: AnalysisEvidence[];
   }>;
 
   error?: string;
@@ -486,6 +490,11 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                             <p className="text-sm text-muted-foreground leading-relaxed">
                               {s.explanation}
                             </p>
+                            <EvidenceLinks
+                              evidence={s.evidence}
+                              label={t.overlay.evidence_label}
+                              linkTitle={t.overlay.evidence_link_title}
+                            />
                           </div>
                         ))}
                       </div>
@@ -504,6 +513,11 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                         <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
                           {llm.architecture?.explanation || t.overlay.llm_empty_architecture}
                         </p>
+                        <EvidenceLinks
+                          evidence={llm.architecture?.evidence}
+                          label={t.overlay.evidence_label}
+                          linkTitle={t.overlay.evidence_link_title}
+                        />
                       </div>
                     </div>
 
@@ -562,6 +576,11 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
                                       {s.explanation}
                                     </p>
                                   )}
+                                  <EvidenceLinks
+                                    evidence={s.evidence}
+                                    label={t.overlay.evidence_label}
+                                    linkTitle={t.overlay.evidence_link_title}
+                                  />
                                 </div>
                               </div>
                             ))}
