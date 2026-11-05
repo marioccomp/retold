@@ -247,6 +247,9 @@ model Project {
   comments  Comment[]
   notifications Notification[]
   collaborators ProjectCollaborator[]
+  analysisRuns   AnalysisRun[]
+  analysisClaims AnalysisClaim[]
+  scores         ProjectScore[]
 }
 
 enum ProjectCollaboratorStatus {
@@ -329,6 +332,108 @@ model RepositoryAnalysis {
   repoMap     Json?
 
   createdAt DateTime @default(now())
+}
+
+// Uma execução da análise em duas etapas (Fase 2 do docs/analysis-roadmap.md):
+// modelo, commit analisado, tokens e resultado, para comparar versões e custos.
+enum AnalysisRunStatus {
+  DONE
+  ERROR
+}
+
+model AnalysisRun {
+  id Int @id @default(autoincrement())
+
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  pipelineVersion String
+  provider        String
+  model           String
+  commitSha       String?
+  privacyMode     String
+  status          AnalysisRunStatus
+
+  llmCalls     Int      @default(0)
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  // Só preenchido quando LLM_PRICE_INPUT_PER_MTOK / LLM_PRICE_OUTPUT_PER_MTOK estão configurados.
+  costUsd      Decimal? @db.Decimal(10, 6)
+  durationMs   Int?
+  // Unidades lidas, afirmações rejeitadas/refutadas, chamadas.
+  stats        Json?
+  error        String?  @db.Text
+
+  createdAt DateTime @default(now())
+
+  claims AnalysisClaim[]
+  scores ProjectScore[]
+
+  @@index([projectId, createdAt])
+}
+
+enum AnalysisClaimKind {
+  RESPONSIBILITY
+  PATTERN
+  NOTABLE
+  RISK
+}
+
+// Afirmação sobre o código que passou pelo validador (arquivo + linhas + símbolo).
+model AnalysisClaim {
+  id Int @id @default(autoincrement())
+
+  runId Int
+  run   AnalysisRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Id usado nos prompts e nas referências do llmOverview ("c3").
+  key       String
+  module    String
+  kind      AnalysisClaimKind
+  text      String            @db.Text
+  filePath  String
+  startLine Int
+  endLine   Int
+  symbol    String
+  // "verified" ou "reanchored" (o símbolo estava em outra linha do mesmo arquivo).
+  location  String
+  // Confirmada pela segunda checagem com o LLM.
+  checked   Boolean           @default(false)
+
+  @@unique([runId, key])
+  @@index([projectId])
+}
+
+enum ScoreAxis {
+  ARCHITECTURE
+  SECURITY
+  TESTING
+  DEVOPS
+  DOCUMENTATION
+}
+
+model ProjectScore {
+  id Int @id @default(autoincrement())
+
+  runId Int
+  run   AnalysisRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  axis      ScoreAxis
+  // 0–100.
+  score     Int
+  // "measured" (maturidade do repo map) ou "llm" (exige afirmação verificada).
+  source    String
+  rationale String    @db.Text
+  evidence  Json
+
+  @@unique([runId, axis])
+  @@index([projectId, axis])
 }
 
 model Certification {

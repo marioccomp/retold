@@ -11,6 +11,7 @@ import { LlmRateLimitError } from "./llm/index.js";
 import { buildLlmPrivacyDecision } from "./privacy.js";
 import { runAnalysisPipeline } from "./pipeline.js";
 import { markProjectAnalysisFailed } from "./analysis-failure.js";
+import { saveAnalysisRun } from "./analysis-run.js";
 import {
   PROJECT_ANALYSIS_TMP_ROOT,
   cleanupScopedDirectory,
@@ -96,7 +97,8 @@ const worker = new Worker(
           })
         );
 
-      const { analysis, preparedLlmAnalysis, llmInsights, tags: tagsToAssign } =
+      const pipelineStartedAt = Date.now();
+      const { analysis, preparedLlmAnalysis, llmInsights, twoStage, tags: tagsToAssign } =
         await runAnalysisPipeline({
           repoPath: tmpPath,
           repoUrl: repositoryOrigin.normalizedUrl,
@@ -133,6 +135,21 @@ const worker = new Worker(
           repoMap: analysis.repoMap as unknown as Prisma.InputJsonValue,
         },
       });
+
+      if (twoStage) {
+        // History of runs (tokens, claims, scores). Losing it must not fail an
+        // analysis that already succeeded and was saved.
+        try {
+          await saveAnalysisRun({
+            projectId,
+            result: twoStage,
+            privacyMode: llmPrivacyDecision.mode,
+            durationMs: Date.now() - pipelineStartedAt,
+          });
+        } catch (error) {
+          logger.error("worker.analysis_run_save_failed", error, { projectId });
+        }
+      }
 
       // Connect or create tags
       if (tagsToAssign.length > 0) {
