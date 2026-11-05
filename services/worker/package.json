@@ -7,7 +7,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx --watch --env-file=../../.env index.ts",
-    "start": "tsx --env-file=../../.env index.ts"
+    "start": "tsx --env-file=../../.env index.ts",
+    "eval": "tsx evals/run-eval.ts"
   },
   "dependencies": {
     "@octokit/auth-app": "^8.1.2",

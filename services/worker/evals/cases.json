@@ -1,0 +1,440 @@
+[
+  {
+    "id": "express",
+    "repo": "expressjs/express",
+    "ref": "43fca52d28a422c8be48fd489cbd4f2d6152bab6",
+    "notes": "Mature JavaScript library (HTTP framework). README full of http links: regression for the old 'tp' substring bug.",
+    "expect": {
+      "primaryLanguage": "JavaScript",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "library",
+        "web"
+      ],
+      "llmMustMention": [
+        "middleware|routing"
+      ]
+    }
+  },
+  {
+    "id": "flask",
+    "repo": "pallets/flask",
+    "ref": "49943b5a94413a530761350f04e896f76e8d620e",
+    "notes": "Mature Python web framework library with CI and tests.",
+    "expect": {
+      "primaryLanguage": "Python",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "library",
+        "web"
+      ],
+      "llmMustMention": [
+        "WSGI|micro ?framework|web framework"
+      ]
+    }
+  },
+  {
+    "id": "cobra",
+    "repo": "spf13/cobra",
+    "ref": "adbc8813901bba65827259daa8e22ff94ec1f30e",
+    "notes": "Go library for building CLIs.",
+    "expect": {
+      "primaryLanguage": "Go",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "library",
+        "cli"
+      ],
+      "llmMustMention": [
+        "CLI|command[- ]line"
+      ]
+    }
+  },
+  {
+    "id": "ripgrep",
+    "repo": "BurntSushi/ripgrep",
+    "ref": "91f5d22ef48bde459d90a8c7dbeab416e97d0f2b",
+    "notes": "Production Rust CLI tool.",
+    "expect": {
+      "primaryLanguage": "Rust",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "cli",
+        "systems"
+      ],
+      "llmMustMention": [
+        "search|grep"
+      ]
+    }
+  },
+  {
+    "id": "create-t3-app",
+    "repo": "t3-oss/create-t3-app",
+    "ref": "4709861f7e67a15564c0460c13e7b4b6cfcae40d",
+    "notes": "TypeScript monorepo with a scaffolding CLI. Regression: 't3' must not look like coursework ('t1', 't2').",
+    "expect": {
+      "primaryLanguage": "TypeScript",
+      "purpose": [
+        "production"
+      ],
+      "llmMustMention": [
+        "scaffold|template|boilerplate|create"
+      ]
+    }
+  },
+  {
+    "id": "web-dev-for-beginners",
+    "repo": "microsoft/Web-Dev-For-Beginners",
+    "ref": "78085398be0dea7abaaf5eda914817f46f6ddbbc",
+    "notes": "A curriculum: a real learning project. The analysis should recognize it as educational material.",
+    "expect": {
+      "purpose": [
+        "learning"
+      ],
+      "llmMustMention": [
+        "curriculum|lesson|beginner"
+      ]
+    }
+  },
+  {
+    "id": "is",
+    "repo": "sindresorhus/is",
+    "ref": "e9c026c611c1160eaad50da00be4e676b626018f",
+    "notes": "Small TypeScript library (type checks) with CI.",
+    "expect": {
+      "primaryLanguage": "TypeScript",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "library"
+      ],
+      "llmMustMention": [
+        "type (check|guard)|runtime type|type assertion"
+      ]
+    }
+  },
+  {
+    "id": "taxonomy",
+    "repo": "shadcn-ui/taxonomy",
+    "ref": "298a8857c7128a0d121e7f699dfd729f23b3966d",
+    "notes": "Next.js example application (auth, payments, content). Full-stack web app built as a showcase.",
+    "expect": {
+      "primaryLanguage": "TypeScript",
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Fullstack"
+      ],
+      "frameworksInclude": [
+        "Next.js"
+      ],
+      "llmMustMention": [
+        "Next\\.js"
+      ]
+    }
+  },
+  {
+    "id": "retold",
+    "repo": "marioccomp/retold",
+    "ref": "0bbb5d414c44b6ab41214df342c9f92f96df3af1",
+    "notes": "Dogfooding: o próprio Retold (monorepo Next.js + workers BullMQ + Prisma).",
+    "expect": {
+      "primaryLanguage": "TypeScript",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Fullstack"
+      ],
+      "frameworksInclude": [
+        "Next.js"
+      ],
+      "llmMustMention": [
+        "portf[oó]lio",
+        "BullMQ|worker|queue|fila"
+      ]
+    }
+  },
+  {
+    "id": "vllm",
+    "repo": "gmarinho2/vllm",
+    "ref": "aed2eb355a9d9136c8e17690b932983b55fb343f",
+    "notes": "Fork do vLLM. Repo grande (3K+ arquivos Python): testa escala do scan e tamanho do prompt.",
+    "expect": {
+      "primaryLanguage": "Python",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "library",
+        "systems",
+        "data"
+      ],
+      "llmMustMention": [
+        "inference|serving|infer[eê]ncia"
+      ]
+    }
+  },
+  {
+    "id": "lumia",
+    "repo": "marioccomp/lumia",
+    "ref": "3a623f73af2fe80545e999d9f8853f0bcd33c7f3",
+    "notes": "Trabalho web de faculdade, ainda não concluído (AdonisJS + Edge + Vite). Sem README: o propósito acadêmico não aparece em lugar nenhum, só dá para inferir pelo contexto. Caso difícil de propósito.",
+    "expect": {
+      "primaryLanguage": "TypeScript",
+      "purpose": [
+        "learning"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Fullstack"
+      ],
+      "frameworksInclude": [
+        "AdonisJS"
+      ],
+      "llmMustMention": [
+        "Adonis"
+      ]
+    }
+  },
+  {
+    "id": "homelab",
+    "repo": "marioccomp/homelab",
+    "ref": "8f86bcdd2617cabeeb5369a4876baa98499477d8",
+    "notes": "Serviços pessoais de homelab: backend FastAPI (auth + arquivos, SQLAlchemy/Alembic), AdGuard e hello-world via Docker Compose. Sem README. requirements.txt usa 'fastapi[standard]'.",
+    "expect": {
+      "primaryLanguage": "Python",
+      "purpose": [
+        "production",
+        "demo"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Backend"
+      ],
+      "frameworksInclude": [
+        "FastAPI"
+      ],
+      "llmMustMention": [
+        "FastAPI"
+      ]
+    }
+  },
+  {
+    "id": "light-devil",
+    "repo": "marioccomp/light-devil",
+    "ref": "fd629a8bd11d22f1351eb8f5516600ea38f43626",
+    "notes": "Jogo em Godot (GDScript + shaders) para a disciplina de Computação Gráfica. Sem README. GDScript hoje não é reconhecido pelo detector de linguagens.",
+    "expect": {
+      "primaryLanguage": "GDScript",
+      "purpose": [
+        "learning"
+      ],
+      "llmMustMention": [
+        "Godot"
+      ]
+    }
+  },
+  {
+    "id": "lucasos",
+    "repo": "LucasSSantiago/lucasOS",
+    "ref": "670636be1d06ecf70f30f978ea7ff50139038014",
+    "notes": "Kernel x86 em C + Assembly feito para aprender como um SO funciona (README diz 'learning project').",
+    "expect": {
+      "primaryLanguage": "C",
+      "purpose": [
+        "learning"
+      ],
+      "domain": [
+        "systems"
+      ],
+      "llmMustMention": [
+        "kernel|operating system|sistema operacional"
+      ]
+    }
+  },
+  {
+    "id": "getapet",
+    "repo": "LucasSSantiago/GETAPET",
+    "ref": "56f55de26e699dbd325feaa048481084fd1e37de",
+    "notes": "API Express + Mongoose de um curso de Node. Sem README. Tem node_modules commitado: um revisor de verdade apontaria isso.",
+    "expect": {
+      "primaryLanguage": "JavaScript",
+      "purpose": [
+        "learning"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Backend"
+      ],
+      "frameworksInclude": [
+        "Express"
+      ],
+      "llmMustMention": [
+        "Mongo",
+        "node_modules"
+      ]
+    }
+  },
+  {
+    "id": "spring-petclinic",
+    "repo": "spring-projects/spring-petclinic",
+    "ref": "500158f732419217507c7656904b8e6aa1bcc0d6",
+    "notes": "App de exemplo clássico do Spring Boot (Java, Thymeleaf).",
+    "expect": {
+      "primaryLanguage": "Java",
+      "purpose": [
+        "demo"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Backend",
+        "Fullstack"
+      ],
+      "frameworksInclude": [
+        "Spring Boot"
+      ],
+      "llmMustMention": [
+        "Spring"
+      ]
+    }
+  },
+  {
+    "id": "python-data-science-handbook",
+    "repo": "jakevdp/PythonDataScienceHandbook",
+    "ref": "d66231454ef753818dc9213c9b5942e067266966",
+    "notes": "Livro em Jupyter notebooks: material didático de ciência de dados.",
+    "expect": {
+      "primaryLanguage": "Python",
+      "purpose": [
+        "learning"
+      ],
+      "domain": [
+        "data"
+      ],
+      "llmMustMention": [
+        "notebook|Jupyter"
+      ]
+    }
+  },
+  {
+    "id": "react-realworld",
+    "repo": "gothinkster/react-redux-realworld-example-app",
+    "ref": "ee72eba4056392c95a27bc48d385d3f54ba38a18",
+    "notes": "Frontend React + Redux de exemplo (spec RealWorld). Só frontend.",
+    "expect": {
+      "primaryLanguage": "JavaScript",
+      "purpose": [
+        "demo"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Frontend"
+      ],
+      "frameworksInclude": [
+        "React"
+      ],
+      "llmMustMention": [
+        "Redux"
+      ]
+    }
+  },
+  {
+    "id": "djangoproject",
+    "repo": "django/djangoproject.com",
+    "ref": "9f69c930737454b4df1410f5da0bea9ba4bdc8cc",
+    "notes": "Site oficial do Django, em produção. README em .rst (o leitor de README hoje só lê .md).",
+    "expect": {
+      "primaryLanguage": "Python",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "web"
+      ],
+      "frameworksInclude": [
+        "Django"
+      ],
+      "llmMustMention": [
+        "Django"
+      ]
+    }
+  },
+  {
+    "id": "tabnews",
+    "repo": "filipedeschamps/tabnews.com.br",
+    "ref": "11aa57b1b3b797fa2f7f94c03b6d7a91a1ed4a7c",
+    "notes": "TabNews: Next.js em produção, README em português.",
+    "expect": {
+      "primaryLanguage": "JavaScript",
+      "purpose": [
+        "production"
+      ],
+      "domain": [
+        "web"
+      ],
+      "appType": [
+        "Fullstack"
+      ],
+      "frameworksInclude": [
+        "Next.js"
+      ],
+      "llmMustMention": [
+        "communit|comunidade|forum|news"
+      ]
+    }
+  },
+  {
+    "id": "curso-java-basico",
+    "repo": "loiane/curso-java-basico",
+    "ref": "5a3b2c65531946dbb9b5b798b74759e14dcdd92c",
+    "notes": "Código de um curso de Java para iniciantes, organizado por aulas. README em português.",
+    "expect": {
+      "primaryLanguage": "Java",
+      "purpose": [
+        "learning"
+      ],
+      "llmMustMention": [
+        "course|curso|lesson|aula|beginner|iniciante"
+      ]
+    }
+  },
+  {
+    "id": "thealgorithms-c",
+    "repo": "TheAlgorithms/C",
+    "ref": "e5dad3fa8def3726ec850ca66a7f51521f8ad393",
+    "notes": "Coleção didática de algoritmos em C (com CI). Propósito educacional mesmo tendo infraestrutura.",
+    "expect": {
+      "primaryLanguage": "C",
+      "purpose": [
+        "learning"
+      ],
+      "llmMustMention": [
+        "algorithm|algoritmo"
+      ]
+    }
+  }
+]

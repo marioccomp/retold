@@ -6,59 +6,24 @@ import "./last-commit-worker";
 import { cloneRepository } from "./clone";
 import { prisma, githubRepository, Prisma } from "@repo/database";
 import { createLogger } from "@repo/observability";
-import { analyzeProjectWithLLM, LlmAnalysisUnavailableError } from "./llm/analyze-project";
-import { analyzeRepository } from "./analyze/index";
-import { buildLlmPrivacyDecision, prepareAnalysisForLlm } from "./privacy.js";
+import { LlmAnalysisUnavailableError } from "./llm/analyze-project";
+import { LlmRateLimitError } from "./llm/index.js";
+import { buildLlmPrivacyDecision } from "./privacy.js";
+import { runAnalysisPipeline } from "./pipeline.js";
+import { markProjectAnalysisFailed } from "./analysis-failure.js";
 import {
   PROJECT_ANALYSIS_TMP_ROOT,
   cleanupScopedDirectory,
   getProjectTempPath,
   parseProjectId,
-  tryReadRepositoryTextFile,
   validateGitHubRepositoryUrl,
 } from "./security.js";
 
 const logger = createLogger("worker.project-analysis");
 
-function readRepositoryReadme(repoPath: string, maxChars = 30_000) {
-  const possibleReadmePaths = ["README.md", "readme.md", "README.MD"];
-  for (const fileName of possibleReadmePaths) {
-    try {
-      const content = tryReadRepositoryTextFile(repoPath, fileName, maxChars);
-      if (content !== null) {
-        return content;
-      }
-    } catch (error) {
-      logger.warn("worker.repository_readme_blocked", { readmeName: fileName }, error);
-    }
-  }
-  return "";
-}
-
 logger.info("worker.started");
 
 const PROJECT_ANALYSIS_RETRY_JOB_ID_PREFIX = "project-analysis-retry-";
-const INTERNAL_ERROR_COOLDOWN_MS = 60 * 60 * 1000;
-
-function startOfDay(now: Date) {
-  const today = new Date(now);
-  today.setHours(0, 0, 0, 0);
-  return today;
-}
-
-async function releaseReservedDailyAnalysisQuota(userId: number, now: Date = new Date()) {
-  const today = startOfDay(now);
-
-  await prisma.$executeRaw`
-    UPDATE "User"
-    SET "dailyAnalysisCount" = CASE
-      WHEN "dailyAnalysisDate" >= ${today} AND "dailyAnalysisCount" > 0
-        THEN "dailyAnalysisCount" - 1
-      ELSE "dailyAnalysisCount"
-    END
-    WHERE "id" = ${userId}
-  `;
-}
 
 const worker = new Worker(
   "analyze-repo",
@@ -111,44 +76,8 @@ const worker = new Worker(
       logger.info("worker.repository_clone_started", { projectId });
       await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token);
       logger.info("worker.repository_clone_completed", { projectId });
-      const readmeContent = readRepositoryReadme(tmpPath);
 
-      logger.info("worker.repository_analysis_started", { projectId });
-      const analysis = await analyzeRepository(tmpPath, {
-        readme: readmeContent,
-        repoUrl: repositoryOrigin.normalizedUrl,
-        includeCodeSamples: llmPrivacyDecision.includeCodeSamples,
-      });
-      logger.info("worker.repository_analysis_completed", {
-        projectId,
-        totalFiles: analysis.stats.totalFiles,
-        frameworkCount: analysis.stack.frameworks.length,
-        languageCount: analysis.stack.languages.length,
-        codeSamplesCount: analysis.codeSamples?.length ?? 0,
-      });
-
-      const repoName = repositoryOrigin.repo;
-      const preparedLlmAnalysis = prepareAnalysisForLlm(
-        {
-          ...analysis,
-          readme: readmeContent,
-          codeSamples: analysis.codeSamples,
-          locale,
-        },
-        llmPrivacyDecision
-      );
-
-      logger.info("worker.llm_privacy_mode_selected", {
-        projectId,
-        mode: llmPrivacyDecision.mode,
-        projectSensitivity: llmPrivacyDecision.projectSensitivity,
-        externalLlmAllowed: llmPrivacyDecision.externalLlmAllowed,
-        includeReadme: llmPrivacyDecision.includeReadme,
-        includeCodeSamples: llmPrivacyDecision.includeCodeSamples,
-        redactionsApplied: preparedLlmAnalysis.redactionsApplied,
-      });
-
-      // Trigger user analysis in parallel with LLM processing
+      // Trigger user analysis in parallel with the analysis pipeline.
       // Fire and forget - lets the user worker handle it async
       userAnalyzeQueue
         .add(
@@ -167,30 +96,17 @@ const worker = new Worker(
           })
         );
 
-      const llmInsights = await analyzeProjectWithLLM(
-        preparedLlmAnalysis.promptAnalysis,
-        repoName,
-        projectWithUser.title,
-        projectWithUser.description || undefined,
-        llmPrivacyDecision
-      );
-      const llmSummaryParagraphs = Array.isArray(
-        (llmInsights as { summary?: { paragraphs?: unknown[] } }).summary?.paragraphs
-      )
-        ? (llmInsights as { summary?: { paragraphs?: unknown[] } }).summary?.paragraphs?.length ?? 0
-        : 0;
-      const llmSuggestions: unknown[] = Array.isArray(
-        (llmInsights as { suggestions?: unknown[] }).suggestions
-      )
-        ? (llmInsights as { suggestions?: unknown[] }).suggestions ?? []
-        : [];
-
-      logger.info("worker.llm_analysis_completed", {
-        projectId,
-        hasError: Boolean((llmInsights as { error?: unknown }).error),
-        summaryParagraphs: llmSummaryParagraphs,
-        suggestionCount: llmSuggestions.length,
-      });
+      const { analysis, preparedLlmAnalysis, llmInsights, tags: tagsToAssign } =
+        await runAnalysisPipeline({
+          repoPath: tmpPath,
+          repoUrl: repositoryOrigin.normalizedUrl,
+          repoName: repositoryOrigin.repo,
+          title: projectWithUser.title,
+          description: projectWithUser.description || undefined,
+          locale,
+          privacyDecision: llmPrivacyDecision,
+          logContext: { projectId },
+        });
 
       const llmInsightsJson = JSON.stringify(llmInsights);
       const persistedRawAnalysis = preparedLlmAnalysis.persistenceAnalysis as Prisma.InputJsonValue;
@@ -215,55 +131,6 @@ const worker = new Worker(
           llmOverview: llmInsightsJson,
         },
       });
-
-      // Extract tags from analysis (max 4 tags)
-      const tagsToAssign: string[] = [];
-
-      // Primary language
-      if (analysis.summary.primaryLanguage && analysis.summary.primaryLanguage !== "unknown") {
-        tagsToAssign.push(analysis.summary.primaryLanguage);
-      }
-
-      // Prioritized framework selection
-      if (analysis.stack.frameworks && Array.isArray(analysis.stack.frameworks)) {
-        // Priority tiers: backend/main frameworks > frontend frameworks > SDKs/tools
-        const highPriority = [
-          "NestJS",
-          "Express",
-          "FastAPI",
-          "Django",
-          "Flask",
-          "AdonisJS",
-          "Next.js",
-          "Nuxt.js",
-          "Rails",
-        ];
-        const mediumPriority = [
-          "React Native",
-          "React",
-          "Vue",
-          "Angular",
-          "Svelte",
-          "Flutter",
-          "Spring Boot",
-          "Laravel",
-        ];
-        const lowPriority = ["Expo", "Electron"]; // SDKs/runners that are less important as tags
-
-        const sortedFrameworks = [...analysis.stack.frameworks].sort((a, b) => {
-          const getPriority = (fw: string) => {
-            if (highPriority.includes(fw)) return 0;
-            if (mediumPriority.includes(fw)) return 1;
-            if (lowPriority.includes(fw)) return 2;
-            return 1; // default to medium
-          };
-          return getPriority(a) - getPriority(b);
-        });
-
-        for (const fw of sortedFrameworks) {
-          if (tagsToAssign.length < 4) tagsToAssign.push(fw);
-        }
-      }
 
       // Connect or create tags
       if (tagsToAssign.length > 0) {
@@ -312,35 +179,13 @@ const worker = new Worker(
       logger.error("worker.job_failed", err, { projectId });
 
       // Check if it's a rate limit error from Groq
-      const isRateLimitError =
-        err?.error?.error?.code === "rate_limit_exceeded" ||
-        err?.message?.includes("Rate limit") ||
-        err?.message?.includes("rate_limit_exceeded");
-
-      if (isRateLimitError) {
+      // Providers convert their own rate-limit errors into LlmRateLimitError
+      // (analyzeProjectWithLLM rethrows it untouched).
+      if (err instanceof LlmRateLimitError) {
         logger.warn("worker.rate_limit_detected", { projectId });
 
-        const message = err?.error?.error?.message || err?.message || "";
-        let addMs = 0;
-
-        // Extract strictly the "try again in ..." part
-        const tryAgainMatch = message.match(/try again in\s+([0-9hms\.]+)/i);
-
-        if (tryAgainMatch) {
-          const timePart = tryAgainMatch[1];
-
-          const hoursMatch = timePart.match(/(\d+)h/);
-          if (hoursMatch) addMs += parseFloat(hoursMatch[1]) * 3600 * 1000;
-
-          const minutesMatch = timePart.match(/(\d+)m/);
-          if (minutesMatch) addMs += parseFloat(minutesMatch[1]) * 60 * 1000;
-
-          const secondsMatch = timePart.match(/(\d+(\.\d+)?)s/);
-          if (secondsMatch) addMs += parseFloat(secondsMatch[1]) * 1000;
-        }
-
-        // Fallback default 1h if parsing failed but it is rate limit
-        if (addMs === 0) addMs = 3600 * 1000;
+        // Wait what the provider asked for (at least 1s); 1h when it didn't say.
+        const addMs = err.retryAfterMs !== null ? Math.max(err.retryAfterMs, 1000) : 3600 * 1000;
 
         const resetAt = new Date(Date.now() + addMs);
 
@@ -413,38 +258,26 @@ const worker = new Worker(
         return;
       }
 
-      const ownerProject = await prisma.project.findUnique({
-        where: { id: projectId },
-        select: { userId: true },
-      });
+      // BullMQ retries the job automatically while attempts remain. Only the final
+      // attempt marks the project as failed and gives the reserved quota back, so a
+      // single reservation is never released more than once.
+      const maxAttempts = job.opts.attempts ?? 1;
+      const isFinalAttempt = job.attemptsMade + 1 >= maxAttempts;
 
-      if (ownerProject) {
-        await releaseReservedDailyAnalysisQuota(ownerProject.userId);
-
-        const cooldownUntil = new Date(Date.now() + INTERNAL_ERROR_COOLDOWN_MS);
-
-        await prisma.$transaction([
-          prisma.user.update({
-            where: { id: ownerProject.userId },
-            data: { rateLimitResetAt: cooldownUntil },
-          }),
-          prisma.project.delete({
-            where: { id: projectId },
-          }),
-        ]);
-
-        logger.warn("worker.project_removed_after_internal_error", {
+      if (!isFinalAttempt) {
+        logger.warn("worker.job_will_retry", {
           projectId,
-          userId: ownerProject.userId,
-          cooldownUntil,
-          reason:
-            err instanceof LlmAnalysisUnavailableError ? err.code : "job_failed",
+          attempt: job.attemptsMade + 1,
+          maxAttempts,
         });
-      } else {
-        await prisma.project.deleteMany({
-          where: { id: projectId },
-        });
+        throw err;
       }
+
+      // The project is kept (never deleted): it moves to ERROR and the owner can
+      // retry from the project panel after MANUAL_REANALYZE_COOLDOWN_MS.
+      await markProjectAnalysisFailed(projectId, {
+        reason: err instanceof LlmAnalysisUnavailableError ? err.code : "job_failed",
+      });
 
       throw err;
     } finally {
