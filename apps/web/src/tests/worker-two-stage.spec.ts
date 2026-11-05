@@ -9,6 +9,7 @@ import {
   assembleOverview,
   evidenceUrl,
   githubWebUrl,
+  stripRefIds,
   runTwoStageAnalysis,
   TwoStageInput,
 } from "../../../../services/worker/llm/two-stage/run";
@@ -443,10 +444,10 @@ describe("assembleOverview", () => {
     summary: { title: "Job runner", paragraphs: ["A job runner that retries failed work with backoff."] },
     architecture: { explanation: "Single module.", refs: ["c1", "f4", "zz"] },
     strengths: [
-      { name: "Backoff", explanation: "Retries with exponential backoff.", refs: ["c1"] },
+      { name: "Backoff", explanation: "Retries with exponential backoff (c1).", refs: ["c1"] },
       { name: "Invented", explanation: "Something without support.", refs: ["c99"] },
     ],
-    suggestions: [{ name: "Ignore node_modules", explanation: "Stop committing dependencies.", refs: ["F9"] }],
+    suggestions: [{ name: "Add types", explanation: "Type-check the queue module.", refs: ["F9"] }],
     scores: {
       architecture: { score: 4, rationale: "Clear queue layer.", refs: ["c1"] },
       security: { score: 2, rationale: "Only a fact.", refs: ["f1"] },
@@ -470,15 +471,52 @@ describe("assembleOverview", () => {
       type: "code",
       url: `https://github.com/acme/jobs/blob/${"a".repeat(40)}/src/queue.ts#L3-L6`,
     });
-    expect(overview.suggestions).toHaveLength(1);
+    expect(overview.strengths[0].explanation).toBe("Retries with exponential backoff.");
     expect(overview.architecture.evidence).toHaveLength(2);
     expect(overview.language).toBe("pt-BR");
+  });
+
+  it("adds the measured hygiene problem when the model did not raise it", () => {
+    expect(overview.suggestions.map((s) => s.name)).toEqual([
+      "Tirar do Git o que não deveria ser versionado",
+      "Add types",
+    ]);
+    expect(overview.suggestions[0].explanation).toContain("node_modules (2107 arquivos)");
+    expect(overview.suggestions[0].evidence[0]).toMatchObject({ type: "fact" });
+  });
+
+  it("does not duplicate the hygiene suggestion when the model cited it", () => {
+    const hygieneId = facts.find((f) => f.topic === "hygiene")!.id;
+    const cited = assembleOverview({
+      reduce: {
+        ...reduce,
+        suggestions: [{ name: "Ignore node_modules", explanation: "Stop committing dependencies.", refs: [hygieneId] }],
+      },
+      claims,
+      facts,
+      analysis: analysisFixture,
+      webUrl: null,
+      commitSha: null,
+      locale: "en",
+      privacyMode: "metadata+sanitized-readme+sanitized-samples",
+    });
+    expect(cited.overview.suggestions.map((s) => s.name)).toEqual(["Ignore node_modules"]);
   });
 
   it("drops model scores that no verified code claim supports", () => {
     const axes = overview.scores.map((s) => `${s.axis}:${s.source}`);
     expect(axes).toEqual(["architecture:llm", "testing:measured", "devops:measured", "documentation:measured"]);
     expect(overview.scores[0].score).toBe(80);
+  });
+});
+
+describe("stripRefIds", () => {
+  it.each([
+    ["Router grouped (c10).", "Router grouped."],
+    ["Add CI and lint (f7, f8) to the pipeline", "Add CI and lint to the pipeline"],
+    ["Keeps function calls like run(c) intact", "Keeps function calls like run(c) intact"],
+  ])("%s", (input, expected) => {
+    expect(stripRefIds(input)).toBe(expected);
   });
 });
 

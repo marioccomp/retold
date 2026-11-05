@@ -67,6 +67,45 @@ export function buildMeasuredFacts(analysis: AnalysisForFacts): MeasuredFact[] {
   return facts.map((fact, index) => ({ id: `f${index + 1}`, ...fact }));
 }
 
+/**
+ * Committed dependencies, builds or secrets are measured, not judged: when the
+ * reduce step does not raise them (in the eval it skipped GETAPET's 2,107
+ * committed node_modules files), this suggestion is added in code.
+ */
+export function hygieneSuggestion(repoMap: RepoMap, locale: string | undefined, factId: string) {
+  const { flags, counts } = repoMap.hygiene;
+  if (flags.length === 0) return null;
+
+  const lower = (locale ?? "en").toLowerCase();
+  const lang = lower.startsWith("pt") ? "pt" : lower.startsWith("es") ? "es" : "en";
+  const filesWord = { pt: "arquivos", es: "archivos", en: "files" }[lang];
+  const items = flags.map((flag) => `${flag} (${counts[flag] ?? "?"} ${filesWord})`).join(", ");
+  const secrets = flags.includes("env-file") || flags.includes("private-key");
+
+  const text = {
+    pt: {
+      name: "Tirar do Git o que não deveria ser versionado",
+      explanation:
+        `O repositório versiona ${items}. Remova com git rm --cached e adicione ao .gitignore: isso incha o repositório e esconde o código que importa.` +
+        (secrets ? " Como há credenciais versionadas, troque-as também, porque continuam no histórico." : ""),
+    },
+    es: {
+      name: "Sacar de Git lo que no debería versionarse",
+      explanation:
+        `El repositorio versiona ${items}. Elimínalos con git rm --cached y agrégalos al .gitignore: inflan el repositorio y ocultan el código que importa.` +
+        (secrets ? " Como hay credenciales versionadas, rótalas también, porque siguen en el historial." : ""),
+    },
+    en: {
+      name: "Stop versioning files that do not belong in Git",
+      explanation:
+        `The repository versions ${items}. Remove them with git rm --cached and add them to .gitignore: they bloat the repository and hide the code that matters.` +
+        (secrets ? " Since credentials were committed, rotate them too: they remain in the history." : ""),
+    },
+  }[lang];
+
+  return { ...text, factId };
+}
+
 export type AxisScore = {
   axis: "architecture" | "security" | "testing" | "devops" | "documentation";
   /** 0–100. */

@@ -11,7 +11,14 @@ import type { LlmPrivacyDecision } from "../../privacy.js";
 import { completeJson, LlmAnalysisUnavailableError } from "../analyze-project.js";
 import { BudgetedProvider, estimateRequestTokens, LlmBudget, LlmCallRecord } from "../budget.js";
 import type { LlmProvider, LlmUsage } from "../provider.js";
-import { AnalysisForFacts, AxisScore, buildMeasuredFacts, MeasuredFact, measuredScores } from "./facts.js";
+import {
+  AnalysisForFacts,
+  AxisScore,
+  buildMeasuredFacts,
+  hygieneSuggestion,
+  MeasuredFact,
+  measuredScores,
+} from "./facts.js";
 import { applyCheckVerdicts, planClaimCheck } from "./check.js";
 import { buildMapMessages, buildReduceMessages } from "./prompts.js";
 import { parseCheckOutput, parseMapOutput, parseReduceOutput, ReduceItem, ReduceOutput } from "./schemas.js";
@@ -294,6 +301,14 @@ export async function runTwoStageAnalysis(input: TwoStageInput): Promise<TwoStag
   };
 }
 
+/** Removes reference ids the model copied into prose: "routes (c10)", "(f7, f8)". */
+export function stripRefIds(text: string) {
+  return text
+    .replace(/\s*\((?:\s*[cf]\d+\s*[,;]?)+\)/gi, "")
+    .replace(/\s+([.,;:])/g, "$1")
+    .trim();
+}
+
 /** Keeps only reduce items backed by known ids, and turns refs into evidence. */
 export function assembleOverview(input: {
   reduce: ReduceOutput;
@@ -335,9 +350,30 @@ export function assembleOverview(input: {
 
   const supported = (items: ReduceItem[]) =>
     items
-      .map((item) => ({ name: item.name, explanation: item.explanation, evidence: toEvidence(item.refs) }))
+      .map((item) => ({
+        name: stripRefIds(item.name),
+        explanation: stripRefIds(item.explanation),
+        evidence: toEvidence(item.refs),
+      }))
       .filter((item) => item.evidence.length > 0)
       .slice(0, MAX_ITEMS);
+
+  const suggestions = supported(input.reduce.suggestions);
+  const hygieneFact = input.facts.find((f) => f.topic === "hygiene");
+  if (hygieneFact) {
+    const raised = suggestions.some((s) =>
+      s.evidence.some((e) => e.type === "fact" && e.factId === hygieneFact.id)
+    );
+    const fixed = hygieneSuggestion(input.analysis.repoMap, input.locale, hygieneFact.id);
+    if (!raised && fixed) {
+      suggestions.unshift({
+        name: fixed.name,
+        explanation: fixed.explanation,
+        evidence: toEvidence([hygieneFact.id]),
+      });
+      suggestions.splice(MAX_ITEMS);
+    }
+  }
 
   const llmScores: ScoreWithEvidence[] = [];
   for (const axis of ["architecture", "security"] as const) {
@@ -364,13 +400,16 @@ export function assembleOverview(input: {
       domain: classification.domain,
       purpose: classification.purpose,
     },
-    summary: { title: input.reduce.summary.title, paragraphs: input.reduce.summary.paragraphs },
+    summary: {
+      title: stripRefIds(input.reduce.summary.title),
+      paragraphs: input.reduce.summary.paragraphs.map(stripRefIds),
+    },
     architecture: {
-      explanation: input.reduce.architecture.explanation,
+      explanation: stripRefIds(input.reduce.architecture.explanation),
       evidence: toEvidence(input.reduce.architecture.refs),
     },
     strengths: supported(input.reduce.strengths),
-    suggestions: supported(input.reduce.suggestions),
+    suggestions,
     scores,
     privacy_mode: input.privacyMode,
   };
