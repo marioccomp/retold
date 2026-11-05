@@ -39,7 +39,9 @@ export default defineConfig({
   expect: {
     timeout: isCI ? 20_000 : 10_000,
   },
-  reporter: "list",
+  // In CI the "github" reporter turns each failure into a PR annotation,
+  // readable without downloading the job log.
+  reporter: isCI ? [["github"], ["list"]] : "list",
   outputDir: "./test-results/e2e",
   use: {
     ...devices["Desktop Chrome"],
