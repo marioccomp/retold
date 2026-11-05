@@ -41,9 +41,12 @@ env:
   MINIO_BUCKET: "retold-ci"
   MINIO_PUBLIC_URL: "http://localhost:9000"
 
+# Runners are pinned to ubuntu-24.04: ubuntu-latest moved to Ubuntu 26 in
+# October 2026 and Playwright 1.59 has no browser build/deps list for it, so
+# `playwright install --with-deps` fails there. Bump together with Playwright.
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -58,7 +61,7 @@ jobs:
       - run: pnpm --filter @repo/database exec prisma validate
 
   typecheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -70,7 +73,7 @@ jobs:
       - run: pnpm typecheck
 
   unit-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -82,7 +85,7 @@ jobs:
       - run: pnpm test:web:unit
 
   integration-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: pgvector/pgvector:0.8.1-pg18
@@ -119,7 +122,7 @@ jobs:
       - run: pnpm test:web:integration
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # `next build` (like `next start`) always forces NODE_ENV=production
     # internally, which trips the same Redis password guard described below
     # on the e2e job. No job actually needs to *connect* to Redis during a
@@ -139,7 +142,7 @@ jobs:
       - run: pnpm build
 
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # `next start` (used by playwright.config.ts's webServer in CI) always
     # forces NODE_ENV=production, and packages/queue/redis.ts intentionally
     # refuses to connect to Redis without a password when NODE_ENV is
