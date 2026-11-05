@@ -26,6 +26,8 @@ export interface ProjectCardDTO {
   ownerUsername: string;
   ownerId: number;
   isFollowingOwner?: boolean;
+  /** True when the profile user is a collaborator (not the owner) of this project. */
+  isCollaboration?: boolean;
 
   repositoryUrl?: string;
   repositoryFullName?: string;

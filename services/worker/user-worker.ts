@@ -1,13 +1,13 @@
 import { Worker } from "bullmq";
 import { redisConnection } from "@repo/queue";
-import {
-  prisma,
-  githubRepository,
-  matchesUserCommitAuthor,
-  resolveUserCommitIdentity,
-} from "@repo/database";
+import { prisma, githubRepository, resolveUserCommitIdentity } from "@repo/database";
 import { execFileSync } from "child_process";
 import { cloneRepository } from "./clone";
+import {
+  buildContributionLogArgs,
+  ContributionMember,
+  parseTeamContributionLog,
+} from "./contribution-stats.js";
 import { createLogger } from "@repo/observability";
 import {
   USER_ANALYSIS_TMP_ROOT,
@@ -21,6 +21,58 @@ const logger = createLogger("worker.user-analysis");
 
 logger.info("worker.started");
 
+/** Fields needed to resolve a member's commit identity. */
+const memberIdentitySelect = {
+  id: true,
+  email: true,
+  githubEmail: true,
+  username: true,
+  name: true,
+  githubUrl: true,
+  accounts: {
+    where: { provider: "github" },
+    select: { providerAccountId: true },
+  },
+  githubInstallations: {
+    select: { accountLogin: true, accountType: true },
+    take: 1,
+  },
+} as const;
+
+type MemberIdentitySource = {
+  id: number;
+  email: string;
+  githubEmail: string | null;
+  username: string | null;
+  name: string | null;
+  githubUrl: string | null;
+  accounts: { providerAccountId: string }[];
+  githubInstallations: { accountLogin: string; accountType: string }[];
+};
+
+function toContributionMember(user: MemberIdentitySource): ContributionMember<number> {
+  const personalGithubInstallation = user.githubInstallations[0];
+  const identity = resolveUserCommitIdentity({
+    email: user.email,
+    githubEmail: user.githubEmail,
+    username: user.username,
+    name: user.name,
+    githubUrl: user.githubUrl,
+    githubLogin:
+      personalGithubInstallation?.accountType === "User"
+        ? personalGithubInstallation.accountLogin
+        : null,
+    githubAccountId: user.accounts[0]?.providerAccountId ?? null,
+  });
+
+  return { id: user.id, emails: identity.candidateEmails, names: identity.candidateNames };
+}
+
+/**
+ * Recomputes contribution stats for every member of a project (owner + accepted
+ * collaborators) from the repository history. Idempotent: safe to run again at
+ * any time (after a push, a new member, a re-analysis...).
+ */
 export const userWorker = new Worker(
   "user-analyze",
   async (job) => {
@@ -34,17 +86,10 @@ export const userWorker = new Worker(
         where: { id: projectId },
         include: {
           repository: true,
-          user: {
-            include: {
-              accounts: {
-                where: { provider: "github" },
-                select: { providerAccountId: true },
-              },
-              githubInstallations: {
-                select: { accountLogin: true, accountType: true },
-                take: 1,
-              },
-            },
+          user: { select: memberIdentitySelect },
+          collaborators: {
+            where: { status: "ACCEPTED" },
+            select: { user: { select: memberIdentitySelect } },
           },
         },
       });
@@ -67,6 +112,7 @@ export const userWorker = new Worker(
       }
       const repositoryOrigin = validateGitHubRepositoryUrl(repoUrl);
 
+      // The owner's installation token is used for the clone, for every member.
       let token = "";
       try {
         token = await githubRepository.getToken(projectId);
@@ -78,137 +124,51 @@ export const userWorker = new Worker(
         }
       }
 
-      await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token);
+      await cloneRepository(repositoryOrigin.normalizedUrl, tmpPath, token, "history");
 
-      const personalGithubInstallation = project.user.githubInstallations[0];
-      const githubAccount = project.user.accounts[0];
-      const commitIdentity = resolveUserCommitIdentity({
-        email: project.user.email,
-        githubEmail: project.user.githubEmail,
-        username: project.user.username,
-        name: project.user.name,
-        githubUrl: project.user.githubUrl,
-        githubLogin:
-          personalGithubInstallation?.accountType === "User"
-            ? personalGithubInstallation.accountLogin
-            : null,
-        githubAccountId: githubAccount?.providerAccountId ?? null,
-      });
-
-      const logOutput = execFileSync(
-        "git",
-        ["-C", tmpPath, "log", "--format=%aE%x1f%aN%x1f%cd"],
-        {
-          encoding: "utf8",
-        }
+      const members = [project.user, ...project.collaborators.map((c) => c.user)].map(
+        toContributionMember
       );
-      const commits = logOutput.split("\n").filter(Boolean);
 
-      let userCommitsCount = 0;
-      let firstCommit: string | null = null;
-      let lastCommit: string | null = null;
-      const daysActive = new Set<string>();
-
-      for (const line of commits) {
-        const [email, authorName, dateStr] = line.split("\x1f");
-        if (
-          matchesUserCommitAuthor(
-            {
-              email,
-              name: authorName,
-            },
-            commitIdentity
-          )
-        ) {
-          userCommitsCount++;
-          const dateObj = new Date(dateStr);
-
-          if (!lastCommit) lastCommit = dateStr;
-          firstCommit = dateStr;
-
-          const dayKey = dateObj.toISOString().split("T")[0];
-          daysActive.add(dayKey);
-        }
-      }
-
-      let linesAdded = 0;
-      let linesDeleted = 0;
-
-      try {
-        const numstatOutput = execFileSync(
-          "git",
-          ["-C", tmpPath, "log", "--all", "--numstat", "--pretty=%aE%x1f%aN"],
-          {
-            encoding: "utf8",
-          }
-        );
-        const numstatLines = numstatOutput.split("\n");
-
-        let isUserCommit = false;
-
-        for (const line of numstatLines) {
-          if (!line.trim()) continue;
-
-          if (line.includes("\x1f")) {
-            const [email, authorName] = line.split("\x1f");
-            isUserCommit = matchesUserCommitAuthor(
-              {
-                email,
-                name: authorName,
-              },
-              commitIdentity
-            );
-          } else if (isUserCommit) {
-            const parts = line.split("\t");
-            if (parts.length >= 2) {
-              const add = parseInt(parts[0]);
-              const del = parseInt(parts[1]);
-              if (!isNaN(add)) linesAdded += add;
-              if (!isNaN(del)) linesDeleted += del;
-            }
-          }
-        }
-      } catch (error) {
-        logger.warn("worker.numstat_calculation_failed", { projectId }, error);
-      }
-
-      logger.info("worker.stats_calculated", {
-        projectId: project.id,
-        userId: project.userId,
-        commitsCount: userCommitsCount,
-        linesAdded,
-        linesDeleted,
-        activeDays: daysActive.size,
+      // One log invocation for commits AND lines (same scope, no merges), on the
+      // full default-branch history (the clone is not shallow). Each commit is
+      // credited to at most one member.
+      const logOutput = execFileSync("git", buildContributionLogArgs(tmpPath), {
+        encoding: "utf8",
+        maxBuffer: 256 * 1024 * 1024,
       });
+      const statsByMember = parseTeamContributionLog(logOutput, members);
 
-      await prisma.userProjectStats.upsert({
-        where: {
-          userId_projectId: {
-            userId: project.userId,
-            projectId,
-          },
-        },
-        create: {
-          userId: project.userId,
+      for (const [userId, stats] of statsByMember) {
+        const { commitsCount, linesAdded, linesDeleted, activeDates } = stats;
+
+        logger.info("worker.stats_calculated", {
           projectId,
-          commitsCount: userCommitsCount,
+          userId,
+          isOwner: userId === project.userId,
+          commitsCount,
           linesAdded,
           linesDeleted,
-          activeDays: daysActive.size,
-          firstCommitDate: firstCommit ? new Date(firstCommit) : null,
-          lastCommitDate: lastCommit ? new Date(lastCommit) : null,
-          impactScore: (linesAdded - linesDeleted) * 0.01 + userCommitsCount,
-        },
-        update: {
-          commitsCount: userCommitsCount,
+          activeDays: activeDates.length,
+        });
+
+        const statsData = {
+          commitsCount,
           linesAdded,
           linesDeleted,
-          activeDays: daysActive.size,
-          firstCommitDate: firstCommit ? new Date(firstCommit) : null,
-          lastCommitDate: lastCommit ? new Date(lastCommit) : null,
-          impactScore: (linesAdded - linesDeleted) * 0.01 + userCommitsCount,
-        },
-      });
+          activeDays: activeDates.length,
+          activeDates,
+          firstCommitDate: stats.firstCommitDate,
+          lastCommitDate: stats.lastCommitDate,
+          impactScore: (linesAdded - linesDeleted) * 0.01 + commitsCount,
+        };
+
+        await prisma.userProjectStats.upsert({
+          where: { userId_projectId: { userId, projectId } },
+          create: { userId, projectId, ...statsData },
+          update: statsData,
+        });
+      }
     } catch (err) {
       logger.error("worker.job_failed", err, { projectId });
     } finally {

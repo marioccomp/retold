@@ -35,6 +35,28 @@ function normalizeLastCommit(value: unknown): LastCommitDTO {
   return null;
 }
 
+/**
+ * Distinct active days across all projects: the same day in two projects counts once.
+ * Rows computed before `activeDates` existed only carry the count, so they are added
+ * as-is until the next user analysis refreshes them.
+ */
+export function countDistinctActiveDays(
+  stats: Array<{ activeDates: string[]; activeDays: number }>
+) {
+  const days = new Set<string>();
+  let legacyDays = 0;
+
+  for (const entry of stats) {
+    if (entry.activeDates.length > 0) {
+      entry.activeDates.forEach((day) => days.add(day));
+    } else {
+      legacyDays += entry.activeDays;
+    }
+  }
+
+  return days.size + legacyDays;
+}
+
 export function mapUserToPublicProfile(
   user: UserWithProfileData,
   currentUserId?: number,
@@ -91,11 +113,25 @@ export function mapUserToPublicProfile(
         name: tag.name,
       })),
 
-      ownerName: user.name ?? user.username ?? "",
-      ownerUsername: user.username ?? "",
-      ownerImage: user.image,
-      ownerId: user.id,
-      isFollowingOwner: isFollowing,
+      // On collaborations the owner is another user (project.user); on owned
+      // projects it is the profile user.
+      ...(project.user && project.user.id !== user.id
+        ? {
+            ownerName: project.user.name ?? project.user.username ?? "",
+            ownerUsername: project.user.username ?? "",
+            ownerImage: project.user.image,
+            ownerId: project.user.id,
+            isFollowingOwner: undefined,
+            isCollaboration: true,
+          }
+        : {
+            ownerName: user.name ?? user.username ?? "",
+            ownerUsername: user.username ?? "",
+            ownerImage: user.image,
+            ownerId: user.id,
+            isFollowingOwner: isFollowing,
+            isCollaboration: false,
+          }),
 
       repositoryUrl: project.repository?.url,
       repositoryFullName: project.repository?.fullName,
@@ -143,7 +179,7 @@ export function mapUserToPublicProfile(
       commits: user.userStats.reduce((acc, curr) => acc + curr.commitsCount, 0),
       linesAdded: user.userStats.reduce((acc, curr) => acc + curr.linesAdded, 0),
       linesDeleted: user.userStats.reduce((acc, curr) => acc + curr.linesDeleted, 0),
-      activeDays: user.userStats.reduce((acc, curr) => acc + curr.activeDays, 0),
+      activeDays: countDistinctActiveDays(user.userStats),
       projectsCount: user._count.projects, // Use the total count from DB
       lastCommitFetchedAt: user.githubStats?.lastCommitFetchedAt || null,
       lastCommit: normalizeLastCommit(user.githubStats?.lastCommit),

@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProjectForOverlay } from "./types";
 import { useProjectAnalysis } from "./hooks/useProjectAnalysis";
 import { ProjectSettings } from "./components/ProjectSettings";
+import { ProjectTeamSection } from "./components/ProjectTeamSection";
 import { useTranslation } from "@/src/i18n/client";
 import { incrementView } from "@/src/domains/project/actions/increment-view.action";
 import { CommentSection } from "./CommentSection";
@@ -366,6 +367,9 @@ export function FeedProjectPanel({ project, onClose, isModal }: FeedProjectPanel
               />
             </div>
           )}
+
+          {/* Team: members and each member's own contribution */}
+          <ProjectTeamSection projectId={project.id} visibility={project.visibility} />
 
           {/* Main State Views */}
           {status === "PENDING" &&

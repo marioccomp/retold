@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslation } from "@/src/i18n/client";
 import { getNotificationsAction, markAsReadAction, markAllAsReadAction, clearAllNotificationsAction, deleteNotificationAction } from "@/src/domains/notification/actions";
+import { respondToInvitationAction } from "@/src/domains/project/actions/collaborators.actions";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
@@ -21,7 +23,7 @@ import { ptBR, enUS } from "date-fns/locale";
 
 type Notification = {
   id: number;
-  type: "FOLLOW" | "LIKE" | "COMMENT";
+  type: "FOLLOW" | "LIKE" | "COMMENT" | "PROJECT_INVITE" | "PROJECT_INVITE_ACCEPTED";
   read: boolean;
   createdAt: Date;
   projectId: number | null;
@@ -112,6 +114,24 @@ export function NotificationBell() {
     },
   });
 
+  // Accept / decline a project invitation straight from the dropdown
+  const { mutate: respondToInvite, isPending: isRespondingToInvite } = useMutation({
+    mutationFn: (input: { projectId: number; accept: boolean }) =>
+      respondToInvitationAction(input.projectId, input.accept),
+    onSuccess: (result, input) => {
+      const team = dict.project.team;
+      if (!result.success) {
+        toast.error((team.errors as Record<string, string>)[result.message] ?? team.errors.default);
+      } else {
+        toast.success(result.data?.accepted ? team.invite_accepted : team.invite_declined);
+      }
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["project-team", input.projectId] });
+      queryClient.invalidateQueries({ queryKey: ["profile"], refetchType: "all" });
+    },
+    onError: () => toast.error(dict.project.team.errors.default),
+  });
+
   const handleNotificationClick = (notification: Notification, linkHref: string) => {
     if (!notification.read) {
       markAsRead(notification.id);
@@ -194,7 +214,20 @@ export function NotificationBell() {
               } else if (type === "COMMENT") {
                 text = dict.notifications?.comment?.replace("{{user}}", sourceUser.name || "")?.replace("{{project}}", project?.title || "") || `${sourceUser.name} commented on your project ${project?.title}`;
                 linkHref = `/?project=${project?.id}`;
+              } else if (type === "PROJECT_INVITE" || type === "PROJECT_INVITE_ACCEPTED") {
+                linkHref = `/?project=${project?.id}`;
               }
+
+              const typeLabel =
+                type === "FOLLOW"
+                  ? (dict.notifications?.types?.follow || "started following you")
+                  : type === "LIKE"
+                    ? (dict.notifications?.types?.like || "liked your project")
+                    : type === "PROJECT_INVITE"
+                      ? dict.notifications.types.project_invite
+                      : type === "PROJECT_INVITE_ACCEPTED"
+                        ? dict.notifications.types.project_invite_accepted
+                        : (dict.notifications?.types?.comment || "commented on your project");
 
               return (
                 <DropdownMenuItem
@@ -215,11 +248,7 @@ export function NotificationBell() {
                       <p className="text-sm text-foreground leading-tight break-words">
                         <span className="font-medium mr-1">{sourceUser.name}</span>
                         <span className="text-muted-foreground mr-1">
-                          {type === "FOLLOW" 
-                            ? (dict.notifications?.types?.follow || "started following you") 
-                            : type === "LIKE" 
-                              ? (dict.notifications?.types?.like || "liked your project") 
-                              : (dict.notifications?.types?.comment || "commented on your project")}
+                          {typeLabel}
                         </span>
                         {project && type !== "FOLLOW" && (
                           <span className="font-medium break-words">
@@ -227,6 +256,33 @@ export function NotificationBell() {
                           </span>
                         )}
                       </p>
+                      {type === "PROJECT_INVITE" && project && (
+                        <div className="flex gap-2 pt-1">
+                          <Button
+                            size="sm"
+                            className="h-7 px-3 text-xs cursor-pointer"
+                            disabled={isRespondingToInvite}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              respondToInvite({ projectId: project.id, accept: true });
+                            }}
+                          >
+                            {dict.notifications.accept}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-3 text-xs cursor-pointer"
+                            disabled={isRespondingToInvite}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              respondToInvite({ projectId: project.id, accept: false });
+                            }}
+                          >
+                            {dict.notifications.decline}
+                          </Button>
+                        </div>
+                      )}
                       <span className="text-[10px] text-muted-foreground">
                         {formatDistanceToNow(new Date(createdAt), {
                           addSuffix: true,

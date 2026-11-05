@@ -108,14 +108,33 @@ function createGitAuthEnvironment(token: string): GitAuthHelper {
   };
 }
 
-export async function cloneRepository(repoUrl: string, targetPath: string, token?: string) {
+export type CloneMode =
+  /** Working tree of the latest commit, for structure/code analysis. */
+  | "snapshot"
+  /** Full history of the default branch without a working tree, for git log stats. */
+  | "history";
+
+export async function cloneRepository(
+  repoUrl: string,
+  targetPath: string,
+  token?: string,
+  mode: CloneMode = "snapshot"
+) {
   if (fs.existsSync(targetPath)) {
     fs.rmSync(targetPath, { recursive: true, force: true });
   }
 
   const authHelper = token ? createGitAuthEnvironment(token) : null;
 
-  await runGitCommand(["clone", "--depth=50", repoUrl, targetPath], {
+  // "history" must not be shallow: a --depth clone silently truncates commit
+  // counts, line counts and active days to the last N commits.
+  const args =
+    mode === "history"
+      ? ["clone", "--bare", "--single-branch", "--no-tags", repoUrl, targetPath]
+      : ["clone", "--depth=50", "--single-branch", "--no-tags", repoUrl, targetPath];
+
+  await runGitCommand(args, {
     env: authHelper?.env,
+    timeoutMs: mode === "history" ? 120_000 : undefined,
   });
 }

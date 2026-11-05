@@ -15,11 +15,21 @@ export type ProjectAccessContext = {
   visibility: ProjectVisibility;
 };
 
+/**
+ * Public projects are visible to everyone. Private projects are visible to the
+ * owner and to project members: accepted collaborators and invited users (an
+ * invitee needs to see the project to decide whether to accept).
+ */
 export function canAccessProject(
   project: Pick<ProjectAccessContext, "userId" | "visibility">,
-  currentUserId?: number | null
+  currentUserId?: number | null,
+  isMemberOrInvited = false
 ) {
-  return project.visibility !== "private" || project.userId === currentUserId;
+  return (
+    project.visibility !== "private" ||
+    (currentUserId != null && project.userId === currentUserId) ||
+    (currentUserId != null && isMemberOrInvited)
+  );
 }
 
 export async function requireProjectAccess(
@@ -32,6 +42,14 @@ export async function requireProjectAccess(
       id: true,
       userId: true,
       visibility: true,
+      ...(currentUserId
+        ? {
+            collaborators: {
+              where: { userId: currentUserId },
+              select: { status: true },
+            },
+          }
+        : {}),
     },
   });
 
@@ -39,9 +57,11 @@ export async function requireProjectAccess(
     throw new ProjectAccessError("PROJECT_NOT_FOUND");
   }
 
-  if (!canAccessProject(project, currentUserId)) {
+  const membership = (project as { collaborators?: { status: string }[] }).collaborators ?? [];
+
+  if (!canAccessProject(project, currentUserId, membership.length > 0)) {
     throw new ProjectAccessError("PROJECT_NOT_ACCESSIBLE");
   }
 
-  return project;
+  return { id: project.id, userId: project.userId, visibility: project.visibility };
 }

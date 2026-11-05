@@ -12,8 +12,14 @@
     "types": {
       "follow": "começou a seguir você",
       "like": "curtiu seu projeto",
-      "comment": "comentou no seu projeto"
-    }
+      "comment": "comentou no seu projeto",
+      "project_invite": "convidou você para colaborar em",
+      "project_invite_accepted": "aceitou o convite para"
+    },
+    "project_invite": "{{user}} convidou você para o projeto {{project}}",
+    "project_invite_accepted": "{{user}} entrou no seu projeto {{project}}",
+    "accept": "Aceitar",
+    "decline": "Recusar"
   },
   "settings": {
     "title": "Configurações",
@@ -344,6 +350,48 @@
       "success_delete": "Comentário excluído!",
       "error_create": "Falha ao publicar comentário",
       "error_delete": "Falha ao excluir comentário"
+    },
+    "team": {
+      "title": "Equipe",
+      "owner_label": "Dono",
+      "collaborator_label": "Colaborador(a)",
+      "collaboration_badge": "Colaboração",
+      "commits": "{count} commits",
+      "lines": "+{added} / −{deleted} linhas",
+      "active_days": "{count} dias ativos",
+      "no_stats": "Contribuições ainda não calculadas",
+      "stats_private": "As contribuições só são calculadas para projetos públicos.",
+      "invite_title": "Convidar colaborador",
+      "invite_placeholder": "@username",
+      "invite_button": "Convidar",
+      "invite_help": "A pessoa recebe uma notificação e entra no projeto ao aceitar. Os commits dela neste repositório passam a contar no perfil dela.",
+      "pending_title": "Convites pendentes",
+      "cancel_invite": "Cancelar",
+      "remove_member": "Remover",
+      "remove_confirm": "Remover {name} do projeto? As contribuições dessa pessoa neste projeto saem do perfil dela.",
+      "leave_project": "Sair do projeto",
+      "leave_confirm": "Sair deste projeto? Suas contribuições nele saem do seu perfil.",
+      "invited_banner": "{name} convidou você para colaborar neste projeto.",
+      "accept": "Aceitar",
+      "decline": "Recusar",
+      "invite_sent": "Convite enviado para @{username}",
+      "invite_accepted": "Você agora faz parte do projeto",
+      "invite_declined": "Convite recusado",
+      "member_removed": "Membro removido",
+      "left_project": "Você saiu do projeto",
+      "limit": "{count}/{max} colaboradores",
+      "errors": {
+        "USER_NOT_FOUND": "Usuário não encontrado",
+        "CANNOT_INVITE_SELF": "Você já é o dono do projeto",
+        "ALREADY_MEMBER": "Essa pessoa já faz parte do projeto",
+        "ALREADY_INVITED": "Essa pessoa já foi convidada",
+        "TOO_MANY_COLLABORATORS": "Limite de colaboradores atingido",
+        "INVITATION_NOT_FOUND": "Convite não encontrado ou já respondido",
+        "NOT_PROJECT_OWNER": "Só o dono do projeto pode fazer isso",
+        "NOT_A_MEMBER": "Essa pessoa não faz parte do projeto",
+        "PROJECT_NOT_FOUND": "Projeto não encontrado",
+        "default": "Algo deu errado. Tente de novo."
+      }
     }
   },
   "feed": {
