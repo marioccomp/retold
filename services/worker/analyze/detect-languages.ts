@@ -1,6 +1,6 @@
 import { FileEntry } from "./scan-repository.js";
 
-const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
+export const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
   ".html": "HTML",
   ".htm": "HTML",
   ".css": "CSS",
@@ -29,6 +29,9 @@ const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
   ".sh": "Shell",
   ".kt": "Kotlin",
   ".swift": "Swift",
+  ".gd": "GDScript",
+  // Jupyter notebooks are overwhelmingly Python (GitHub reports them as "Jupyter Notebook").
+  ".ipynb": "Python",
 };
 
 export function detectLanguages(files: FileEntry[]) {

@@ -10,6 +10,9 @@ export function detectStack(files: FileEntry[], languages: string[]) {
   };
 
   const hasFile = (name: string) => files.some((f) => f.name === name);
+
+  // Game engines are identified by their project file, not by dependencies.
+  if (hasFile("project.godot")) stack.frameworks.push("Godot");
   const hasPath = (fragment: string) => files.some((f) => f.path.includes(fragment));
 
   const byDepth = (a: FileEntry, b: FileEntry) =>

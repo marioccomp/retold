@@ -324,6 +324,9 @@ model RepositoryAnalysis {
   signals     Json?
   rawAnalysis Json?
   llmOverview String? @db.Text
+  // Mapa determinístico do repositório (módulos, arquivos centrais, higiene, maturidade medida).
+  // Ver services/worker/analyze/repo-map. Fase 1 do docs/analysis-roadmap.md.
+  repoMap     Json?
 
   createdAt DateTime @default(now())
 }
