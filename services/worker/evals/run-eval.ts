@@ -4,6 +4,7 @@
  *   pnpm eval                  heuristics only (free, no LLM calls)
  *   pnpm eval --llm            full pipeline, including the configured LLM
  *   pnpm eval --case flask     run a single case (repeatable)
+ *   pnpm eval --llm --repeat 3 run each case N times (LLM answers vary between runs)
  *
  * Each case pins a repository to a commit SHA, so results are reproducible.
  * Reports are written to services/worker/evals/results/ (git-ignored).
@@ -61,6 +62,22 @@ type CaseResult = {
   error?: string;
   /** Raw LLM answer (JSON report only), to understand failed text checks. */
   llmOutput?: unknown;
+  /** 1-based run number when --repeat is used. */
+  run?: number;
+  /** Two-stage analysis statistics (LLM mode). */
+  pipeline?: PipelineStats;
+};
+
+type PipelineStats = {
+  units: number;
+  mapFailures: number;
+  claimsVerified: number;
+  claimsReanchored: number;
+  claimsRejected: number;
+  claimsRefuted: number;
+  uncheckedRisks: number;
+  strengthsWithCode: number;
+  llmCalls: number;
 };
 
 const evalsDir = path.dirname(fileURLToPath(import.meta.url));
@@ -71,17 +88,19 @@ function parseArgs(argv: string[]) {
   const caseIds: string[] = [];
   let llm = false;
   let locale = "en";
+  let repeat = 1;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--llm") llm = true;
     else if (arg === "--case") caseIds.push(argv[++i]);
     else if (arg === "--locale") locale = argv[++i];
+    else if (arg === "--repeat") repeat = Math.max(1, Number.parseInt(argv[++i], 10) || 1);
     else if (arg === "--") continue;
     else throw new Error(`Unknown argument "${arg}"`);
   }
 
-  return { caseIds, llm, locale };
+  return { caseIds, llm, locale, repeat };
 }
 
 /** Same history depth as the production analysis clone (churn, history signals). */
@@ -202,6 +221,32 @@ function heuristicChecks(
   return checks;
 }
 
+/** Structural checks of the two-stage output, the same for every case. */
+function evidenceChecks(stats: PipelineStats | undefined) {
+  if (!stats) return [];
+  return [
+    check("evidence:claimsVerified>=3", stats.claimsVerified >= 3, ">= 3", stats.claimsVerified),
+    check("evidence:strengthsWithCode>=1", stats.strengthsWithCode >= 1, ">= 1", stats.strengthsWithCode),
+  ];
+}
+
+function pipelineStats(result: Awaited<ReturnType<typeof runAnalysisPipeline>>): PipelineStats | undefined {
+  const twoStage = result.twoStage;
+  if (!twoStage) return undefined;
+  const strengths = (twoStage.overview.strengths ?? []) as { evidence: { type: string }[] }[];
+  return {
+    units: twoStage.units.length,
+    mapFailures: twoStage.mapFailures.length,
+    claimsVerified: twoStage.claims.length,
+    claimsReanchored: twoStage.claims.filter((c) => c.status === "reanchored").length,
+    claimsRejected: Object.values(twoStage.rejectedClaims).reduce((sum, n) => sum + (n ?? 0), 0),
+    claimsRefuted: twoStage.claimCheck.refuted,
+    uncheckedRisks: twoStage.claimCheck.uncheckedRisks,
+    strengthsWithCode: strengths.filter((s) => s.evidence.some((e) => e.type === "code")).length,
+    llmCalls: twoStage.calls.length,
+  };
+}
+
 function llmChecks(expect: EvalExpectations, llmInsights: unknown) {
   const checks: CheckResult[] = [];
   const text = JSON.stringify(llmInsights ?? {});
@@ -267,16 +312,19 @@ async function runCase(
     provider: tracked,
   });
 
+  const stats = pipelineStats(result);
   return {
     id: evalCase.id,
     repo: evalCase.repo,
     checks: [
       ...heuristicChecks(evalCase.expect, result.analysis),
       ...llmChecks(evalCase.expect, result.llmInsights),
+      ...evidenceChecks(stats),
     ],
     durationMs: Date.now() - startedAt,
     usage,
     llmOutput: result.llmInsights,
+    pipeline: stats,
   };
 }
 
@@ -333,11 +381,47 @@ function buildMarkdownReport(
     }
   }
 
+  const withStats = results.filter((r) => r.pipeline);
+  if (withStats.length > 0) {
+    lines.push(
+      "",
+      "## Pipeline",
+      "",
+      "| Case | Run | Units | Claims verified (reanchored) | Rejected | Refuted | Unchecked risks | Strengths with code | Calls | Tokens in/out | Time |",
+      "|---|---|---|---|---|---|---|---|---|---|---|"
+    );
+    for (const r of withStats) {
+      const p = r.pipeline!;
+      const units = `${p.units}${p.mapFailures ? ` (${p.mapFailures} failed)` : ""}`;
+      lines.push(
+        `| ${r.id} | ${r.run ?? 1} | ${units} | ${p.claimsVerified} (${p.claimsReanchored}) | ${p.claimsRejected} | ${p.claimsRefuted} | ${p.uncheckedRisks} | ${p.strengthsWithCode} | ${p.llmCalls} | ${r.usage?.inputTokens ?? 0}/${r.usage?.outputTokens ?? 0} | ${Math.round(r.durationMs / 1000)}s |`
+      );
+    }
+  }
+
+  const runs = new Set(results.map((r) => r.run ?? 1)).size;
+  if (runs > 1) {
+    const rates = new Map<string, { pass: number; total: number }>();
+    for (const r of results) {
+      for (const c of r.checks) {
+        const key = `${r.id} | ${c.name.replace(/\|/g, "\\|")}`;
+        const entry = rates.get(key) ?? { pass: 0, total: 0 };
+        entry.total++;
+        if (c.pass) entry.pass++;
+        rates.set(key, entry);
+      }
+    }
+    lines.push("", `## Pass rate over ${runs} runs (unstable checks only)`, "", "| Case | Check | Passed |", "|---|---|---|");
+    for (const [key, rate] of rates) {
+      if (rate.pass !== rate.total) lines.push(`| ${key} | ${rate.pass}/${rate.total} |`);
+    }
+  }
+
   return lines.join("\n") + "\n";
 }
 
 async function main() {
-  const { caseIds, llm, locale } = parseArgs(process.argv.slice(2));
+  const { caseIds, llm, locale, repeat } = parseArgs(process.argv.slice(2));
   const allCases: EvalCase[] = JSON.parse(
     fs.readFileSync(path.join(evalsDir, "cases.json"), "utf8")
   );
@@ -350,10 +434,13 @@ async function main() {
   const startedAt = new Date();
   const results: CaseResult[] = [];
 
-  for (const evalCase of cases) {
-    process.stdout.write(`• ${evalCase.id} … `);
+  const runs = llm ? repeat : 1;
+  const plan = Array.from({ length: runs }, (_, i) => cases.map((evalCase) => ({ evalCase, run: i + 1 }))).flat();
+
+  for (const { evalCase, run } of plan) {
+    process.stdout.write(`• ${evalCase.id}${runs > 1 ? ` (run ${run})` : ""} … `);
     try {
-      const result = await runCaseWaitingOnRateLimits(evalCase, { llm, locale, provider });
+      const result = { ...(await runCaseWaitingOnRateLimits(evalCase, { llm, locale, provider })), run };
       results.push(result);
       const failed = result.checks.filter((c) => !c.pass);
       console.log(
@@ -363,7 +450,7 @@ async function main() {
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      results.push({ id: evalCase.id, repo: evalCase.repo, checks: [], durationMs: 0, usage: null, error: message });
+      results.push({ id: evalCase.id, repo: evalCase.repo, checks: [], durationMs: 0, usage: null, error: message, run });
       console.log(`ERROR ${message}`);
     }
   }

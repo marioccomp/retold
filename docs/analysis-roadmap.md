@@ -166,13 +166,38 @@ usados para escrever as regras.
 
 ## Fase 2: Análise em duas etapas com evidência verificada (3 semanas)
 
-- [ ] **Map:** por módulo, enviar os arquivos mais centrais (orçamento < 100K tokens por chamada). A saída é JSON com
-      responsabilidades, padrões, implementações notáveis e riscos, cada item com `{file, startLine, endLine}`.
-- [ ] **Validador:** confere se o arquivo e as linhas existem e se o trecho tem relação com a afirmação; descarta o resto.
-- [ ] **Reduce:** síntese do projeto com resumo, arquitetura, pontos fortes e fracos, e notas por eixo com justificativa e evidências.
-- [ ] Saída estruturada validada com zod. Prompts curtos.
-- [ ] Novos modelos: `AnalysisRun` (versão do pipeline, modelo, tokens, custo, status), `AnalysisClaim`, `ProjectScore`.
-- [ ] Manter os modos de privacidade de `privacy.ts`.
+> **Ajuste de orçamento (2026-11-05):** o plano original previa chamadas de até 100K tokens (modelo pago). O
+> desenvolvimento roda no free tier do Groq (`gpt-oss-120b`: 8K tokens/min, contando o `max_completion_tokens`, e
+> o raciocínio do modelo conta como saída). Por isso o orçamento por chamada é **configurável por env** e o padrão
+> cabe no free tier: entrada ~4,5K + saída ~2K por chamada, no máximo 3 chamadas de map e 1 de reduce, com um
+> limitador de tokens/min que espera em vez de estourar. Com um modelo pago, basta subir os limites.
+
+- [x] **Orçamento de tokens:** estimativa de tokens, limitador por minuto (`LLM_TOKENS_PER_MINUTE`), espera curta
+      em rate limit dentro da própria análise (sem reagendar tudo), `reasoning_effort` baixo no `gpt-oss`.
+- [x] **Map:** unidades montadas a partir do repo map (módulos ordenados pela centralidade dos arquivos). Cada
+      chamada recebe os arquivos centrais da unidade **com número de linha**, sanitizados, dentro do orçamento. A saída
+      é JSON com afirmações (responsabilidade, padrão, implementação notável, risco), cada uma com
+      `{file, startLine, endLine, symbol}`.
+- [x] **Validador (determinístico):** o arquivo precisa ter sido enviado, as linhas precisam existir e o `symbol`
+      citado precisa aparecer no trecho. Se o símbolo estiver em outra parte do arquivo, a citação é reancorada;
+      se não aparecer no arquivo, a afirmação é descartada.
+- [x] **Checagem (adicionada durante a fase):** o validador prova *onde* a afirmação aponta, não que ela é
+      *verdadeira*. No eval, o map acusou "senha armazenada antes do hash" num código do flask que chama
+      `generate_password_hash`. Uma chamada curta em lote mostra só as linhas citadas e pergunta se elas comprovam
+      cada afirmação (riscos primeiro). Refutadas saem; riscos que não couberam na checagem também saem.
+- [x] **Reduce:** recebe fatos medidos (stack, classificação, repo map, maturidade) + afirmações verificadas, e
+      devolve resumo, arquitetura, pontos fortes e sugestões que **referenciam as afirmações por id**. Referência
+      inexistente é removida.
+- [x] **Notas por eixo:** Testes, DevOps e Documentação vêm da maturidade medida (sem LLM). Arquitetura e
+      Segurança vêm do reduce e só valem com pelo menos uma afirmação verificada.
+- [x] Saída estruturada validada com zod. Prompts curtos (as regras viram código).
+- [x] Novos modelos: `AnalysisRun` (versão do pipeline, modelo, commit, tokens, chamadas, status), `AnalysisClaim`,
+      `ProjectScore`.
+- [x] Manter os modos de privacidade de `privacy.ts`: projeto privado não envia código, então pula o map e o reduce
+      trabalha só com metadados.
+- [x] `llmOverview` continua compatível com a UI atual; pontos fortes e sugestões ganham links para o GitHub
+      (SHA + linhas).
+- [x] Eval: `--repeat N`, taxa de afirmações verificadas, tokens por análise.
 
 ## Fase 3: "O que essa pessoa fez" (3 semanas)
 
@@ -238,3 +263,5 @@ oficiais antes de decidir.
 | 2026-11-05 | 0 | Fase 0 encerrada. E2E do fluxo de equipe (dono convida, colega aceita pelo sino, projeto no perfil). Corrigido de quebra um bug antigo: o modal de projeto do perfil quebrava no SSR com link direto (`document is not defined`). |
 | 2026-11-05 | 0.7 | Corrigido o diagnóstico dos 413: não é o README (já cortado em ~1K tokens), é o prompt fixo (~3,5K tokens) + a árvore de pastas. O Groq também conta o `max_completion_tokens` no limite por minuto. |
 | 2026-11-05 | 1 | Fase 1 concluída: `services/worker/analyze/repo-map/` (grafo de imports + PageRank, churn, gerados, módulos, higiene, maturidade medida), persistido em `RepositoryAnalysis.repoMap`. Classificação com fatos (pacote publicável, notebooks, research só sem CI, frases de aprendizado/demo, backends no tipo de app), README `.rst`, GDScript/Godot. Eval de heurísticas: 61/76 → 107/110. 28 testes unitários novos. |
+| 2026-11-05 | CI | E2E da `main` quebrado desde agosto: `ubuntu-latest` virou Ubuntu 26 (sem build do Playwright 1.59) e faltava `AUTH_TRUST_HOST` no build de produção do CI. Runners fixados em `ubuntu-24.04`, variável adicionada (e no `.env.example`), falhas do Playwright viram anotações no PR. CI verde. |
+| 2026-11-05 | 2 | Fase 2 iniciada (branch `feat/analysis-phase-2`, sobre a Fase 1). Desenho ajustado ao free tier do Groq: orçamento por chamada configurável, até 3 maps + 1 reduce, limitador de tokens/min. |
