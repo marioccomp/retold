@@ -134,6 +134,7 @@ Defined in [`packages/database/prisma/schema.prisma`](packages/database/prisma/s
 - `Repository` / `GithubAppInstallation` — link between a `User` and their installed GitHub App / repositories.
 - `UserProjectStats` — per-user, per-project commit metrics (commits, lines added/deleted, active days, impact score).
 - `GithubStats` — per-user aggregate GitHub stats (stars, repos, PRs, last commit across projects).
+- `ProjectCollaborator` — team projects: invited/accepted members besides the owner, each with their own `UserProjectStats`.
 - `Follows`, `Like`, `Comment`, `Notification` — the social graph and activity layer.
 
 ## Documentation index
@@ -147,6 +148,8 @@ Defined in [`packages/database/prisma/schema.prisma`](packages/database/prisma/s
 | [docs/rate-limiting.md](docs/rate-limiting.md) | Rate limiting architecture (Upstash) |
 | [docs/github-webhooks.md](docs/github-webhooks.md) | GitHub webhook processing pipeline |
 | [docs/workers.md](docs/workers.md) | Background workers, security hardening, LLM data policy |
+| [docs/analysis-roadmap.md](docs/analysis-roadmap.md) | Living roadmap for the repository-analysis differentiator (phases, status, eval baseline) |
+| [docs/project-collaborators.md](docs/project-collaborators.md) | Team projects: invitations, per-member contribution stats, visibility rules |
 | [docs/hybrid-feed-algorithm.md](docs/hybrid-feed-algorithm.md) | Feed ranking formulas for projects and people |
 | [docs/highlighted-project.md](docs/highlighted-project.md) | Featured project selection logic |
 | [docs/logging-hardening.md](docs/logging-hardening.md) | Log redaction policy |
